@@ -10,12 +10,14 @@ import { PdsView } from "./views/pds.tsx";
 import { RepoView } from "./views/repo.tsx";
 import { CollectionView } from "./views/collection.tsx";
 import { RecordView } from "./views/record.tsx";
+import { FirehoseView } from "./views/firehose.tsx";
 
 render(
   () => (
     <Router root={Layout}>
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
+      <Route path="/firehose" component={FirehoseView} />
       <Route path="/:pds" component={PdsView} />
       <Route path="/:pds/:repo" component={RepoView} />
       <Route path="/:pds/:repo/:collection" component={CollectionView} />
