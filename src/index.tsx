@@ -13,11 +13,13 @@ import { BlobView } from "./views/blob.tsx";
 import { CollectionView } from "./views/collection.tsx";
 import { RecordView } from "./views/record.tsx";
 import { LabelView } from "./views/labels.tsx";
+import { FirehoseView } from "./views/firehose.tsx";
 
 render(
   () => (
     <Router root={Layout}>
       <Route path="/" component={Home} />
+      <Route path="/firehose" component={FirehoseView} />
       <Route path="/:pds" component={PdsView} />
       <Route path="/:pds/:repo" component={RepoView} />
       <Route path="/:pds/:repo/blobs" component={BlobView} />
