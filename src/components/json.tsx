@@ -19,10 +19,10 @@ const JSONString = ({ data }: { data: string }) => {
         <A class="underline" href={`/at/${data}`}>
           {data}
         </A>
-      : (
-        URL.canParse(data) &&
-        ["http:", "https:", "web+at:"].includes(new URL(data).protocol)
-      ) ?
+      : (()=>{
+        try {var url = new URL(data)} catch(e){}
+        return url && ["http:", "https:", "web+at:"].includes(url.protocol)
+      }) ?
         <a
           class="underline"
           href={data}
