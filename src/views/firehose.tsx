@@ -1,4 +1,4 @@
-import { createSignal, onCleanup, Show, type Component } from "solid-js";
+import { createSignal, For, onCleanup, Show, type Component } from "solid-js";
 import { JSONValue } from "../components/json";
 import { action } from "@solidjs/router";
 
@@ -8,12 +8,23 @@ const FirehoseView: Component = () => {
   let socket: WebSocket;
 
   const connect = action(async (formData: FormData) => {
-    let url = "wss://jetstream1.us-east.bsky.network/subscribe?";
-    const collection = formData.get("collection");
-    if (collection) url = url.concat(`wantedCollections=${collection}`);
-    const did = formData.get("did");
-    if (collection && did) url = url.concat("&");
-    if (did) url = url.concat(`wantedDids=${did}`);
+    let url =
+      formData.get("instance")?.toString() ??
+      "wss://jetstream1.us-east.bsky.network/subscribe";
+    url = url.concat("?");
+    const collections = formData.get("collections")?.toString().split(",");
+    collections?.forEach((collection) => {
+      if (collection.length)
+        url = url.concat(`wantedCollections=${collection}&`);
+    });
+    const dids = formData.get("dids")?.toString().split(",");
+    dids?.forEach((did) => {
+      if (did.length) url = url.concat(`wantedDids=${did}&`);
+    });
+    const cursor = formData.get("cursor")?.toString();
+    if (cursor?.length) url = url.concat(`cursor=${cursor}`);
+    if (url.endsWith("&")) url = url.slice(0, -1);
+    console.log(url);
     const socket = new WebSocket(url);
     socket.addEventListener("message", (event) => {
       const rec = JSON.parse(event.data);
@@ -29,36 +40,60 @@ const FirehoseView: Component = () => {
 
   return (
     <div class="mt-5 flex flex-col items-center gap-y-4">
-      <form
-        method="post"
-        action={connect}
-        class="flex flex-col gap-y-3 font-sans"
-      >
-        <div class="flex items-center gap-x-2">
-          <label for="collection" class="basis-1/2">
-            Collection
-          </label>
+      <form method="post" action={connect} class="flex flex-col gap-y-3">
+        <label class="flex items-center gap-x-2 text-right">
+          <span class="basis-1/2">Instance</span>
           <input
             type="text"
-            id="collection"
-            name="collection"
+            name="instance"
             spellcheck={false}
-            placeholder="app.bsky.feed.post"
+            size={25}
+            value="wss://jetstream1.us-east.bsky.network/subscribe"
             class="dark:bg-dark-100 rounded-lg border border-gray-400 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-gray-300"
           />
-        </div>
-        <div class="flex items-center gap-x-2">
-          <label for="did" class="basis-1/2 text-right">
-            DID
-          </label>
+        </label>
+        <label class="flex items-center gap-x-2 text-right">
+          <span class="basis-1/2">Collections</span>
           <input
             type="text"
-            id="did"
-            name="did"
+            name="collections"
             spellcheck={false}
-            placeholder="did:plc:oisofpd7lj26yvgiivf3lxsi"
+            size={25}
+            placeholder="Comma-separated list of collections"
             class="dark:bg-dark-100 rounded-lg border border-gray-400 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-gray-300"
           />
+        </label>
+        <label class="flex items-center gap-x-2 text-right">
+          <span class="basis-1/2">DIDs</span>
+          <input
+            type="text"
+            name="dids"
+            spellcheck={false}
+            size={25}
+            placeholder="Comma-separated list of DIDs"
+            class="dark:bg-dark-100 rounded-lg border border-gray-400 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-gray-300"
+          />
+        </label>
+        <label class="flex items-center gap-x-2 text-right">
+          <span class="basis-1/2">Cursor</span>
+          <input
+            type="text"
+            name="cursor"
+            spellcheck={false}
+            size={25}
+            placeholder="Leave empty for live-tail"
+            class="dark:bg-dark-100 rounded-lg border border-gray-400 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-gray-300"
+          />
+        </label>
+        <div class="flex items-center justify-end gap-x-1">
+          <input
+            type="checkbox"
+            id="allEvents"
+            onChange={(e) => setShowAllEvents(e.currentTarget.checked)}
+          />
+          <label for="allEvents" class="select-none">
+            Show account and identity events
+          </label>
         </div>
         <div class="flex justify-end">
           <button
@@ -69,32 +104,20 @@ const FirehoseView: Component = () => {
           </button>
         </div>
       </form>
-      <div class="flex items-center gap-x-1">
-        <input
-          type="checkbox"
-          id="allEvents"
-          onChange={(e) => setShowAllEvents(e.currentTarget.checked)}
-        />
-        <label for="allEvents" class="select-none">
-          Show account and identity events
-        </label>
-      </div>
-      {records()
-        .reverse()
-        .map((rec) => {
-          return (
-            <Show
-              when={
-                showAllEvents() ||
-                (rec.kind !== "account" && rec.kind !== "identity")
-              }
-            >
-              <div class="w-[40rem]">
-                <JSONValue data={rec} repo={rec.did} />
-              </div>
-            </Show>
-          );
-        })}
+      <For each={records().reverse()}>
+        {(rec) => (
+          <Show
+            when={
+              showAllEvents() ||
+              (rec.kind !== "account" && rec.kind !== "identity")
+            }
+          >
+            <div class="break-anywhere whitespace-pre-wrap border-b border-neutral-500 pb-2 font-mono text-sm">
+              <JSONValue data={rec} repo={rec.did} />
+            </div>
+          </Show>
+        )}
+      </For>
     </div>
   );
 };
