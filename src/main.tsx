@@ -1,28 +1,25 @@
-import { createSignal, Show, type Component } from "solid-js";
+import {
+  createSignal,
+  ErrorBoundary,
+  Show,
+  Suspense,
+  type Component,
+} from "solid-js";
 import {
   A,
   action,
   Navigate,
+  Params,
   redirect,
   RouteSectionProps,
   useLocation,
+  useNavigate,
   useParams,
+  useSubmission,
 } from "@solidjs/router";
-import {
-  AiFillGithub,
-  Bluesky,
-  FaRegularCircleCheck,
-  FaRegularCircleXmark,
-  FaSolidAt,
-  IoList,
-  TbBinaryTree,
-  TbMoonStar,
-  TbServer,
-  TbSun,
-  VsJson,
-} from "./components/svg.jsx";
 import { agent, loginState, LoginStatus } from "./views/login.jsx";
-import { resolveHandle, resolvePDS } from "./utils/api.js";
+import { resolveHandle } from "./utils/api.js";
+import { CreateRecord } from "./components/create.jsx";
 
 export const [theme, setTheme] = createSignal(
   (
@@ -33,7 +30,6 @@ export const [theme, setTheme] = createSignal(
     "dark"
   : "light",
 );
-export const [notice, setNotice] = createSignal("");
 export const [pds, setPDS] = createSignal<string>();
 export const [validRecord, setValidRecord] = createSignal<boolean | undefined>(
   undefined,
@@ -42,7 +38,7 @@ export const [validRecord, setValidRecord] = createSignal<boolean | undefined>(
 const processInput = action(async (formData: FormData) => {
   const input = formData.get("input")?.toString();
   (document.getElementById("uriForm") as HTMLFormElement).reset();
-  if (!input) return;
+  if (!input) return new Error("Empty input");
   if (
     !input.startsWith("https://bsky.app/") &&
     !input.startsWith("https://main.bsky.dev/") &&
@@ -57,67 +53,117 @@ const processInput = action(async (formData: FormData) => {
     .replace("https://bsky.app/profile/", "")
     .replace("https://main.bsky.dev/profile/", "")
     .replace("/post/", "/app.bsky.feed.post/");
-  let did = "";
-  try {
-    await resolvePDS(uri.split("/")[0]);
-    did =
-      !uri.startsWith("did:") ?
-        await resolveHandle(uri.split("/")[0])
-      : uri.split("/")[0];
-    if (!did) throw Error;
-  } catch {
-    setNotice("Could not resolve AT URI");
-    return;
-  }
+  const uriParts = uri.split("/");
+  const actor = uriParts[0];
+  const did = uri.startsWith("did:") ? actor : await resolveHandle(actor);
   throw redirect(
-    `/at/${did}${uri.split("/").length > 1 ? "/" + uri.split("/").slice(1).join("/") : ""}`,
+    `/at/${did}${uriParts.length > 1 ? `/${uriParts.slice(1).join("/")}` : ""}`,
   );
 });
 
-const Home: Component = () => {
-  setNotice("");
+const NavBar: Component<{ params: Params }> = (props) => {
   return (
-    <div class="mt-3 flex flex-col break-words font-sans">
-      <div>
-        <span class="font-semibold text-orange-400">PDS URL</span> (https://
-        required):
-        <div>
-          <a href="/pds.bsky.mom" class="text-lightblue-500 hover:underline">
-            https://pds.bsky.mom
-          </a>
-        </div>
-      </div>
-      <div>
-        <span class="font-semibold text-orange-400">AT URI</span> (at://
-        optional, DID or handle alone also works):
-        <div>
-          <a
-            href="/at/did:plc:oisofpd7lj26yvgiivf3lxsi/app.bsky.feed.post/3l2zpbbhuvw2h"
-            class="text-lightblue-500 hover:underline"
+    <div class="break-anywhere mb-3 mt-4 flex min-w-[20rem] flex-col font-mono">
+      <Show when={pds() && props.params.pds}>
+        <div class="flex items-center">
+          <div class="i-tabler-server mr-1 text-sm" />
+          <A
+            end
+            href={pds()!}
+            inactiveClass="text-lightblue-500 hover:underline"
           >
-            at://did:plc:oisofpd7lj26yvgiivf3lxsi/app.bsky.feed.post/3l2zpbbhuvw2h
-          </a>
+            {pds()}
+          </A>
         </div>
-      </div>
-      <div>
-        <span class="font-semibold text-orange-400">Bluesky Link</span> (posts
-        and profiles):
-        <div>
-          <a
-            href="/at/did:plc:ia76kvnndjutgedggx2ibrem/app.bsky.feed.post/3kenlltlvus2u"
-            class="text-lightblue-500 hover:underline"
-          >
-            https://bsky.app/profile/mary.my.id/post/3kenlltlvus2u
-          </a>
-        </div>
+      </Show>
+      <div
+        classList={{
+          "flex flex-col flex-wrap md:flex-row": true,
+          "md:mt-1": !!props.params.repo,
+        }}
+      >
+        <Show when={props.params.repo}>
+          <div>
+            <div class="mt-1 flex items-center md:mt-0">
+              <div class="i-atproto-logo mr-1 text-sm" />
+              <A
+                end
+                href={`at/${props.params.repo}`}
+                inactiveClass="text-lightblue-500 hover:underline"
+              >
+                {props.params.repo}
+              </A>
+            </div>
+            <Show when={!props.params.collection && !props.params.rkey}>
+              <div class="mt-1 flex items-center">
+                <div class="i-lucide-binary mr-1 text-sm" />
+                <A
+                  end
+                  href={`at/${props.params.repo}/blobs`}
+                  inactiveClass="text-lightblue-500 hover:underline"
+                >
+                  blobs
+                </A>
+              </div>
+            </Show>
+          </div>
+        </Show>
+        <Show when={props.params.collection}>
+          <div class="mt-1 flex items-center md:mt-0">
+            <div class="i-uil-list-ul mr-1 text-sm md:hidden" />
+            <span class="mx-1 hidden md:inline">/</span>
+            <A
+              end
+              href={`at/${props.params.repo}/${props.params.collection}`}
+              inactiveClass="text-lightblue-500 hover:underline"
+            >
+              {props.params.collection}
+            </A>
+          </div>
+        </Show>
+        <Show when={props.params.rkey}>
+          <div class="mt-1 flex items-center md:mt-0">
+            <div class="i-mdi-code-json mr-1 text-sm md:hidden" />
+            <span class="mx-1 hidden md:inline">/</span>
+            <span class="cursor-pointer">{props.params.rkey}</span>
+            <Show when={validRecord()}>
+              <div
+                title="This record is valid"
+                class="i-fluent-checkmark-circle-12-regular ml-1"
+              />
+            </Show>
+            <Show when={validRecord() === false}>
+              <div
+                title="This record is invalid"
+                class="i-fluent-dismiss-circle-12-regular ml-1"
+              />
+            </Show>
+            <Show when={validRecord() === undefined}>
+              <div
+                title="Validating record..."
+                class="i-line-md-loading-twotone-loop ml-1"
+              />
+            </Show>
+          </div>
+        </Show>
       </div>
     </div>
   );
 };
 
 const Layout: Component<RouteSectionProps<unknown>> = (props) => {
+  try {
+    navigator.registerProtocolHandler("web+at", "/%s");
+    const pathname = decodeURIComponent(useLocation().pathname);
+    if (pathname.startsWith("/web+at://")) {
+      const navigate = useNavigate();
+      navigate(pathname.replace("web+at://", "at/"));
+    }
+  } catch (err) {
+    console.log(err);
+  }
   const params = useParams();
-  setNotice("");
+  const submission = useSubmission(processInput);
 
   return (
     <div
@@ -138,30 +184,33 @@ const Layout: Component<RouteSectionProps<unknown>> = (props) => {
             }}
           >
             {theme() === "dark" ?
-              <TbMoonStar class="size-6" />
-            : <TbSun class="size-6" />}
+              <div class="i-tabler-moon-stars text-xl" />
+            : <div class="i-tabler-sun text-xl" />}
           </div>
           <LoginStatus />
+          <Show when={loginState()}>
+            <CreateRecord />
+          </Show>
         </div>
         <div class="basis-1/3 text-center font-mono text-xl font-bold">
           <a href="/" class="hover:underline">
             PDSls
           </a>
         </div>
-        <div class="justify-right flex basis-1/3 gap-x-2">
+        <div class="justify-right flex basis-1/3 items-center gap-x-2">
           <a
             title="Bluesky"
             href="https://bsky.app/profile/did:plc:b3pn34agqqchkaf75v7h43dk"
             target="_blank"
           >
-            <Bluesky class="size-6" />
+            <div class="i-fa6-brands-bluesky text-xl" />
           </a>
           <a
             title="GitHub"
             href="https://github.com/notjuliet/pdsls"
             target="_blank"
           >
-            <AiFillGithub class="size-6" />
+            <div class="i-bi-github text-xl" />
           </a>
         </div>
       </div>
@@ -183,7 +232,6 @@ const Layout: Component<RouteSectionProps<unknown>> = (props) => {
                 type="text"
                 id="input"
                 name="input"
-                autofocus
                 spellcheck={false}
                 class="dark:bg-dark-100 rounded-lg border border-gray-400 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-gray-300"
               />
@@ -196,7 +244,7 @@ const Layout: Component<RouteSectionProps<unknown>> = (props) => {
               <Show when={loginState()}>
                 <div title={`Repository`}>
                   <a href={`/at/${agent.sub}`}>
-                    <TbBinaryTree class="size-6" />
+                    <div class="i-tabler-binary-tree text-xl" />
                     <Show when={location.pathname === "/"}>
                       <Navigate href={`/at/${agent.sub}`} />
                     </Show>
@@ -205,85 +253,29 @@ const Layout: Component<RouteSectionProps<unknown>> = (props) => {
               </Show>
             </div>
           </form>
+          <Show when={submission.error}>
+            {(err) => <div class="mt-3">{err().message}</div>}
+          </Show>
         </Show>
         <Show when={params.pds}>
-          <div class="mb-3 mt-4 flex flex-col font-mono">
-            <Show when={pds() && params.pds}>
-              <div class="flex items-center">
-                <TbServer class="mr-0.5 size-4" />
-                <A
-                  end
-                  href={pds()!}
-                  inactiveClass="text-lightblue-500 hover:underline"
-                >
-                  {pds()}
-                </A>
-              </div>
-            </Show>
-            <div
-              classList={{
-                "flex flex-col flex-wrap md:flex-row": true,
-                "md:mt-1": !!params.repo,
-              }}
+          <NavBar params={params} />
+        </Show>
+        <Show keyed when={useLocation().pathname}>
+          <ErrorBoundary
+            fallback={(err) => (
+              <div class="break-words">Error: {err.message}</div>
+            )}
+          >
+            <Suspense
+              fallback={<div class="i-line-md-loading-twotone-loop ml-1" />}
             >
-              <Show when={params.repo}>
-                <div class="mt-1 flex items-center md:mt-0">
-                  <FaSolidAt class="mr-1 size-3.5" />
-                  <A
-                    end
-                    href={`at/${params.repo}`}
-                    inactiveClass="text-lightblue-500 hover:underline"
-                  >
-                    {params.repo}
-                  </A>
-                </div>
-              </Show>
-              <Show when={params.collection}>
-                <div class="mt-1 flex items-center md:mt-0">
-                  <IoList class="mr-1 size-3.5 md:hidden" />
-                  <span class="mx-1 hidden md:inline">/</span>
-                  <A
-                    end
-                    href={`at/${params.repo}/${params.collection}`}
-                    inactiveClass="text-lightblue-500 hover:underline"
-                  >
-                    {params.collection}
-                  </A>
-                </div>
-              </Show>
-              <Show when={params.rkey}>
-                <div class="mt-1 flex items-center md:mt-0">
-                  <VsJson class="mr-1 size-3.5 md:hidden" />
-                  <span class="mx-1 hidden md:inline">/</span>
-                  <span class="cursor-pointer">{params.rkey}</span>
-                  <Show when={validRecord()}>
-                    <FaRegularCircleCheck
-                      title="This record is valid"
-                      class="ml-1 size-3.5"
-                    />
-                  </Show>
-                  <Show when={validRecord() === false}>
-                    <FaRegularCircleXmark
-                      title="This record is invalid"
-                      class="ml-1 size-3.5"
-                    />
-                  </Show>
-                </div>
-              </Show>
-            </div>
-          </div>
+              {props.children}
+            </Suspense>
+          </ErrorBoundary>
         </Show>
-        <Show when={notice()}>
-          <div class="mb-3 w-full break-words text-center">{notice()}</div>
-        </Show>
-        <div class="flex max-w-full flex-col space-y-1 font-mono">
-          <Show keyed when={useLocation().pathname}>
-            {props.children}
-          </Show>
-        </div>
       </div>
     </div>
   );
 };
 
-export { Layout, Home };
+export { Layout };

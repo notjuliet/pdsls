@@ -1,33 +1,19 @@
-import { createSignal, onMount, For, Show, type Component } from "solid-js";
+import {
+  createSignal,
+  For,
+  Show,
+  type Component,
+  createResource,
+} from "solid-js";
 import { CredentialManager, XRPC } from "@atcute/client";
-import { ComAtprotoRepoDescribeRepo } from "@atcute/client/lexicons";
 import { A, query, useParams } from "@solidjs/router";
-import { TbExternalLink } from "../components/svg.jsx";
-import { setNotice, setPDS } from "../main.jsx";
-import { resolvePDS } from "../utils/api.js";
+import { didDocCache, resolveHandle, resolvePDS } from "../utils/api.js";
+import { DidDoc } from "../utils/types.js";
 
 const RepoView: Component = () => {
   const params = useParams();
-  const [repo, setRepo] = createSignal<ComAtprotoRepoDescribeRepo.Output>();
+  const [didDoc, setDidDoc] = createSignal<DidDoc>();
   let rpc: XRPC;
-
-  onMount(async () => {
-    setNotice("Loading...");
-    setPDS(params.pds);
-    let pds =
-      params.pds.startsWith("localhost") ?
-        `http://${params.pds}`
-      : `https://${params.pds}`;
-    if (params.pds === "at") pds = await resolvePDS(params.repo);
-    rpc = new XRPC({ handler: new CredentialManager({ service: pds }) });
-    try {
-      const res = await describeRepo(params.repo);
-      setNotice("");
-      setRepo(res.data);
-    } catch (err: any) {
-      setNotice(err.message);
-    }
-  });
 
   const describeRepo = query(
     (repo: string) =>
@@ -35,97 +21,121 @@ const RepoView: Component = () => {
     "describeRepo",
   );
 
+  const fetchRepo = async () => {
+    const did =
+      params.repo.startsWith("did:") ?
+        params.repo
+      : await resolveHandle(params.repo);
+    const pds = await resolvePDS(did);
+    rpc = new XRPC({ handler: new CredentialManager({ service: pds }) });
+    const res = await describeRepo(did);
+    const didDocument = res.data.didDoc as DidDoc;
+    setDidDoc(didDocument.id ? didDocument : didDocCache[did]);
+    return res.data;
+  };
+
+  const [repo] = createResource(fetchRepo);
+
   return (
-    <>
-      <div class="mb-3 flex max-w-full flex-col self-center overflow-y-auto">
-        <For each={repo()?.collections}>
-          {(collection) => (
-            <A
-              href={`${collection}`}
-              class="text-lightblue-500 hover:underline"
-            >
-              {collection}
-            </A>
-          )}
-        </For>
-      </div>
-      <Show when={repo()}>
-        <div class="overflow-y-auto text-sm">
-          <div class="mb-3">
-            <span class="font-semibold text-stone-600 dark:text-stone-400">
-              DID{" "}
-            </span>
-            <span>{(repo()?.didDoc as any).id}</span>
-          </div>
-          <div class="mb-3">
-            <p class="font-semibold text-stone-600 dark:text-stone-400">
-              Identities
-            </p>
-            <ul class="ml-3">
-              <For each={(repo()?.didDoc as any).alsoKnownAs}>
-                {(alias) => <li>{alias}</li>}
-              </For>
-            </ul>
-          </div>
-          <div class="mb-3">
-            <p class="font-semibold text-stone-600 dark:text-stone-400">
-              Services
-            </p>
-            <ul class="ml-3">
-              <For each={(repo()?.didDoc as any).service}>
-                {(service) => (
-                  <li class="mb-2 flex flex-col">
-                    <span>{service.id}</span>
-                    <a
-                      class="text-lightblue-500 w-fit hover:underline"
-                      href={service.serviceEndpoint}
-                      target="_blank"
-                    >
-                      {service.serviceEndpoint}
-                    </a>
-                  </li>
-                )}
-              </For>
-            </ul>
-          </div>
-          <div>
-            <p class="font-semibold text-stone-600 dark:text-stone-400">
-              Verification methods
-            </p>
-            <ul class="ml-3">
-              <For each={(repo()?.didDoc as any).verificationMethod}>
-                {(verif) => (
-                  <li class="mb-2 flex flex-col">
-                    <span>#{verif.id.split("#")[1]}</span>
-                    <span>{verif.publicKeyMultibase}</span>
-                  </li>
-                )}
-              </For>
-            </ul>
-          </div>
+    <Show when={repo()}>
+      <div class="flex w-[20rem] flex-col gap-2 break-words">
+        <div class="flex flex-col border-b border-neutral-500 pb-2 font-mono">
+          <p class="font-sans font-semibold text-stone-600 dark:text-stone-400">
+            Collections
+          </p>
+          <For each={repo()?.collections}>
+            {(collection) => (
+              <A
+                href={`${collection}`}
+                class="text-lightblue-500 break-anywhere w-fit hover:underline"
+              >
+                {collection}
+              </A>
+            )}
+          </For>
         </div>
-        <a
-          class="text-lightblue-500 flex w-fit items-center text-sm hover:underline"
-          href={
-            repo()?.did.startsWith("did:plc") ?
-              `https://plc.directory/${repo()?.did}`
-            : `https://${repo()?.did.split("did:web:")[1]}/.well-known/did.json`
-          }
-          target="_blank"
-        >
-          DID document <TbExternalLink class="ml-0.5 size-3.5" />
-        </a>
-        <Show when={repo()?.did.startsWith("did:plc")}>
-          <a
-            class="text-lightblue-500 flex w-fit items-center text-sm hover:underline"
-            href={`https://boat.kelinci.net/plc-oplogs?q=${repo()?.did}`}
-            target="_blank"
-          >
-            PLC operation logs <TbExternalLink class="ml-0.5 size-3.5" />
-          </a>
+        <Show when={didDoc()}>
+          {(didDocument) => (
+            <div class="flex flex-col gap-y-1">
+              <div>
+                <span class="font-semibold text-stone-600 dark:text-stone-400">
+                  ID{" "}
+                </span>
+                <span>{didDocument().id}</span>
+              </div>
+              <div>
+                <p class="font-semibold text-stone-600 dark:text-stone-400">
+                  Identities
+                </p>
+                <ul class="ml-3">
+                  <For each={didDocument().alsoKnownAs}>
+                    {(alias) => <li>{alias}</li>}
+                  </For>
+                </ul>
+              </div>
+              <div>
+                <p class="font-semibold text-stone-600 dark:text-stone-400">
+                  Services
+                </p>
+                <ul class="ml-3">
+                  <For each={didDocument().service}>
+                    {(service) => (
+                      <li class="flex flex-col">
+                        <span>{service.id}</span>
+                        <a
+                          class="text-lightblue-500 w-fit hover:underline"
+                          href={service.serviceEndpoint}
+                          target="_blank"
+                        >
+                          {service.serviceEndpoint}
+                        </a>
+                      </li>
+                    )}
+                  </For>
+                </ul>
+              </div>
+              <div>
+                <p class="font-semibold text-stone-600 dark:text-stone-400">
+                  Verification methods
+                </p>
+                <ul class="ml-3">
+                  <For each={didDocument().verificationMethod}>
+                    {(verif) => (
+                      <li class="flex flex-col">
+                        <span>#{verif.id.split("#")[1]}</span>
+                        <span>{verif.publicKeyMultibase}</span>
+                      </li>
+                    )}
+                  </For>
+                </ul>
+              </div>
+              <a
+                class="text-lightblue-500 flex w-fit items-center hover:underline"
+                href={
+                  repo()?.did.startsWith("did:plc") ?
+                    `https://plc.directory/${repo()?.did}`
+                  : `https://${repo()?.did.split("did:web:")[1]}/.well-known/did.json`
+                }
+                target="_blank"
+              >
+                DID document{" "}
+                <div class="i-tabler-external-link ml-0.5 text-xs" />
+              </a>
+              <Show when={repo()?.did.startsWith("did:plc")}>
+                <a
+                  class="text-lightblue-500 flex w-fit items-center hover:underline"
+                  href={`https://boat.kelinci.net/plc-oplogs?q=${repo()?.did}`}
+                  target="_blank"
+                >
+                  PLC operation logs{" "}
+                  <div class="i-tabler-external-link ml-0.5 text-xs" />
+                </a>
+              </Show>
+            </div>
+          )}
         </Show>
-      </Show>
-    </>
+      </div>
+    </Show>
   );
 };
 

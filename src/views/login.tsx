@@ -9,7 +9,6 @@ import {
   type Session,
 } from "@atcute/oauth-browser-client";
 import { At } from "@atcute/client/lexicons";
-import { FiLogIn, FiLogOut } from "../components/svg";
 
 configureOAuth({
   metadata: {
@@ -125,13 +124,13 @@ const LoginStatus: Component = () => {
     <>
       <Show when={loginState()}>
         <div title="Logout" class="cursor-pointer" onclick={() => logoutBsky()}>
-          <FiLogOut class="size-6" />
+          <div class="i-lucide-log-out text-xl" />
         </div>
       </Show>
       <Show when={!loginState()}>
         <div title="Login">
           <a href="/login">
-            <FiLogIn class="size-6" />
+            <div class="i-lucide-log-in text-xl" />
           </a>
         </div>
       </Show>

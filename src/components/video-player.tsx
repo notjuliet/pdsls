@@ -56,6 +56,8 @@ const VideoPlayer = ({ did, cid }: VideoPlayerProps) => {
           });
         }}
         controls
+        autoplay
+        muted
         playsinline
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}

@@ -1,9 +1,10 @@
 import { CredentialManager, XRPC } from "@atcute/client";
 import { query } from "@solidjs/router";
-import { setNotice, setPDS } from "../main";
+import { setPDS } from "../main";
+import { DidDoc } from "./types";
 
-const didPDSCache: { [key: string]: string } = {};
-const didDocCache: { [key: string]: {} } = {};
+const didPDSCache: Record<string, string> = {};
+const didDocCache: Record<string, DidDoc> = {};
 const getPDS = query(async (did: string) => {
   if (did in didPDSCache) return didPDSCache[did];
   const res = await fetch(
@@ -12,7 +13,7 @@ const getPDS = query(async (did: string) => {
     : "https://plc.directory/" + did,
   );
 
-  return res.json().then((doc) => {
+  return res.json().then((doc: DidDoc) => {
     for (const service of doc.service) {
       if (service.id === "#atproto_pds") {
         didPDSCache[did] = service.serviceEndpoint;
@@ -33,17 +34,12 @@ const resolveHandle = async (handle: string) => {
   return res.data.did;
 };
 
-const resolvePDS = async (repo: string) => {
-  try {
-    let did = repo;
-    if (!repo.startsWith("did:")) did = await resolveHandle(repo);
-    if (!did) throw Error;
-    const pds = await getPDS(did);
-    setPDS(pds.replace("https://", "").replace("http://", ""));
-    return pds;
-  } catch {
-    setNotice("Could not resolve PDS");
-  }
+const resolvePDS = async (did: string) => {
+  setPDS(undefined);
+  const pds = await getPDS(did);
+  if (!pds) throw new Error("No PDS found");
+  setPDS(pds.replace("https://", "").replace("http://", ""));
+  return pds;
 };
 
 export { getPDS, didDocCache, resolveHandle, resolvePDS };

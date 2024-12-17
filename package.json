@@ -9,21 +9,21 @@
     "serve": "vite preview"
   },
   "devDependencies": {
-    "prettier": "^3.4.1",
+    "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.9",
     "typescript": "^5.7.2",
-    "unocss": "^0.64.1",
+    "unocss": "^0.65.1",
     "vite": "^5.4.11",
     "vite-plugin-solid": "^2.11.0",
     "vite-plugin-wasm": "^3.3.0"
   },
   "dependencies": {
     "@atcute/client": "^2.0.6",
-    "@atcute/oauth-browser-client": "^1.0.6",
+    "@atcute/oauth-browser-client": "^1.0.7",
     "@atcute/tid": "^1.0.1",
-    "@solidjs/router": "^0.15.1",
+    "@solidjs/router": "^0.15.2",
     "hls.js": "^1.5.17",
-    "monaco-editor": "^0.52.0",
+    "monaco-editor": "^0.52.2",
     "public-transport": "file:pkg/pt.tgz",
     "solid-js": "^1.9.3"
   },

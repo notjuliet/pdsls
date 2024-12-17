@@ -1,6 +1,5 @@
 import { A } from "@solidjs/router";
 import VideoPlayer from "./video-player";
-import { BsClipboard, BsClipboardCheck } from "./svg";
 import { createSignal } from "solid-js";
 
 interface AtBlob {
@@ -10,17 +9,31 @@ interface AtBlob {
 }
 
 const JSONString = ({ data }: { data: string }) => {
+  const isURL =
+    URL.canParse ??
+    ((url, base) => {
+      try {
+        new URL(url, base);
+        return true;
+      } catch {
+        return false;
+      }
+    });
+
   return (
-    <pre class="text-emerald-600 dark:text-emerald-400">
+    <span class="text-stone-800 dark:text-stone-200">
       {data.startsWith("at://") && data.split(" ").length === 1 ?
         <A class="underline" href={data.replace("at://", "/at/")}>
           {data}
         </A>
-      : data.startsWith("did:") ?
+      : data.startsWith("did:") && data.split(" ").length === 1 ?
         <A class="underline" href={`/at/${data}`}>
           {data}
         </A>
-      : URL.canParse(data) ?
+      : (
+        isURL(data) &&
+        ["http:", "https:", "web+at:"].includes(new URL(data).protocol)
+      ) ?
         <a
           class="underline"
           href={data}
@@ -30,20 +43,24 @@ const JSONString = ({ data }: { data: string }) => {
           {data}
         </a>
       : data}
-    </pre>
+    </span>
   );
 };
 
 const JSONNumber = ({ data }: { data: number }) => {
-  return <pre class="text-red-600 dark:text-red-500">{data}</pre>;
+  return <span class="text-[#f85552] dark:text-red-400">{data}</span>;
 };
 
 const JSONBoolean = ({ data }: { data: boolean }) => {
-  return <pre class="text-blue-500">{data ? "true" : "false"}</pre>;
+  return (
+    <span class="text-[#f57d26] dark:text-orange-300">
+      {data ? "true" : "false"}
+    </span>
+  );
 };
 
 const JSONNull = () => {
-  return <pre class="text-gray-600 dark:text-gray-400">null</pre>;
+  return <span class="text-neutral-400 dark:text-neutral-500">null</span>;
 };
 
 const JSONObject = ({
@@ -63,9 +80,9 @@ const JSONObject = ({
             "flex-col": value === Object(value),
           }}
         >
-          <span class="text-amber-600 dark:text-amber-400">
+          <span class="shrink-0 text-[#3a94c5] dark:text-cyan-500">
             <span
-              class="group relative flex size-fit cursor-pointer items-center"
+              class="group/clip relative flex size-fit cursor-pointer items-center"
               onmouseleave={() => setClip(false)}
               onclick={() =>
                 navigator.clipboard
@@ -73,10 +90,10 @@ const JSONObject = ({
                   .then(() => setClip(true))
               }
             >
-              <span class="absolute -left-4 size-3">
+              <span class="absolute -left-4 hidden text-[0.625rem] group-hover/clip:block">
                 {clip() ?
-                  <BsClipboardCheck class="hidden size-3 group-hover:block" />
-                : <BsClipboard class="hidden size-3 group-hover:block" />}
+                  <div class="i-bi-clipboard-check-fill" />
+                : <div class="i-bi-clipboard" />}
               </span>
               {key}:
             </span>
@@ -123,11 +140,11 @@ const JSONObject = ({
 
 const JSONArray = ({ data, repo }: { data: JSONType[]; repo: string }) => {
   return (
-    <ul>
+    <ul class="list-dash">
       {data.map((value, index) => (
         <li
           classList={{
-            "mb-3": value === Object(value) && index != data.length - 1,
+            "mb-3": value === Object(value) && index !== data.length - 1,
           }}
         >
           <JSONValue data={value} repo={repo} />
