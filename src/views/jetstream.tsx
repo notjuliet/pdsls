@@ -1,11 +1,11 @@
 import { createSignal, For, onCleanup } from "solid-js";
 import { JSONValue } from "../components/json";
 import { action } from "@solidjs/router";
+import { Show } from "solid-js";
 
 // TODO: show applied settings
-// subscribeRepos support
 
-const FirehoseView = () => {
+const JetstreamView = () => {
   const [records, setRecords] = createSignal<Array<any>>([]);
   const [connected, setConnected] = createSignal(false);
   const [showAllEvents, setShowAllEvents] = createSignal(false);
@@ -51,60 +51,65 @@ const FirehoseView = () => {
   return (
     <div class="mt-5 flex flex-col items-center gap-y-4">
       <form method="post" action={connect} class="flex flex-col gap-y-3">
-        <label class="flex items-center gap-x-2 text-right">
-          <span class="basis-1/2">Instance</span>
-          <input
-            type="text"
-            name="instance"
-            spellcheck={false}
-            size={25}
-            value="wss://jetstream1.us-east.bsky.network/subscribe"
-            class="dark:bg-dark-100 rounded-lg border border-gray-400 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-gray-300"
-          />
-        </label>
-        <label class="flex items-center gap-x-2 text-right">
-          <span class="basis-1/2">Collections</span>
-          <input
-            type="text"
-            name="collections"
-            spellcheck={false}
-            size={25}
-            placeholder="Comma-separated list of collections"
-            class="dark:bg-dark-100 rounded-lg border border-gray-400 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-gray-300"
-          />
-        </label>
-        <label class="flex items-center gap-x-2 text-right">
-          <span class="basis-1/2">DIDs</span>
-          <input
-            type="text"
-            name="dids"
-            spellcheck={false}
-            size={25}
-            placeholder="Comma-separated list of DIDs"
-            class="dark:bg-dark-100 rounded-lg border border-gray-400 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-gray-300"
-          />
-        </label>
-        <label class="flex items-center gap-x-2 text-right">
-          <span class="basis-1/2">Cursor</span>
-          <input
-            type="text"
-            name="cursor"
-            spellcheck={false}
-            size={25}
-            placeholder="Leave empty for live-tail"
-            class="dark:bg-dark-100 rounded-lg border border-gray-400 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-gray-300"
-          />
-        </label>
-        <div class="flex items-center justify-end gap-x-1">
-          <input
-            type="checkbox"
-            id="allEvents"
-            onChange={(e) => setShowAllEvents(e.currentTarget.checked)}
-          />
-          <label for="allEvents" class="select-none">
-            Show account and identity events
+        <Show when={!connected()}>
+          <label class="flex items-center gap-x-2 text-right">
+            <span class="basis-1/2">Instance</span>
+            <input
+              type="text"
+              name="instance"
+              spellcheck={false}
+              size={25}
+              value="wss://jetstream1.us-east.bsky.network/subscribe"
+              class="dark:bg-dark-100 rounded-lg border border-gray-400 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-gray-300"
+            />
           </label>
-        </div>
+          <label class="flex items-center gap-x-2 text-right">
+            <span class="basis-1/2">Collections</span>
+            <input
+              type="text"
+              name="collections"
+              spellcheck={false}
+              size={25}
+              placeholder="Comma-separated list of collections"
+              class="dark:bg-dark-100 rounded-lg border border-gray-400 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-gray-300"
+            />
+          </label>
+          <label class="flex items-center gap-x-2 text-right">
+            <span class="basis-1/2">DIDs</span>
+            <input
+              type="text"
+              name="dids"
+              spellcheck={false}
+              size={25}
+              placeholder="Comma-separated list of DIDs"
+              class="dark:bg-dark-100 rounded-lg border border-gray-400 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-gray-300"
+            />
+          </label>
+          <label class="flex items-center gap-x-2 text-right">
+            <span class="basis-1/2">Cursor</span>
+            <input
+              type="text"
+              name="cursor"
+              spellcheck={false}
+              size={25}
+              placeholder="Leave empty for live-tail"
+              class="dark:bg-dark-100 rounded-lg border border-gray-400 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-gray-300"
+            />
+          </label>
+          <div class="flex items-center justify-end gap-x-1">
+            <input
+              type="checkbox"
+              id="allEvents"
+              onChange={(e) => setShowAllEvents(e.currentTarget.checked)}
+            />
+            <label for="allEvents" class="select-none">
+              Show account and identity events
+            </label>
+          </div>
+        </Show>
+        <Show when={connected()}>
+          <div>Instance: </div>
+        </Show>
         <div class="flex justify-end">
           <button
             type="submit"
@@ -127,4 +132,4 @@ const FirehoseView = () => {
   );
 };
 
-export { FirehoseView };
+export { JetstreamView };
