@@ -1,13 +1,23 @@
-import { createSignal, For, onCleanup, Show, type Component } from "solid-js";
+import { createSignal, For, onCleanup } from "solid-js";
 import { JSONValue } from "../components/json";
 import { action } from "@solidjs/router";
 
-const FirehoseView: Component = () => {
+// TODO: show applied settings
+// subscribeRepos support
+
+const FirehoseView = () => {
   const [records, setRecords] = createSignal<Array<any>>([]);
+  const [connected, setConnected] = createSignal(false);
   const [showAllEvents, setShowAllEvents] = createSignal(false);
   let socket: WebSocket;
 
   const connect = action(async (formData: FormData) => {
+    if (connected()) {
+      setRecords([]);
+      socket?.close();
+      setConnected(false);
+      return;
+    }
     let url =
       formData.get("instance")?.toString() ??
       "wss://jetstream1.us-east.bsky.network/subscribe";
@@ -24,15 +34,15 @@ const FirehoseView: Component = () => {
     const cursor = formData.get("cursor")?.toString();
     if (cursor?.length) url = url.concat(`cursor=${cursor}`);
     if (url.endsWith("&")) url = url.slice(0, -1);
-    console.log(url);
-    const socket = new WebSocket(url);
+    socket = new WebSocket(url);
+    setConnected(true);
     socket.addEventListener("message", (event) => {
       const rec = JSON.parse(event.data);
       if (
         showAllEvents() ||
         (rec.kind !== "account" && rec.kind !== "identity")
       )
-        setRecords(records().concat(rec).slice(-5));
+        setRecords(records().concat(rec).slice(-25));
     });
   });
 
@@ -100,24 +110,19 @@ const FirehoseView: Component = () => {
             type="submit"
             class="dark:bg-dark-700 dark:hover:bg-dark-800 w-fit rounded-lg border border-slate-400 bg-white px-2.5 py-1.5 text-sm font-bold hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-700 dark:focus:ring-slate-300"
           >
-            Connect
+            {connected() ? "Disconnect" : "Connect"}
           </button>
         </div>
       </form>
-      <For each={records().reverse()}>
-        {(rec) => (
-          <Show
-            when={
-              showAllEvents() ||
-              (rec.kind !== "account" && rec.kind !== "identity")
-            }
-          >
-            <div class="break-anywhere whitespace-pre-wrap border-b border-neutral-500 pb-2 font-mono text-sm">
+      <div class="break-anywhere flex flex-col gap-2 divide-y divide-neutral-500 whitespace-pre-wrap font-mono text-sm">
+        <For each={records().reverse()}>
+          {(rec) => (
+            <div class="pt-2">
               <JSONValue data={rec} repo={rec.did} />
             </div>
-          </Show>
-        )}
-      </For>
+          )}
+        </For>
+      </div>
     </div>
   );
 };
