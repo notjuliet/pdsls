@@ -25,7 +25,7 @@ const RepoView = () => {
     const res = await describeRepo(did);
     setDidDoc(didDocCache[did]);
     const backlinks = await getAllBacklinks(did);
-    setBacklinks(backlinks.links);
+    setBacklinks({ links: backlinks.links, target: did });
     return res.data;
   };
 
@@ -128,7 +128,7 @@ const RepoView = () => {
               </Show>
               <Show when={backlinks()}>
                 <div class="border-t mt-2 pt-2 border-neutral-500 ">
-                  <Backlinks links={backlinks()} />
+                  <Backlinks links={backlinks().links} target={backlinks().target} />
                 </div>
               </Show>
             </div>

@@ -54,6 +54,8 @@ const getConstellation = async (
   target: string,
   collection?: string,
   path?: string,
+  cursor?: string,
+  limit?: number,
 ) => {
   const url = new URL(CONSTELLATION_HOST);
   url.pathname = endpoint;
@@ -65,6 +67,12 @@ const getConstellation = async (
   } else {
     if (path) throw new Error('collection and path must either both be set or neither');
   }
+  if (limit) {
+    url.searchParams.set('limit', `${limit}`);
+  }
+  if (cursor) {
+    url.searchParams.set('cursor', `${cursor}`);
+  }
   let res = await fetch(url);
   if (!res.ok) throw new Error('failed to fetch from constellation');
   let json = await res.json();
@@ -74,4 +82,10 @@ const getConstellation = async (
 const getAllBacklinks = (target: string) =>
   getConstellation('/links/all', target);
 
-export { getPDS, getAllBacklinks, labelerCache, didDocCache, resolveHandle, resolvePDS };
+const getRecordBacklinks = (target: string, collection: string, path: string, cursor?: string, limit?: number) =>
+  getConstellation('/links', target, collection, path, cursor, limit || 100);
+
+const getDidBacklinks = (target: string, collection: string, path: string, cursor?: string, limit?: string) =>
+  getConstellation('/links/distinct-dids', target, collection, path, cursor, limit || 100);
+
+export { getPDS, getAllBacklinks, getRecordBacklinks, getDidBacklinks, labelerCache, didDocCache, resolveHandle, resolvePDS };

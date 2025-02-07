@@ -64,8 +64,9 @@ const RecordView = () => {
       else setNotice(`Invalid record: ${err}`);
       setValidRecord(false);
     }
-    const backlinks = await getAllBacklinks(`at://${did}/${params.collection}/${params.rkey}`);
-    setBacklinks(backlinks.links);
+    const backlinkTarget = `at://${did}/${params.collection}/${params.rkey}`;
+    const backlinks = await getAllBacklinks(backlinkTarget);
+    setBacklinks({ links: backlinks.links, target: backlinkTarget });
   });
 
   onCleanup(() => {
@@ -340,7 +341,7 @@ const RecordView = () => {
             />
           </div>
           <Show when={backlinks()}>
-            <Backlinks links={backlinks()} />
+            <Backlinks links={backlinks().links} target={backlinks().target} />
           </Show>
         </Show>
         <Show when={JSONSyntax()}>
