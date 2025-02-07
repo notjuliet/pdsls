@@ -13,11 +13,11 @@ const JetstreamView = () => {
 
   const connect = action(async (formData: FormData) => {
     if (connected()) {
-      setRecords([]);
       socket?.close();
       setConnected(false);
       return;
     }
+    setRecords([]);
     let url =
       formData.get("instance")?.toString() ??
       "wss://jetstream1.us-east.bsky.network/subscribe";
