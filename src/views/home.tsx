@@ -14,6 +14,17 @@ const Home = () => {
           .
         </p>
         <p>
+          This <span class="font-mono">PDSls</span> looks up backlinks from{" "}
+          <a
+            class="text-lightblue-500 hover:underline"
+            href="https://links.bsky.bad-example.com"
+            target="_blank"
+          >
+            Constellation
+          </a>
+          .
+        </p>
+        <p>
           You can optionally login to manage the records in your repository.
         </p>
       </div>

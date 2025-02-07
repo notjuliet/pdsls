@@ -46,7 +46,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
       class="m-5 flex flex-col items-center text-slate-900 dark:text-slate-100"
     >
       <div class="mb-2 flex w-[21rem] items-center">
-        <div class="flex basis-1/3 gap-x-2">
+        <div class="flex basis-1/4 gap-x-2">
           <div
             class="w-fit cursor-pointer"
             onclick={() => {
@@ -68,13 +68,21 @@ const Layout = (props: RouteSectionProps<unknown>) => {
             <CreateRecord />
           </Show>
         </div>
-        <div class="basis-1/3 text-center font-mono text-xl font-bold">
+        <div class="basis-1/2 text-center font-mono text-xl font-bold">
           <a href="/" class="hover:underline">
             PDSls
+          </a>{" "}
+          <a
+            href="https://links.bsky.bad-example.com"
+            class="hover:underline"
+            title="PDSls with backlinks from Constellation"
+            target="_blank"
+          >
+            -l🌌
           </a>
         </div>
-        <div class="justify-right flex basis-1/3 items-center gap-x-2">
-          <a href="https://github.com/notjuliet/pdsls" target="_blank">
+        <div class="justify-right flex basis-1/4 items-center gap-x-2">
+          <a href="https://github.com/at-ucosm/pdsls" target="_blank">
             <Tooltip text="GitHub">
               <div class="i-bi-github text-xl" />
             </Tooltip>
