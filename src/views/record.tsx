@@ -6,14 +6,16 @@ import { JSONValue } from "../components/json.jsx";
 import { authenticate_post_with_doc } from "public-transport";
 import { agent, loginState } from "../components/login.jsx";
 import { Editor } from "../components/editor.jsx";
+import { Backlinks } from "../components/backlinks.jsx";
 import { editor } from "monaco-editor";
 import { setCID, setValidRecord, validRecord } from "../components/navbar.jsx";
-import { didDocCache, resolveHandle, resolvePDS } from "../utils/api.js";
+import { didDocCache, getAllBacklinks, resolveHandle, resolvePDS } from "../utils/api.js";
 import { theme } from "../layout.jsx";
 
 const RecordView = () => {
   const params = useParams();
   const [record, setRecord] = createSignal<ComAtprotoRepoGetRecord.Output>();
+  const [backlinks, setBacklinks] = createSignal<JSONType>();
   const [modal, setModal] = createSignal<HTMLDialogElement>();
   const [openDelete, setOpenDelete] = createSignal(false);
   const [openEdit, setOpenEdit] = createSignal(false);
@@ -62,6 +64,8 @@ const RecordView = () => {
       else setNotice(`Invalid record: ${err}`);
       setValidRecord(false);
     }
+    const backlinks = await getAllBacklinks(`at://${did}/${params.collection}/${params.rkey}`);
+    setBacklinks(backlinks.links);
   });
 
   onCleanup(() => {
@@ -328,14 +332,19 @@ const RecordView = () => {
             </button>
           </Show>
         </div>
-        <div class="break-anywhere mt-1 whitespace-pre-wrap pl-3.5 font-mono text-sm sm:text-base">
-          <Show when={!JSONSyntax()}>
+        <Show when={!JSONSyntax()}>
+          <div class="break-anywhere mt-1 mb-2 whitespace-pre-wrap border-b border-neutral-500 pl-3.5 pr-3.5 pb-3 font-mono text-sm sm:text-base">
             <JSONValue
               data={record()?.value as any}
               repo={record()!.uri.split("/")[2]}
             />
+          </div>
+          <Show when={backlinks()}>
+            <Backlinks links={backlinks()} />
           </Show>
-          <Show when={JSONSyntax()}>
+        </Show>
+        <Show when={JSONSyntax()}>
+          <div class="break-anywhere mt-1 whitespace-pre-wrap pl-3.5 font-mono text-sm sm:text-base">
             <Editor
               theme={theme()}
               model={editor.createModel(
@@ -348,8 +357,8 @@ const RecordView = () => {
               )}
               readOnly={true}
             />
-          </Show>
-        </div>
+          </div>
+        </Show>
       </Show>
     </>
   );

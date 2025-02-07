@@ -4,6 +4,8 @@ import { setPDS } from "../components/navbar";
 import { DidDocument } from "@atcute/client/utils/did";
 import { createStore } from "solid-js/store";
 
+const CONSTELLATION_HOST = "https://links.bsky.bad-example.com";
+
 const didPDSCache: Record<string, string> = {};
 const [labelerCache, setLabelerCache] = createStore<Record<string, string>>({});
 const didDocCache: Record<string, DidDocument> = {};
@@ -47,4 +49,29 @@ const resolvePDS = async (did: string) => {
   return pds;
 };
 
-export { getPDS, labelerCache, didDocCache, resolveHandle, resolvePDS };
+const getConstellation = async (
+  endpoint: string,
+  target: string,
+  collection?: string,
+  path?: string,
+) => {
+  const url = new URL(CONSTELLATION_HOST);
+  url.pathname = endpoint;
+  url.searchParams.set('target', target);
+  if (collection) {
+    if (!path) throw new Error('collection and path must either both be set or neither');
+    url.searchParams.set('collection', collection);
+    url.searchParams.set('path', path);
+  } else {
+    if (path) throw new Error('collection and path must either both be set or neither');
+  }
+  let res = await fetch(url);
+  if (!res.ok) throw new Error('failed to fetch from constellation');
+  let json = await res.json();
+  return json;
+}
+
+const getAllBacklinks = (target: string) =>
+  getConstellation('/links/all', target);
+
+export { getPDS, getAllBacklinks, labelerCache, didDocCache, resolveHandle, resolvePDS };
