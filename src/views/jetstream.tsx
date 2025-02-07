@@ -2,10 +2,12 @@ import { createSignal, For, Show, onCleanup, onMount } from "solid-js";
 import { JSONValue } from "../components/json";
 import { action, useAction, useSearchParams } from "@solidjs/router";
 
-// TODO: show applied settings
+type Parameter = { name: string; param: string | string[] | undefined };
 
 const JetstreamView = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [parameters, setParameters] = createSignal<Parameter[]>([]);
+
   const [records, setRecords] = createSignal<Array<any>>([]);
   const [connected, setConnected] = createSignal(false);
   const [allEvents, setAllEvents] = createSignal(false);
@@ -48,6 +50,14 @@ const JetstreamView = () => {
       cursor: formData.get("cursor")?.toString(),
       allEvents: formData.get("allEvents")?.toString(),
     });
+
+    setParameters([
+      { name: "Instance", param: formData.get("instance")?.toString() },
+      { name: "Collections", param: formData.get("collections")?.toString() },
+      { name: "DIDs", param: formData.get("dids")?.toString() },
+      { name: "Cursor", param: formData.get("cursor")?.toString() },
+      { name: "All Events", param: formData.get("allEvents")?.toString() },
+    ]);
 
     socket = new WebSocket(url);
     setConnected(true);
@@ -139,21 +149,20 @@ const JetstreamView = () => {
           </div>
         </Show>
         <Show when={connected()}>
-          <Show when={searchParams.instance}>
-            <div>Instance: {searchParams.instance}</div>
-          </Show>
-          <Show when={searchParams.collections}>
-            <div>Collections: {searchParams.collections}</div>
-          </Show>
-          <Show when={searchParams.dids}>
-            <div>DIDs: {searchParams.dids}</div>
-          </Show>
-          <Show when={searchParams.cursor}>
-            <div>Cursor: {searchParams.cursor}</div>
-          </Show>
-          <Show when={searchParams.allEvents}>
-            <div>All Events: {searchParams.allEvents}</div>
-          </Show>
+          <div class="break-anywhere flex flex-col gap-1">
+            <For each={parameters()}>
+              {(param) => (
+                <Show when={param.param}>
+                  <div class="flex">
+                    <div class="min-w-6rem font-semibold text-stone-600 dark:text-stone-400">
+                      {param.name}
+                    </div>
+                    {param.param}
+                  </div>
+                </Show>
+              )}
+            </For>
+          </div>
         </Show>
         <div class="flex justify-end">
           <button
