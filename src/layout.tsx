@@ -47,22 +47,11 @@ const Layout = (props: RouteSectionProps<unknown>) => {
     >
       <div class="mb-2 flex w-[21rem] items-center">
         <div class="flex basis-1/3 gap-x-2">
-          <div
-            class="w-fit cursor-pointer"
-            onclick={() => {
-              setTheme(theme() === "light" ? "dark" : "light");
-              if (theme() === "dark")
-                document.documentElement.classList.add("dark");
-              else document.documentElement.classList.remove("dark");
-              localStorage.theme = theme();
-            }}
-          >
-            <Tooltip text="Theme">
-              {theme() === "dark" ?
-                <div class="i-tabler-moon-stars text-xl" />
-              : <div class="i-tabler-sun text-xl" />}
+          <a href="/jetstream">
+            <Tooltip text="Jetstream">
+              <div class="i-ic-outline-cell-tower text-xl" />
             </Tooltip>
-          </div>
+          </a>
           <AccountManager />
           <Show when={loginState()}>
             <CreateRecord />
@@ -84,6 +73,22 @@ const Layout = (props: RouteSectionProps<unknown>) => {
               <div class="i-simple-icons-kofi text-xl" />
             </Tooltip>
           </a>
+          <div
+            class="w-fit cursor-pointer"
+            onclick={() => {
+              setTheme(theme() === "light" ? "dark" : "light");
+              if (theme() === "dark")
+                document.documentElement.classList.add("dark");
+              else document.documentElement.classList.remove("dark");
+              localStorage.theme = theme();
+            }}
+          >
+            <Tooltip text="Theme">
+              {theme() === "dark" ?
+                <div class="i-tabler-moon-stars text-xl" />
+              : <div class="i-tabler-sun text-xl" />}
+            </Tooltip>
+          </div>
         </div>
       </div>
       <div class="mb-5 flex max-w-full flex-col items-center text-pretty md:max-w-screen-md">
