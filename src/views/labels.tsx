@@ -53,7 +53,6 @@ const LabelView = () => {
   };
 
   const filterLabels = () => {
-    console.log("hello");
     const newFilter = labels().filter((label) =>
       filter() ? filter() === label.val : true,
     );
