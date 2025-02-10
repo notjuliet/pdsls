@@ -1,5 +1,5 @@
 import { resolveHandle } from "../utils/api.js";
-import { action, redirect, useSubmission } from "@solidjs/router";
+import { A, action, redirect, useSubmission } from "@solidjs/router";
 import Tooltip from "./tooltip.jsx";
 import { Show } from "solid-js";
 import { agent, loginState } from "../components/login.jsx";
@@ -69,9 +69,9 @@ const Search = () => {
             <Tooltip
               text="Repository"
               children={
-                <a href={`/at/${agent.sub}`} class="flex items-center">
+                <A href={`/at/${agent.sub}`} class="flex items-center">
                   <button class="i-tabler-binary-tree text-xl" />
-                </a>
+                </A>
               }
             />
           </Show>

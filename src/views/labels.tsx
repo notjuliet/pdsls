@@ -1,6 +1,6 @@
 import { createResource, createSignal, For, onMount, Show } from "solid-js";
 import { CredentialManager, XRPC } from "@atcute/client";
-import { useParams, useSearchParams } from "@solidjs/router";
+import { A, useParams, useSearchParams } from "@solidjs/router";
 import { labelerCache, resolvePDS } from "../utils/api.js";
 import { ComAtprotoLabelDefs } from "@atcute/client/lexicons";
 import { localDateFromTimestamp } from "../utils/date.js";
@@ -141,13 +141,13 @@ const LabelView = () => {
                     <div class="min-w-[5rem] font-semibold text-stone-600 dark:text-stone-400">
                       URI
                     </div>
-                    <a
+                    <A
                       href={`/at/${label.uri.replace("at://", "")}`}
                       target="_blank"
                       class="underline"
                     >
                       {label.uri}
-                    </a>
+                    </A>
                   </div>
                   <Show when={label.cid}>
                     <div class="flex gap-x-2">

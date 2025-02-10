@@ -1,5 +1,5 @@
 import { createSignal, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
-import { RouteSectionProps, useLocation, useParams } from "@solidjs/router";
+import { A, RouteSectionProps, useLocation, useParams } from "@solidjs/router";
 import { agent, loginState, retrieveSession } from "./components/login.jsx";
 import { CreateRecord } from "./components/create.jsx";
 import Tooltip from "./components/tooltip.jsx";
@@ -47,20 +47,20 @@ const Layout = (props: RouteSectionProps<unknown>) => {
     >
       <div class="mb-2 flex w-[21rem] items-center">
         <div class="flex basis-1/3 gap-x-2">
-          <a href="/jetstream">
+          <A href="/jetstream">
             <Tooltip text="Jetstream">
               <div class="i-ic-outline-cell-tower text-xl" />
             </Tooltip>
-          </a>
+          </A>
           <AccountManager />
           <Show when={loginState()}>
             <CreateRecord />
           </Show>
         </div>
         <div class="basis-1/3 text-center font-mono text-xl font-bold">
-          <a href="/" class="hover:underline">
+          <A href="/" class="hover:underline">
             PDSls
-          </a>
+          </A>
         </div>
         <div class="justify-right flex basis-1/3 items-center gap-x-2">
           <a href="https://github.com/notjuliet/pdsls" target="_blank">

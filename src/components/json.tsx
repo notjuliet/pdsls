@@ -1,5 +1,6 @@
 import VideoPlayer from "./video-player";
 import { createSignal, For } from "solid-js";
+import { A } from "@solidjs/router";
 
 interface AtBlob {
   $type: string;
@@ -25,17 +26,17 @@ const JSONString = ({ data }: { data: string }) => {
         {(part) => (
           <>
             {part.startsWith("at://") && part.split(" ").length === 1 ?
-              <a class="underline" href={part.replace("at://", "/at/")}>
+              <A class="underline" href={part.replace("at://", "/at/")}>
                 {part}
-              </a>
+              </A>
             : (
               part.startsWith("did:") &&
               part.split(" ").length === 1 &&
               part.split(":").length === 3
             ) ?
-              <a class="underline" href={`/at/${part}`}>
+              <A class="underline" href={`/at/${part}`}>
                 {part}
-              </a>
+              </A>
             : (
               isURL(part) &&
               ["http:", "https:", "web+at:"].includes(new URL(part).protocol) &&
