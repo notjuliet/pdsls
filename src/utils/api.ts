@@ -59,33 +59,57 @@ const getConstellation = async (
 ) => {
   const url = new URL(CONSTELLATION_HOST);
   url.pathname = endpoint;
-  url.searchParams.set('target', target);
+  url.searchParams.set("target", target);
   if (collection) {
-    if (!path) throw new Error('collection and path must either both be set or neither');
-    url.searchParams.set('collection', collection);
-    url.searchParams.set('path', path);
+    if (!path)
+      throw new Error("collection and path must either both be set or neither");
+    url.searchParams.set("collection", collection);
+    url.searchParams.set("path", path);
   } else {
-    if (path) throw new Error('collection and path must either both be set or neither');
+    if (path)
+      throw new Error("collection and path must either both be set or neither");
   }
-  if (limit) {
-    url.searchParams.set('limit', `${limit}`);
-  }
-  if (cursor) {
-    url.searchParams.set('cursor', `${cursor}`);
-  }
-  let res = await fetch(url);
-  if (!res.ok) throw new Error('failed to fetch from constellation');
-  let json = await res.json();
-  return json;
-}
+  if (limit) url.searchParams.set("limit", `${limit}`);
+  if (cursor) url.searchParams.set("cursor", `${cursor}`);
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("failed to fetch from constellation");
+  return await res.json();
+};
 
 const getAllBacklinks = (target: string) =>
-  getConstellation('/links/all', target);
+  getConstellation("/links/all", target);
 
-const getRecordBacklinks = (target: string, collection: string, path: string, cursor?: string, limit?: number) =>
-  getConstellation('/links', target, collection, path, cursor, limit || 100);
+const getRecordBacklinks = (
+  target: string,
+  collection: string,
+  path: string,
+  cursor?: string,
+  limit?: number,
+) => getConstellation("/links", target, collection, path, cursor, limit || 100);
 
-const getDidBacklinks = (target: string, collection: string, path: string, cursor?: string, limit?: string) =>
-  getConstellation('/links/distinct-dids', target, collection, path, cursor, limit || 100);
+const getDidBacklinks = (
+  target: string,
+  collection: string,
+  path: string,
+  cursor?: string,
+  limit?: number,
+) =>
+  getConstellation(
+    "/links/distinct-dids",
+    target,
+    collection,
+    path,
+    cursor,
+    limit || 100,
+  );
 
-export { getPDS, getAllBacklinks, getRecordBacklinks, getDidBacklinks, labelerCache, didDocCache, resolveHandle, resolvePDS };
+export {
+  getPDS,
+  getAllBacklinks,
+  getRecordBacklinks,
+  getDidBacklinks,
+  labelerCache,
+  didDocCache,
+  resolveHandle,
+  resolvePDS,
+};

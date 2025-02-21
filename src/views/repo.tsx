@@ -1,14 +1,23 @@
 import { createSignal, For, Show, createResource } from "solid-js";
 import { CredentialManager, XRPC } from "@atcute/client";
 import { A, query, useParams } from "@solidjs/router";
-import { didDocCache, getAllBacklinks, resolveHandle, resolvePDS } from "../utils/api.js";
+import {
+  didDocCache,
+  getAllBacklinks,
+  resolveHandle,
+  resolvePDS,
+} from "../utils/api.js";
 import { DidDocument } from "@atcute/client/utils/did";
 import { Backlinks } from "../components/backlinks.jsx";
+import { JSONType } from "../components/json.jsx";
 
 const RepoView = () => {
   const params = useParams();
   const [didDoc, setDidDoc] = createSignal<DidDocument>();
-  const [backlinks, setBacklinks] = createSignal<JSONType>();
+  const [backlinks, setBacklinks] = createSignal<{
+    links: JSONType;
+    target: string;
+  }>();
   let rpc: XRPC;
   let did = params.repo;
 
@@ -127,9 +136,14 @@ const RepoView = () => {
                 </a>
               </Show>
               <Show when={backlinks()}>
-                <div class="border-t mt-2 pt-2 border-neutral-500 ">
-                  <Backlinks links={backlinks().links} target={backlinks().target} />
-                </div>
+                {(backlinks) => (
+                  <div class="mt-2 border-t border-neutral-500 pt-2">
+                    <Backlinks
+                      links={backlinks().links}
+                      target={backlinks().target}
+                    />
+                  </div>
+                )}
               </Show>
             </div>
           )}

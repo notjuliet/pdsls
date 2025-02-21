@@ -2,21 +2,29 @@ import { createSignal, onMount, Show, onCleanup, createEffect } from "solid-js";
 import { CredentialManager, XRPC } from "@atcute/client";
 import { ComAtprotoRepoGetRecord } from "@atcute/client/lexicons";
 import { action, query, redirect, useParams } from "@solidjs/router";
-import { JSONValue } from "../components/json.jsx";
+import { JSONType, JSONValue } from "../components/json.jsx";
 import { authenticate_post_with_doc } from "public-transport";
 import { agent, loginState } from "../components/login.jsx";
 import { Editor } from "../components/editor.jsx";
 import { Backlinks } from "../components/backlinks.jsx";
 import { editor } from "monaco-editor";
 import { setCID, setValidRecord, validRecord } from "../components/navbar.jsx";
-import { didDocCache, getAllBacklinks, resolveHandle, resolvePDS } from "../utils/api.js";
+import {
+  didDocCache,
+  getAllBacklinks,
+  resolveHandle,
+  resolvePDS,
+} from "../utils/api.js";
 import { theme } from "../layout.jsx";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 
 const RecordView = () => {
   const params = useParams();
   const [record, setRecord] = createSignal<ComAtprotoRepoGetRecord.Output>();
-  const [backlinks, setBacklinks] = createSignal<JSONType>();
+  const [backlinks, setBacklinks] = createSignal<{
+    links: JSONType;
+    target: string;
+  }>();
   const [modal, setModal] = createSignal<HTMLDialogElement>();
   const [openDelete, setOpenDelete] = createSignal(false);
   const [openEdit, setOpenEdit] = createSignal(false);
@@ -296,18 +304,23 @@ const RecordView = () => {
           </Show>
         </div>
         <Show when={!JSONSyntax()}>
-          <div class="break-anywhere mt-1 mb-2 whitespace-pre-wrap border-b border-neutral-500 pl-3.5 pr-3.5 pb-3 font-mono text-sm sm:text-base">
+          <div class="break-anywhere mb-2 mt-1 whitespace-pre-wrap border-b border-neutral-500 pb-3 font-mono text-sm sm:text-base">
             <JSONValue
               data={record()?.value as any}
               repo={record()!.uri.split("/")[2]}
             />
           </div>
           <Show when={backlinks()}>
-            <Backlinks links={backlinks().links} target={backlinks().target} />
+            {(backlinks) => (
+              <Backlinks
+                links={backlinks().links}
+                target={backlinks().target}
+              />
+            )}
           </Show>
         </Show>
         <Show when={JSONSyntax()}>
-          <div class="break-anywhere mt-1 whitespace-pre-wrap pl-3.5 font-mono text-sm sm:text-base">
+          <div class="mt-1">
             <Editor
               theme={theme()}
               model={editor.createModel(
