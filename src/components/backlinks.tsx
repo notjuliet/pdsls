@@ -70,7 +70,7 @@ const Backlinks = ({ links, target }: { links: LinkData; target: string }) => {
                     : setShow({ collection, path, showDids: false })
                   }
                 >
-                  {counts.records} records
+                  {counts.records} record{counts.records < 2 ? "" : "s"}
                 </a>
                 {" from "}
                 <a
@@ -87,7 +87,8 @@ const Backlinks = ({ links, target }: { links: LinkData; target: string }) => {
                     : setShow({ collection, path, showDids: true })
                   }
                 >
-                  {counts.distinct_dids} DIDs
+                  {counts.distinct_dids} DID
+                  {counts.distinct_dids < 2 ? "" : "s"}
                 </a>
               </p>
               <Show
