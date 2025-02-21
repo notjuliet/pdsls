@@ -61,7 +61,11 @@ const Backlinks = ({ links, target }: { links: LinkData; target: string }) => {
                   href="#"
                   title="Show linking records"
                   onclick={() =>
-                    show() && !show()?.showDids ?
+                    (
+                      show()?.collection === collection &&
+                      show()?.path === path &&
+                      !show()?.showDids
+                    ) ?
                       setShow(null)
                     : setShow({ collection, path, showDids: false })
                   }
@@ -74,7 +78,11 @@ const Backlinks = ({ links, target }: { links: LinkData; target: string }) => {
                   href="#"
                   title="Show linking DIDs"
                   onclick={() =>
-                    show() && show()?.showDids ?
+                    (
+                      show()?.collection === collection &&
+                      show()?.path === path &&
+                      show()?.showDids
+                    ) ?
                       setShow(null)
                     : setShow({ collection, path, showDids: true })
                   }
