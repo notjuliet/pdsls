@@ -156,7 +156,7 @@ const BacklinkItems = ({
         <For each={links().linking_dids}>
           {(did) => (
             <a
-              href={`/at/${did}`}
+              href={`/at://${did}`}
               class="text-lightblue-500 relative flex w-full font-mono hover:underline"
             >
               {did}
@@ -169,7 +169,7 @@ const BacklinkItems = ({
           {({ did, collection, rkey }) => (
             <p class="relative flex w-full items-center gap-1 font-mono">
               <a
-                href={`/at/${did}/${collection}/${rkey}`}
+                href={`/at://${did}/${collection}/${rkey}`}
                 class="text-lightblue-500 hover:underline"
               >
                 {rkey}
