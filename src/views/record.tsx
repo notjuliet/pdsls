@@ -11,6 +11,7 @@ import { editor } from "monaco-editor";
 import { setCID, setValidRecord, validRecord } from "../components/navbar.jsx";
 import { didDocCache, getAllBacklinks, resolveHandle, resolvePDS } from "../utils/api.js";
 import { theme } from "../layout.jsx";
+import { AtUri, uriTemplates } from "../utils/templates.js";
 
 const RecordView = () => {
   const params = useParams();
@@ -139,7 +140,7 @@ const RecordView = () => {
         rkey: params.rkey,
       },
     });
-    throw redirect(`/at/${params.repo}/${params.collection}`);
+    throw redirect(`/at://${params.repo}/${params.collection}`);
   });
 
   createEffect(() => {
@@ -147,45 +148,6 @@ const RecordView = () => {
     else document.body.style.overflow = "auto";
     setEditNotice("");
   });
-
-  type AtUri = { repo: string; collection: string; rkey: string };
-  type TemplateFn = (uri: AtUri) => { label: string; link: string };
-  type TemplateMap = Record<string, TemplateFn>;
-
-  const uriTemplates: TemplateMap = {
-    "app.bsky.actor.profile": (uri) => ({
-      label: "Bluesky",
-      link: `https://bsky.app/profile/${uri.repo}`,
-    }),
-    "app.bsky.feed.post": (uri) => ({
-      label: "Bluesky",
-      link: `https://bsky.app/profile/${uri.repo}/post/${uri.rkey}`,
-    }),
-    "app.bsky.graph.list": (uri) => ({
-      label: "Bluesky",
-      link: `https://bsky.app/profile/${uri.repo}/lists/${uri.rkey}`,
-    }),
-    "app.bsky.feed.generator": (uri) => ({
-      label: "Bluesky",
-      link: `https://bsky.app/profile/${uri.repo}/feed/${uri.rkey}`,
-    }),
-    "fyi.unravel.frontpage.post": (uri) => ({
-      label: "Frontpage",
-      link: `https://frontpage.fyi/post/${uri.repo}/${uri.rkey}`,
-    }),
-    "com.whtwnd.blog.entry": (uri) => ({
-      label: "WhiteWind",
-      link: `https://whtwnd.com/${uri.repo}/${uri.rkey}`,
-    }),
-    "com.shinolabs.pinksea.oekaki": (uri) => ({
-      label: "PinkSea",
-      link: `https://pinksea.art/${uri.repo}/oekaki/${uri.rkey}`,
-    }),
-    "blue.linkat.board": (uri) => ({
-      label: "Linkat",
-      link: `https://linkat.blue/${uri.repo}`,
-    }),
-  };
 
   const checkUri = (uri: string) => {
     const uriParts = uri.split("/"); // expected: ["at:", "", "repo", "collection", "rkey"]
@@ -279,7 +241,7 @@ const RecordView = () => {
                           type="submit"
                           class="rounded-lg bg-green-500 px-2.5 py-1.5 text-sm font-bold text-slate-100 hover:bg-green-400 focus:outline-none focus:ring-1 focus:ring-slate-700 dark:bg-green-600 dark:hover:bg-green-500 dark:focus:ring-slate-300"
                         >
-                          Confirm
+                          Edit
                         </button>
                       </div>
                     </div>

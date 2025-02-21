@@ -1,5 +1,5 @@
 import { createSignal, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
-import { RouteSectionProps, useLocation, useParams } from "@solidjs/router";
+import { A, RouteSectionProps, useLocation, useParams } from "@solidjs/router";
 import { agent, loginState, retrieveSession } from "./components/login.jsx";
 import { CreateRecord } from "./components/create.jsx";
 import Tooltip from "./components/tooltip.jsx";
@@ -7,6 +7,7 @@ import { NavBar } from "./components/navbar.jsx";
 import { Search } from "./components/search.jsx";
 import { AccountManager } from "./components/account.jsx";
 import { resolveHandle } from "./utils/api.js";
+import { Meta, MetaProvider } from "@solidjs/meta";
 
 export const [theme, setTheme] = createSignal(
   (
@@ -23,7 +24,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
     navigator.registerProtocolHandler("web+at", "/%s");
     const pathname = decodeURIComponent(useLocation().pathname);
     if (pathname.startsWith("/web+at://")) {
-      window.location.href = pathname.replace("web+at://", "at/");
+      window.location.href = pathname.replace("web+at://", "at://");
     }
   } catch (err) {
     console.error(err);
@@ -37,7 +38,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
     }
     await retrieveSession();
     if (loginState() && location.pathname === "/")
-      window.location.href = `/at/${agent.sub}`;
+      window.location.href = `/at://${agent.sub}`;
   });
 
   return (
@@ -45,8 +46,34 @@ const Layout = (props: RouteSectionProps<unknown>) => {
       id="main"
       class="m-5 flex flex-col items-center text-slate-900 dark:text-slate-100"
     >
+      <Show when={location.pathname !== "/"}>
+        <MetaProvider>
+          <Meta name="robots" content="noindex, nofollow" />
+        </MetaProvider>
+      </Show>
       <div class="mb-2 flex w-[21rem] items-center">
-        <div class="flex basis-1/4 gap-x-2">
+        <div class="flex basis-1/3 gap-x-2">
+          <A href="/jetstream">
+            <Tooltip text="Jetstream">
+              <div class="i-ic-outline-cell-tower text-xl" />
+            </Tooltip>
+          </A>
+          <AccountManager />
+          <Show when={loginState()}>
+            <CreateRecord />
+          </Show>
+        </div>
+        <div class="basis-1/3 text-center font-mono text-xl font-bold">
+          <A href="/" class="hover:underline">
+            PDSls
+          </A>
+        </div>
+        <div class="justify-right flex basis-1/3 items-center gap-x-2">
+          <a href="https://github.com/notjuliet/pdsls" target="_blank">
+            <Tooltip text="GitHub">
+              <div class="i-bi-github text-xl" />
+            </Tooltip>
+          </a>
           <div
             class="w-fit cursor-pointer"
             onclick={() => {
@@ -63,39 +90,15 @@ const Layout = (props: RouteSectionProps<unknown>) => {
               : <div class="i-tabler-sun text-xl" />}
             </Tooltip>
           </div>
-          <AccountManager />
-          <Show when={loginState()}>
-            <CreateRecord />
-          </Show>
-        </div>
-        <div class="basis-1/2 text-center font-mono text-xl font-bold">
-          <a href="/" class="hover:underline">
-            PDSls
-          </a>{" "}
-          <a
-            href="https://links.bsky.bad-example.com"
-            class="hover:underline"
-            title="PDSls with backlinks from Constellation"
-            target="_blank"
-          >
-            -l🌌
-          </a>
-        </div>
-        <div class="justify-right flex basis-1/4 items-center gap-x-2">
-          <a href="https://github.com/at-ucosm/pdsls" target="_blank">
-            <Tooltip text="GitHub">
-              <div class="i-bi-github text-xl" />
-            </Tooltip>
-          </a>
-          <a href="https://ko-fi.com/notjuliet" target="_blank">
-            <Tooltip text="Donate">
-              <div class="i-simple-icons-kofi text-xl" />
-            </Tooltip>
-          </a>
         </div>
       </div>
       <div class="mb-5 flex max-w-full flex-col items-center text-pretty md:max-w-screen-md">
-        <Show when={location.pathname !== "/login"}>
+        <Show
+          when={
+            location.pathname !== "/jetstream" &&
+            location.pathname !== "/firehose"
+          }
+        >
           <Search />
         </Show>
         <Show when={params.pds}>

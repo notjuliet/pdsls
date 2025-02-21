@@ -99,7 +99,7 @@ const NavBar = (props: { params: Params }) => {
               </Tooltip>
               <A
                 end
-                href={`at/${props.params.repo}`}
+                href={`/at://${props.params.repo}`}
                 inactiveClass="text-lightblue-500 w-full hover:underline"
               >
                 {props.params.repo}
@@ -112,7 +112,7 @@ const NavBar = (props: { params: Params }) => {
                 </Tooltip>
                 <A
                   end
-                  href={`at/${props.params.repo}/blobs`}
+                  href={`/at://${props.params.repo}/blobs`}
                   inactiveClass="text-lightblue-500 w-full hover:underline"
                 >
                   blobs
@@ -132,7 +132,7 @@ const NavBar = (props: { params: Params }) => {
                 </Tooltip>
                 <A
                   end
-                  href={`at/${props.params.repo}/labels`}
+                  href={`/at://${props.params.repo}/labels`}
                   inactiveClass="text-lightblue-500 w-full hover:underline"
                 >
                   labels
@@ -148,7 +148,7 @@ const NavBar = (props: { params: Params }) => {
             </Tooltip>
             <A
               end
-              href={`at/${props.params.repo}/${props.params.collection}`}
+              href={`/at://${props.params.repo}/${props.params.collection}`}
               inactiveClass="text-lightblue-500 w-full hover:underline"
             >
               {props.params.collection}

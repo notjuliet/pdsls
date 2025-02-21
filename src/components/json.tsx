@@ -1,5 +1,8 @@
 import VideoPlayer from "./video-player";
-import { createSignal, For } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
+import { A } from "@solidjs/router";
+import { pds } from "./navbar";
+import Tooltip from "./tooltip";
 
 interface AtBlob {
   $type: string;
@@ -25,17 +28,17 @@ const JSONString = ({ data }: { data: string }) => {
         {(part) => (
           <>
             {part.startsWith("at://") && part.split(" ").length === 1 ?
-              <a class="underline" href={part.replace("at://", "/at/")}>
+              <A class="underline" href={`/${part}`}>
                 {part}
-              </a>
+              </A>
             : (
               part.startsWith("did:") &&
               part.split(" ").length === 1 &&
               part.split(":").length === 3
             ) ?
-              <a class="underline" href={`/at/${part}`}>
+              <A class="underline" href={`/at://${part}`}>
                 {part}
-              </a>
+              </A>
             : (
               isURL(part) &&
               ["http:", "https:", "web+at:"].includes(new URL(part).protocol) &&
@@ -118,28 +121,37 @@ const JSONObject = ({
 
   const blob: AtBlob = data as any;
 
-  if (blob.$type === "blob" && blob.mimeType.startsWith("image/")) {
+  if (blob.$type === "blob") {
     return (
       <>
-        <a
-          href={`https://cdn.bsky.app/img/feed_thumbnail/plain/${repo}/${blob.ref.$link}@jpeg`}
-          target="_blank"
-          class="contents"
-        >
-          <img
-            class="max-h-[16rem] max-w-[16rem]"
-            src={`https://cdn.bsky.app/img/feed_thumbnail/plain/${repo}/${blob.ref.$link}@jpeg`}
-          />
-        </a>
-        {rawObj}
-      </>
-    );
-  }
-
-  if (blob.$type === "blob" && blob.mimeType === "video/mp4") {
-    return (
-      <>
-        <VideoPlayer did={repo} cid={blob.ref.$link} />
+        <span class="flex gap-x-1">
+          <Show when={blob.mimeType.startsWith("image/")}>
+            <a
+              href={`https://cdn.bsky.app/img/feed_thumbnail/plain/${repo}/${blob.ref.$link}@jpeg`}
+              target="_blank"
+              class="contents"
+            >
+              <img
+                class="max-h-[16rem] max-w-[16rem]"
+                src={`https://cdn.bsky.app/img/feed_thumbnail/plain/${repo}/${blob.ref.$link}@jpeg`}
+              />
+            </a>
+          </Show>
+          <Show when={blob.mimeType === "video/mp4"}>
+            <VideoPlayer did={repo} cid={blob.ref.$link} />
+          </Show>
+          <Show when={pds()}>
+            <a
+              href={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${repo}&cid=${blob.ref.$link}`}
+              target="_blank"
+              class="size-fit"
+            >
+              <Tooltip text="Blob link">
+                <div class="i-tabler-external-link" />
+              </Tooltip>
+            </a>
+          </Show>
+        </span>
         {rawObj}
       </>
     );

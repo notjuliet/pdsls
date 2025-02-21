@@ -1,7 +1,7 @@
-import { defineConfig, presetUno } from "unocss";
+import { defineConfig, presetWind3 } from "unocss";
 
 export default defineConfig({
-  presets: [presetUno()],
+  presets: [presetWind3()],
   extendTheme: (theme) => {
     return {
       ...theme,

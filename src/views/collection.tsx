@@ -199,7 +199,7 @@ const CollectionView = () => {
 
   return (
     <Show when={records.length || response()}>
-      <div class="z-5 dark:bg-dark-700 sticky top-0 flex w-full flex-col items-center justify-center gap-2 bg-slate-100 py-4">
+      <div class="z-5 dark:bg-dark-700 sticky top-0 mb-2 flex w-full flex-col items-center justify-center gap-2 border-b border-neutral-500 bg-slate-100 py-4">
         <div
           classList={{
             "flex items-center gap-2": true,
@@ -358,7 +358,7 @@ const CollectionView = () => {
                 </label>
               </Show>
               <Show when={!batchDelete()}>
-                <A href={`${record.rkey}`}>
+                <A href={`/at://${did}/${params.collection}/${record.rkey}`}>
                   <RecordLink record={record} index={index()} />
                 </A>
               </Show>

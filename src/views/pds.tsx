@@ -1,7 +1,7 @@
 import { createSignal, For, Show, createResource } from "solid-js";
 import { CredentialManager, XRPC } from "@atcute/client";
 import { ComAtprotoSyncListRepos } from "@atcute/client/lexicons";
-import { useParams } from "@solidjs/router";
+import { A, useParams } from "@solidjs/router";
 import { setPDS } from "../components/navbar";
 import Tooltip from "../components/tooltip";
 
@@ -55,8 +55,8 @@ const PdsView = () => {
         </p>
         <For each={repos()}>
           {(repo) => (
-            <a
-              href={`/at/${repo.did}`}
+            <A
+              href={`/at://${repo.did}`}
               classList={{
                 "w-full flex font-mono relative": true,
                 "text-lightblue-500": repo.active,
@@ -69,8 +69,8 @@ const PdsView = () => {
                   <span>🪦</span>
                 </Tooltip>
               </Show>
-              <span class="hover:underline">{repo.did}</span>
-            </a>
+              <span class="w-full hover:underline">{repo.did}</span>
+            </A>
           )}
         </For>
         <div class="flex w-full justify-center">
