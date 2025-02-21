@@ -1,5 +1,7 @@
 import { createSignal, createMemo, onMount, Show, For } from "solid-js";
 import { getRecordBacklinks, getDidBacklinks, LinkData } from "../utils/api.js";
+import * as TID from "@atcute/tid";
+import { localDateFromTimestamp } from "../utils/date.js";
 
 // the actual backlink api will probably become closer to this
 const linksBySource = (links: Record<string, any>) => {
@@ -59,7 +61,7 @@ const Backlinks = ({ links, target }: { links: LinkData; target: string }) => {
                   href="#"
                   title="Show linking records"
                   onclick={() =>
-                    show() ?
+                    show() && !show()?.showDids ?
                       setShow(null)
                     : setShow({ collection, path, showDids: false })
                   }
@@ -72,7 +74,7 @@ const Backlinks = ({ links, target }: { links: LinkData; target: string }) => {
                   href="#"
                   title="Show linking DIDs"
                   onclick={() =>
-                    show() ?
+                    show() && show()?.showDids ?
                       setShow(null)
                     : setShow({ collection, path, showDids: true })
                   }
@@ -165,13 +167,18 @@ const BacklinkItems = ({
       <Show when={!dids}>
         <For each={links().linking_records}>
           {({ did, collection, rkey }) => (
-            <p class="relative flex w-full gap-1 font-mono">
+            <p class="relative flex w-full items-center gap-1 font-mono">
               <a
                 href={`/at/${did}/${collection}/${rkey}`}
                 class="text-lightblue-500 hover:underline"
               >
                 {rkey}
               </a>
+              <span class="text-xs text-neutral-500 dark:text-neutral-400">
+                {TID.validate(rkey) ?
+                  localDateFromTimestamp(TID.parse(rkey).timestamp / 1000)
+                : undefined}
+              </span>
             </p>
           )}
         </For>
