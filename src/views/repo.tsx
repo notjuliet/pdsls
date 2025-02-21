@@ -4,18 +4,18 @@ import { A, query, useParams } from "@solidjs/router";
 import {
   didDocCache,
   getAllBacklinks,
+  LinkData,
   resolveHandle,
   resolvePDS,
 } from "../utils/api.js";
 import { DidDocument } from "@atcute/client/utils/did";
 import { Backlinks } from "../components/backlinks.jsx";
-import { JSONType } from "../components/json.jsx";
 
 const RepoView = () => {
   const params = useParams();
   const [didDoc, setDidDoc] = createSignal<DidDocument>();
   const [backlinks, setBacklinks] = createSignal<{
-    links: JSONType;
+    links: LinkData;
     target: string;
   }>();
   let rpc: XRPC;

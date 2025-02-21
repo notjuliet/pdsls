@@ -49,6 +49,17 @@ const resolvePDS = async (did: string) => {
   return pds;
 };
 
+interface LinkData {
+  links: {
+    [key: string]: {
+      [key: string]: {
+        records: number;
+        distinct_dids: number;
+      };
+    };
+  };
+}
+
 const getConstellation = async (
   endpoint: string,
   target: string,
@@ -112,4 +123,5 @@ export {
   didDocCache,
   resolveHandle,
   resolvePDS,
+  type LinkData,
 };

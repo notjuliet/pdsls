@@ -2,7 +2,7 @@ import { createSignal, onMount, Show, onCleanup, createEffect } from "solid-js";
 import { CredentialManager, XRPC } from "@atcute/client";
 import { ComAtprotoRepoGetRecord } from "@atcute/client/lexicons";
 import { action, query, redirect, useParams } from "@solidjs/router";
-import { JSONType, JSONValue } from "../components/json.jsx";
+import { JSONValue } from "../components/json.jsx";
 import { authenticate_post_with_doc } from "public-transport";
 import { agent, loginState } from "../components/login.jsx";
 import { Editor } from "../components/editor.jsx";
@@ -12,6 +12,7 @@ import { setCID, setValidRecord, validRecord } from "../components/navbar.jsx";
 import {
   didDocCache,
   getAllBacklinks,
+  LinkData,
   resolveHandle,
   resolvePDS,
 } from "../utils/api.js";
@@ -22,7 +23,7 @@ const RecordView = () => {
   const params = useParams();
   const [record, setRecord] = createSignal<ComAtprotoRepoGetRecord.Output>();
   const [backlinks, setBacklinks] = createSignal<{
-    links: JSONType;
+    links: LinkData;
     target: string;
   }>();
   const [modal, setModal] = createSignal<HTMLDialogElement>();

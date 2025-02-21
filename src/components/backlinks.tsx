@@ -1,16 +1,9 @@
 import { createSignal, createMemo, onMount, Show, For } from "solid-js";
-import { getRecordBacklinks, getDidBacklinks } from "../utils/api.js";
-import { JSONType } from "./json.jsx";
-
-// i just kind of think seeing a few incidentally-public atproto things could be opt-in
-const FILTER_LINKS = {
-  "app.bsky.graph.block": new Set([".subject"]),
-};
+import { getRecordBacklinks, getDidBacklinks, LinkData } from "../utils/api.js";
 
 // the actual backlink api will probably become closer to this
-const linksBySource = (links: JSONType, filter: boolean) => {
-  let out = [];
-  let filterMatches = 0;
+const linksBySource = (links: Record<string, any>) => {
+  let out: any[] = [];
   Object.keys(links)
     .toSorted()
     .forEach((collection) => {
@@ -18,22 +11,21 @@ const linksBySource = (links: JSONType, filter: boolean) => {
       Object.keys(paths)
         .toSorted()
         .forEach((path) => {
-          const matchesFilter = FILTER_LINKS[collection]?.has(path);
-          if (matchesFilter) {
-            filterMatches += 1;
-            if (filter) return;
-          }
-          out.push({ collection, path, counts: paths[path], matchesFilter });
+          if (paths[path].records === 0) return;
+          out.push({ collection, path, counts: paths[path] });
         });
     });
-  return { links: out, filterMatches };
+  return { links: out };
 };
 
-const Backlinks = ({ links, target }: { links: JSONType; target: String }) => {
-  const [filter, setFilter] = createSignal(true);
-  const [show, setShow] = createSignal(null);
+const Backlinks = ({ links, target }: { links: LinkData; target: string }) => {
+  const [show, setShow] = createSignal<{
+    collection: string;
+    path: string;
+    showDids: boolean;
+  } | null>();
 
-  const filteredLinks = createMemo(() => linksBySource(links, filter()));
+  const filteredLinks = createMemo(() => linksBySource(links));
 
   return (
     <div class="flex flex-col pb-2">
@@ -46,26 +38,10 @@ const Backlinks = ({ links, target }: { links: JSONType; target: String }) => {
         >
           🌌
         </a>{" "}
-        <Show when={filteredLinks().filterMatches > 0}>
-          <label
-            class="float-right ml-2 flex select-none items-center gap-1 text-stone-400 dark:text-stone-500"
-            title="Some links, like blocks between accounts on Bluesky, are not shown by default."
-          >
-            Show all ({filteredLinks().filterMatches}){" "}
-            <input
-              type="checkbox"
-              oninput={(e) => setFilter(!e.target.checked)}
-              checked={!filter()}
-            />
-          </label>
-        </Show>
       </p>
       <For each={filteredLinks().links}>
         {({ collection, path, matchesFilter, counts }) => (
-          <div
-            key={`${collection}-${path}`}
-            class="mt-2 font-mono text-sm sm:text-base"
-          >
+          <div class="mt-2 font-mono text-sm sm:text-base">
             <p classList={{ "text-stone-400": matchesFilter }}>
               <span title="Collection containing linking records">
                 {collection}
@@ -109,7 +85,7 @@ const Backlinks = ({ links, target }: { links: JSONType; target: String }) => {
                   show()?.collection === collection && show()?.path === path
                 }
               >
-                <Show when={show().showDids}>
+                <Show when={show()?.showDids}>
                   {/* putting this in the `dids` prop directly failed to re-render. idk how to solidjs. */}
                   <p class="w-full font-semibold text-stone-600 dark:text-stone-400">
                     Distinct identities
@@ -121,7 +97,7 @@ const Backlinks = ({ links, target }: { links: JSONType; target: String }) => {
                     dids={true}
                   />
                 </Show>
-                <Show when={!show().showDids}>
+                <Show when={!show()?.showDids}>
                   <p class="w-full font-semibold text-stone-600 dark:text-stone-400">
                     Records
                   </p>
@@ -156,7 +132,7 @@ const BacklinkItems = ({
   dids: boolean;
   cursor?: string;
 }) => {
-  const [links, setLinks] = createSignal(null);
+  const [links, setLinks] = createSignal<any>();
   const [more, setMore] = createSignal<boolean>(false);
 
   onMount(async () => {
