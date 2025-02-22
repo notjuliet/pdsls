@@ -44,6 +44,16 @@ const Home = () => {
           </A>
           .
         </p>
+        <p>
+          <A
+            href="https://links.bsky.bad-example.com"
+            class="text-lightblue-500 hover:underline"
+            target="_blank"
+          >
+            Backlinks
+          </A>{" "}
+          can be enabled in the settings.
+        </p>
       </div>
       <p>Examples:</p>
       <div class="ml-2">

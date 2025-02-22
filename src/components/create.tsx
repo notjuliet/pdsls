@@ -3,7 +3,7 @@ import { XRPC, XRPCResponse } from "@atcute/client";
 import { agent } from "../components/login.jsx";
 import { Editor } from "../components/editor.jsx";
 import { editor } from "monaco-editor";
-import { theme } from "../layout.jsx";
+import { theme } from "../components/settings.jsx";
 import { action, redirect } from "@solidjs/router";
 import { ComAtprotoRepoCreateRecord } from "@atcute/client/lexicons";
 import Tooltip from "./tooltip.jsx";
@@ -138,7 +138,7 @@ const CreateRecord = () => {
                   </select>
                 </div>
               </div>
-              <Editor theme={theme()} model={model!} />
+              <Editor theme={theme().color} model={model!} />
               <div class="flex flex-col gap-x-2">
                 <div class="text-red-500 dark:text-red-400">
                   {createNotice()}

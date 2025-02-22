@@ -1,4 +1,4 @@
-import { createSignal, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
+import { ErrorBoundary, onMount, Show, Suspense } from "solid-js";
 import { A, RouteSectionProps, useLocation, useParams } from "@solidjs/router";
 import { agent, loginState, retrieveSession } from "./components/login.jsx";
 import { CreateRecord } from "./components/create.jsx";
@@ -8,16 +8,7 @@ import { Search } from "./components/search.jsx";
 import { AccountManager } from "./components/account.jsx";
 import { resolveHandle } from "./utils/api.js";
 import { Meta, MetaProvider } from "@solidjs/meta";
-
-export const [theme, setTheme] = createSignal(
-  (
-    localStorage.theme === "dark" ||
-      (!("theme" in localStorage) &&
-        globalThis.matchMedia("(prefers-color-scheme: dark)").matches)
-  ) ?
-    "dark"
-  : "light",
-);
+import { Settings } from "./components/settings.jsx";
 
 const Layout = (props: RouteSectionProps<unknown>) => {
   try {
@@ -74,22 +65,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
               <div class="i-bi-github text-xl" />
             </Tooltip>
           </a>
-          <div
-            class="w-fit cursor-pointer"
-            onclick={() => {
-              setTheme(theme() === "light" ? "dark" : "light");
-              if (theme() === "dark")
-                document.documentElement.classList.add("dark");
-              else document.documentElement.classList.remove("dark");
-              localStorage.theme = theme();
-            }}
-          >
-            <Tooltip text="Theme">
-              {theme() === "dark" ?
-                <div class="i-tabler-moon-stars text-xl" />
-              : <div class="i-tabler-sun text-xl" />}
-            </Tooltip>
-          </div>
+          <Settings />
         </div>
       </div>
       <div class="mb-5 flex max-w-full flex-col items-center text-pretty md:max-w-screen-md">

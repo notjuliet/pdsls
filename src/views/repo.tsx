@@ -33,8 +33,10 @@ const RepoView = () => {
     rpc = new XRPC({ handler: new CredentialManager({ service: pds }) });
     const res = await describeRepo(did);
     setDidDoc(didDocCache[did]);
-    const backlinks = await getAllBacklinks(did);
-    setBacklinks({ links: backlinks.links, target: did });
+    if (localStorage.backlinks === "true") {
+      const backlinks = await getAllBacklinks(did);
+      setBacklinks({ links: backlinks.links, target: did });
+    }
     return res.data;
   };
 

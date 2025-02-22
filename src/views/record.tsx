@@ -16,7 +16,7 @@ import {
   resolveHandle,
   resolvePDS,
 } from "../utils/api.js";
-import { theme } from "../layout.jsx";
+import { theme } from "../components/settings.jsx";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 
 const RecordView = () => {
@@ -74,9 +74,11 @@ const RecordView = () => {
       else setNotice(`Invalid record: ${err}`);
       setValidRecord(false);
     }
-    const backlinkTarget = `at://${did}/${params.collection}/${params.rkey}`;
-    const backlinks = await getAllBacklinks(backlinkTarget);
-    setBacklinks({ links: backlinks.links, target: backlinkTarget });
+    if (localStorage.backlinks === "true") {
+      const backlinkTarget = `at://${did}/${params.collection}/${params.rkey}`;
+      const backlinks = await getAllBacklinks(backlinkTarget);
+      setBacklinks({ links: backlinks.links, target: backlinkTarget });
+    }
   });
 
   onCleanup(() => {
@@ -223,7 +225,7 @@ const RecordView = () => {
                         <option value="false">False</option>
                       </select>
                     </div>
-                    <Editor theme={theme()} model={model!} />
+                    <Editor theme={theme().color} model={model!} />
                     <div class="mt-2 flex flex-col gap-2">
                       <div class="text-red-500 dark:text-red-400">
                         {editNotice()}
@@ -305,7 +307,13 @@ const RecordView = () => {
           </Show>
         </div>
         <Show when={!JSONSyntax()}>
-          <div class="break-anywhere mb-2 mt-1 whitespace-pre-wrap border-b border-neutral-500 pb-3 font-mono text-sm sm:text-base">
+          <div
+            classList={{
+              "break-anywhere mb-2 mt-1 whitespace-pre-wrap pb-3 font-mono text-sm sm:text-base":
+                true,
+              "border-b border-neutral-500": !!backlinks(),
+            }}
+          >
             <JSONValue
               data={record()?.value as any}
               repo={record()!.uri.split("/")[2]}
@@ -323,7 +331,7 @@ const RecordView = () => {
         <Show when={JSONSyntax()}>
           <div class="mt-1">
             <Editor
-              theme={theme()}
+              theme={theme().color}
               model={editor.createModel(
                 JSON.stringify(record()?.value, null, 2).replace(
                   /[\u007F-\uFFFF]/g,

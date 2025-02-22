@@ -4,7 +4,8 @@ import { setPDS } from "../components/navbar";
 import { DidDocument } from "@atcute/client/utils/did";
 import { createStore } from "solid-js/store";
 
-const CONSTELLATION_HOST = "https://links.bsky.bad-example.com";
+localStorage.constellationHost =
+  localStorage.constellationHost || "https://links.bsky.bad-example.com";
 
 const didPDSCache: Record<string, string> = {};
 const [labelerCache, setLabelerCache] = createStore<Record<string, string>>({});
@@ -68,7 +69,7 @@ const getConstellation = async (
   cursor?: string,
   limit?: number,
 ) => {
-  const url = new URL(CONSTELLATION_HOST);
+  const url = new URL(localStorage.constellationHost);
   url.pathname = endpoint;
   url.searchParams.set("target", target);
   if (collection) {
