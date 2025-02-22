@@ -34,7 +34,7 @@ const Backlinks = ({ links, target }: { links: LinkData; target: string }) => {
       <p class="font-sans font-semibold text-stone-600 dark:text-stone-400">
         Backlinks{" "}
         <a
-          href="https://links.bsky.bad-example.com"
+          href="https://constellation.microcosm.blue"
           title="constellation: atproto backlink index"
           target="_blank"
         >

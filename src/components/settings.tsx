@@ -148,7 +148,7 @@ const Settings = () => {
                   spellcheck={false}
                   value={
                     localStorage.constellationHost ||
-                    "https://links.bsky.bad-example.com"
+                    "https://constellation.microcosm.blue"
                   }
                   disabled={!backlinksEnabled()}
                   class="dark:bg-dark-100 rounded-lg border border-gray-400 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-gray-300 disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-500 dark:disabled:border-gray-700 dark:disabled:bg-gray-800/20"

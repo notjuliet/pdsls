@@ -46,7 +46,7 @@ const Home = () => {
         </p>
         <p>
           <A
-            href="https://links.bsky.bad-example.com"
+            href="https://constellation.microcosm.blue"
             class="text-lightblue-500 hover:underline"
             target="_blank"
           >

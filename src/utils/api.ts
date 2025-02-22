@@ -5,7 +5,7 @@ import { DidDocument } from "@atcute/client/utils/did";
 import { createStore } from "solid-js/store";
 
 localStorage.constellationHost =
-  localStorage.constellationHost || "https://links.bsky.bad-example.com";
+  localStorage.constellationHost || "https://constellation.microcosm.blue";
 
 const didPDSCache: Record<string, string> = {};
 const [labelerCache, setLabelerCache] = createStore<Record<string, string>>({});
