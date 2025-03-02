@@ -86,6 +86,11 @@ export default () => {
           didDocCache[res.data.uri.split("/")[2]],
         );
         setValidRecord(true);
+      } else {
+        setNotice(
+          "Unable to validate record due to the browser not supporting WebAssembly.",
+        );
+        setValidRecord(false);
       }
     } catch (err: any) {
       if (err.message) setNotice(err.message);
