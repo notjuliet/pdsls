@@ -77,7 +77,7 @@ export default () => {
       setRecord(res.data);
       setCID(res.data.cid);
       setExternalLink(checkUri(res.data.uri));
-      if (false) {
+      if (wasmSupported) {
         const publicTransport = await import("public-transport");
         await publicTransport.authenticate_post_with_doc(
           res.data.uri,
