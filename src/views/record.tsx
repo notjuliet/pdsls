@@ -3,7 +3,6 @@ import { CredentialManager, XRPC } from "@atcute/client";
 import { ComAtprotoRepoGetRecord } from "@atcute/client/lexicons";
 import { action, query, redirect, useParams } from "@solidjs/router";
 import { JSONValue, syntaxHighlight } from "../components/json.jsx";
-import { authenticate_post_with_doc } from "public-transport";
 import { agent, loginState } from "../components/login.jsx";
 import { Editor } from "../components/editor.jsx";
 import { Backlinks } from "../components/backlinks.jsx";
@@ -78,8 +77,9 @@ export default () => {
       setRecord(res.data);
       setCID(res.data.cid);
       setExternalLink(checkUri(res.data.uri));
-      if (wasmSupported) {
-        await authenticate_post_with_doc(
+      if (false) {
+        const publicTransport = await import("public-transport");
+        await publicTransport.authenticate_post_with_doc(
           res.data.uri,
           res.data.cid!,
           res.data.value,
