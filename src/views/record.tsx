@@ -19,6 +19,22 @@ import {
 import { theme } from "../components/settings.jsx";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 
+const wasmSupported = (() => {
+  try {
+    if (
+      typeof WebAssembly === "object" &&
+      typeof WebAssembly.instantiate === "function"
+    ) {
+      const module = new WebAssembly.Module(
+        Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00),
+      );
+      if (module instanceof WebAssembly.Module)
+        return new WebAssembly.Instance(module) instanceof WebAssembly.Instance;
+    }
+  } catch (e) {}
+  return false;
+})();
+
 export default () => {
   const params = useParams();
   const [record, setRecord] = createSignal<ComAtprotoRepoGetRecord.Output>();
@@ -62,13 +78,15 @@ export default () => {
       setRecord(res.data);
       setCID(res.data.cid);
       setExternalLink(checkUri(res.data.uri));
-      await authenticate_post_with_doc(
-        res.data.uri,
-        res.data.cid!,
-        res.data.value,
-        didDocCache[res.data.uri.split("/")[2]],
-      );
-      setValidRecord(true);
+      if (wasmSupported) {
+        await authenticate_post_with_doc(
+          res.data.uri,
+          res.data.cid!,
+          res.data.value,
+          didDocCache[res.data.uri.split("/")[2]],
+        );
+        setValidRecord(true);
+      }
     } catch (err: any) {
       if (err.message) setNotice(err.message);
       else setNotice(`Invalid record: ${err}`);
