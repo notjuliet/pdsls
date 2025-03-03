@@ -18,7 +18,6 @@ import {
 import { theme } from "../components/settings.jsx";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 import { wasmSupported } from "../utils/wasm.js";
-import { authenticate_post_with_doc } from "public-transport";
 
 export default () => {
   const params = useParams();
@@ -63,18 +62,32 @@ export default () => {
       setRecord(res.data);
       setCID(res.data.cid);
       setExternalLink(checkUri(res.data.uri));
-      if (!wasmSupported) {
+      if (wasmSupported) {
+        const publicTransport = await import("public-transport");
+        await publicTransport.authenticate_post_with_doc(
+          res.data.uri,
+          res.data.cid!,
+          res.data.value,
+          didDocCache[res.data.uri.split("/")[2]],
+        );
+        setValidRecord(true);
+      } else {
         // @ts-ignore
         const polywasm = await import("polywasm");
         globalThis.WebAssembly = polywasm.WebAssembly;
+        const publicTransport = await import("public-transport");
+        await publicTransport.authenticate_post_with_doc(
+          res.data.uri,
+          res.data.cid!,
+          res.data.value,
+          didDocCache[res.data.uri.split("/")[2]],
+        );
+        setValidRecord(true);
+        //setNotice(
+        //  "Unable to validate record due to the browser not supporting WebAssembly.",
+        //);
+        //setValidRecord(false);
       }
-      await authenticate_post_with_doc(
-        res.data.uri,
-        res.data.cid!,
-        res.data.value,
-        didDocCache[res.data.uri.split("/")[2]],
-      );
-      setValidRecord(true);
     } catch (err: any) {
       if (err.message) setNotice(err.message);
       else setNotice(`Invalid record: ${err}`);
