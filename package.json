@@ -27,6 +27,7 @@
     "@atcute/oauth-browser-client": "^1.0.17",
     "@atcute/tid": "^1.0.2",
     "@atcute/uint8array": "^1.0.1",
+    "@skyware/firehose": "^0.4.3",
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.3",
     "hls.js": "^1.6.2",

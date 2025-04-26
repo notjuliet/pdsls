@@ -1,7 +1,7 @@
 import { createSignal, For, Show, onCleanup, onMount } from "solid-js";
 import { JSONValue } from "../components/json";
 import { A, useLocation, useSearchParams } from "@solidjs/router";
-import { Firehose } from "../utils/firehose";
+import { Firehose } from "@skyware/firehose";
 
 const LIMIT = 25;
 type Parameter = { name: string; param: string | string[] | undefined };

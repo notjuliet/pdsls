@@ -38,6 +38,9 @@ importers:
       '@atcute/uint8array':
         specifier: ^1.0.1
         version: 1.0.1
+      '@skyware/firehose':
+        specifier: ^0.4.3
+        version: 0.4.3
       '@solidjs/meta':
         specifier: ^0.29.4
         version: 0.29.4(solid-js@1.9.5)
@@ -88,8 +91,14 @@ packages:
   '@atcute/car@3.0.2':
     resolution: {integrity: sha512-0XYBruH0DS6t5/qwMA9dMjo7KrDul8CgG+NIGdnunrMuwuH2To2Ys1BePLVglLtnX9ZGSmJHsTjqEhHMJn16Bw==}
 
+  '@atcute/car@3.0.3':
+    resolution: {integrity: sha512-TV596HRRl8LgNcO58fqf6zELjYutrpcj3VeM7cnoEQ3GLwH0hJSbPmYlRxF1gxurJhMEE5PUpIDb+dgDxFRLpw==}
+
   '@atcute/cbor@2.2.1':
     resolution: {integrity: sha512-o+zCkfFQhRxpQmGYOAlRAK9xqq3VH66Mw0muUOlc+Wnk5X8CyZcIkdYorzYWTtyNO2/WHdMcUzZs93+Ajl6BbA==}
+
+  '@atcute/cbor@2.2.2':
+    resolution: {integrity: sha512-UzgoEtgGzWy5p9qcFfirRCCgGl1QF8xQF53ycq5yaZ43o7pJdGsctAHK58rTru9QfQxTZs7V9vTDUIxVEZ0s9g==}
 
   '@atcute/cid@2.2.1':
     resolution: {integrity: sha512-tSsVdgx8jj+n6l+MP8IN8rZCR9N4ltJ8EPMiRzo6uduAAygYiZkCRceCOZ57IMtToZcSgm3nxYr4g1aeUbHUcw==}
@@ -635,6 +644,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@skyware/firehose@0.4.3':
+    resolution: {integrity: sha512-3uzsXj99n/GQZUIw2zQinJJVZajVZGSA36QLCydidiq7auixdGnRfxSCWqTA4Fw5qwGi3VfUzt1WbCnIy6JUog==}
+
   '@solidjs/meta@0.29.4':
     resolution: {integrity: sha512-zdIWBGpR9zGx1p1bzIPqF5Gs+Ks/BH8R6fWhmUa/dcK1L2rUC8BAcZJzNRYBQv74kScf1TSOs0EY//Vd/I0V8g==}
     peerDependencies:
@@ -1161,6 +1173,9 @@ packages:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
 
+  tiny-emitter@2.1.0:
+    resolution: {integrity: sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==}
+
   tinyexec@0.3.2:
     resolution: {integrity: sha512-KQQR9yN7R5+OSwaK0XQoj22pwHoTlgYqmUscPYoknOoWCWfj/5/ABTMRi69FrKU5ffPVh5QcFikpWJI/P1ocHA==}
 
@@ -1291,6 +1306,18 @@ packages:
       typescript:
         optional: true
 
+  ws@8.18.1:
+    resolution: {integrity: sha512-RKW2aJZMXeMxVpnZ6bck+RswznaxmzdULiBr6KY7XkTnW8uvt0iT9H5DkHUChXrc+uurzwa0rVI16n/Xzjdz1w==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
   yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
 
@@ -1314,7 +1341,19 @@ snapshots:
       '@atcute/cid': 2.2.1
       '@atcute/varint': 1.0.2
 
+  '@atcute/car@3.0.3':
+    dependencies:
+      '@atcute/cbor': 2.2.2
+      '@atcute/cid': 2.2.1
+      '@atcute/varint': 1.0.2
+
   '@atcute/cbor@2.2.1':
+    dependencies:
+      '@atcute/cid': 2.2.1
+      '@atcute/multibase': 1.1.3
+      '@atcute/uint8array': 1.0.1
+
+  '@atcute/cbor@2.2.2':
     dependencies:
       '@atcute/cid': 2.2.1
       '@atcute/multibase': 1.1.3
@@ -1720,6 +1759,16 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.40.0':
     optional: true
+
+  '@skyware/firehose@0.4.3':
+    dependencies:
+      '@atcute/car': 3.0.3
+      '@atcute/cbor': 2.2.2
+      tiny-emitter: 2.1.0
+      ws: 8.18.1
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   '@solidjs/meta@0.29.4(solid-js@1.9.5)':
     dependencies:
@@ -2320,6 +2369,8 @@ snapshots:
 
   source-map-js@1.2.1: {}
 
+  tiny-emitter@2.1.0: {}
+
   tinyexec@0.3.2: {}
 
   tinyglobby@0.2.12:
@@ -2440,5 +2491,7 @@ snapshots:
       '@vue/shared': 3.5.13
     optionalDependencies:
       typescript: 5.8.3
+
+  ws@8.18.1: {}
 
   yallist@3.1.1: {}
