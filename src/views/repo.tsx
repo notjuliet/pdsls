@@ -5,6 +5,7 @@ import { didDocCache, getAllBacklinks, LinkData, resolveHandle, resolvePDS } fro
 import { DidDocument } from "@atcute/client/utils/did";
 import { Backlinks } from "../components/backlinks.jsx";
 import { At } from "@atcute/client/lexicons";
+import Tooltip from "../components/tooltip.jsx";
 
 const RepoView = () => {
   const params = useParams();
@@ -43,11 +44,11 @@ const RepoView = () => {
       }
     });
     setNsids(collections);
-    
+
     // Initialize allCollapsed based on if all collections are hidden
-    const allHidden = Object.keys(collections).every(authority => collections[authority].hidden);
+    const allHidden = Object.keys(collections).every((authority) => collections[authority].hidden);
     setAllCollapsed(allHidden);
-    
+
     setDidDoc(didDocCache[did] as DidDocument);
     if (localStorage.backlinks === "true") {
       try {
@@ -96,12 +97,12 @@ const RepoView = () => {
   const toggleAllCollections = () => {
     const newState = !allCollapsed();
     setAllCollapsed(newState);
-    
+
     const updatedNsids = { ...nsids() };
-    Object.keys(updatedNsids).forEach(authority => {
+    Object.keys(updatedNsids).forEach((authority) => {
       updatedNsids[authority].hidden = newState;
     });
-    
+
     setNsids(updatedNsids);
   };
 
@@ -109,28 +110,28 @@ const RepoView = () => {
     <Show when={repo()}>
       <div class="mt-3 flex w-[21rem] flex-col gap-2 break-words">
         <div class="flex flex-col border-b border-neutral-500 pb-2 font-mono">
-          <div class="flex flex-col items-start justify-between">
+          <div class="flex items-center gap-1">
             <p class="font-sans font-semibold text-stone-600 dark:text-stone-400">Collections</p>
-            <button 
-              class="text-md bg-transparent hover:underline flex items-center gap-1 mb-2 mt-2 text-stone-500"
-              onclick={toggleAllCollections}
-            >
-              {allCollapsed() ? <div class="i-ant-design-plus-square-outlined" /> : <div class="i-ant-design-minus-square-outlined" />}
-              {allCollapsed() ? "Expand all" : "Collapse all"}
-            </button>
+            <Tooltip text={allCollapsed() ? "Expand all" : "Collapse all"}>
+              <button class="bg-transparent" onclick={toggleAllCollections}>
+                {allCollapsed() ?
+                  <div class="i-fluent-add-square-multiple-20-regular text-xl" />
+                : <div class="i-fluent-subtract-square-multiple-20-regular text-xl" />}
+              </button>
+            </Tooltip>
           </div>
           <For each={Object.keys(nsids() ?? {})}>
             {(authority) => (
               <div class="grid grid-cols-[min-content_1fr] items-center">
                 <Show when={nsids()?.[authority].hidden}>
                   <button
-                    class="i-ant-design-plus-square-outlined mr-1"
+                    class="i-fluent-add-square-20-regular mr-1"
                     onclick={() => toggleCollection(authority)}
                   />
                 </Show>
                 <Show when={!nsids()?.[authority].hidden}>
                   <button
-                    class="i-ant-design-minus-square-outlined mr-1"
+                    class="i-fluent-subtract-square-20-regular mr-1"
                     onclick={() => toggleCollection(authority)}
                   />
                 </Show>
