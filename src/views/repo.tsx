@@ -15,6 +15,7 @@ const RepoView = () => {
     target: string;
   }>();
   const [nsids, setNsids] = createSignal<Record<string, { hidden: boolean; nsids: string[] }>>();
+  const [allCollapsed, setAllCollapsed] = createSignal(false);
   let rpc: XRPC;
   let pds: string;
   let did = params.repo;
@@ -42,6 +43,11 @@ const RepoView = () => {
       }
     });
     setNsids(collections);
+    
+    // Initialize allCollapsed based on if all collections are hidden
+    const allHidden = Object.keys(collections).every(authority => collections[authority].hidden);
+    setAllCollapsed(allHidden);
+    
     setDidDoc(didDocCache[did] as DidDocument);
     if (localStorage.backlinks === "true") {
       try {
@@ -87,11 +93,32 @@ const RepoView = () => {
     });
   };
 
+  const toggleAllCollections = () => {
+    const newState = !allCollapsed();
+    setAllCollapsed(newState);
+    
+    const updatedNsids = { ...nsids() };
+    Object.keys(updatedNsids).forEach(authority => {
+      updatedNsids[authority].hidden = newState;
+    });
+    
+    setNsids(updatedNsids);
+  };
+
   return (
     <Show when={repo()}>
       <div class="mt-3 flex w-[21rem] flex-col gap-2 break-words">
         <div class="flex flex-col border-b border-neutral-500 pb-2 font-mono">
-          <p class="font-sans font-semibold text-stone-600 dark:text-stone-400">Collections</p>
+          <div class="flex flex-col items-start justify-between">
+            <p class="font-sans font-semibold text-stone-600 dark:text-stone-400">Collections</p>
+            <button 
+              class="text-md bg-transparent hover:underline flex items-center gap-1 mb-2 mt-2 text-stone-500"
+              onclick={toggleAllCollections}
+            >
+              {allCollapsed() ? <div class="i-ant-design-plus-square-outlined" /> : <div class="i-ant-design-minus-square-outlined" />}
+              {allCollapsed() ? "Expand all" : "Collapse all"}
+            </button>
+          </div>
           <For each={Object.keys(nsids() ?? {})}>
             {(authority) => (
               <div class="grid grid-cols-[min-content_1fr] items-center">
