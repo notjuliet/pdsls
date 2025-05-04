@@ -115,8 +115,8 @@ const RepoView = () => {
             <Tooltip text={allCollapsed() ? "Expand all" : "Collapse all"}>
               <button class="bg-transparent" onclick={toggleAllCollections}>
                 {allCollapsed() ?
-                  <div class="i-fluent-add-square-multiple-20-regular text-xl" />
-                : <div class="i-fluent-subtract-square-multiple-20-regular text-xl" />}
+                  <div class="i-lucide-plus-copy text-xl" />
+                : <div class="i-lucide-minus-copy text-xl" />}
               </button>
             </Tooltip>
           </div>
@@ -126,13 +126,13 @@ const RepoView = () => {
                 <>
                   <Show when={nsids()?.[authority].hidden}>
                     <button
-                      class="i-fluent-add-square-20-regular mr-1"
+                      class="i-lucide-plus-square mr-1"
                       onclick={() => toggleCollection(authority)}
                     />
                   </Show>
                   <Show when={!nsids()?.[authority].hidden}>
                     <button
-                      class="i-fluent-subtract-square-20-regular mr-1"
+                      class="i-lucide-minus-square mr-1"
                       onclick={() => toggleCollection(authority)}
                     />
                   </Show>
@@ -216,7 +216,7 @@ const RepoView = () => {
                 }
                 target="_blank"
               >
-                DID document <div class="i-tabler-external-link ml-0.5 text-xs" />
+                DID document <div class="i-lucide-external-link ml-0.5 text-xs" />
               </a>
               <Show when={repo()?.did.startsWith("did:plc")}>
                 <a
@@ -224,7 +224,7 @@ const RepoView = () => {
                   href={`https://boat.kelinci.net/plc-oplogs?q=${repo()?.did}`}
                   target="_blank"
                 >
-                  PLC operation logs <div class="i-tabler-external-link ml-0.5 text-xs" />
+                  PLC operation logs <div class="i-lucide-external-link ml-0.5 text-xs" />
                 </a>
               </Show>
               <div class="flex items-center gap-1">

@@ -162,7 +162,7 @@ const CreateRecord = () => {
         text="Create record"
         children={
           <button
-            class="i-octicon-pencil-16 cursor-pointer text-xl"
+            class="i-lucide-pencil cursor-pointer text-xl"
             onclick={() => {
               createModel();
               setOpenCreate(true);

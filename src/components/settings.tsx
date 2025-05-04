@@ -157,7 +157,7 @@ const Settings = () => {
         text="Settings"
         children={
           <button
-            class="i-majesticons-settings-cog cursor-pointer text-xl"
+            class="i-lucide-cog cursor-pointer text-xl"
             onclick={() => setOpenSettings(true)}
           />
         }

@@ -37,7 +37,7 @@ const NavBar = (props: { params: Params }) => {
         <div class="flex basis-full items-center">
           <Show when={pds() && props.params.pds}>
             <Tooltip text="PDS">
-              <div class="i-tabler-server mr-1 shrink-0" />
+              <div class="i-lucide-server mr-1 shrink-0" />
             </Tooltip>
             <A end href={pds()!} inactiveClass="text-lightblue-500 w-full hover:underline">
               {pds()}
@@ -46,7 +46,7 @@ const NavBar = (props: { params: Params }) => {
         </div>
         <button
           ref={setDropdown}
-          class="i-si-more-horiz-fill ml-1 shrink-0 text-lg"
+          class="i-lucide-ellipsis ml-1 shrink-0 text-lg"
           onclick={() => setOpenMenu(!openMenu())}
         />
         <Show when={openMenu()}>
@@ -126,7 +126,7 @@ const NavBar = (props: { params: Params }) => {
             <Show when={!props.params.collection && !props.params.rkey}>
               <div class="mt-1 flex items-center">
                 <Tooltip text="Blobs">
-                  <div class="i-ph-binary-bold mr-1" />
+                  <div class="i-lucide-binary mr-1" />
                 </Tooltip>
                 <A
                   end
@@ -144,7 +144,7 @@ const NavBar = (props: { params: Params }) => {
             >
               <div class="mt-1 flex items-center">
                 <Tooltip text="Labels">
-                  <div class="i-mdi-tag-outline mr-1" />
+                  <div class="i-lucide-tag mr-1" />
                 </Tooltip>
                 <A
                   end
@@ -160,7 +160,7 @@ const NavBar = (props: { params: Params }) => {
         <Show when={props.params.collection}>
           <div class="mt-1 flex items-center">
             <Tooltip text="Collection">
-              <div class="i-uil-list-ul mr-1" />
+              <div class="i-lucide-list mr-1" />
             </Tooltip>
             <A
               end
@@ -174,20 +174,20 @@ const NavBar = (props: { params: Params }) => {
         <Show when={props.params.rkey}>
           <div class="mt-1 flex items-center">
             <Tooltip text="Record">
-              <div class="i-mdi-code-json mr-1" />
+              <div class="i-lucide-braces mr-1" />
             </Tooltip>
             <span class="mr-1 cursor-pointer">{props.params.rkey}</span>
             <Show when={validRecord()}>
               <Tooltip
                 text="Valid record"
-                children={<div class="i-fluent-checkmark-circle-12-regular" />}
+                children={<div class="i-lucide-check-circle" />}
               />
             </Show>
             <Show when={validRecord() === false}>
               <Tooltip
                 text="Invalid record"
                 children={
-                  <div class="i-fluent-dismiss-circle-12-regular text-red-500 dark:text-red-400" />
+                  <div class="i-lucide-dismiss-circle text-red-500 dark:text-red-400" />
                 }
               />
             </Show>
@@ -204,7 +204,7 @@ const NavBar = (props: { params: Params }) => {
         {(cid) => (
           <div class="mt-1 flex items-center">
             <Tooltip text="CID">
-              <div class="i-meteor-icons-cube mr-1" />
+              <div class="i-lucide-box mr-1" />
             </Tooltip>
             <span dir="rtl" class="truncate">
               {cid()}

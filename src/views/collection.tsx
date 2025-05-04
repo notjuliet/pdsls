@@ -236,7 +236,7 @@ const CollectionView = () => {
                   text="Select All"
                   children={
                     <button
-                      class="i-mdi-checkbox-multiple-marked text-xl text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
+                      class="i-lucide-copy-check text-xl text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
                       onclick={() => selectAll()}
                     />
                   }
@@ -245,7 +245,7 @@ const CollectionView = () => {
                   text="Unselect All"
                   children={
                     <button
-                      class="i-mdi-checkbox-multiple-blank-outline text-xl text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
+                      class="i-lucide-copy text-xl text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
                       onclick={() => unselectAll()}
                     />
                   }
@@ -254,7 +254,7 @@ const CollectionView = () => {
                   text="Confirm"
                   children={
                     <button
-                      class="i-ic-round-delete-sweep text-xl text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+                      class="i-lucide-trash text-xl text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
                       onclick={() => setOpenDelete(true)}
                     />
                   }

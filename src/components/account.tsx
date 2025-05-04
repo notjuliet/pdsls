@@ -85,7 +85,7 @@ const AccountManager = () => {
                       {session}
                     </button>
                     <button
-                      class="i-basil-cross-solid text-xl text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-500"
+                      class="i-lucide-x text-xl text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-500"
                       onclick={() => removeSession(session)}
                     />
                   </div>
@@ -100,7 +100,7 @@ const AccountManager = () => {
         text="Manage accounts"
         children={
           <button
-            class="i-mingcute-user-4-fill cursor-pointer text-xl"
+            class="i-lucide-user cursor-pointer text-xl"
             onclick={() => setOpenManager(true)}
           />
         }

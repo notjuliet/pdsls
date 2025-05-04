@@ -215,7 +215,7 @@ export default () => {
               target="_blank"
               href={externalLink()?.link}
             >
-              {externalLink()?.label} <div class="i-tabler-external-link text-sm" />
+              {externalLink()?.label} <div class="i-lucide-external-link text-sm" />
             </a>
           </Show>
           <Show when={loginState() && agent.sub === record()?.uri.split("/")[2]}>
