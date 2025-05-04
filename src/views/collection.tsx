@@ -214,9 +214,9 @@ const CollectionView = () => {
                   <button
                     classList={{
                       "flex items-center text-xl": true,
-                      "i-ic-round-delete-sweep text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300":
+                      "i-lucide-trash text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300":
                         !batchDelete(),
-                      "i-fluent-dismiss-circle-12-regular text-neutral-500 hover:text-neutral-600 dark:text-neutral-400 dark:hover:text-neutral-300":
+                      "i-lucide-dismiss-circle text-neutral-500 hover:text-neutral-600 dark:text-neutral-400 dark:hover:text-neutral-300":
                         batchDelete(),
                     }}
                     onclick={() => {
