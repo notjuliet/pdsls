@@ -205,7 +205,7 @@ const CollectionView = () => {
             <div
               classList={{
                 "flex items-center gap-x-2": true,
-                "border p-1 rounded-md border-neutral-500": batchDelete(),
+                "border py-1.5 px-2 rounded-md border-neutral-500": batchDelete(),
               }}
             >
               <Tooltip

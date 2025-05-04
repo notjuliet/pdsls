@@ -97,8 +97,8 @@ const NavBar = (props: { params: Params }) => {
       <div class="flex flex-col flex-wrap">
         <Show when={props.params.repo}>
           <div>
-            <div class="relative flex items-center justify-between">
-              <div class="mt-1 flex items-center">
+            <div class="mt-1 relative flex items-center justify-between">
+              <div class="flex items-center">
                 <Tooltip text="Repository">
                   <div class="i-atproto-logo mr-1" />
                 </Tooltip>
