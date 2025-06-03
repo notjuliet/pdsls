@@ -47,6 +47,8 @@ const Search = () => {
   onCleanup(() => window.removeEventListener("keydown", keyEvent));
 
   const keyEvent = (event: KeyboardEvent) => {
+    if (document.querySelector("dialog")) return;
+
     if (event.key == "/" && document.activeElement !== searchInput) {
       event.preventDefault();
       searchInput.focus();
