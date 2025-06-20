@@ -99,6 +99,8 @@ const NavBar = (props: { params: Params }) => {
                     onclick={() => addToClipboard(props.params.repo)}
                   />
                 </Tooltip>
+                <div class="flex gap-1">
+
                 <A
                   end
                   href={`/at://${props.params.repo}`}
@@ -126,6 +128,7 @@ const NavBar = (props: { params: Params }) => {
                     }
                   />
                 </Show>
+                </div>
               </div>
               <Tooltip text={showHandle() ? "Show DID" : "Show Handle"}>
                 <button
@@ -197,6 +200,7 @@ const NavBar = (props: { params: Params }) => {
                   onclick={() => addToClipboard(props.params.rkey)}
                 />
               </Tooltip>
+              <div class="flex gap-1">
               <span>{props.params.rkey}</span>
               <Show when={validRecord()}>
                 <Tooltip text="Valid record" children={<div class="i-lucide-lock-keyhole" />} />
@@ -219,6 +223,7 @@ const NavBar = (props: { params: Params }) => {
                   children={<div class="i-lucide-file-x text-red-500 dark:text-red-400" />}
                 />
               </Show>
+              </div>
             </div>
             <Tooltip text="Record on PDS">
               <a

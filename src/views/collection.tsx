@@ -207,7 +207,7 @@ const CollectionView = () => {
                 children={
                   <button
                     classList={{
-                      "flex text-xl items-center": true,
+                      "flex text-lg items-center": true,
                       "i-lucide-trash-2 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300":
                         !batchDelete(),
                       "i-lucide-circle-x text-neutral-500 hover:text-neutral-600 dark:text-neutral-400 dark:hover:text-neutral-300":
