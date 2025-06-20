@@ -108,7 +108,7 @@ const AccountManager = () => {
         text="Manage accounts"
         children={
           <button
-            class="i-lucide-circle-user-round cursor-pointer text-2xl"
+            class="i-lucide-circle-user-round cursor-pointer text-xl"
             onclick={() => setOpenManager(true)}
           />
         }

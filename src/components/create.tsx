@@ -306,7 +306,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
           text="Create record"
           children={
             <button
-              class="i-lucide-square-pen cursor-pointer text-2xl"
+              class="i-lucide-square-pen cursor-pointer text-xl"
               onclick={() => {
                 createModel();
                 setOpenDialog(true);
@@ -322,7 +322,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
               createModel();
               setOpenDialog(true);
             }}
-            class="i-lucide-pencil text-xl"
+            class="i-lucide-pencil text-lg"
           />
         </Tooltip>
       </Show>

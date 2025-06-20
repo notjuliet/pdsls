@@ -163,7 +163,7 @@ export const RecordView = () => {
         <div class="mt-3 flex gap-2">
           <Tooltip text="Copy record">
             <button
-              class="i-lucide-copy text-xl"
+              class="i-lucide-copy text-lg"
               onclick={() => addToClipboard(JSON.stringify(record()?.value))}
             />
           </Tooltip>
@@ -197,14 +197,14 @@ export const RecordView = () => {
               </dialog>
             </Show>
             <Tooltip text="Delete">
-              <button onclick={() => setOpenDelete(true)} class="i-lucide-trash-2 text-xl" />
+              <button onclick={() => setOpenDelete(true)} class="i-lucide-trash-2 text-lg" />
             </Tooltip>
           </Show>
           <Show when={externalLink()}>
             {(externalLink) => (
               <Tooltip text={`Open on ${externalLink().label}`}>
                 <a
-                  class={`${externalLink().icon ?? "i-lucide-external-link"} text-xl`}
+                  class={`${externalLink().icon ?? "i-lucide-external-link"} text-lg`}
                   target="_blank"
                   href={externalLink()?.link}
                 ></a>
@@ -215,8 +215,8 @@ export const RecordView = () => {
             <Tooltip text={showBacklinks() ? "Show record" : "Show backlinks"}>
               <button
                 classList={{
-                  "i-lucide-send-to-back text-xl": !showBacklinks(),
-                  "i-lucide-file-json text-xl": showBacklinks(),
+                  "i-lucide-send-to-back text-lg": !showBacklinks(),
+                  "i-lucide-file-json text-lg": showBacklinks(),
                 }}
                 onclick={() => setShowBacklinks(!showBacklinks())}
               />

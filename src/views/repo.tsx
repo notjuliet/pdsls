@@ -181,8 +181,8 @@ const RepoView = () => {
             onclick={toggleAllCollections}
           >
             {allCollapsed() ?
-              <div class="i-lucide-copy-plus" />
-            : <div class="i-lucide-copy-minus" />}
+              <div class="i-lucide-copy-plus text-lg" />
+            : <div class="i-lucide-copy-minus text-lg" />}
             {allCollapsed() ? "Expand all" : "Collapse all"}
           </button>
           <div class="flex flex-col font-mono">
@@ -192,13 +192,13 @@ const RepoView = () => {
                   <>
                     <Show when={nsids()?.[authority].hidden}>
                       <button
-                        class="i-lucide-plus-square mr-1 text-base"
+                        class="i-lucide-plus-square mr-1 text-lg"
                         onclick={() => toggleCollection(authority)}
                       />
                     </Show>
                     <Show when={!nsids()?.[authority].hidden}>
                       <button
-                        class="i-lucide-minus-square mr-1 text-base"
+                        class="i-lucide-minus-square mr-1 text-lg"
                         onclick={() => toggleCollection(authority)}
                       />
                     </Show>

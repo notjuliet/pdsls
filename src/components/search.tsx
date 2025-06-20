@@ -85,7 +85,7 @@ const Search = () => {
           <button
             type="submit"
             onclick={() => processInput(searchInput.value)}
-            class="i-lucide-square-arrow-right text-2xl"
+            class="i-lucide-arrow-right text-xl"
           />
         </Show>
         <Show when={loginState()}>
@@ -93,7 +93,7 @@ const Search = () => {
             text="Repository"
             children={
               <A href={`/at://${agent.sub}`} class="flex">
-                <button class="i-lucide-git-fork-custom text-2xl" />
+                <button class="i-lucide-git-fork-custom text-xl" />
               </A>
             }
           />

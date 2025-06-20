@@ -47,7 +47,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         <div class="flex basis-1/3 gap-x-2">
           <A href="/jetstream">
             <Tooltip text="Relay">
-              <div class="i-lucide-radio-tower text-2xl" />
+              <div class="i-lucide-radio-tower text-xl" />
             </Tooltip>
           </A>
           <AccountManager />
@@ -83,7 +83,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
       </div>
       <Show when={copyNotice()}>
         <div class="dark:bg-dark-100 fixed bottom-5 z-10 flex items-center rounded-md bg-neutral-200 p-2">
-          <div class="i-lucide-clipboard-check mr-1 text-lg" />
+          <div class="i-lucide-clipboard-check mr-1 text-xl" />
           Copied to clipboard
         </div>
       </Show>
