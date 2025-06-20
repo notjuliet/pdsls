@@ -322,7 +322,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
               createModel();
               setOpenDialog(true);
             }}
-            class="i-lucide-pencil text-lg"
+            class="i-lucide-pencil text-xl"
           />
         </Tooltip>
       </Show>
