@@ -62,7 +62,7 @@ const NavBar = (props: { params: Params }) => {
   return (
     <div class="break-anywhere mt-4 flex w-[21rem] flex-col font-mono text-sm sm:w-[23rem]">
       <div class="relative flex items-center justify-between gap-1">
-        <div class="min-h-1.25rem flex basis-full items-center gap-1">
+        <div class="min-h-1.25rem flex basis-full items-center gap-2">
           <Tooltip text="PDS">
             <button
               class="i-lucide-server shrink-0 text-lg"
@@ -92,7 +92,7 @@ const NavBar = (props: { params: Params }) => {
         <Show when={props.params.repo}>
           <div>
             <div class="relative mt-1 flex items-center justify-between gap-1">
-              <div class="flex basis-full items-center gap-1">
+              <div class="flex basis-full items-center gap-2">
                 <Tooltip text="Repository">
                   <button
                     class="i-lucide-at-sign text-lg"
@@ -138,7 +138,7 @@ const NavBar = (props: { params: Params }) => {
               </Tooltip>
             </div>
             <Show when={!props.params.collection && !props.params.rkey}>
-              <div class="mt-1 flex items-center gap-1">
+              <div class="mt-1 flex items-center gap-2">
                 <Tooltip text="Blobs">
                   <div class="i-lucide-file-digit text-lg" />
                 </Tooltip>
@@ -156,7 +156,7 @@ const NavBar = (props: { params: Params }) => {
                 props.params.repo in labelerCache && !props.params.collection && !props.params.rkey
               }
             >
-              <div class="mt-1 flex items-center gap-1">
+              <div class="mt-1 flex items-center gap-2">
                 <Tooltip text="Labels">
                   <div class="i-lucide-tag text-lg" />
                 </Tooltip>
@@ -172,7 +172,7 @@ const NavBar = (props: { params: Params }) => {
           </div>
         </Show>
         <Show when={props.params.collection}>
-          <div class="mt-1 flex items-center gap-1">
+          <div class="mt-1 flex items-center gap-2">
             <Tooltip text="Collection">
               <button
                 class="i-lucide-list text-lg"
@@ -190,7 +190,7 @@ const NavBar = (props: { params: Params }) => {
         </Show>
         <Show when={props.params.rkey}>
           <div class="relative mt-1 flex items-center justify-between">
-            <div class="flex basis-full items-center gap-1">
+            <div class="flex basis-full items-center gap-2">
               <Tooltip text="Record">
                 <button
                   class="i-lucide-braces text-lg"
