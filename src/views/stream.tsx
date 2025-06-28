@@ -147,7 +147,7 @@ const StreamView = () => {
 
   return (
     <div class="mt-4 flex flex-col items-center gap-y-3">
-      <div class="flex divide-x-2 divide-neutral-500 text-lg font-bold">
+      <div class="flex divide-x-2 divide-neutral-500 font-bold">
         <A class="pr-2" inactiveClass="text-sky-500 hover:underline" href="/jetstream">
           Jetstream
         </A>
