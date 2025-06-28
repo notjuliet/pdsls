@@ -271,7 +271,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                 <div class="flex items-center justify-between gap-2">
                   <button
                     onclick={() => setOpenDialog(false)}
-                    class="dark:hover:bg-dark-300 rounded-lg border border-slate-400 bg-transparent px-2 py-1.5 text-xs font-bold hover:bg-zinc-50 focus:outline-none focus:ring-1 focus:ring-slate-700 sm:text-sm dark:focus:ring-slate-300"
+                    class="dark:hover:bg-dark-300 rounded-lg border border-slate-400 bg-transparent px-2 py-1.5 text-xs font-bold hover:bg-zinc-50 focus:border-blue-500 focus:outline-none sm:text-sm"
                   >
                     Close
                   </button>
@@ -291,7 +291,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                           createRecord(new FormData(formRef))
                         : editRecord(new FormData(formRef))
                       }
-                      class="rounded-lg bg-blue-500 px-2 py-1.5 text-xs font-bold text-slate-100 hover:bg-blue-400 focus:outline-none focus:ring-1 focus:ring-slate-700 sm:text-sm dark:bg-blue-600 dark:hover:bg-blue-500 dark:focus:ring-slate-300"
+                      class="rounded-lg bg-blue-500 px-2 py-1.5 text-xs font-bold text-slate-100 hover:bg-blue-400 sm:text-sm dark:bg-blue-600 dark:hover:bg-blue-500"
                     >
                       Confirm
                     </button>
