@@ -17,8 +17,7 @@ render(
   () => (
     <Router root={Layout}>
       <Route path="/" component={Home} />
-      <Route path="/jetstream" component={StreamView} />
-      <Route path="/firehose" component={StreamView} />
+      <Route path={["/jetstream", "/firehose"]} component={StreamView} />
       <Route path="/:pds" component={PdsView} />
       <Route path="/:pds/:repo" component={RepoView} />
       <Route path="/:pds/:repo/labels" component={LabelView} />
