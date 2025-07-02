@@ -137,9 +137,9 @@ const PdsView = () => {
                   </Tooltip>
                 </div>
               </Show>
-              <span>{repo.did}</span>
+              <span class="text-xs sm:text-sm">{repo.did}</span>
               <Show when={TID.validate(repo.rev)}>
-                <span class="ml-1 text-[0.65rem] text-neutral-500 sm:text-xs dark:text-neutral-400">
+                <span class="ml-1 text-xs text-neutral-500 dark:text-neutral-400">
                   {localDateFromTimestamp(TID.parse(repo.rev).timestamp / 1000).split(" ")[0]}
                 </span>
               </Show>
