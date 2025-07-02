@@ -5,6 +5,8 @@ import { setPDS } from "../components/navbar";
 import Tooltip from "../components/tooltip";
 import { InferXRPCBodyOutput } from "@atcute/lexicons";
 import { ComAtprotoServerDescribeServer, ComAtprotoSyncListRepos } from "@atcute/atproto";
+import * as TID from "@atcute/tid";
+import { localDateFromTimestamp } from "../utils/date";
 
 const LIMIT = 1000;
 
@@ -123,7 +125,7 @@ const PdsView = () => {
             <A
               href={`/at://${repo.did}`}
               classList={{
-                "w-full flex font-mono items-center relative": true,
+                "w-fit text-sm font-mono relative hover:bg-zinc-200 dark:hover:bg-neutral-700": true,
                 "text-sky-500": repo.active,
                 "text-neutral-400 dark:text-neutral-500": !repo.active,
               }}
@@ -135,7 +137,12 @@ const PdsView = () => {
                   </Tooltip>
                 </div>
               </Show>
-              <span class="w-full hover:underline">{repo.did}</span>
+              <span>{repo.did}</span>
+              <Show when={TID.validate(repo.rev)}>
+                <span class="ml-1 text-[0.65rem] text-neutral-500 sm:text-xs dark:text-neutral-400">
+                  {localDateFromTimestamp(TID.parse(repo.rev).timestamp / 1000).split(" ")[0]}
+                </span>
+              </Show>
             </A>
           )}
         </For>
