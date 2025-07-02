@@ -125,7 +125,7 @@ const PdsView = () => {
             <A
               href={`/at://${repo.did}`}
               classList={{
-                "w-fit text-sm font-mono relative hover:bg-zinc-200 dark:hover:bg-neutral-700": true,
+                "rounded w-fit text-sm font-mono relative hover:bg-zinc-200 dark:hover:bg-neutral-700": true,
                 "text-sky-500": repo.active,
                 "text-neutral-400 dark:text-neutral-500": !repo.active,
               }}
