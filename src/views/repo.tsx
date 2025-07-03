@@ -1,4 +1,4 @@
-import { createSignal, For, Show, createResource } from "solid-js";
+import { createSignal, For, Show, createResource, Suspense, ErrorBoundary } from "solid-js";
 import { Client, CredentialManager } from "@atcute/client";
 import { A, useParams } from "@solidjs/router";
 import { didDocCache, getAllBacklinks, LinkData, resolvePDS } from "../utils/api.js";
@@ -165,7 +165,11 @@ const RepoView = () => {
           </Show>
         </Show>
         <Show when={tab() === "blobs"}>
-          <BlobView pds={pds!} repo={did} />
+          <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
+            <Suspense fallback={<div class="i-eos-icons-loading self-center text-xl" />}>
+              <BlobView pds={pds!} repo={did} />
+            </Suspense>
+          </ErrorBoundary>
         </Show>
         <Show when={nsids() && tab() === "collections"}>
           <button
