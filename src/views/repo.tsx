@@ -6,6 +6,7 @@ import { Backlinks } from "../components/backlinks.jsx";
 import { ActorIdentifier } from "@atcute/lexicons";
 import { DidDocument } from "@atcute/identity";
 import { BlobView } from "./blob.jsx";
+import { TextInput } from "../components/text-input.jsx";
 
 type Tab = "collections" | "backlinks" | "doc" | "blobs";
 
@@ -19,8 +20,8 @@ const RepoView = () => {
     target: string;
   }>();
   const [nsids, setNsids] = createSignal<Record<string, { hidden: boolean; nsids: string[] }>>();
-  const [allCollapsed, setAllCollapsed] = createSignal(false);
   const [tab, setTab] = createSignal<Tab>("collections");
+  const [filter, setFilter] = createSignal<string>();
   let rpc: Client;
   let pds: string;
   const did = params.repo;
@@ -29,7 +30,7 @@ const RepoView = () => {
     <button
       classList={{
         "flex flex-1 py-1 justify-center": true,
-        "bg-zinc-200 dark:bg-dark-100": tab() === props.tab,
+        "bg-zinc-200 dark:bg-dark-300": tab() === props.tab,
         "bg-transparent hover:bg-zinc-100 dark:hover:bg-dark-400": tab() !== props.tab,
       }}
       onclick={() => setTab(props.tab)}
@@ -60,9 +61,6 @@ const RepoView = () => {
         }
       });
       setNsids(collections);
-
-      // Initialize allCollapsed based on if all collections are hidden
-      setAllCollapsed(Object.keys(collections).every((authority) => collections[authority].hidden));
     } else {
       console.error(res.data.error);
       switch (res.data.error) {
@@ -123,18 +121,6 @@ const RepoView = () => {
     });
   };
 
-  const toggleAllCollections = () => {
-    const newState = !allCollapsed();
-    setAllCollapsed(newState);
-
-    const updatedNsids = { ...nsids() };
-    Object.keys(updatedNsids).forEach((authority) => {
-      updatedNsids[authority].hidden = newState;
-    });
-
-    setNsids(updatedNsids);
-  };
-
   return (
     <Show when={repo()}>
       <div class="mt-3 flex w-[21rem] flex-col gap-2 break-words sm:w-[23rem]">
@@ -172,18 +158,19 @@ const RepoView = () => {
           </ErrorBoundary>
         </Show>
         <Show when={nsids() && tab() === "collections"}>
-          <button
-            class="flex w-fit items-center gap-2 bg-transparent"
-            onclick={toggleAllCollections}
-          >
-            {allCollapsed() ?
-              <div class="i-lucide-copy-plus text-lg" />
-            : <div class="i-lucide-copy-minus text-lg" />}
-            {allCollapsed() ? "Expand all" : "Collapse all"}
-          </button>
+          <TextInput
+            placeholder="Filter collections"
+            onInput={(e) => setFilter(e.currentTarget.value)}
+          />
           <div class="flex flex-col font-mono">
             <div class="grid grid-cols-[min-content_1fr] items-center gap-x-1 overflow-hidden text-sm">
-              <For each={Object.keys(nsids() ?? {})}>
+              <For
+                each={Object.keys(nsids() ?? {}).filter((authority) =>
+                  filter() ?
+                    authority.startsWith(filter()!) || filter()?.startsWith(authority)
+                  : true,
+                )}
+              >
                 {(authority) => (
                   <>
                     <Show when={nsids()?.[authority].hidden}>
@@ -205,7 +192,13 @@ const RepoView = () => {
                     <Show when={!nsids()?.[authority].hidden}>
                       <div></div>
                       <div class="flex flex-col">
-                        <For each={nsids()?.[authority].nsids}>
+                        <For
+                          each={nsids()?.[authority].nsids.filter((nsid) =>
+                            filter() ?
+                              nsid.startsWith(filter()!.split(".").slice(2).join("."))
+                            : true,
+                          )}
+                        >
                           {(nsid) => (
                             <A
                               href={`/at://${did}/${authority}.${nsid}`}
