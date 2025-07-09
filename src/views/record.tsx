@@ -143,10 +143,10 @@ export const RecordView = () => {
   return (
     <div class="flex w-full flex-col items-center gap-3">
       <Show when={record() === undefined && validRecord() !== false}>
-        <div class="i-eos-icons-loading text-2xl" />
+        <div class="i-eos-icons-loading mt-3 text-2xl" />
       </Show>
       <Show when={validRecord() === false}>
-        <div class="break-words text-red-500 dark:text-red-400">{notice()}</div>
+        <div class="mt-3 break-words text-red-500 dark:text-red-400">{notice()}</div>
       </Show>
       <Show when={record()}>
         <div class="mt-3 flex gap-3">

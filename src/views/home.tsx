@@ -66,16 +66,6 @@ const Home = () => {
             notjuliet/pdsls
           </A>
         </p>
-        <p>
-          <span class="font-semibold">Tangled</span>:{" "}
-          <A
-            href="https://tangled.sh/@did:plc:b3pn34agqqchkaf75v7h43dk/pdsls"
-            target="_blank"
-            class="text-sky-500 hover:underline"
-          >
-            @juli.ee/pdsls
-          </A>
-        </p>
       </div>
       <Show when={localStorage.kawaii === "true"}>
         <p>

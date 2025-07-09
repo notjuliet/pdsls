@@ -79,7 +79,11 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         </Show>
         <Show keyed when={location.pathname}>
           <ErrorBoundary
-            fallback={(err) => <div class="mt-3 break-words">Error: {err.message}</div>}
+            fallback={(err) => (
+              <div class="mt-3 break-words text-red-500 dark:text-red-400">
+                Error: {err.message}
+              </div>
+            )}
           >
             <Suspense fallback={<div class="i-eos-icons-loading mt-3 text-2xl" />}>
               {props.children}
