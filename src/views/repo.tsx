@@ -287,10 +287,11 @@ const RepoView = () => {
                 <Show when={error()?.length === 0 || error() === undefined}>
                   <div class="flex items-center gap-1">
                     <button
+                      type="button"
                       onclick={() => downloadRepo()}
-                      class="bg-transparent text-sky-500 hover:underline"
+                      class="dark:hover:bg-dark-300 rounded-lg border border-gray-400 bg-transparent px-2 py-1.5 text-xs font-bold hover:bg-zinc-100 focus:border-blue-500 focus:outline-none"
                     >
-                      Export repo
+                      Export Repo
                     </button>
                     <Show when={downloading()}>
                       <div class="i-eos-icons-loading text-xl" />
