@@ -125,7 +125,7 @@ const PdsView = () => {
             <A
               href={`/at://${repo.did}`}
               classList={{
-                "rounded w-fit text-sm font-mono relative hover:bg-zinc-200 dark:hover:bg-neutral-700": true,
+                "rounded items-center text-sm gap-1 flex justify-between font-mono relative hover:bg-zinc-200 dark:hover:bg-neutral-700": true,
                 "text-sky-500": repo.active,
                 "text-neutral-400 dark:text-neutral-500": !repo.active,
               }}
@@ -139,7 +139,7 @@ const PdsView = () => {
               </Show>
               <span class="text-xs sm:text-sm">{repo.did}</span>
               <Show when={TID.validate(repo.rev)}>
-                <span class="ml-1 text-xs text-neutral-500 dark:text-neutral-400">
+                <span class="text-xs text-neutral-500 dark:text-neutral-400">
                   {localDateFromTimestamp(TID.parse(repo.rev).timestamp / 1000).split(" ")[0]}
                 </span>
               </Show>
