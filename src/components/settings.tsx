@@ -78,10 +78,10 @@ const Settings = () => {
           <div class="dark:bg-dark-400 top-10% absolute rounded-md border border-slate-900 bg-zinc-100 p-4 text-slate-900 dark:border-slate-100 dark:text-slate-100">
             <h3 class="mb-2 border-b border-neutral-500 pb-2 text-xl font-bold">Settings</h3>
             <h4 class="mb-1 font-semibold">Theme</h4>
-            <div class="w-xs flex divide-x divide-neutral-500 overflow-hidden rounded-lg border border-neutral-500">
+            <div class="w-xs flex gap-2 overflow-hidden">
               <button
                 classList={{
-                  "basis-1/3 p-2": true,
+                  "basis-1/3 py-1 rounded-lg": true,
                   "bg-transparent hover:bg-zinc-200 dark:hover:bg-dark-200": !theme().system,
                   "bg-neutral-500 text-slate-100": theme().system,
                 }}
@@ -97,7 +97,7 @@ const Settings = () => {
               </button>
               <button
                 classList={{
-                  "basis-1/3 p-2": true,
+                  "basis-1/3 py-1 rounded-lg": true,
                   "bg-transparent hover:bg-zinc-200 dark:hover:bg-dark-200":
                     theme().color !== "light" || theme().system,
                   "bg-neutral-500 text-slate-100": theme().color === "light" && !theme().system,
@@ -108,7 +108,7 @@ const Settings = () => {
               </button>
               <button
                 classList={{
-                  "basis-1/3 p-2": true,
+                  "basis-1/3 py-1 rounded-lg": true,
                   "bg-transparent hover:bg-zinc-200 dark:hover:bg-dark-200":
                     theme().color !== "dark" || theme().system,
                   "bg-neutral-500": theme().color === "dark" && !theme().system,
