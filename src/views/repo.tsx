@@ -29,8 +29,8 @@ const RepoView = () => {
   const RepoTab = (props: { tab: Tab; label: string }) => (
     <button
       classList={{
-        "flex flex-1 py-1 justify-center": true,
-        "bg-zinc-200 dark:bg-dark-300": tab() === props.tab,
+        "rounded-lg flex flex-1 py-1 justify-center": true,
+        "bg-zinc-200 dark:bg-dark-200": tab() === props.tab,
         "bg-transparent hover:bg-zinc-100 dark:hover:bg-dark-400": tab() !== props.tab,
       }}
       onclick={() => setTab(props.tab)}
@@ -129,7 +129,7 @@ const RepoView = () => {
             {error()}
           </div>
         </Show>
-        <div class="flex divide-x divide-neutral-500 overflow-hidden rounded-lg border border-neutral-500 text-sm">
+        <div class="flex gap-1 overflow-hidden text-sm">
           <Show when={!error()}>
             <RepoTab tab="collections" label="Collections" />
           </Show>
