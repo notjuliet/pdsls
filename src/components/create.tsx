@@ -245,7 +245,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                     <p>Blob metadata will be pasted after the cursor</p>
                   </Show>
                   <Show when={uploading()}>
-                    <div class="i-eos-icons-loading text-xl" />
+                    <div class="i-lucide-loader-circle animate-spin text-xl" />
                   </Show>
                 </div>
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

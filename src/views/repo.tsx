@@ -152,7 +152,7 @@ const RepoView = () => {
         </Show>
         <Show when={tab() === "blobs"}>
           <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
-            <Suspense fallback={<div class="i-eos-icons-loading self-center text-xl" />}>
+            <Suspense fallback={<div class="i-lucide-loader-circle animate-spin self-center text-xl" />}>
               <BlobView pds={pds!} repo={did} />
             </Suspense>
           </ErrorBoundary>
@@ -294,7 +294,7 @@ const RepoView = () => {
                       Export Repo
                     </button>
                     <Show when={downloading()}>
-                      <div class="i-eos-icons-loading text-xl" />
+                      <div class="i-lucide-loader-circle animate-spin text-xl" />
                     </Show>
                   </div>
                 </Show>

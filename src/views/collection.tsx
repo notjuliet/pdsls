@@ -266,7 +266,7 @@ const CollectionView = () => {
                 </button>
               </Show>
               <Show when={response.loading}>
-                <div class="i-eos-icons-loading text-xl" />
+                <div class="i-lucide-loader-circle animate-spin text-xl" />
               </Show>
             </div>
           </Show>

@@ -85,7 +85,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
               </div>
             )}
           >
-            <Suspense fallback={<div class="i-eos-icons-loading mt-3 text-2xl" />}>
+            <Suspense fallback={<div class="i-lucide-loader-circle animate-spin mt-3 text-2xl" />}>
               {props.children}
             </Suspense>
           </ErrorBoundary>

@@ -81,7 +81,7 @@ const LabelView = () => {
               </button>
             </Show>
             <Show when={response.loading}>
-              <div class="i-eos-icons-loading text-2xl" />
+              <div class="i-lucide-loader-circle animate-spin text-2xl" />
             </Show>
           </div>
         </div>
@@ -112,7 +112,7 @@ const LabelView = () => {
                 </button>
               </Show>
               <Show when={response.loading}>
-                <div class="i-eos-icons-loading text-2xl" />
+                <div class="i-lucide-loader-circle animate-spin text-2xl" />
               </Show>
             </div>
           </Show>
