@@ -82,7 +82,7 @@ const Settings = () => {
               <button
                 classList={{
                   "basis-1/3 py-1 rounded-lg": true,
-                  "bg-transparent hover:bg-zinc-200 dark:hover:bg-dark-200": !theme().system,
+                  "bg-transparent hover:bg-zinc-200 dark:hover:bg-dark-100": !theme().system,
                   "bg-neutral-500 text-slate-100": theme().system,
                 }}
                 onclick={() =>
@@ -98,7 +98,7 @@ const Settings = () => {
               <button
                 classList={{
                   "basis-1/3 py-1 rounded-lg": true,
-                  "bg-transparent hover:bg-zinc-200 dark:hover:bg-dark-200":
+                  "bg-transparent hover:bg-zinc-200 dark:hover:bg-dark-100":
                     theme().color !== "light" || theme().system,
                   "bg-neutral-500 text-slate-100": theme().color === "light" && !theme().system,
                 }}
@@ -109,7 +109,7 @@ const Settings = () => {
               <button
                 classList={{
                   "basis-1/3 py-1 rounded-lg": true,
-                  "bg-transparent hover:bg-zinc-200 dark:hover:bg-dark-200":
+                  "bg-transparent hover:bg-zinc-200 dark:hover:bg-dark-100":
                     theme().color !== "dark" || theme().system,
                   "bg-neutral-500": theme().color === "dark" && !theme().system,
                 }}

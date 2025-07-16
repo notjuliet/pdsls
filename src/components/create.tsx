@@ -271,7 +271,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                 <div class="flex items-center justify-between gap-2">
                   <button
                     onclick={() => setOpenDialog(false)}
-                    class="dark:hover:bg-dark-300 rounded-lg border border-slate-400 bg-transparent px-2 py-1.5 text-xs font-bold hover:bg-zinc-50 focus:border-blue-500 focus:outline-none sm:text-sm"
+                    class="dark:hover:bg-dark-100 rounded-lg border border-slate-400 bg-transparent px-2 py-1.5 text-xs font-bold hover:bg-zinc-50 focus:border-blue-500 focus:outline-none sm:text-sm"
                   >
                     Close
                   </button>
