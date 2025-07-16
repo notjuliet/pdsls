@@ -25,7 +25,6 @@ const swapIcons: Record<string, string> = {
   "did:plc:6v6jqsy7swpzuu53rmzaybjy": "i-lucide-fish",
   "did:plc:hx53snho72xoj7zqt5uice4u": "i-lucide-lab-flower-rose-single",
   "did:plc:wzsilnxf24ehtmmc3gssy5bu": "i-lucide-music-2",
-  "did:plc:b3pn34agqqchkaf75v7h43dk": "i-lucide-lab-fox-face-tail",
   "did:plc:bnqkww7bjxaacajzvu5gswdf": "i-lucide-gem",
   "did:plc:pm6jxakrtzmkorra62cr43kr": "i-lucide-flag",
   "did:plc:355lbopbpckczt672hss2ra4": "i-fluent-emoji-alien",
@@ -209,7 +208,10 @@ const NavBar = (props: { params: Params }) => {
                   />
                 </Show>
                 <Show when={validRecord() === undefined}>
-                  <Tooltip text="Validating" children={<div class="i-lucide-loader-circle animate-spin" />} />
+                  <Tooltip
+                    text="Validating"
+                    children={<div class="i-lucide-loader-circle animate-spin" />}
+                  />
                 </Show>
                 <Show when={validSchema()}>
                   <Tooltip text="Valid schema" children={<div class="i-lucide-file-check" />} />
