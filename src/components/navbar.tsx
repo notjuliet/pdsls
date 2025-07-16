@@ -1,4 +1,4 @@
-import { A, Params } from "@solidjs/router";
+import { A, Params, useLocation } from "@solidjs/router";
 import Tooltip from "./tooltip";
 import { createEffect, createSignal, Show } from "solid-js";
 import { didDocCache, labelerCache, validateHandle } from "../utils/api";
@@ -34,6 +34,7 @@ const swapIcons: Record<string, string> = {
 };
 
 const NavBar = (props: { params: Params }) => {
+  const location = useLocation();
   const [handle, setHandle] = createSignal(props.params.repo);
   const [validHandle, setValidHandle] = createSignal<boolean | undefined>(undefined);
   const [fullCid, setFullCid] = createSignal(false);
@@ -108,7 +109,7 @@ const NavBar = (props: { params: Params }) => {
                   </button>
                 </Tooltip>
                 <div class="flex gap-1">
-                  <Show when={props.params.collection}>
+                  {props.params.collection || location.pathname.includes("/labels") ?
                     <A
                       end
                       href={`/at://${props.params.repo}`}
@@ -116,10 +117,7 @@ const NavBar = (props: { params: Params }) => {
                     >
                       {showHandle() ? handle() : props.params.repo}
                     </A>
-                  </Show>
-                  <Show when={!props.params.collection}>
-                    <span>{showHandle() ? handle() : props.params.repo}</span>
-                  </Show>
+                  : <span>{showHandle() ? handle() : props.params.repo}</span>}
                   <Show when={showHandle()}>
                     <Tooltip
                       text={
