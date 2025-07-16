@@ -69,9 +69,14 @@ const NavBar = (props: { params: Params }) => {
             </button>
           </Tooltip>
           <Show when={pds()}>
-            <A end href={pds()!} inactiveClass="text-sky-500 w-full hover:underline">
-              {pds()}
-            </A>
+            <Show when={props.params.repo}>
+              <A end href={pds()!} inactiveClass="text-sky-500 w-full hover:underline">
+                {pds()}
+              </A>
+            </Show>
+            <Show when={!props.params.repo}>
+              <span>{pds()}</span>
+            </Show>
           </Show>
         </div>
         <Tooltip
@@ -106,13 +111,18 @@ const NavBar = (props: { params: Params }) => {
                   </button>
                 </Tooltip>
                 <div class="flex gap-1">
-                  <A
-                    end
-                    href={`/at://${props.params.repo}`}
-                    inactiveClass="text-sky-500 hover:underline"
-                  >
-                    {showHandle() ? handle() : props.params.repo}
-                  </A>
+                  <Show when={props.params.collection}>
+                    <A
+                      end
+                      href={`/at://${props.params.repo}`}
+                      inactiveClass="text-sky-500 hover:underline"
+                    >
+                      {showHandle() ? handle() : props.params.repo}
+                    </A>
+                  </Show>
+                  <Show when={!props.params.collection}>
+                    <span>{showHandle() ? handle() : props.params.repo}</span>
+                  </Show>
                   <Show when={showHandle()}>
                     <Tooltip
                       text={
@@ -167,13 +177,18 @@ const NavBar = (props: { params: Params }) => {
                 <div class="i-lucide-list text-lg" />
               </button>
             </Tooltip>
-            <A
-              end
-              href={`/at://${props.params.repo}/${props.params.collection}`}
-              inactiveClass="text-sky-500 w-full hover:underline"
-            >
-              {props.params.collection}
-            </A>
+            <Show when={props.params.rkey}>
+              <A
+                end
+                href={`/at://${props.params.repo}/${props.params.collection}`}
+                inactiveClass="text-sky-500 w-full hover:underline"
+              >
+                {props.params.collection}
+              </A>
+            </Show>
+            <Show when={!props.params.rkey}>
+              <span>{props.params.collection}</span>
+            </Show>
           </div>
         </Show>
         <Show when={props.params.rkey}>
