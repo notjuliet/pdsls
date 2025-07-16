@@ -194,7 +194,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
           ref={setModal}
           class="starting:backdrop-brightness-100 backdrop-brightness-40 fixed left-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-transparent transition duration-300"
         >
-          <div class="dark:bg-dark-300 w-21rem sm:w-xl top-10% absolute rounded-md bg-zinc-100 p-2 text-slate-900 sm:p-4 lg:w-[50rem] dark:text-slate-100">
+          <div class="starting:opacity-0 dark:bg-dark-300 w-21rem sm:w-xl top-10% absolute rounded-md bg-zinc-100 p-2 text-slate-900 transition-opacity duration-300 sm:p-4 lg:w-[50rem] dark:text-slate-100">
             <h3 class="mb-2 font-bold">{props.create ? "Creating" : "Editing"} record</h3>
             <form ref={formRef} class="flex flex-col gap-y-2">
               <div class="flex w-fit flex-col gap-y-1 text-xs sm:text-sm">

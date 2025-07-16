@@ -92,7 +92,7 @@ const AccountManager = () => {
           ref={setModal}
           class="starting:backdrop-brightness-100 backdrop-brightness-40 fixed left-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-transparent transition duration-300"
         >
-          <div class="dark:bg-dark-300 top-10% absolute rounded-md bg-zinc-100 p-4 text-slate-900 dark:text-slate-100">
+          <div class="starting:opacity-0 dark:bg-dark-300 top-10% absolute rounded-md bg-zinc-100 p-4 text-slate-900 transition-opacity duration-300 dark:text-slate-100">
             <h3 class="mb-2 font-bold">Manage accounts</h3>
             <div class="mb-2 max-h-[20rem] overflow-y-auto border-b border-neutral-500 pb-2 md:max-h-[25rem]">
               <For each={Object.keys(sessions)}>
