@@ -3,7 +3,7 @@ import { Show } from "solid-js";
 
 const Home = () => {
   return (
-    <div class="mt-4 flex flex-col gap-2 break-words">
+    <div class="w-21rem sm:w-23rem mt-4 flex flex-col gap-2 break-words">
       <div>
         <p>
           Browse the public data on{" "}
@@ -37,19 +37,22 @@ const Home = () => {
       <div>
         <span class="font-semibold">Examples</span>
         <div>
-          <A href="/pds.kelinci.net" class="text-sky-500 hover:underline">
+          <A href="/pds.kelinci.net" class="text-sm text-sky-500 hover:underline sm:text-base">
             https://pds.kelinci.net
           </A>
         </div>
         <div>
-          <A href="/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2" class="text-sky-500 hover:underline">
+          <A
+            href="/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2"
+            class="text-sm text-sky-500 hover:underline sm:text-base"
+          >
             at://did:plc:vwzwgnygau7ed7b7wt5ux7y2
           </A>
         </div>
         <div>
           <A
             href="/at://did:plc:oisofpd7lj26yvgiivf3lxsi/app.bsky.feed.post/3l2zpbbhuvw2h"
-            class="text-sky-500 hover:underline"
+            class="text-sm text-sky-500 hover:underline sm:text-base"
           >
             at://hailey.at/app.bsky.feed.post/3l2zpbbhuvw2h
           </A>
