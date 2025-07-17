@@ -59,7 +59,7 @@ const BlobView = (props: { pds: string; repo: string }) => {
         </button>
       </Show>
       <Show when={response.loading}>
-        <div class="i-lucide-loader-circle animate-spin mt-2 text-xl" />
+        <div class="i-lucide-loader-circle mt-2 animate-spin text-xl" />
       </Show>
     </div>
   );
