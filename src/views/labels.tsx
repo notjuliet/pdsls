@@ -65,23 +65,23 @@ const LabelView = () => {
             URI Patterns (comma-separated)
           </label>
         </div>
-        <div class="relative flex items-center gap-x-2">
+        <div class="w-21rem sm:w-23rem flex items-center gap-x-2">
           <textarea
             id="patterns"
             name="patterns"
             spellcheck={false}
             rows={3}
             value={searchParams.uriPatterns ?? "*"}
-            class="dark:bg-dark-100 bg-light-100 w-16rem border-1.5 rounded-lg border-neutral-300 px-2 py-1 focus:border-blue-500 focus:outline-none dark:border-neutral-500"
+            class="dark:bg-dark-100 bg-light-100 border-1.5 grow rounded-lg border-neutral-300 px-2 py-1 focus:border-blue-500 focus:outline-none dark:border-neutral-500"
           />
-          <div class="absolute -right-8 flex justify-center">
+          <div class="flex justify-center">
             <Show when={!response.loading}>
               <button onclick={() => initQuery()} type="submit">
-                <div class="i-lucide-arrow-right text-2xl" />
+                <div class="i-lucide-arrow-right text-xl" />
               </button>
             </Show>
             <Show when={response.loading}>
-              <div class="i-lucide-loader-circle animate-spin text-2xl" />
+              <div class="i-lucide-loader-circle animate-spin text-xl" />
             </Show>
           </div>
         </div>
@@ -90,7 +90,7 @@ const LabelView = () => {
         <TextInput
           placeholder="Filter by label"
           onInput={(e) => setFilter(e.currentTarget.value)}
-          class="w-16rem"
+          class="w-21rem sm:w-23rem"
         />
         <div class="flex items-center gap-x-2">
           <Show when={labelCount() && labels().length}>
