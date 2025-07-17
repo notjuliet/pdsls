@@ -57,6 +57,14 @@ const Home = () => {
             at://hailey.at/app.bsky.feed.post/3l2zpbbhuvw2h
           </A>
         </div>
+        <div>
+          <A
+            href="/at://did:plc:wkoofae5uytcm7bjncmev6n6/labels"
+            class="text-sm text-sky-500 hover:underline sm:text-base"
+          >
+            at://did:plc:wkoofae5uytcm7bjncmev6n6/labels
+          </A>
+        </div>
       </div>
       <div>
         <p>
