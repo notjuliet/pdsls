@@ -143,7 +143,7 @@ export const RecordView = () => {
   return (
     <div class="flex w-full flex-col items-center gap-3">
       <Show when={record() === undefined && validRecord() !== false}>
-        <div class="i-lucide-loader-circle animate-spin mt-3 text-2xl" />
+        <div class="i-lucide-loader-circle mt-3 animate-spin text-2xl" />
       </Show>
       <Show when={validRecord() === false}>
         <div class="mt-3 break-words text-red-500 dark:text-red-400">{notice()}</div>
