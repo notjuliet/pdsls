@@ -13,15 +13,15 @@ export const [validRecord, setValidRecord] = createSignal<boolean | undefined>(u
 export const [validSchema, setValidSchema] = createSignal<boolean | undefined>(undefined);
 
 const swapIcons: Record<string, string> = {
-  "did:plc:vwzwgnygau7ed7b7wt5ux7y2": "i-hugeicons-nintendo-switch",
+  "did:plc:vwzwgnygau7ed7b7wt5ux7y2": "i-lucide-microchip",
   "did:plc:oisofpd7lj26yvgiivf3lxsi": "i-lucide-bone",
-  "did:plc:uu5axsmbm2or2dngy4gwchec": "i-keycap",
+  "did:plc:uu5axsmbm2or2dngy4gwchec": "i-lucide-train-track",
   "did:plc:7x6rtuenkuvxq3zsvffp2ide": "i-lucide-rabbit",
   "did:plc:ia76kvnndjutgedggx2ibrem": "i-lucide-rabbit",
   "did:plc:5rowvb4jjbm26fdkx6a5rxls": "i-lucide-rabbit",
   "did:plc:hdhoaan3xa3jiuq4fg4mefid": "i-lucide-lab-shark",
   "did:plc:hvakvedv6byxhufjl23mfmsd": "i-lucide-rat",
-  "did:plc:ezhjhbzqt32bqprrn6qjlkri": "i-trogi",
+  "did:plc:ezhjhbzqt32bqprrn6qjlkri": "i-lucide-film",
   "did:plc:6v6jqsy7swpzuu53rmzaybjy": "i-lucide-fish",
   "did:plc:hx53snho72xoj7zqt5uice4u": "i-lucide-lab-flower-rose-single",
   "did:plc:wzsilnxf24ehtmmc3gssy5bu": "i-lucide-music-2",

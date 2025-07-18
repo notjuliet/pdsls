@@ -1,35 +1,3 @@
-.i-hugeicons-nintendo-switch {
-  --un-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 24 24'%3E%3Cpath fill='currentColor' d='M10.04 20.4H7.12c-.93 0-1.82-.4-2.48-1.04C4 18.7 3.6 17.81 3.6 16.88V7.12c0-.93.4-1.82 1.04-2.48C5.3 4 6.19 3.62 7.12 3.62h2.92zM7.12 2A5.12 5.12 0 0 0 2 7.12v9.76C2 19.71 4.29 22 7.12 22h4.53V2zM5.11 8c0 1.04.84 1.88 1.89 1.88c1.03 0 1.87-.84 1.87-1.88S8.03 6.12 7 6.12c-1.05 0-1.89.84-1.89 1.88m12.5 3c1.11 0 2.01.89 2.01 2c0 1.12-.9 2-2.01 2s-2.03-.88-2.03-2c0-1.11.92-2 2.03-2m-.73 11A5.12 5.12 0 0 0 22 16.88V7.12C22 4.29 19.71 2 16.88 2h-3.23v20z'/%3E%3C/svg%3E");
-  -webkit-mask: var(--un-icon) no-repeat;
-  mask: var(--un-icon) no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  background-color: currentColor;
-  color: inherit;
-  width: 1em;
-  height: 1em;
-}
-
-.i-keycap {
-  --un-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22151%22%20height%3D%22151%22%20fill%3D%22none%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22m146.171%2084.05-21.142-38.896-56.53-32.039-2.895%202.233c-.701.543-1.502%201.185-2.4%201.906-7.311%205.879-20.925%2016.805-50.475%2028.048l-3.013%201.146-5.098%2037.493%2065.906%2044.813.08.464%201.659.721.148.099.02-.03%203.754%201.621%2069.986-47.59v.01Zm-14.227-3.468-52.47%2035.674-4.376-27.385c10.848-2.698%2031.12-10.76%2045.949-28.433l10.897%2020.144ZM69.398%2026.205l44.467%2025.845c-13.228%2016.706-31.772%2023.572-40.486%2026.002l-2.924%201.087L26.54%2051.437c23.75-10.166%2036.277-19.956%2042.867-25.232h-.01ZM18.904%2059.47l44.971%2028.364%204.219%2026.131-51.808-35.23%202.618-19.265Z%22%2F%3E%3C%2Fsvg%3E");
-  -webkit-mask: var(--un-icon) no-repeat;
-  mask: var(--un-icon) no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  background-color: currentColor;
-  color: inherit;
-  width: 1em;
-  height: 1em;
-}
-
-.i-trogi {
-  background: url("data:image/webp;base64,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")
-    no-repeat center;
-  background-size: 100% 100%;
-  width: 1em;
-  height: 1.2em;
-}
-
 .i-fluent-emoji-alien {
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1em' height='1em' viewBox='0 0 32 32'%3E%3C!-- Icon from Fluent Emoji Flat by Microsoft Corporation - https://github.com/microsoft/fluentui-emoji/blob/main/LICENSE --%3E%3Cg fill='none'%3E%3Cpath fill='%2386D72F' d='M29.84 15.92C29.84 23.61 18.92 30 15.92 30S2 23.61 2 15.92S8.23 2 15.92 2s13.92 6.23 13.92 13.92'/%3E%3Cpath fill='%23212121' d='M13.368 24.225a1 1 0 0 1 1.407.143c.376.461.825.645 1.225.645s.85-.184 1.225-.645a1 1 0 1 1 1.55 1.264c-.724.889-1.726 1.38-2.775 1.38c-1.05 0-2.05-.491-2.775-1.38a1 1 0 0 1 .143-1.407'/%3E%3Cpath fill='%23533566' d='M6.474 19.527c2.254 2.253 4.6 3.549 6.845 1.306c2.253-2.242 2.233-5.905-.01-8.147c-2.244-2.243-5.898-2.253-8.142 0s-.946 4.588 1.307 6.84m19.051.001c-2.255 2.253-4.602 3.549-6.847 1.306s-2.234-5.905.01-8.147c2.245-2.243 5.9-2.253 8.144 0c2.245 2.253.947 4.588-1.307 6.84'/%3E%3Cpath fill='%23fff' d='M12.62 15.62c.61-.61.47-1.73-.31-2.51c-.78-.77-1.9-.92-2.51-.31s-.47 1.73.31 2.51s1.9.92 2.51.31m13.28 0c.61-.61.47-1.73-.31-2.51c-.77-.77-1.9-.92-2.51-.31s-.47 1.73.31 2.51s1.9.92 2.51.31'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 100% 100%;
