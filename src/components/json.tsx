@@ -77,50 +77,52 @@ const JSONNull = () => {
 };
 
 const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: string }) => {
-  const [clip, setClip] = createSignal(false);
   const [hide, setHide] = createSignal(localStorage.hideMedia === "true");
 
   createEffect(() => setHide(hideMedia()));
 
-  const rawObj = (
-    <For each={Object.entries(data)}>
-      {([key, value]) => (
+  const Obj = ({ key, value }: { key: string; value: JSONType }) => {
+    const [show, setShow] = createSignal(true);
+
+    return (
+      <span
+        classList={{
+          "group/indent flex gap-x-1 w-full": true,
+          "flex-col": value === Object(value),
+        }}
+      >
         <span
-          classList={{
-            "group/indent flex gap-x-1 w-full": true,
-            "flex-col": value === Object(value),
-          }}
+          class="max-w-40% sm:max-w-50% break-anywhere group/clip relative flex size-fit shrink-0 cursor-default select-none items-center gap-1 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+          onclick={() => setShow(!show())}
         >
-          <span class="max-w-40% sm:max-w-50% break-anywhere shrink-0 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200">
-            <span
-              class="group/clip relative flex size-fit cursor-default items-center"
-              onmouseleave={() => setClip(false)}
-              onclick={() =>
-                navigator.clipboard
-                  .writeText(JSON.stringify(value).replace(/^"(.+)"$/, "$1"))
-                  .then(() => setClip(true))
-              }
-            >
-              <span class="dark:bg-dark-800 absolute -left-4 hidden bg-zinc-50 text-sm group-hover/clip:block">
-                {clip() ?
-                  <div class="i-lucide-clipboard-check" />
-                : <div class="i-lucide-clipboard" />}
-              </span>
-              {key}:
-            </span>
-          </span>
           <span
             classList={{
-              "self-center": value !== Object(value),
-              "pl-[calc(2ch-1px)] border-l border-neutral-500/40 dark:border-neutral-400/40 has-hover:group-hover/indent:border-neutral-700/80 dark:has-hover:group-hover/indent:border-neutral-200/80":
-                value === Object(value),
+              "dark:bg-dark-800 absolute -left-5 bg-zinc-50 text-sm": true,
+              "hidden group-hover/clip:block": show(),
             }}
           >
-            <JSONValue data={value} repo={repo} />
+            {show() ?
+              <div class="i-lucide-chevron-down" />
+            : <div class="i-lucide-chevron-right" />}
           </span>
+          {key}:
         </span>
-      )}
-    </For>
+        <span
+          classList={{
+            "self-center": value !== Object(value),
+            "pl-[calc(2ch-1px)] border-l border-neutral-500/40 dark:border-neutral-400/40 has-hover:group-hover/indent:border-neutral-700/80 dark:has-hover:group-hover/indent:border-neutral-200/80":
+              value === Object(value),
+            "invisible h-0": !show(),
+          }}
+        >
+          <JSONValue data={value} repo={repo} />
+        </span>
+      </span>
+    );
+  };
+
+  const rawObj = (
+    <For each={Object.entries(data)}>{([key, value]) => <Obj key={key} value={value} />}</For>
   );
 
   const blob: AtBlob = data as any;
