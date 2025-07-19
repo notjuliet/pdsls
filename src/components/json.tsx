@@ -112,7 +112,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
           <span
             classList={{
               "self-center": value !== Object(value),
-              "pl-[2ch] border-l border-neutral-500/40 dark:border-neutral-400/40 has-hover:group-hover/indent:border-neutral-700/80 dark:has-hover:group-hover/indent:border-neutral-200/80":
+              "pl-[calc(2ch-1px)] border-l border-neutral-500/40 dark:border-neutral-400/40 has-hover:group-hover/indent:border-neutral-700/80 dark:has-hover:group-hover/indent:border-neutral-200/80":
                 value === Object(value),
             }}
           >
