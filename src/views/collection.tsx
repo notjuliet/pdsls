@@ -11,12 +11,14 @@ import { localDateFromTimestamp } from "../utils/date.js";
 import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import { ComAtprotoRepoApplyWrites, ComAtprotoRepoGetRecord } from "@atcute/atproto";
 import { TextInput } from "../components/text-input.jsx";
+import { splitArray } from "../utils/array.js";
 
 interface AtprotoRecord {
   rkey: string;
   record: InferXRPCBodyOutput<ComAtprotoRepoGetRecord.mainSchema["output"]>;
   timestamp: number | undefined;
   toDelete: boolean;
+  note?: string;
 }
 
 const LIMIT = 100;
@@ -86,11 +88,50 @@ const CollectionView = () => {
       },
     });
 
+  const fetchProfiles = async (dids: string[]) => {
+    const client = new Client({handler: agent})
+    const res = await client.get("app.bsky.actor.getProfiles", {
+      params: {
+        actors: dids as ActorIdentifier[]
+      }
+    })
+    if (!res.ok) throw new Error(res.data.error);
+    return res.data.profiles
+  }
+
   const fetchRecords = async () => {
     if (!pds) pds = await resolvePDS(did);
     if (!rpc) rpc = new Client({ handler: new CredentialManager({ service: pds }) });
     const res = await listRecords(did, params.collection, cursor());
     if (!res.ok) throw new Error(res.data.error);
+
+    // special check profile when browser follow and listitem
+    const specialCheck = () => loginState() && agent.sub === did && ['app.bsky.graph.follow', 'app.bsky.graph.listitem'].includes(params.collection)
+    // missing: actor maybe deleted or takedown by bsky
+    let missingDids: string[];
+    // blocked: actor block viewer
+    let blockedDids: string[];
+    // muted: actor muted viewer 
+    let mutedDids: string[];
+
+    if (specialCheck()) {
+      const subjects = res.data.records.map((record) => record.value.subject as string)
+      let profiles: any[] = []
+      for (const dids of splitArray(subjects, 25)) {
+        profiles = profiles.concat(await fetchProfiles(dids))
+      }
+      const existsDids = profiles.map((profile) => profile.did)
+      missingDids = subjects.filter((subject) => existsDids.includes(subject) == false)
+      blockedDids = profiles.filter((profile) => profile.viewer.blockedBy).map((profile) => profile.did)
+      mutedDids = profiles.filter((profile) => profile.viewer.muted).map((profile) => profile.did)
+    }
+
+    const getNote = (actor: string) => {
+      if (missingDids.includes(actor)) return "missing"
+      if (blockedDids.includes(actor)) return "blocked"
+      if (mutedDids.includes(actor)) return "muted"
+    }
+
     setCursor(res.data.records.length < LIMIT ? undefined : res.data.cursor);
     const tmpRecords: AtprotoRecord[] = [];
     res.data.records.forEach((record) => {
@@ -100,6 +141,7 @@ const CollectionView = () => {
         record: record,
         timestamp: TID.validate(rkey) ? TID.parse(rkey).timestamp / 1000 : undefined,
         toDelete: false,
+        note: specialCheck() ? getNote(record.value.subject as string) : undefined
       });
     });
     setRecords(records.concat(tmpRecords) ?? tmpRecords);
@@ -291,11 +333,13 @@ const CollectionView = () => {
                     onchange={(e) => setRecords(index(), "toDelete", e.currentTarget.checked)}
                   />
                   <RecordLink record={record} index={index()} />
+                  <Show when={record.note != undefined}><span class="ml-2">{record.note}</span></Show>
                 </label>
               </Show>
               <Show when={!batchDelete()}>
                 <A href={`/at://${did}/${params.collection}/${record.rkey}`}>
                   <RecordLink record={record} index={index()} />
+                  <Show when={record.note != undefined}><span class="ml-2">{record.note}</span></Show>
                 </A>
               </Show>
             </>
