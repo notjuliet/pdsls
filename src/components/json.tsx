@@ -87,7 +87,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
       {([key, value]) => (
         <span
           classList={{
-            "flex gap-x-1 w-full": true,
+            "group/indent flex gap-x-1 w-full": true,
             "flex-col": value === Object(value),
           }}
         >
@@ -112,7 +112,8 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
           <span
             classList={{
               "self-center": value !== Object(value),
-              "ml-[2ch]": value === Object(value),
+              "pl-[2ch] border-l border-neutral-500/40 dark:border-neutral-400/40 has-hover:group-hover/indent:border-neutral-700/80 dark:has-hover:group-hover/indent:border-neutral-200/80":
+                value === Object(value),
             }}
           >
             <JSONValue data={value} repo={repo} />
