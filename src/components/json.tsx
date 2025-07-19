@@ -1,5 +1,5 @@
 import VideoPlayer from "./video-player";
-import { createEffect, createSignal, For, Show } from "solid-js";
+import { createEffect, createSignal, For, Show, type JSX } from "solid-js";
 import { A } from "@solidjs/router";
 import { pds } from "./navbar";
 import Tooltip from "./tooltip";
@@ -115,7 +115,9 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
               "ml-[2ch]": value === Object(value),
             }}
           >
-            <JSONValue data={value} repo={repo} />
+            <Foldable>
+              <JSONValue data={value} repo={repo} />
+            </Foldable>
           </span>
         </span>
       )}
@@ -181,22 +183,32 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
 
 const JSONArray = ({ data, repo }: { data: JSONType[]; repo: string }) => {
   return (
-    <For each={data}>
-      {(value, index) => (
-        <span
-          classList={{
-            "flex before:content-['-']": true,
-            "mb-2": value === Object(value) && index() !== data.length - 1,
-          }}
-        >
-          <span class="ml-[1ch] w-full">
-            <JSONValue data={value} repo={repo} />
+    <Foldable>
+      <For each={data}>
+        {(value, index) => (
+          <span
+            classList={{
+              "flex before:content-['-']": true,
+              "mb-2": value === Object(value) && index() !== data.length - 1,
+            }}
+          >
+            <span class="ml-[1ch] w-full">
+              <JSONValue data={value} repo={repo} />
+            </span>
           </span>
-        </span>
-      )}
-    </For>
+        )}
+      </For>
+    </Foldable>
   );
 };
+
+export const Foldable = (props: { children: JSX.Element }) => {
+  const [show, setShow] = createSignal(true)
+  return <>
+    <button onclick={() => setShow(!show())}>{show() ? "[fold]" : "[unfold]"}</button>
+    <Show when={show()} children={props.children}/>
+  </>
+}
 
 export const JSONValue = ({ data, repo }: { data: JSONType; repo: string }) => {
   if (typeof data === "string") return <JSONString data={data} />;
