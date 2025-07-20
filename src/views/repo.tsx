@@ -228,13 +228,13 @@ const RepoView = () => {
                 </div>
                 <div>
                   <p class="font-semibold text-stone-600 dark:text-stone-400">Identities</p>
-                  <ul class="ml-3">
+                  <ul class="ml-2">
                     <For each={didDocument().alsoKnownAs}>{(alias) => <li>{alias}</li>}</For>
                   </ul>
                 </div>
                 <div>
                   <p class="font-semibold text-stone-600 dark:text-stone-400">Services</p>
-                  <ul class="ml-3">
+                  <ul class="ml-2">
                     <For each={didDocument().service}>
                       {(service) => (
                         <li class="flex flex-col">
@@ -255,7 +255,7 @@ const RepoView = () => {
                   <p class="font-semibold text-stone-600 dark:text-stone-400">
                     Verification methods
                   </p>
-                  <ul class="ml-3">
+                  <ul class="ml-2">
                     <For each={didDocument().verificationMethod}>
                       {(verif) => (
                         <li class="flex flex-col">
@@ -266,33 +266,36 @@ const RepoView = () => {
                     </For>
                   </ul>
                 </div>
-                <a
-                  class="flex w-fit items-center text-sky-500 hover:underline"
-                  href={
-                    did.startsWith("did:plc") ?
-                      `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
-                    : `https://${did.split("did:web:")[1]}/.well-known/did.json`
-                  }
-                  target="_blank"
-                >
-                  DID document <div class="i-lucide-external-link ml-0.5 text-sm" />
-                </a>
-                <Show when={did.startsWith("did:plc")}>
+                <div>
                   <a
                     class="flex w-fit items-center text-sky-500 hover:underline"
-                    href={`https://boat.kelinci.net/plc-oplogs?q=${did}`}
+                    href={
+                      did.startsWith("did:plc") ?
+                        `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
+                      : `https://${did.split("did:web:")[1]}/.well-known/did.json`
+                    }
                     target="_blank"
                   >
-                    PLC operation logs <div class="i-lucide-external-link ml-0.5 text-sm" />
+                    DID document <div class="i-lucide-external-link ml-0.5 text-sm" />
                   </a>
-                </Show>
+                  <Show when={did.startsWith("did:plc")}>
+                    <a
+                      class="flex w-fit items-center text-sky-500 hover:underline"
+                      href={`https://boat.kelinci.net/plc-oplogs?q=${did}`}
+                      target="_blank"
+                    >
+                      PLC operation logs <div class="i-lucide-external-link ml-0.5 text-sm" />
+                    </a>
+                  </Show>
+                </div>
                 <Show when={error()?.length === 0 || error() === undefined}>
                   <div class="flex items-center gap-1">
                     <button
                       type="button"
                       onclick={() => downloadRepo()}
-                      class="dark:hover:bg-dark-300 rounded-lg border border-gray-400 bg-transparent px-2 py-1.5 text-xs font-bold hover:bg-zinc-100 focus:border-blue-500 focus:outline-none"
+                      class="dark:hover:bg-dark-300 flex items-center gap-1 rounded-lg border border-gray-400 bg-transparent px-2 py-1.5 text-xs font-bold hover:bg-zinc-100 focus:border-blue-500 focus:outline-none"
                     >
+                      <div class="i-lucide-download text-sm" />
                       Export Repo
                     </button>
                     <Show when={downloading()}>
