@@ -152,7 +152,9 @@ const RepoView = () => {
         </Show>
         <Show when={tab() === "blobs"}>
           <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
-            <Suspense fallback={<div class="i-lucide-loader-circle animate-spin self-center text-xl" />}>
+            <Suspense
+              fallback={<div class="i-lucide-loader-circle animate-spin self-center text-xl" />}
+            >
               <BlobView pds={pds!} repo={did} />
             </Suspense>
           </ErrorBoundary>
@@ -175,12 +177,12 @@ const RepoView = () => {
                   <>
                     <Show when={nsids()?.[authority].hidden}>
                       <button onclick={() => toggleCollection(authority)}>
-                        <div class="i-lucide-plus-square mr-1 text-lg" />
+                        <div class="i-lucide-chevron-right mr-1 text-lg" />
                       </button>
                     </Show>
                     <Show when={!nsids()?.[authority].hidden}>
                       <button onclick={() => toggleCollection(authority)}>
-                        <div class="i-lucide-minus-square mr-1 text-lg" />
+                        <div class="i-lucide-chevron-down mr-1 text-lg" />
                       </button>
                     </Show>
                     <button
