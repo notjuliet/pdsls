@@ -36,7 +36,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
 
   return (
     <span
-      class="relative rounded px-0.5 hover:bg-zinc-200 dark:hover:bg-neutral-700"
+      class="relative flex items-baseline rounded px-0.5 hover:bg-zinc-200 dark:hover:bg-neutral-700"
       ref={rkeyRef}
       onmouseover={() => setHover(true)}
       onmouseleave={() => setHover(false)}
@@ -50,10 +50,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
       <Show when={hover()}>
         <span
           ref={previewRef}
-          classList={{
-            "w-max lg:max-w-lg max-w-sm bg-zinc-50 shadow-md dark:bg-dark-500 left-50% border-neutral-400 dark:border-neutral-600 max-h-md pointer-events-none absolute z-25 mt-2 block -translate-x-1/2 overflow-hidden whitespace-pre-wrap rounded-md border p-2 text-xs": true,
-            "bottom-8": isOverflowing(previewHeight()),
-          }}
+          class={`dark:bg-dark-500 left-50% max-h-md z-25 pointer-events-none absolute mt-2 block w-max max-w-sm -translate-x-1/2 overflow-hidden whitespace-pre-wrap rounded-md border border-neutral-400 bg-zinc-50 p-2 text-xs shadow-md lg:max-w-lg dark:border-neutral-600 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-5"}`}
         >
           <JSONValue
             data={props.record.record.value as JSONType}
