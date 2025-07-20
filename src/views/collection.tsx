@@ -21,36 +21,38 @@ interface AtprotoRecord {
 
 const LIMIT = 100;
 
-const RecordLink = (props: { record: AtprotoRecord; index: number }) => {
-  const [hoverRk, setHoverRk] = createSignal<HTMLSpanElement>();
+const RecordLink = (props: { record: AtprotoRecord }) => {
+  const [hover, setHover] = createSignal(false);
   const [previewHeight, setPreviewHeight] = createSignal(0);
+  let rkeyRef!: HTMLSpanElement;
+  let previewRef!: HTMLSpanElement;
 
   createEffect(() => {
-    const preview = hoverRk()?.querySelector(".preview");
-    setPreviewHeight((preview as HTMLSpanElement)?.offsetHeight ?? 0);
+    if (hover()) setPreviewHeight(previewRef.offsetHeight);
   });
 
-  const isOverflowing = (elem: HTMLElement, previewHeight: number) =>
-    elem.offsetTop - window.scrollY + previewHeight + 32 > window.innerHeight;
+  const isOverflowing = (previewHeight: number) =>
+    rkeyRef.offsetTop - window.scrollY + previewHeight + 32 > window.innerHeight;
 
   return (
     <span
-      id={`rkey-${props.index}`}
       class="relative rounded px-0.5 hover:bg-zinc-200 dark:hover:bg-neutral-700"
-      onmouseover={(e) => setHoverRk(e.currentTarget)}
-      onmouseleave={() => setHoverRk(undefined)}
+      ref={rkeyRef}
+      onmouseover={() => setHover(true)}
+      onmouseleave={() => setHover(false)}
     >
       <span class="text-sky-500">{props.record.rkey}</span>
       <Show when={props.record.timestamp && props.record.timestamp <= Date.now()}>
-        <span class="ml-2 text-xs text-neutral-500 dark:text-neutral-400">
+        <span class="ml-1 text-xs text-neutral-500 dark:text-neutral-400">
           {localDateFromTimestamp(props.record.timestamp!)}
         </span>
       </Show>
-      <Show when={hoverRk()?.id === `rkey-${props.index}`}>
+      <Show when={hover()}>
         <span
+          ref={previewRef}
           classList={{
-            "preview w-max lg:max-w-lg max-w-sm bg-zinc-50 shadow-md dark:bg-dark-500 left-50% border-neutral-400 dark:border-neutral-600 max-h-md pointer-events-none absolute z-25 mt-2 block -translate-x-1/2 overflow-hidden whitespace-pre-wrap rounded-md border p-2 text-xs": true,
-            "bottom-8": isOverflowing(hoverRk()!, previewHeight()),
+            "w-max lg:max-w-lg max-w-sm bg-zinc-50 shadow-md dark:bg-dark-500 left-50% border-neutral-400 dark:border-neutral-600 max-h-md pointer-events-none absolute z-25 mt-2 block -translate-x-1/2 overflow-hidden whitespace-pre-wrap rounded-md border p-2 text-xs": true,
+            "bottom-8": isOverflowing(previewHeight()),
           }}
         >
           <JSONValue
@@ -290,12 +292,12 @@ const CollectionView = () => {
                     checked={record.toDelete}
                     onchange={(e) => setRecords(index(), "toDelete", e.currentTarget.checked)}
                   />
-                  <RecordLink record={record} index={index()} />
+                  <RecordLink record={record} />
                 </label>
               </Show>
               <Show when={!batchDelete()}>
                 <A href={`/at://${did}/${params.collection}/${record.rkey}`}>
-                  <RecordLink record={record} index={index()} />
+                  <RecordLink record={record} />
                 </A>
               </Show>
             </>
