@@ -195,7 +195,13 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
           class="starting:backdrop-brightness-100 backdrop-brightness-40 fixed left-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-transparent transition duration-300"
         >
           <div class="starting:opacity-0 dark:bg-dark-300 w-21rem sm:w-xl top-10% absolute rounded-md bg-zinc-100 p-2 text-slate-900 transition-opacity duration-300 sm:p-4 lg:w-[50rem] dark:text-slate-100">
-            <h3 class="mb-2 font-bold">{props.create ? "Creating" : "Editing"} record</h3>
+            <div class="mb-2 flex w-full justify-between">
+              <h3 class="font-bold">{props.create ? "Creating" : "Editing"} record</h3>
+              <div
+                class="i-lucide-x text-xl hover:text-blue-500"
+                onclick={() => setOpenDialog(false)}
+              />
+            </div>
             <form ref={formRef} class="flex flex-col gap-y-2">
               <div class="flex w-fit flex-col gap-y-1 text-xs sm:text-sm">
                 <Show when={props.create}>
@@ -268,34 +274,26 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                 <Show when={notice()}>
                   <div class="text-red-500 dark:text-red-400">{notice()}</div>
                 </Show>
-                <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center justify-end gap-2">
+                  <Show when={!props.create}>
+                    <div class="flex items-center gap-1">
+                      <input id="recreate" class="size-4" name="recreate" type="checkbox" />
+                      <label for="recreate" class="select-none">
+                        Recreate record
+                      </label>
+                    </div>
+                  </Show>
                   <button
-                    onclick={() => setOpenDialog(false)}
-                    class="dark:hover:bg-dark-100 rounded-lg border border-slate-400 bg-transparent px-2 py-1.5 text-xs font-bold hover:bg-zinc-50 focus:border-blue-500 focus:outline-none sm:text-sm"
+                    type="button"
+                    onclick={() =>
+                      props.create ?
+                        createRecord(new FormData(formRef))
+                      : editRecord(new FormData(formRef))
+                    }
+                    class="rounded-lg bg-blue-500 px-2 py-1.5 text-xs font-bold text-slate-100 hover:bg-blue-400 sm:text-sm dark:bg-blue-600 dark:hover:bg-blue-500"
                   >
-                    Close
+                    Confirm
                   </button>
-                  <div class="flex items-center gap-2">
-                    <Show when={!props.create}>
-                      <div class="flex items-center gap-1">
-                        <input id="recreate" class="size-4" name="recreate" type="checkbox" />
-                        <label for="recreate" class="select-none">
-                          Recreate record
-                        </label>
-                      </div>
-                    </Show>
-                    <button
-                      type="button"
-                      onclick={() =>
-                        props.create ?
-                          createRecord(new FormData(formRef))
-                        : editRecord(new FormData(formRef))
-                      }
-                      class="rounded-lg bg-blue-500 px-2 py-1.5 text-xs font-bold text-slate-100 hover:bg-blue-400 sm:text-sm dark:bg-blue-600 dark:hover:bg-blue-500"
-                    >
-                      Confirm
-                    </button>
-                  </div>
                 </div>
               </div>
             </form>
