@@ -91,8 +91,8 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
           "flex-col": value === Object(value),
         }}
       >
-        <span
-          class="max-w-40% sm:max-w-50% break-anywhere group/clip relative flex size-fit shrink-0 cursor-default select-none items-center text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+        <button
+          class="max-w-40% sm:max-w-50% break-anywhere group/clip relative flex size-fit shrink-0 items-center text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
           onclick={() => setShow(!show())}
         >
           <span
@@ -106,7 +106,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
             : <div class="i-lucide-chevron-right" />}
           </span>
           {key}:
-        </span>
+        </button>
         <span
           classList={{
             "self-center": value !== Object(value),
