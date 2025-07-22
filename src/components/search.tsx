@@ -72,20 +72,24 @@ const Search = () => {
         </label>
       </div>
       <div class="flex w-full items-center gap-2">
-        <TextInput
-          ref={searchInput}
-          id="input"
-          placeholder={isTouchDevice ? "" : "Type / to search"}
-          class="grow"
-        />
-        <Show when={loading()}>
-          <div class="i-lucide-loader-circle animate-spin text-xl" />
-        </Show>
-        <Show when={!loading()}>
-          <button type="submit" onclick={() => processInput(searchInput.value)}>
-            <div class="i-lucide-arrow-right text-xl" />
-          </button>
-        </Show>
+        <div class="dark:bg-dark-100 bg-light-100 border-1.5 flex grow items-center gap-2 rounded-lg border-neutral-300 px-2 py-1 focus-within:border-blue-500 dark:border-neutral-500">
+          <input
+            type="text"
+            spellcheck={false}
+            ref={searchInput}
+            id="input"
+            placeholder={isTouchDevice ? "" : "Type / to search"}
+            class="grow focus:outline-none"
+          />
+          <Show when={loading()}>
+            <div class="i-lucide-loader-circle animate-spin text-xl" />
+          </Show>
+          <Show when={!loading()}>
+            <button type="submit" onclick={() => processInput(searchInput.value)}>
+              <div class="i-lucide-search text-xl text-neutral-500 dark:text-neutral-400" />
+            </button>
+          </Show>
+        </div>
         <Show when={loginState()}>
           <Tooltip
             text="Repository"
