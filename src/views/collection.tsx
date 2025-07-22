@@ -157,7 +157,7 @@ const CollectionView = () => {
 
   return (
     <Show when={records.length || response()}>
-      <div class="z-5 dark:bg-dark-800 sticky top-0 mb-2 flex w-full flex-col items-center justify-center gap-2 border-b border-neutral-500 bg-zinc-50 py-3">
+      <div class="z-5 dark:bg-dark-800 sticky top-0 mb-2 flex w-full flex-col items-center justify-center gap-2 border-b border-neutral-400 bg-zinc-50 py-3 dark:border-neutral-600">
         <div class="flex w-full items-center gap-2">
           <Show when={loginState() && agent.sub === did}>
             <div class="flex items-center gap-x-2">
