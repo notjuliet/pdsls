@@ -50,7 +50,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
       <Show when={hover()}>
         <span
           ref={previewRef}
-          class={`dark:bg-dark-500 left-50% max-h-md z-25 pointer-events-none absolute block w-max max-w-sm -translate-x-1/2 overflow-hidden whitespace-pre-wrap rounded-md border border-neutral-400 bg-zinc-50 p-2 text-xs shadow-md lg:max-w-lg dark:border-neutral-600 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
+          class={`dark:bg-dark-500 left-50% max-h-md z-25 pointer-events-none absolute block w-max max-w-sm -translate-x-1/2 overflow-hidden whitespace-pre-wrap rounded-md border border-neutral-300 bg-zinc-50 p-2 text-xs shadow-lg lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
         >
           <JSONValue
             data={props.record.record.value as JSONType}
@@ -179,7 +179,7 @@ const CollectionView = () => {
                       classList={{
                         "flex text-lg items-center": true,
                         "i-lucide-trash-2": !batchDelete(),
-                        "i-lucide-circle-x text-neutral-500 hover:text-neutral-600 dark:text-neutral-400 dark:hover:text-neutral-300":
+                        "i-lucide-circle-x hover:text-neutral-600 dark:hover:text-neutral-300":
                           batchDelete(),
                       }}
                     />
