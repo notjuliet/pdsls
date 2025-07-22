@@ -160,12 +160,7 @@ const CollectionView = () => {
       <div class="z-5 dark:bg-dark-800 sticky top-0 mb-2 flex w-full flex-col items-center justify-center gap-2 border-b border-neutral-500 bg-zinc-50 py-3">
         <div class="flex w-full items-center gap-2">
           <Show when={loginState() && agent.sub === did}>
-            <div
-              classList={{
-                "flex items-center gap-x-2": true,
-                "border py-1.5 px-2 rounded-md border-neutral-500": batchDelete(),
-              }}
-            >
+            <div class="flex items-center gap-x-2">
               <Tooltip
                 text={batchDelete() ? "Cancel" : "Delete"}
                 children={
