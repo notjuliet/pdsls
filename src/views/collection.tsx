@@ -155,11 +155,6 @@ const CollectionView = () => {
       true,
     );
 
-  const unselectAll = () => {
-    setRecords({ from: 0, to: records.length - 1 }, "toDelete", false);
-    setLastSelected(undefined);
-  };
-
   return (
     <Show when={records.length || response()}>
       <div class="z-5 dark:bg-dark-800 sticky top-0 mb-2 flex w-full flex-col items-center justify-center gap-2 border-b border-neutral-500 bg-zinc-50 py-3">
@@ -202,14 +197,6 @@ const CollectionView = () => {
                   children={
                     <button onclick={() => selectAll()}>
                       <div class="i-lucide-copy-check text-lg text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300" />
-                    </button>
-                  }
-                />
-                <Tooltip
-                  text="Unselect All"
-                  children={
-                    <button onclick={() => unselectAll()}>
-                      <div class="i-lucide-copy text-lg text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300" />
                     </button>
                   }
                 />
