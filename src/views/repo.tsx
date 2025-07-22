@@ -1,4 +1,12 @@
-import { createSignal, For, Show, createResource, Suspense, ErrorBoundary } from "solid-js";
+import {
+  createSignal,
+  For,
+  Show,
+  createResource,
+  Suspense,
+  ErrorBoundary,
+  onMount,
+} from "solid-js";
 import { Client, CredentialManager } from "@atcute/client";
 import { A, useParams } from "@solidjs/router";
 import { didDocCache, getAllBacklinks, LinkData, resolvePDS } from "../utils/api.js";
@@ -77,6 +85,12 @@ const RepoView = () => {
       setTab("doc");
     }
 
+    return res.data;
+  };
+
+  const [repo] = createResource(fetchRepo);
+
+  onMount(async () => {
     if (localStorage.backlinks === "true") {
       try {
         const backlinks = await getAllBacklinks(did);
@@ -85,10 +99,7 @@ const RepoView = () => {
         console.error(e);
       }
     }
-    return res.data;
-  };
-
-  const [repo] = createResource(fetchRepo);
+  });
 
   const downloadRepo = async () => {
     try {
