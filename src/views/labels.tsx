@@ -77,7 +77,7 @@ const LabelView = () => {
           <div class="flex justify-center">
             <Show when={!response.loading}>
               <button onclick={() => initQuery()} type="submit">
-                <div class="i-lucide-arrow-right text-xl" />
+                <div class="i-lucide-search text-xl" />
               </button>
             </Show>
             <Show when={response.loading}>
