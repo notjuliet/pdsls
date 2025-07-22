@@ -198,7 +198,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
             <div class="mb-2 flex w-full justify-between">
               <h3 class="font-bold">{props.create ? "Creating" : "Editing"} record</h3>
               <div
-                class="i-lucide-x text-xl hover:text-blue-500"
+                class="i-lucide-x text-xl hover:text-red-500 dark:hover:text-red-400"
                 onclick={() => setOpenDialog(false)}
               />
             </div>
