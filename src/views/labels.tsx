@@ -119,11 +119,11 @@ const LabelView = () => {
         </div>
       </div>
       <Show when={labels().length}>
-        <div class="break-anywhere flex flex-col gap-2 divide-y divide-neutral-400 whitespace-pre-wrap font-mono text-sm dark:divide-neutral-600">
+        <div class="break-anywhere flex flex-col gap-2 divide-y divide-neutral-400 whitespace-pre-wrap text-sm dark:divide-neutral-600">
           <For each={filterLabels()}>
             {(label) => (
               <div class="flex justify-between gap-2 pb-2">
-                <div class="flex flex-col gap-x-2">
+                <div class="flex flex-col">
                   <div class="flex items-center gap-x-2">
                     <div class="min-w-[5rem] font-semibold text-stone-600 dark:text-stone-400">
                       URI
@@ -131,7 +131,7 @@ const LabelView = () => {
                     <A
                       href={`/at://${label.uri.replace("at://", "")}`}
                       target="_blank"
-                      class="underline"
+                      class="text-sky-500 hover:underline"
                     >
                       {label.uri}
                     </A>
