@@ -92,7 +92,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
         }}
       >
         <button
-          class="max-w-40% sm:max-w-50% break-anywhere group/clip relative flex size-fit shrink-0 items-center text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+          class="max-w-40% sm:max-w-50% break-anywhere group/clip relative flex size-fit shrink-0 items-center text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
           onclick={() => setShow(!show())}
         >
           <span
@@ -110,7 +110,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
         <span
           classList={{
             "self-center": value !== Object(value),
-            "pl-[calc(2ch-1px)] border-l border-neutral-500/40 dark:border-neutral-400/40 has-hover:group-hover/indent:border-neutral-700/80 dark:has-hover:group-hover/indent:border-neutral-200/80":
+            "pl-[calc(2ch-1px)] border-l border-neutral-500/40 dark:border-neutral-400/40 has-hover:group-hover/indent:border-neutral-700/80 dark:has-hover:group-hover/indent:border-neutral-300/80":
               value === Object(value),
             "invisible h-0": !show(),
           }}
