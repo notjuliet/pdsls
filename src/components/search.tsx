@@ -82,7 +82,7 @@ const Search = () => {
             class="grow focus:outline-none"
           />
           <Show when={loading()}>
-            <div class="i-lucide-loader-circle animate-spin text-xl" />
+            <div class="i-lucide-loader-circle animate-spin text-lg" />
           </Show>
           <Show when={!loading()}>
             <button type="submit" onclick={() => processInput(searchInput.value)}>

@@ -157,7 +157,7 @@ const PdsView = () => {
             </button>
           </Show>
           <Show when={response.loading}>
-            <div class="i-lucide-loader-circle animate-spin mt-2 text-2xl" />
+            <div class="i-lucide-loader-circle mt-2 animate-spin text-xl" />
           </Show>
         </div>
       </div>
