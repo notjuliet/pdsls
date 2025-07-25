@@ -58,7 +58,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
               <img
                 src="/bluetan.png"
                 title="Art by nico ღ (ninikyuu.bsky.social)"
-                class="w-45px sm:w-150px md:w-200px lg:w-250px z-0"
+                class="w-45px sm:w-150px md:w-200px z-0"
               />
             </a>
           </Show>
