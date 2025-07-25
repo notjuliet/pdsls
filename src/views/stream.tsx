@@ -147,7 +147,7 @@ const StreamView = () => {
 
   return (
     <div class="mt-2 flex flex-col items-center gap-y-3">
-      <div class="flex divide-x-2 divide-neutral-500 font-bold">
+      <div class="flex divide-x divide-neutral-500 font-bold">
         <A class="pr-2" inactiveClass="text-blue-400 hover:underline" href="/jetstream">
           Jetstream
         </A>
@@ -247,7 +247,7 @@ const StreamView = () => {
       <Show when={notice().length}>
         <div class="text-red-500 dark:text-red-400">{notice()}</div>
       </Show>
-      <div class="break-anywhere md:w-screen-md flex h-screen w-full flex-col gap-2 divide-y divide-neutral-500 overflow-auto whitespace-pre-wrap pl-4 font-mono text-sm">
+      <div class="break-anywhere md:w-screen-md divide-y-0.5 flex h-screen w-full flex-col gap-2 divide-neutral-500 overflow-auto whitespace-pre-wrap pl-4 font-mono text-sm">
         <For each={records().toReversed()}>
           {(rec) => (
             <div class="pb-2">

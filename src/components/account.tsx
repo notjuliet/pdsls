@@ -94,7 +94,7 @@ const AccountManager = () => {
         >
           <div class="starting:opacity-0 dark:bg-dark-300 absolute top-12 rounded-md bg-zinc-100 p-4 text-slate-900 transition-opacity duration-300 dark:text-slate-100">
             <h3 class="mb-2 font-bold">Manage accounts</h3>
-            <div class="mb-2 max-h-[20rem] overflow-y-auto border-b border-neutral-500 pb-2 md:max-h-[25rem]">
+            <div class="border-b-0.5 mb-2 max-h-[20rem] overflow-y-auto border-neutral-500 pb-2 md:max-h-[25rem]">
               <For each={Object.keys(sessions)}>
                 {(did) => (
                   <div class="group/select flex w-full items-center justify-between gap-x-2">

@@ -86,7 +86,7 @@ const LabelView = () => {
           </div>
         </div>
       </form>
-      <div class="z-5 dark:bg-dark-800 sticky top-0 mb-2 flex w-full flex-col items-center justify-center gap-3 border-b border-neutral-400 bg-zinc-50 py-3 dark:border-neutral-600">
+      <div class="z-5 dark:bg-dark-800 border-b-0.5 sticky top-0 mb-2 flex w-full flex-col items-center justify-center gap-3 border-neutral-400 bg-zinc-50 py-3 dark:border-neutral-600">
         <TextInput
           placeholder="Filter by label"
           onInput={(e) => setFilter(e.currentTarget.value)}
@@ -119,7 +119,7 @@ const LabelView = () => {
         </div>
       </div>
       <Show when={labels().length}>
-        <div class="break-anywhere flex flex-col gap-2 divide-y divide-neutral-400 whitespace-pre-wrap text-sm dark:divide-neutral-600">
+        <div class="break-anywhere divide-y-0.5 flex flex-col gap-2 divide-neutral-400 whitespace-pre-wrap text-sm dark:divide-neutral-600">
           <For each={filterLabels()}>
             {(label) => (
               <div class="flex justify-between gap-2 pb-2">

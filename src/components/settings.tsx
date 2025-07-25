@@ -76,7 +76,7 @@ const Settings = () => {
           class="starting:backdrop-brightness-100 fixed left-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-transparent backdrop-brightness-50 transition duration-300"
         >
           <div class="starting:opacity-0 dark:bg-dark-300 absolute top-12 rounded-md bg-zinc-100 p-4 text-slate-900 transition-opacity duration-300 dark:text-slate-100">
-            <h3 class="mb-2 border-b border-neutral-500 pb-2 font-bold">Settings</h3>
+            <h3 class="border-b-0.5 mb-2 border-neutral-500 pb-2 font-bold">Settings</h3>
             <h4 class="mb-1 font-semibold">Theme</h4>
             <div class="w-xs flex gap-2 overflow-hidden">
               <button
@@ -118,7 +118,7 @@ const Settings = () => {
                 Dark
               </button>
             </div>
-            <div class="mt-4 flex flex-col gap-1 border-t border-neutral-500 pt-2">
+            <div class="border-t-0.5 mt-4 flex flex-col gap-1 border-neutral-500 pt-2">
               <div class="flex items-center gap-1">
                 <input
                   id="backlinks"
@@ -157,7 +157,7 @@ const Settings = () => {
                   }}
                 />
               </div>
-              <div class="mt-2 flex flex-col gap-1 border-t border-neutral-500 pt-2">
+              <div class="border-t-0.5 mt-2 flex flex-col gap-1 border-neutral-500 pt-2">
                 <div class="flex flex-col gap-1">
                   <label for="plcDirectory" class="select-none font-semibold">
                     PLC Directory
@@ -173,7 +173,7 @@ const Settings = () => {
                   />
                 </div>
               </div>
-              <div class="mt-2 flex flex-col gap-1 border-t border-neutral-500 pt-2">
+              <div class="border-t-0.5 mt-2 flex flex-col gap-1 border-neutral-500 pt-2">
                 <div class="flex items-center gap-1">
                   <input
                     id="showHandle"
