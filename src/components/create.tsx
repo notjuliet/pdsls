@@ -192,9 +192,9 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
       <Show when={openDialog()}>
         <dialog
           ref={setModal}
-          class="starting:backdrop-brightness-100 backdrop-brightness-40 fixed left-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-transparent transition duration-300"
+          class="starting:backdrop-brightness-100 fixed left-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-transparent backdrop-brightness-50 transition duration-300"
         >
-          <div class="starting:opacity-0 dark:bg-dark-300 w-21rem sm:w-xl top-10% absolute rounded-md bg-zinc-100 p-2 text-slate-900 transition-opacity duration-300 sm:p-4 lg:w-[50rem] dark:text-slate-100">
+          <div class="starting:opacity-0 dark:bg-dark-300 w-21rem sm:w-xl absolute top-12 rounded-md bg-zinc-100 p-2 text-slate-900 transition-opacity duration-300 sm:p-4 lg:w-[50rem] dark:text-slate-100">
             <div class="mb-2 flex w-full justify-between">
               <h3 class="font-bold">{props.create ? "Creating" : "Editing"} record</h3>
               <div
