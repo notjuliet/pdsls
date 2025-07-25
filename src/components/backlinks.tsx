@@ -42,7 +42,7 @@ const Backlinks = ({ links, target }: { links: LinkData; target: string }) => {
             <div class="pl-2.5">
               <p>
                 <a
-                  class="text-sky-500 hover:underline"
+                  class="text-blue-400 hover:underline"
                   href="#"
                   title="Show linking records"
                   onclick={() =>
@@ -59,7 +59,7 @@ const Backlinks = ({ links, target }: { links: LinkData; target: string }) => {
                 </a>
                 {" from "}
                 <a
-                  class="text-sky-500 hover:underline"
+                  class="text-blue-400 hover:underline"
                   href="#"
                   title="Show linking DIDs"
                   onclick={() =>
@@ -131,7 +131,7 @@ const BacklinkItems = ({
           {(did) => (
             <a
               href={`/at://${did}`}
-              class="relative flex w-full font-mono text-sky-500 hover:underline"
+              class="relative flex w-full font-mono text-blue-400 hover:underline"
             >
               {did}
             </a>
@@ -142,7 +142,7 @@ const BacklinkItems = ({
         <For each={links().linking_records}>
           {({ did, collection, rkey }) => (
             <p class="relative flex w-full items-center gap-1 font-mono">
-              <a href={`/at://${did}/${collection}/${rkey}`} class="text-sky-500 hover:underline">
+              <a href={`/at://${did}/${collection}/${rkey}`} class="text-blue-400 hover:underline">
                 {rkey}
               </a>
               <span class="text-xs text-neutral-500 dark:text-neutral-400">

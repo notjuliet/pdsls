@@ -215,7 +215,7 @@ const RepoView = () => {
                           {(nsid) => (
                             <A
                               href={`/at://${did}/${authority}.${nsid}`}
-                              class="text-sky-500 hover:underline"
+                              class="text-blue-400 hover:underline"
                             >
                               {authority}.{nsid}
                             </A>
@@ -251,7 +251,7 @@ const RepoView = () => {
                         <li class="flex flex-col">
                           <span>#{service.id.split("#")[1]}</span>
                           <a
-                            class="w-fit text-sky-500 hover:underline"
+                            class="w-fit text-blue-400 hover:underline"
                             href={service.serviceEndpoint.toString()}
                             target="_blank"
                           >
@@ -279,7 +279,7 @@ const RepoView = () => {
                 </div>
                 <div>
                   <a
-                    class="flex w-fit items-center text-sky-500 hover:underline"
+                    class="flex w-fit items-center text-blue-400 hover:underline"
                     href={
                       did.startsWith("did:plc") ?
                         `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
@@ -291,7 +291,7 @@ const RepoView = () => {
                   </a>
                   <Show when={did.startsWith("did:plc")}>
                     <a
-                      class="flex w-fit items-center text-sky-500 hover:underline"
+                      class="flex w-fit items-center text-blue-400 hover:underline"
                       href={`https://boat.kelinci.net/plc-oplogs?q=${did}`}
                       target="_blank"
                     >

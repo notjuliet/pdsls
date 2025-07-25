@@ -43,7 +43,7 @@ const BlobView = (props: { pds: string; repo: string }) => {
                 target="_blank"
                 class="rounded px-0.5 hover:bg-zinc-200 dark:hover:bg-neutral-700"
               >
-                <span class="text-sky-500">{cid}</span>
+                <span class="text-blue-400">{cid}</span>
               </a>
             )}
           </For>

@@ -148,10 +148,10 @@ const StreamView = () => {
   return (
     <div class="mt-2 flex flex-col items-center gap-y-3">
       <div class="flex divide-x-2 divide-neutral-500 font-bold">
-        <A class="pr-2" inactiveClass="text-sky-500 hover:underline" href="/jetstream">
+        <A class="pr-2" inactiveClass="text-blue-400 hover:underline" href="/jetstream">
           Jetstream
         </A>
-        <A class="pl-2" inactiveClass="text-sky-500 hover:underline" href="/firehose">
+        <A class="pl-2" inactiveClass="text-blue-400 hover:underline" href="/firehose">
           Firehose
         </A>
       </div>

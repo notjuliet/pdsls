@@ -7,18 +7,18 @@ const Home = () => {
       <div>
         <p>
           Browse the public data on{" "}
-          <a class="text-sky-500 hover:underline" href="https://atproto.com" target="_blank">
+          <a class="text-blue-400 hover:underline" href="https://atproto.com" target="_blank">
             AT Protocol
           </a>
           .
         </p>
         <p>Login to manage records in your repository.</p>
         <p>
-          <A href="/jetstream" class="text-sky-500 hover:underline">
+          <A href="/jetstream" class="text-blue-400 hover:underline">
             Jetstream
           </A>{" "}
           and{" "}
-          <A href="/firehose" class="text-sky-500 hover:underline">
+          <A href="/firehose" class="text-blue-400 hover:underline">
             firehose
           </A>{" "}
           support.
@@ -26,7 +26,7 @@ const Home = () => {
         <p>
           <A
             href="https://constellation.microcosm.blue"
-            class="text-sky-500 hover:underline"
+            class="text-blue-400 hover:underline"
             target="_blank"
           >
             Backlinks
@@ -37,14 +37,14 @@ const Home = () => {
       <div>
         <span class="font-semibold">Examples</span>
         <div>
-          <A href="/pds.kelinci.net" class="text-sm text-sky-500 hover:underline sm:text-base">
+          <A href="/pds.kelinci.net" class="text-sm text-blue-400 hover:underline sm:text-base">
             https://pds.kelinci.net
           </A>
         </div>
         <div>
           <A
             href="/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2"
-            class="text-sm text-sky-500 hover:underline sm:text-base"
+            class="text-sm text-blue-400 hover:underline sm:text-base"
           >
             at://did:plc:vwzwgnygau7ed7b7wt5ux7y2
           </A>
@@ -52,7 +52,7 @@ const Home = () => {
         <div>
           <A
             href="/at://did:plc:oisofpd7lj26yvgiivf3lxsi/app.bsky.feed.post/3l2zpbbhuvw2h"
-            class="text-sm text-sky-500 hover:underline sm:text-base"
+            class="text-sm text-blue-400 hover:underline sm:text-base"
           >
             at://hailey.at/app.bsky.feed.post/3l2zpbbhuvw2h
           </A>
@@ -60,7 +60,7 @@ const Home = () => {
         <div>
           <A
             href="/at://did:plc:wkoofae5uytcm7bjncmev6n6/labels"
-            class="text-sm text-sky-500 hover:underline sm:text-base"
+            class="text-sm text-blue-400 hover:underline sm:text-base"
           >
             at://did:plc:wkoofae5uytcm7bjncmev6n6/labels
           </A>
@@ -72,7 +72,7 @@ const Home = () => {
           <A
             href="https://github.com/notjuliet/pdsls"
             target="_blank"
-            class="text-sky-500 hover:underline"
+            class="text-blue-400 hover:underline"
           >
             notjuliet/pdsls
           </A>
@@ -84,7 +84,7 @@ const Home = () => {
           <a
             href="https://bsky.app/profile/did:plc:zoujtrsqvk3w4n5svsqtj3kg"
             target="_blank"
-            class="text-sky-500 hover:underline"
+            class="text-blue-400 hover:underline"
           >
             nico ღ
           </a>
