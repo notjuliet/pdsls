@@ -141,7 +141,7 @@ export const RecordView = () => {
   };
 
   return (
-    <div class="flex w-full flex-col items-center gap-3">
+    <div class="flex w-full flex-col items-center">
       <Show when={record() === undefined && validRecord() !== false}>
         <div class="i-lucide-loader-circle mt-3 animate-spin text-xl" />
       </Show>
@@ -149,7 +149,7 @@ export const RecordView = () => {
         <div class="mt-3 break-words text-red-500 dark:text-red-400">{notice()}</div>
       </Show>
       <Show when={record()}>
-        <div class="mt-3 flex gap-3">
+        <div class="my-3 flex gap-3">
           <Tooltip text="Copy record">
             <button onclick={() => addToClipboard(JSON.stringify(record()?.value))}>
               <div class="i-lucide-copy text-xl" />
