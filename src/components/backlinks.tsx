@@ -32,14 +32,14 @@ const Backlinks = ({ links, target }: { links: LinkData; target: string }) => {
   return (
     <div class="break-anywhere flex w-full flex-col">
       <For each={filteredLinks().links}>
-        {({ collection, path, matchesFilter, counts }) => (
+        {({ collection, path, counts }) => (
           <div class="text-sm">
-            <p classList={{ "text-stone-400": matchesFilter }}>
+            <p>
               <span title="Collection containing linking records">{collection}</span>
               <span class="text-cyan-500">@</span>
               <span title="Record path where the link is found">{path.slice(1)}</span>
             </p>
-            <div class="pl-2.5">
+            <div class="pl-2">
               <p>
                 <a
                   class="text-blue-400 hover:underline"
