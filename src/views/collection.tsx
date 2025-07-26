@@ -50,7 +50,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
       <Show when={hover()}>
         <span
           ref={previewRef}
-          class={`dark:bg-dark-800/70 left-50% max-h-md z-25 backdrop-blur-xs border-0.5 pointer-events-none absolute block w-max max-w-sm -translate-x-1/2 overflow-hidden whitespace-pre-wrap rounded-md border-neutral-300 bg-zinc-50/70 p-2 text-xs shadow-lg lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
+          class={`dark:bg-dark-800/70 left-50% max-h-md z-25 backdrop-blur-xs border-0.5 pointer-events-none absolute block w-max max-w-sm -translate-x-1/2 overflow-hidden whitespace-pre-wrap rounded-md border-neutral-300 bg-zinc-100/70 p-2 text-xs shadow-lg lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
         >
           <JSONValue
             data={props.record.record.value as JSONType}
@@ -157,7 +157,7 @@ const CollectionView = () => {
 
   return (
     <Show when={records.length || response()}>
-      <div class="z-5 dark:bg-dark-800 border-b-0.5 sticky top-0 mb-2 flex w-full flex-col items-center justify-center gap-2 border-neutral-400 bg-zinc-50 py-3 dark:border-neutral-600">
+      <div class="z-5 dark:bg-dark-800 border-b-0.5 sticky top-0 mb-2 flex w-full flex-col items-center justify-center gap-2 border-neutral-400 bg-zinc-100 py-3 dark:border-neutral-600">
         <div class="flex w-full items-center gap-2">
           <Show when={loginState() && agent.sub === did}>
             <div class="flex items-center gap-x-2">
@@ -241,7 +241,7 @@ const CollectionView = () => {
                 <button
                   type="button"
                   onclick={() => refetch()}
-                  class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-md hover:bg-zinc-100 focus:outline-blue-500"
+                  class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-md hover:bg-zinc-200 focus:outline-blue-500"
                 >
                   Load More
                 </button>
