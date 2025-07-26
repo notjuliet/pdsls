@@ -53,7 +53,7 @@ const BlobView = (props: { pds: string; repo: string }) => {
         <button
           type="button"
           onclick={() => refetch()}
-          class="dark:hover:bg-dark-300 rounded-lg border border-gray-400 bg-transparent px-2 py-1.5 text-sm font-bold hover:bg-zinc-100 focus:border-blue-500 focus:outline-none"
+          class="dark:hover:bg-dark-300 border-0.5 rounded-lg border-gray-400 bg-transparent px-2 py-1.5 text-sm font-bold hover:bg-zinc-100 focus:border-blue-500 focus:outline-none"
         >
           Load More
         </button>

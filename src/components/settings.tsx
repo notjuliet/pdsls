@@ -149,7 +149,7 @@ const Settings = () => {
                   id="constellation"
                   value={localStorage.constellationHost || "https://constellation.microcosm.blue"}
                   disabled={!backlinksEnabled()}
-                  class="disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-500 dark:disabled:border-gray-700 dark:disabled:bg-gray-800/20"
+                  class="disabled:bg-gray-50 disabled:text-gray-500 dark:disabled:bg-gray-800/20"
                   onInput={(e) => {
                     e.currentTarget.value.length ?
                       (localStorage.constellationHost = e.currentTarget.value)

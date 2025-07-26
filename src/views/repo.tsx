@@ -304,7 +304,7 @@ const RepoView = () => {
                     <button
                       type="button"
                       onclick={() => downloadRepo()}
-                      class="dark:hover:bg-dark-300 flex items-center gap-1 rounded-lg border border-gray-400 bg-transparent px-2 py-1.5 text-xs font-bold hover:bg-zinc-100 focus:border-blue-500 focus:outline-none"
+                      class="dark:hover:bg-dark-300 border-0.5 flex items-center gap-1 rounded-lg border-gray-400 bg-transparent px-2 py-1.5 text-xs font-bold hover:bg-zinc-100 focus:border-blue-500 focus:outline-none"
                     >
                       <div class="i-lucide-download text-sm" />
                       Export Repo
