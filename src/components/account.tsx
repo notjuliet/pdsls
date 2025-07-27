@@ -121,7 +121,7 @@ const AccountManager = () => {
       <button onclick={() => setOpenManager(true)}>
         <Tooltip text="Accounts">
           {loginState() && avatar() ?
-            <img src={avatar()} class="size-5 rounded-full" />
+            <img src={avatar()} class="size-5 rounded-full shadow-sm" />
           : <div class="i-lucide-circle-user-round text-xl" />}
         </Tooltip>
       </button>
