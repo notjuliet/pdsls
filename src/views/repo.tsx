@@ -140,7 +140,7 @@ const RepoView = () => {
             {error()}
           </div>
         </Show>
-        <div class="flex gap-1 overflow-hidden text-sm">
+        <div class="flex gap-1 text-sm">
           <Show when={!error()}>
             <RepoTab tab="collections" label="Collections" />
           </Show>
