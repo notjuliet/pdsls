@@ -78,12 +78,12 @@ const Settings = () => {
           <div class="starting:opacity-0 dark:bg-dark-300 absolute top-12 rounded-md bg-zinc-100 p-4 text-slate-900 transition-opacity duration-300 dark:text-slate-100">
             <h3 class="border-b-0.5 mb-2 border-neutral-500 pb-2 font-bold">Settings</h3>
             <h4 class="mb-1 font-semibold">Theme</h4>
-            <div class="w-xs flex gap-2 overflow-hidden">
+            <div class="w-xs flex gap-2">
               <button
                 classList={{
                   "basis-1/3 py-1 rounded-lg": true,
-                  "bg-transparent hover:bg-zinc-200 dark:hover:bg-dark-100": !theme().system,
-                  "bg-neutral-500 text-slate-100": theme().system,
+                  "bg-transparent hover:bg-light-700 dark:hover:bg-dark-200": !theme().system,
+                  "bg-zinc-200 dark:bg-neutral-600 font-semibold": theme().system,
                 }}
                 onclick={() =>
                   updateTheme({
@@ -98,9 +98,9 @@ const Settings = () => {
               <button
                 classList={{
                   "basis-1/3 py-1 rounded-lg": true,
-                  "bg-transparent hover:bg-zinc-200 dark:hover:bg-dark-100":
+                  "bg-transparent hover:bg-light-700 dark:hover:bg-dark-200":
                     theme().color !== "light" || theme().system,
-                  "bg-neutral-500 text-slate-100": theme().color === "light" && !theme().system,
+                  "bg-zinc-200 font-semibold": theme().color === "light" && !theme().system,
                 }}
                 onclick={() => updateTheme({ color: "light", system: false })}
               >
@@ -109,9 +109,9 @@ const Settings = () => {
               <button
                 classList={{
                   "basis-1/3 py-1 rounded-lg": true,
-                  "bg-transparent hover:bg-zinc-200 dark:hover:bg-dark-100":
+                  "bg-transparent hover:bg-light-700 dark:hover:bg-dark-200":
                     theme().color !== "dark" || theme().system,
-                  "bg-neutral-500": theme().color === "dark" && !theme().system,
+                  "bg-neutral-600 font-semibold": theme().color === "dark" && !theme().system,
                 }}
                 onclick={() => updateTheme({ color: "dark", system: false })}
               >
