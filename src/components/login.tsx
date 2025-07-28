@@ -67,10 +67,10 @@ const Login = () => {
           class="grow"
         />
         <button onclick={() => login(loginInput())}>
-          <div class="i-lucide-log-in text-xl" />
+          <div class="i-lucide-log-in text-lg" />
         </button>
       </div>
-      <div class="break-anywhere max-w-20rem mt-1">{notice()}</div>
+      <div class="max-w-20rem">{notice()}</div>
     </form>
   );
 };
