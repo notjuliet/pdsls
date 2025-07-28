@@ -84,7 +84,7 @@ const AccountManager = () => {
                     {sessions[did]?.length ? sessions[did] : did}
                   </button>
                   <button onclick={() => removeSession(did as Did)}>
-                    <div class="i-lucide-x text-xl text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-500" />
+                    <div class="i-lucide-x text-xl hover:text-red-500 hover:dark:text-red-400" />
                   </button>
                 </div>
               )}
