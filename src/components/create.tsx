@@ -218,21 +218,20 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                   <option value="false">False</option>
                 </select>
               </div>
-              <div class="flex flex-row items-center gap-2">
+              <div class="flex items-center gap-2">
                 <Show when={!uploading()}>
-                  <Tooltip text="Upload file">
-                    <input
-                      type="file"
-                      title=""
-                      id="blob"
-                      class="i-lucide-upload text-xl"
-                      onChange={() => uploadBlob()}
-                    />
-                  </Tooltip>
-                  <p>Blob metadata will be pasted after the cursor</p>
+                  <div class="dark:hover:bg-dark-100 dark:bg-dark-300 focus-within:outline-1.5 dark:shadow-dark-900 flex rounded-lg bg-white text-xs font-bold shadow-sm focus-within:outline-blue-500 hover:bg-zinc-100">
+                    <input type="file" id="blob" hidden onChange={() => uploadBlob()} />
+                    <label class="flex items-center gap-1 px-2 py-1.5" for="blob">
+                      <div class="i-lucide-upload text-sm" />
+                      Upload
+                    </label>
+                  </div>
+                  <p class="text-xs">Metadata will be pasted after the cursor</p>
                 </Show>
                 <Show when={uploading()}>
                   <div class="i-lucide-loader-circle animate-spin text-xl" />
+                  <p>Uploading...</p>
                 </Show>
               </div>
               <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
