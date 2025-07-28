@@ -39,7 +39,7 @@ const RepoView = () => {
       classList={{
         "rounded-lg flex flex-1 py-1 justify-center": true,
         "bg-zinc-200 dark:bg-dark-200": tab() === props.tab,
-        "bg-transparent hover:bg-light-700 dark:hover:bg-dark-400": tab() !== props.tab,
+        "bg-transparent hover:bg-light-700 dark:hover:bg-dark-300": tab() !== props.tab,
       }}
       onclick={() => setTab(props.tab)}
     >
@@ -304,7 +304,7 @@ const RepoView = () => {
                     <button
                       type="button"
                       onclick={() => downloadRepo()}
-                      class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200 focus:outline-blue-500 dark:shadow-dark-900"
+                      class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 dark:shadow-dark-900 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200 focus:outline-blue-500"
                     >
                       <div class="i-lucide-download text-sm" />
                       Export Repo
