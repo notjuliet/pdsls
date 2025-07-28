@@ -1,6 +1,7 @@
-import { createSignal, onMount, Show, onCleanup, createEffect } from "solid-js";
+import { createSignal, onMount, Show, onCleanup } from "solid-js";
 import Tooltip from "./tooltip.jsx";
 import { TextInput } from "./text-input.jsx";
+import { Modal } from "./modal.jsx";
 
 const getInitialTheme = () => {
   const isDarkMode =
@@ -21,15 +22,8 @@ export const [hideMedia, setHideMedia] = createSignal(localStorage.hideMedia ===
 export const [kawaii, setKawaii] = createSignal(localStorage.kawaii === "true");
 
 const Settings = () => {
-  const [modal, setModal] = createSignal<HTMLDialogElement>();
   const [openSettings, setOpenSettings] = createSignal(false);
 
-  const clickEvent = (event: MouseEvent) => {
-    if (modal() && event.target == modal()) setOpenSettings(false);
-  };
-  const keyEvent = (event: KeyboardEvent) => {
-    if (modal() && event.key == "Escape") setOpenSettings(false);
-  };
   const themeEvent = () => {
     if (!theme().system) return;
     const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -42,20 +36,11 @@ const Settings = () => {
   };
 
   onMount(() => {
-    window.addEventListener("keydown", keyEvent);
-    window.addEventListener("click", clickEvent);
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeEvent);
   });
 
   onCleanup(() => {
-    window.removeEventListener("keydown", keyEvent);
-    window.removeEventListener("click", clickEvent);
     window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", themeEvent);
-  });
-
-  createEffect(() => {
-    if (openSettings()) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "auto";
   });
 
   const updateTheme = (newTheme: { color: string; system: boolean }) => {
@@ -70,162 +55,157 @@ const Settings = () => {
 
   return (
     <>
-      <Show when={openSettings()}>
-        <dialog
-          ref={setModal}
-          class="fixed left-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-transparent"
-        >
-          <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900 backdrop-blur-xs absolute top-12 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-slate-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-slate-100">
-            <h3 class="border-b-0.5 mb-2 border-neutral-500 pb-2 font-bold">Settings</h3>
-            <h4 class="mb-1 font-semibold">Theme</h4>
-            <div class="w-xs flex gap-2">
-              <button
-                classList={{
-                  "basis-1/3 py-1 rounded-lg": true,
-                  "bg-transparent hover:bg-neutral-200 dark:hover:bg-dark-200": !theme().system,
-                  "bg-neutral-300 dark:bg-neutral-600 font-semibold": theme().system,
+      <Modal open={openSettings()} onClose={() => setOpenSettings(false)}>
+        <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-slate-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-slate-100">
+          <h3 class="border-b-0.5 mb-2 border-neutral-500 pb-2 font-bold">Settings</h3>
+          <h4 class="mb-1 font-semibold">Theme</h4>
+          <div class="w-xs flex gap-2">
+            <button
+              classList={{
+                "basis-1/3 py-1 rounded-lg": true,
+                "bg-transparent hover:bg-neutral-200 dark:hover:bg-dark-200": !theme().system,
+                "bg-neutral-300 dark:bg-neutral-600 font-semibold": theme().system,
+              }}
+              onclick={() =>
+                updateTheme({
+                  color:
+                    window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
+                  system: true,
+                })
+              }
+            >
+              System
+            </button>
+            <button
+              classList={{
+                "basis-1/3 py-1 rounded-lg": true,
+                "bg-transparent hover:bg-neutral-200 dark:hover:bg-dark-200":
+                  theme().color !== "light" || theme().system,
+                "bg-neutral-300 font-semibold": theme().color === "light" && !theme().system,
+              }}
+              onclick={() => updateTheme({ color: "light", system: false })}
+            >
+              Light
+            </button>
+            <button
+              classList={{
+                "basis-1/3 py-1 rounded-lg": true,
+                "bg-transparent hover:bg-neutral-200 dark:hover:bg-dark-200":
+                  theme().color !== "dark" || theme().system,
+                "bg-neutral-600 font-semibold": theme().color === "dark" && !theme().system,
+              }}
+              onclick={() => updateTheme({ color: "dark", system: false })}
+            >
+              Dark
+            </button>
+          </div>
+          <div class="border-t-0.5 mt-4 flex flex-col gap-1 border-neutral-500 pt-2">
+            <div class="flex items-center gap-1">
+              <input
+                id="backlinks"
+                class="size-4"
+                type="checkbox"
+                checked={localStorage.backlinks === "true"}
+                onChange={(e) => {
+                  localStorage.backlinks = e.currentTarget.checked;
+                  setBacklinksEnabled(e.currentTarget.checked);
                 }}
-                onclick={() =>
-                  updateTheme({
-                    color:
-                      window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
-                    system: true,
-                  })
-                }
-              >
-                System
-              </button>
-              <button
-                classList={{
-                  "basis-1/3 py-1 rounded-lg": true,
-                  "bg-transparent hover:bg-neutral-200 dark:hover:bg-dark-200":
-                    theme().color !== "light" || theme().system,
-                  "bg-neutral-300 font-semibold": theme().color === "light" && !theme().system,
-                }}
-                onclick={() => updateTheme({ color: "light", system: false })}
-              >
-                Light
-              </button>
-              <button
-                classList={{
-                  "basis-1/3 py-1 rounded-lg": true,
-                  "bg-transparent hover:bg-neutral-200 dark:hover:bg-dark-200":
-                    theme().color !== "dark" || theme().system,
-                  "bg-neutral-600 font-semibold": theme().color === "dark" && !theme().system,
-                }}
-                onclick={() => updateTheme({ color: "dark", system: false })}
-              >
-                Dark
-              </button>
+              />
+              <label for="backlinks" class="select-none font-semibold">
+                Backlinks
+              </label>
+              <div class="i-lucide-send-to-back" />
             </div>
-            <div class="border-t-0.5 mt-4 flex flex-col gap-1 border-neutral-500 pt-2">
-              <div class="flex items-center gap-1">
-                <input
-                  id="backlinks"
-                  class="size-4"
-                  type="checkbox"
-                  checked={localStorage.backlinks === "true"}
-                  onChange={(e) => {
-                    localStorage.backlinks = e.currentTarget.checked;
-                    setBacklinksEnabled(e.currentTarget.checked);
-                  }}
-                />
-                <label for="backlinks" class="select-none font-semibold">
-                  Backlinks
-                </label>
-                <div class="i-lucide-send-to-back" />
-              </div>
+            <div class="flex flex-col gap-1">
+              <label
+                for="constellation"
+                classList={{
+                  "select-none": true,
+                  "text-gray-500": !backlinksEnabled(),
+                }}
+              >
+                Constellation host
+              </label>
+              <TextInput
+                id="constellation"
+                value={localStorage.constellationHost || "https://constellation.microcosm.blue"}
+                disabled={!backlinksEnabled()}
+                class="disabled:bg-gray-50 disabled:text-gray-500 dark:disabled:bg-gray-800/20"
+                onInput={(e) => {
+                  e.currentTarget.value.length ?
+                    (localStorage.constellationHost = e.currentTarget.value)
+                  : localStorage.removeItem("constellationHost");
+                }}
+              />
+            </div>
+            <div class="border-t-0.5 mt-2 flex flex-col gap-1 border-neutral-500 pt-2">
               <div class="flex flex-col gap-1">
-                <label
-                  for="constellation"
-                  classList={{
-                    "select-none": true,
-                    "text-gray-500": !backlinksEnabled(),
-                  }}
-                >
-                  Constellation host
+                <label for="plcDirectory" class="select-none font-semibold">
+                  PLC Directory
                 </label>
                 <TextInput
-                  id="constellation"
-                  value={localStorage.constellationHost || "https://constellation.microcosm.blue"}
-                  disabled={!backlinksEnabled()}
-                  class="disabled:bg-gray-50 disabled:text-gray-500 dark:disabled:bg-gray-800/20"
+                  id="plcDirectory"
+                  value={localStorage.plcDirectory || "https://plc.directory"}
                   onInput={(e) => {
                     e.currentTarget.value.length ?
-                      (localStorage.constellationHost = e.currentTarget.value)
-                    : localStorage.removeItem("constellationHost");
+                      (localStorage.plcDirectory = e.currentTarget.value)
+                    : localStorage.removeItem("plcDirectory");
                   }}
                 />
               </div>
-              <div class="border-t-0.5 mt-2 flex flex-col gap-1 border-neutral-500 pt-2">
-                <div class="flex flex-col gap-1">
-                  <label for="plcDirectory" class="select-none font-semibold">
-                    PLC Directory
-                  </label>
-                  <TextInput
-                    id="plcDirectory"
-                    value={localStorage.plcDirectory || "https://plc.directory"}
-                    onInput={(e) => {
-                      e.currentTarget.value.length ?
-                        (localStorage.plcDirectory = e.currentTarget.value)
-                      : localStorage.removeItem("plcDirectory");
-                    }}
-                  />
-                </div>
+            </div>
+            <div class="border-t-0.5 mt-2 flex flex-col gap-1 border-neutral-500 pt-2">
+              <div class="flex items-center gap-1">
+                <input
+                  id="showHandle"
+                  class="size-4"
+                  type="checkbox"
+                  checked={localStorage.showHandle === "true"}
+                  onChange={(e) => {
+                    localStorage.showHandle = e.currentTarget.checked;
+                    setShowHandle(e.currentTarget.checked);
+                  }}
+                />
+                <label for="showHandle" class="select-none">
+                  Default to showing handle
+                </label>
               </div>
-              <div class="border-t-0.5 mt-2 flex flex-col gap-1 border-neutral-500 pt-2">
+              <div class="flex items-center gap-1">
+                <input
+                  id="disableMedia"
+                  class="size-4"
+                  type="checkbox"
+                  checked={localStorage.hideMedia === "true"}
+                  onChange={(e) => {
+                    localStorage.hideMedia = e.currentTarget.checked;
+                    setHideMedia(e.currentTarget.checked);
+                  }}
+                />
+                <label for="disableMedia" class="select-none">
+                  Hide media embeds
+                </label>
+              </div>
+              <Show when={localStorage.kawaii}>
                 <div class="flex items-center gap-1">
                   <input
-                    id="showHandle"
+                    id="enableKawaii"
                     class="size-4"
                     type="checkbox"
-                    checked={localStorage.showHandle === "true"}
+                    checked={localStorage.kawaii === "true"}
                     onChange={(e) => {
-                      localStorage.showHandle = e.currentTarget.checked;
-                      setShowHandle(e.currentTarget.checked);
+                      localStorage.kawaii = e.currentTarget.checked;
+                      setKawaii(e.currentTarget.checked);
                     }}
                   />
-                  <label for="showHandle" class="select-none">
-                    Default to showing handle
+                  <label for="enableKawaii" class="select-none">
+                    Kawaii mode
                   </label>
                 </div>
-                <div class="flex items-center gap-1">
-                  <input
-                    id="disableMedia"
-                    class="size-4"
-                    type="checkbox"
-                    checked={localStorage.hideMedia === "true"}
-                    onChange={(e) => {
-                      localStorage.hideMedia = e.currentTarget.checked;
-                      setHideMedia(e.currentTarget.checked);
-                    }}
-                  />
-                  <label for="disableMedia" class="select-none">
-                    Hide media embeds
-                  </label>
-                </div>
-                <Show when={localStorage.kawaii}>
-                  <div class="flex items-center gap-1">
-                    <input
-                      id="enableKawaii"
-                      class="size-4"
-                      type="checkbox"
-                      checked={localStorage.kawaii === "true"}
-                      onChange={(e) => {
-                        localStorage.kawaii = e.currentTarget.checked;
-                        setKawaii(e.currentTarget.checked);
-                      }}
-                    />
-                    <label for="enableKawaii" class="select-none">
-                      Kawaii mode
-                    </label>
-                  </div>
-                </Show>
-              </div>
+              </Show>
             </div>
           </div>
-        </dialog>
-      </Show>
+        </div>
+      </Modal>
       <button onclick={() => setOpenSettings(true)}>
         <Tooltip text="Settings" children={<div class="i-lucide-settings text-xl" />} />
       </button>

@@ -1,4 +1,4 @@
-import { createSignal, onMount, Show, onCleanup, createEffect, For } from "solid-js";
+import { createSignal, onMount, For } from "solid-js";
 import Tooltip from "./tooltip.jsx";
 import { deleteStoredSession, getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { agent, Login, loginState, setLoginState } from "./login.jsx";
@@ -6,24 +6,14 @@ import { Did } from "@atcute/lexicons";
 import { resolveDidDoc } from "../utils/api.js";
 import { createStore } from "solid-js/store";
 import { Client, CredentialManager } from "@atcute/client";
+import { Modal } from "./modal.jsx";
 
 const AccountManager = () => {
-  const [modal, setModal] = createSignal<HTMLDialogElement>();
   const [openManager, setOpenManager] = createSignal(false);
   const [sessions, setSessions] = createStore<Record<string, string | undefined>>();
   const [avatar, setAvatar] = createSignal<string>();
 
-  const clickEvent = (event: MouseEvent) => {
-    if (modal() && event.target == modal()) setOpenManager(false);
-  };
-  const keyEvent = (event: KeyboardEvent) => {
-    if (modal() && event.key == "Escape") setOpenManager(false);
-  };
-
   onMount(async () => {
-    window.addEventListener("keydown", keyEvent);
-    window.addEventListener("click", clickEvent);
-
     const storedSessions = localStorage.getItem("atcute-oauth:sessions");
     if (storedSessions) {
       const sessionDids = Object.keys(JSON.parse(storedSessions)) as Did[];
@@ -41,16 +31,6 @@ const AccountManager = () => {
 
     const repo = localStorage.getItem("lastSignedIn");
     if (repo) setAvatar(await getAvatar(repo as Did));
-  });
-
-  onCleanup(() => {
-    window.removeEventListener("keydown", keyEvent);
-    window.removeEventListener("click", clickEvent);
-  });
-
-  createEffect(() => {
-    if (openManager()) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "auto";
   });
 
   const resumeSession = (did: Did) => {
@@ -87,37 +67,32 @@ const AccountManager = () => {
 
   return (
     <>
-      <Show when={openManager()}>
-        <dialog
-          ref={setModal}
-          class="fixed left-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-transparent"
-        >
-          <div class="starting:opacity-0 dark:bg-dark-800/70 backdrop-blur-xs border-0.5 dark:shadow-dark-900 absolute top-12 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-slate-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-slate-100">
-            <h3 class="mb-2 font-bold">Manage accounts</h3>
-            <div class="border-b-0.5 mb-2 max-h-[20rem] overflow-y-auto border-neutral-500 pb-2 md:max-h-[25rem]">
-              <For each={Object.keys(sessions)}>
-                {(did) => (
-                  <div class="group/select flex w-full items-center justify-between gap-x-2">
-                    <button
-                      classList={{
-                        "bg-transparent basis-full text-left max-w-[32ch] truncate group-hover/select:bg-zinc-200 px-1 rounded dark:group-hover/select:bg-neutral-600": true,
-                        "text-blue-500 dark:text-blue-400 font-bold": did === agent?.sub,
-                      }}
-                      onclick={() => resumeSession(did as Did)}
-                    >
-                      {sessions[did]?.length ? sessions[did] : did}
-                    </button>
-                    <button onclick={() => removeSession(did as Did)}>
-                      <div class="i-lucide-x text-xl text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-500" />
-                    </button>
-                  </div>
-                )}
-              </For>
-            </div>
-            <Login />
+      <Modal open={openManager()} onClose={() => setOpenManager(false)}>
+        <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-slate-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-slate-100">
+          <h3 class="mb-2 font-bold">Manage accounts</h3>
+          <div class="border-b-0.5 mb-2 max-h-[20rem] overflow-y-auto border-neutral-500 pb-2 md:max-h-[25rem]">
+            <For each={Object.keys(sessions)}>
+              {(did) => (
+                <div class="group/select flex w-full items-center justify-between gap-x-2">
+                  <button
+                    classList={{
+                      "bg-transparent basis-full text-left max-w-[32ch] truncate group-hover/select:bg-zinc-200 px-1 rounded dark:group-hover/select:bg-neutral-600": true,
+                      "text-blue-500 dark:text-blue-400 font-bold": did === agent?.sub,
+                    }}
+                    onclick={() => resumeSession(did as Did)}
+                  >
+                    {sessions[did]?.length ? sessions[did] : did}
+                  </button>
+                  <button onclick={() => removeSession(did as Did)}>
+                    <div class="i-lucide-x text-xl text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-500" />
+                  </button>
+                </div>
+              )}
+            </For>
           </div>
-        </dialog>
-      </Show>
+          <Login />
+        </div>
+      </Modal>
       <button onclick={() => setOpenManager(true)}>
         <Tooltip text="Accounts">
           {loginState() && avatar() ?
