@@ -90,9 +90,9 @@ const AccountManager = () => {
       <Show when={openManager()}>
         <dialog
           ref={setModal}
-          class="starting:backdrop-brightness-100 backdrop-brightness-40 fixed left-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-transparent transition duration-300"
+          class="fixed left-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-transparent"
         >
-          <div class="starting:opacity-0 dark:bg-dark-500 absolute top-12 rounded-md bg-zinc-100 p-4 text-slate-900 transition-opacity duration-300 dark:text-slate-100">
+          <div class="starting:opacity-0 dark:bg-dark-800/70 backdrop-blur-xs border-0.5 dark:shadow-dark-900 absolute top-12 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-slate-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-slate-100">
             <h3 class="mb-2 font-bold">Manage accounts</h3>
             <div class="border-b-0.5 mb-2 max-h-[20rem] overflow-y-auto border-neutral-500 pb-2 md:max-h-[25rem]">
               <For each={Object.keys(sessions)}>

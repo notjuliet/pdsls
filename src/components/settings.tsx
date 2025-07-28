@@ -73,17 +73,17 @@ const Settings = () => {
       <Show when={openSettings()}>
         <dialog
           ref={setModal}
-          class="starting:backdrop-brightness-100 backdrop-brightness-40 fixed left-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-transparent transition duration-300"
+          class="fixed left-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-transparent"
         >
-          <div class="starting:opacity-0 dark:bg-dark-500 absolute top-12 rounded-md bg-zinc-100 p-4 text-slate-900 transition-opacity duration-300 dark:text-slate-100">
+          <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900 backdrop-blur-xs absolute top-12 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-slate-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-slate-100">
             <h3 class="border-b-0.5 mb-2 border-neutral-500 pb-2 font-bold">Settings</h3>
             <h4 class="mb-1 font-semibold">Theme</h4>
             <div class="w-xs flex gap-2">
               <button
                 classList={{
                   "basis-1/3 py-1 rounded-lg": true,
-                  "bg-transparent hover:bg-light-700 dark:hover:bg-dark-200": !theme().system,
-                  "bg-zinc-200 dark:bg-neutral-600 font-semibold": theme().system,
+                  "bg-transparent hover:bg-light-900 dark:hover:bg-dark-200": !theme().system,
+                  "bg-zinc-300 dark:bg-neutral-600 font-semibold": theme().system,
                 }}
                 onclick={() =>
                   updateTheme({
@@ -98,9 +98,9 @@ const Settings = () => {
               <button
                 classList={{
                   "basis-1/3 py-1 rounded-lg": true,
-                  "bg-transparent hover:bg-light-700 dark:hover:bg-dark-200":
+                  "bg-transparent hover:bg-light-900 dark:hover:bg-dark-200":
                     theme().color !== "light" || theme().system,
-                  "bg-zinc-200 font-semibold": theme().color === "light" && !theme().system,
+                  "bg-zinc-300 font-semibold": theme().color === "light" && !theme().system,
                 }}
                 onclick={() => updateTheme({ color: "light", system: false })}
               >
@@ -109,7 +109,7 @@ const Settings = () => {
               <button
                 classList={{
                   "basis-1/3 py-1 rounded-lg": true,
-                  "bg-transparent hover:bg-light-700 dark:hover:bg-dark-200":
+                  "bg-transparent hover:bg-light-900 dark:hover:bg-dark-200":
                     theme().color !== "dark" || theme().system,
                   "bg-neutral-600 font-semibold": theme().color === "dark" && !theme().system,
                 }}
