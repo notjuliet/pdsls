@@ -5,7 +5,6 @@ import { editor, Editor } from "../components/editor.jsx";
 import * as monaco from "monaco-editor";
 import { theme } from "../components/settings.jsx";
 import Tooltip from "./tooltip.jsx";
-import { ActorIdentifier } from "@atcute/lexicons";
 import { useParams } from "@solidjs/router";
 import { remove } from "@mary/exif-rm";
 import { TextInput } from "./text-input.jsx";
@@ -81,7 +80,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
       if (formData.get("recreate")) {
         const res = await rpc.post("com.atproto.repo.applyWrites", {
           input: {
-            repo: params.repo as ActorIdentifier,
+            repo: agent.sub,
             validate: validate,
             writes: [
               {
@@ -105,7 +104,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
       } else {
         const res = await rpc.post("com.atproto.repo.putRecord", {
           input: {
-            repo: params.repo as ActorIdentifier,
+            repo: agent.sub,
             collection: params.collection as `${string}.${string}.${string}`,
             rkey: params.rkey,
             record: editedRecord,
