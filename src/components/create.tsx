@@ -192,9 +192,9 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
       <Show when={openDialog()}>
         <dialog
           ref={setModal}
-          class="starting:backdrop-brightness-100 fixed left-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-transparent backdrop-brightness-50 transition duration-300"
+          class="starting:backdrop-brightness-100 backdrop-brightness-40 fixed left-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-transparent transition duration-300"
         >
-          <div class="starting:opacity-0 dark:bg-dark-300 w-21rem sm:w-xl absolute top-12 rounded-md bg-zinc-100 p-2 text-slate-900 transition-opacity duration-300 sm:p-4 lg:w-[50rem] dark:text-slate-100">
+          <div class="starting:opacity-0 dark:bg-dark-500 w-21rem sm:w-xl absolute top-12 rounded-md bg-zinc-100 p-2 text-slate-900 transition-opacity duration-300 sm:p-4 lg:w-[50rem] dark:text-slate-100">
             <div class="mb-2 flex w-full justify-between">
               <h3 class="font-bold">{props.create ? "Creating" : "Editing"} record</h3>
               <div
@@ -230,7 +230,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                   <select
                     name="validate"
                     id="validate"
-                    class="dark:bg-dark-100 focus:outline-1.5 rounded-lg bg-white px-1 py-1 shadow-sm focus:outline-blue-500"
+                    class="dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900 rounded-lg bg-white px-1 py-1 shadow-sm focus:outline-blue-500"
                   >
                     <option value="unset">Unset</option>
                     <option value="true">True</option>
@@ -290,7 +290,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                         createRecord(new FormData(formRef))
                       : editRecord(new FormData(formRef))
                     }
-                    class="focus:outline-1.5 rounded-lg bg-blue-500 px-2 py-1.5 text-xs font-bold text-slate-100 shadow-sm hover:bg-blue-400 focus:outline-blue-500 sm:text-sm dark:bg-blue-600 dark:hover:bg-blue-500"
+                    class="focus:outline-1.5 dark:shadow-dark-900 rounded-lg bg-blue-500 px-2 py-1.5 text-xs font-bold text-slate-100 shadow-sm hover:bg-blue-400 focus:outline-blue-500 sm:text-sm dark:bg-blue-600 dark:hover:bg-blue-500"
                   >
                     Confirm
                   </button>
