@@ -38,8 +38,8 @@ const RepoView = () => {
     <button
       classList={{
         "rounded-lg flex flex-1 py-1 justify-center": true,
-        "bg-zinc-200 dark:bg-dark-200": tab() === props.tab,
-        "bg-transparent hover:bg-light-700 dark:hover:bg-dark-300": tab() !== props.tab,
+        "bg-zinc-200/70 dark:bg-dark-200 shadow-sm dark:shadow-dark-900": tab() === props.tab,
+        "bg-transparent hover:bg-zinc-200/40 dark:hover:bg-dark-300": tab() !== props.tab,
       }}
       onclick={() => setTab(props.tab)}
     >
