@@ -157,8 +157,8 @@ const CollectionView = () => {
 
   return (
     <Show when={records.length || response()}>
-      <div class="z-5 dark:bg-dark-500 border-b-0.5 sticky top-0 mb-2 flex w-full flex-col items-center justify-center gap-2 border-neutral-400 bg-zinc-100 py-3 dark:border-neutral-600">
-        <div class="flex w-full items-center gap-2">
+      <div class="z-5 dark:bg-dark-500/70 backdrop-blur-xs sticky top-0 flex w-screen flex-col items-center justify-center gap-2 bg-zinc-100/70 py-3">
+        <div class="w-21rem sm:w-23rem flex items-center gap-2">
           <Show when={loginState() && agent.sub === did}>
             <div class="flex items-center gap-x-2">
               <Tooltip
@@ -253,7 +253,7 @@ const CollectionView = () => {
           </Show>
         </div>
       </div>
-      <div class="flex flex-col font-mono">
+      <div class="flex max-w-full flex-col font-mono">
         <For
           each={records.filter((rec) =>
             filter() ? JSON.stringify(rec.record.value).includes(filter()!) : true,

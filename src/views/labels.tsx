@@ -72,7 +72,7 @@ const LabelView = () => {
             spellcheck={false}
             rows={3}
             value={searchParams.uriPatterns ?? "*"}
-            class="dark:bg-dark-100 focus:outline-1.5 mb-1 grow rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-blue-500 dark:shadow-dark-900"
+            class="dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900 mb-1 grow rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-blue-500"
           />
           <div class="flex justify-center">
             <Show when={!response.loading}>
@@ -86,7 +86,7 @@ const LabelView = () => {
           </div>
         </div>
       </form>
-      <div class="z-5 dark:bg-dark-500 border-b-0.5 sticky top-0 mb-2 flex w-full flex-col items-center justify-center gap-3 border-neutral-400 bg-zinc-100 py-3 dark:border-neutral-600">
+      <div class="z-5 dark:bg-dark-500/70 backdrop-blur-xs sticky top-0 flex w-screen flex-col items-center justify-center gap-3 bg-zinc-100/70 py-3">
         <TextInput
           placeholder="Filter by label"
           onInput={(e) => setFilter(e.currentTarget.value)}
@@ -106,7 +106,7 @@ const LabelView = () => {
                 <button
                   type="button"
                   onclick={() => refetch()}
-                  class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200 focus:outline-blue-500 dark:shadow-dark-900"
+                  class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 dark:shadow-dark-900 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200 focus:outline-blue-500"
                 >
                   Load More
                 </button>
