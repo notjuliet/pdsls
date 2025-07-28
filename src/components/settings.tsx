@@ -82,8 +82,8 @@ const Settings = () => {
               <button
                 classList={{
                   "basis-1/3 py-1 rounded-lg": true,
-                  "bg-transparent hover:bg-light-900 dark:hover:bg-dark-200": !theme().system,
-                  "bg-zinc-300 dark:bg-neutral-600 font-semibold": theme().system,
+                  "bg-transparent hover:bg-neutral-200 dark:hover:bg-dark-200": !theme().system,
+                  "bg-neutral-300 dark:bg-neutral-600 font-semibold": theme().system,
                 }}
                 onclick={() =>
                   updateTheme({
@@ -98,9 +98,9 @@ const Settings = () => {
               <button
                 classList={{
                   "basis-1/3 py-1 rounded-lg": true,
-                  "bg-transparent hover:bg-light-900 dark:hover:bg-dark-200":
+                  "bg-transparent hover:bg-neutral-200 dark:hover:bg-dark-200":
                     theme().color !== "light" || theme().system,
-                  "bg-zinc-300 font-semibold": theme().color === "light" && !theme().system,
+                  "bg-neutral-300 font-semibold": theme().color === "light" && !theme().system,
                 }}
                 onclick={() => updateTheme({ color: "light", system: false })}
               >
@@ -109,7 +109,7 @@ const Settings = () => {
               <button
                 classList={{
                   "basis-1/3 py-1 rounded-lg": true,
-                  "bg-transparent hover:bg-light-900 dark:hover:bg-dark-200":
+                  "bg-transparent hover:bg-neutral-200 dark:hover:bg-dark-200":
                     theme().color !== "dark" || theme().system,
                   "bg-neutral-600 font-semibold": theme().color === "dark" && !theme().system,
                 }}
