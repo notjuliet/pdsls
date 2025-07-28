@@ -13,6 +13,7 @@ export const Modal = (props: ModalProps) => {
           onMount(() => {
             document.body.style.overflow = "hidden";
             node.showModal();
+            (document.activeElement as any).blur();
           });
           onCleanup(() => node.close());
         }}
