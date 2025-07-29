@@ -1,5 +1,5 @@
 html {
-  scrollbar-gutter: stable;
+  scrollbar-gutter: stable both-edges;
 }
 
 .i-tabler-brand-bluesky {
