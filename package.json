@@ -14,13 +14,13 @@
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "typescript": "^5.8.3",
-    "unocss": "66.2.3",
-    "vite": "^6.3.5",
-    "vite-plugin-solid": "^2.11.7"
+    "unocss": "66.3.3",
+    "vite": "^7.0.6",
+    "vite-plugin-solid": "^2.11.8"
   },
   "dependencies": {
     "@atcute/atproto": "^3.1.1",
-    "@atcute/bluesky": "^3.1.5",
+    "@atcute/bluesky": "^3.2.0",
     "@atcute/car": "^3.1.1",
     "@atcute/cbor": "^2.2.5",
     "@atcute/cid": "^2.2.3",
