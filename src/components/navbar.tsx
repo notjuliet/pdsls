@@ -126,17 +126,16 @@ const NavBar = (props: { params: Params }) => {
                           "Validating"
                         : "Invalid handle"
                       }
-                      children={
-                        <div
-                          classList={{
-                            "i-lucide-circle-check": validHandle() === true,
-                            "i-lucide-circle-x text-red-500 dark:text-red-400":
-                              validHandle() === false,
-                            "i-lucide-loader-circle animate-spin": validHandle() === undefined,
-                          }}
-                        />
-                      }
-                    />
+                    >
+                      <div
+                        classList={{
+                          "i-lucide-circle-check": validHandle() === true,
+                          "i-lucide-circle-x text-red-500 dark:text-red-400":
+                            validHandle() === false,
+                          "i-lucide-loader-circle animate-spin": validHandle() === undefined,
+                        }}
+                      />
+                    </Tooltip>
                   </Show>
                 </div>
               </div>
@@ -197,28 +196,29 @@ const NavBar = (props: { params: Params }) => {
               <div class="flex gap-1">
                 <span>{props.params.rkey}</span>
                 <Show when={validRecord()}>
-                  <Tooltip text="Valid record" children={<div class="i-lucide-lock-keyhole" />} />
+                  <Tooltip text="Valid record">
+                    <div class="i-lucide-lock-keyhole" />
+                  </Tooltip>
                 </Show>
                 <Show when={validRecord() === false}>
-                  <Tooltip
-                    text="Invalid record"
-                    children={<div class="i-lucide-circle-x text-red-500 dark:text-red-400" />}
-                  />
+                  <Tooltip text="Invalid record">
+                    <div class="i-lucide-lock-keyhole-open text-red-500 dark:text-red-400" />
+                  </Tooltip>
                 </Show>
                 <Show when={validRecord() === undefined}>
-                  <Tooltip
-                    text="Validating"
-                    children={<div class="i-lucide-loader-circle animate-spin" />}
-                  />
+                  <Tooltip text="Validating">
+                    <div class="i-lucide-loader-circle animate-spin" />
+                  </Tooltip>
                 </Show>
                 <Show when={validSchema()}>
-                  <Tooltip text="Valid schema" children={<div class="i-lucide-file-check" />} />
+                  <Tooltip text="Valid schema">
+                    <div class="i-lucide-file-check" />
+                  </Tooltip>
                 </Show>
                 <Show when={validSchema() === false}>
-                  <Tooltip
-                    text="Invalid schema"
-                    children={<div class="i-lucide-file-x text-red-500 dark:text-red-400" />}
-                  />
+                  <Tooltip text="Invalid schema">
+                    <div class="i-lucide-file-x text-red-500 dark:text-red-400" />
+                  </Tooltip>
                 </Show>
               </div>
             </div>
