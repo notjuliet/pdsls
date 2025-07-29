@@ -134,7 +134,7 @@ const RepoView = () => {
 
   return (
     <Show when={repo()}>
-      <div class="mt-3 flex w-[21rem] flex-col gap-2 break-words sm:w-[23rem]">
+      <div class="mt-3 flex w-[21rem] flex-col gap-2 break-words sm:w-[24rem]">
         <Show when={error()}>
           <div class="rounded-md bg-red-100 p-2 text-sm text-red-700 dark:bg-red-50 dark:text-red-600">
             {error()}

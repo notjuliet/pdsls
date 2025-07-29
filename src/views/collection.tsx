@@ -158,7 +158,7 @@ const CollectionView = () => {
   return (
     <Show when={records.length || response()}>
       <div class="z-5 dark:bg-dark-500/70 backdrop-blur-xs sticky top-0 flex w-screen flex-col items-center justify-center gap-2 bg-zinc-100/70 py-3">
-        <div class="w-21rem sm:w-23rem flex items-center gap-2">
+        <div class="w-21rem sm:w-24rem flex items-center gap-2">
           <Show when={loginState() && agent.sub === did}>
             <div class="flex items-center gap-x-2">
               <Tooltip

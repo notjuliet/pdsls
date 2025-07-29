@@ -58,7 +58,7 @@ const NavBar = (props: { params: Params }) => {
   });
 
   return (
-    <div class="break-anywhere mt-4 flex w-[21rem] flex-col font-mono text-sm sm:w-[23rem]">
+    <div class="break-anywhere mt-4 flex w-[21rem] flex-col font-mono text-sm sm:w-[24rem]">
       <div class="relative flex items-center justify-between gap-1">
         <div class="min-h-1.25rem flex basis-full items-center gap-2">
           <Tooltip text="PDS">
