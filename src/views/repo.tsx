@@ -15,6 +15,7 @@ import { ActorIdentifier } from "@atcute/lexicons";
 import { DidDocument } from "@atcute/identity";
 import { BlobView } from "./blob.jsx";
 import { TextInput } from "../components/text-input.jsx";
+import Tooltip from "../components/tooltip.jsx";
 
 type Tab = "collections" | "backlinks" | "doc" | "blobs";
 
@@ -233,9 +234,23 @@ const RepoView = () => {
           <Show when={didDoc()}>
             {(didDocument) => (
               <div class="flex flex-col gap-y-1">
-                <div>
-                  <span class="font-semibold text-stone-600 dark:text-stone-400">ID </span>
-                  <span>{didDocument().id}</span>
+                <div class="flex items-center justify-between">
+                  <div>
+                    <span class="font-semibold text-stone-600 dark:text-stone-400">ID </span>
+                    <span>{didDocument().id}</span>
+                  </div>
+                  <Tooltip text="DID Document">
+                    <a
+                      href={
+                        did.startsWith("did:plc") ?
+                          `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
+                        : `https://${did.split("did:web:")[1]}/.well-known/did.json`
+                      }
+                      target="_blank"
+                    >
+                      <div class="i-lucide-external-link text-lg" />
+                    </a>
+                  </Tooltip>
                 </div>
                 <div>
                   <p class="font-semibold text-stone-600 dark:text-stone-400">Identities</p>
@@ -277,28 +292,15 @@ const RepoView = () => {
                     </For>
                   </ul>
                 </div>
-                <div>
+                <Show when={did.startsWith("did:plc")}>
                   <a
                     class="flex w-fit items-center text-blue-400 hover:underline"
-                    href={
-                      did.startsWith("did:plc") ?
-                        `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
-                      : `https://${did.split("did:web:")[1]}/.well-known/did.json`
-                    }
+                    href={`https://boat.kelinci.net/plc-oplogs?q=${did}`}
                     target="_blank"
                   >
-                    DID document <div class="i-lucide-external-link ml-0.5 text-sm" />
+                    PLC operation logs <div class="i-lucide-external-link ml-0.5 text-sm" />
                   </a>
-                  <Show when={did.startsWith("did:plc")}>
-                    <a
-                      class="flex w-fit items-center text-blue-400 hover:underline"
-                      href={`https://boat.kelinci.net/plc-oplogs?q=${did}`}
-                      target="_blank"
-                    >
-                      PLC operation logs <div class="i-lucide-external-link ml-0.5 text-sm" />
-                    </a>
-                  </Show>
-                </div>
+                </Show>
                 <Show when={error()?.length === 0 || error() === undefined}>
                   <div class="flex items-center gap-1">
                     <button
