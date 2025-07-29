@@ -233,8 +233,8 @@ const RepoView = () => {
         <Show when={tab() === "doc"}>
           <Show when={didDoc()}>
             {(didDocument) => (
-              <div class="flex flex-col gap-y-1">
-                <div class="flex items-center justify-between">
+              <div class="break-anywhere flex flex-col gap-y-1">
+                <div class="flex items-center justify-between gap-2">
                   <div>
                     <span class="font-semibold text-stone-600 dark:text-stone-400">ID </span>
                     <span>{didDocument().id}</span>
