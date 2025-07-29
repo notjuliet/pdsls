@@ -2,7 +2,6 @@
 import { render } from "solid-js/web";
 import "virtual:uno.css";
 import "./styles/index.css";
-import "./styles/icons.css";
 import { Route, Router } from "@solidjs/router";
 import { Layout } from "./layout.tsx";
 import { Home } from "./views/home.tsx";

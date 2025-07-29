@@ -27,7 +27,7 @@ const swapIcons: Record<string, string> = {
   "did:plc:wzsilnxf24ehtmmc3gssy5bu": "i-lucide-music-2",
   "did:plc:bnqkww7bjxaacajzvu5gswdf": "i-lucide-gem",
   "did:plc:pm6jxakrtzmkorra62cr43kr": "i-lucide-flag",
-  "did:plc:355lbopbpckczt672hss2ra4": "i-fluent-emoji-alien",
+  "did:plc:355lbopbpckczt672hss2ra4": "i-lucide-lab-basketball",
   "did:plc:44ybard66vv44zksje25o7dz": "i-lucide-mountain-snow",
   "did:plc:q6gjnaw2blty4crticxkmujt": "i-lucide-cat",
   "did:plc:oky5czdrnfjpqslsw2a5iclo": "i-tabler-brand-bluesky",
