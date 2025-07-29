@@ -1,5 +1,5 @@
 import { A } from "@solidjs/router";
-import { Show } from "solid-js";
+import Tooltip from "../components/tooltip";
 
 const Home = () => {
   return (
@@ -66,37 +66,22 @@ const Home = () => {
           </A>
         </div>
       </div>
-      <div>
-        <p>
-          <span class="font-semibold">GitHub</span>:{" "}
-          <A
-            href="https://github.com/notjuliet/pdsls"
-            target="_blank"
-            class="text-blue-400 hover:underline"
-          >
-            notjuliet/pdsls
+      <div class="flex gap-2">
+        <Tooltip text="GitHub">
+          <A href="https://github.com/notjuliet/pdsls" target="_blank">
+            <div class="i-lucide-github text-xl" />
           </A>
-        </p>
-      </div>
-      <Show when={localStorage.kawaii === "true"}>
-        <p>
-          Blue-tan art by{" "}
-          <a
-            href="https://bsky.app/profile/did:plc:zoujtrsqvk3w4n5svsqtj3kg"
-            target="_blank"
-            class="text-blue-400 hover:underline"
-          >
-            nico ღ
-          </a>
-        </p>
-      </Show>
-      <div>
-        <i>
-          Proudly powered by{" "}
-          <A href="https://github.com/mary-ext/atcute" target="_blank" class="hover:underline">
-            atcute
+        </Tooltip>
+        <Tooltip text="Bluesky">
+          <A href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz" target="_blank">
+            <div class="i-tabler-brand-bluesky text-xl" />
           </A>
-        </i>
+        </Tooltip>
+        <Tooltip text="Donate on Ko-fi">
+          <A href="https://ko-fi.com/notjuliet" target="_blank">
+            <div class="i-lucide-coffee text-xl" />
+          </A>
+        </Tooltip>
       </div>
     </div>
   );
