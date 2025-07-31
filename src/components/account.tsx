@@ -1,4 +1,4 @@
-import { createSignal, onMount, For } from "solid-js";
+import { createSignal, onMount, For, Show } from "solid-js";
 import Tooltip from "./tooltip.jsx";
 import { deleteStoredSession, getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { agent, Login, loginState, setLoginState } from "./login.jsx";
@@ -75,13 +75,13 @@ const AccountManager = () => {
               {(did) => (
                 <div class="group/select flex w-full items-center justify-between gap-x-2">
                   <button
-                    classList={{
-                      "bg-transparent basis-full text-left max-w-[32ch] truncate group-hover/select:bg-zinc-100 px-1 rounded dark:group-hover/select:bg-neutral-600": true,
-                      "text-blue-500 dark:text-blue-400 font-bold": did === agent?.sub,
-                    }}
+                    class="flex max-w-[32ch] basis-full items-center justify-between truncate rounded bg-transparent px-1 text-left group-hover/select:bg-zinc-100 dark:group-hover/select:bg-neutral-600"
                     onclick={() => resumeSession(did as Did)}
                   >
                     {sessions[did]?.length ? sessions[did] : did}
+                    <Show when={did === agent?.sub}>
+                      <div class="i-lucide-check" />
+                    </Show>
                   </button>
                   <button onclick={() => removeSession(did as Did)}>
                     <div class="i-lucide-x text-lg hover:text-red-500 hover:dark:text-red-400" />
