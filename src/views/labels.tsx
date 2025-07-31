@@ -122,7 +122,7 @@ const LabelView = () => {
         <div class="break-anywhere divide-y-0.5 flex flex-col gap-2 divide-neutral-400 whitespace-pre-wrap text-sm dark:divide-neutral-600">
           <For each={filterLabels()}>
             {(label) => (
-              <div class="flex justify-between gap-2 pb-2">
+              <div class="flex items-center justify-between gap-2 pb-2">
                 <div class="flex flex-col">
                   <div class="flex items-center gap-x-2">
                     <div class="min-w-[5rem] font-semibold text-stone-600 dark:text-stone-400">
@@ -169,9 +169,6 @@ const LabelView = () => {
                 </div>
                 <Show when={label.neg}>
                   <div class="i-lucide-minus shrink-0 text-xl text-red-500 dark:text-red-400" />
-                </Show>
-                <Show when={!label.neg}>
-                  <div class="i-lucide-plus shrink-0 text-xl text-blue-500" />
                 </Show>
               </div>
             )}
