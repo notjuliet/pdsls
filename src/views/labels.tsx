@@ -72,7 +72,7 @@ const LabelView = () => {
             spellcheck={false}
             rows={3}
             value={searchParams.uriPatterns ?? "*"}
-            class="dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900 mb-1 grow rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-blue-500"
+            class="dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900 mb-1 grow rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-slate-900 dark:focus:outline-slate-100"
           />
           <div class="flex justify-center">
             <Show when={!response.loading}>
@@ -106,7 +106,7 @@ const LabelView = () => {
                 <button
                   type="button"
                   onclick={() => refetch()}
-                  class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 dark:shadow-dark-900 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50 focus:outline-blue-500"
+                  class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 dark:shadow-dark-900 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50 focus:outline-slate-900 dark:focus:outline-slate-100"
                 >
                   Load More
                 </button>
