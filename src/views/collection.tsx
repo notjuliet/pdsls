@@ -176,7 +176,7 @@ const CollectionView = () => {
                     }}
                   >
                     <div
-                      class={`text-lg ${batchDelete() ? "i-lucide-circle-x hover:text-neutral-600 dark:hover:text-neutral-300" : "i-lucide-trash-2"} `}
+                      class={`text-lg ${batchDelete() ? "i-lucide-circle-x" : "i-lucide-trash-2"} `}
                     />
                   </button>
                 }
@@ -186,7 +186,7 @@ const CollectionView = () => {
                   text="Select All"
                   children={
                     <button onclick={() => selectAll()}>
-                      <div class="i-lucide-copy-check text-lg text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300" />
+                      <div class="i-lucide-copy-check text-lg" />
                     </button>
                   }
                 />
@@ -194,7 +194,7 @@ const CollectionView = () => {
                   text="Confirm"
                   children={
                     <button onclick={() => deleteRecords()}>
-                      <div class="i-lucide-trash-2 text-lg text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300" />
+                      <div class="i-lucide-trash-2 text-lg text-red-500 dark:text-red-400" />
                     </button>
                   }
                 />
