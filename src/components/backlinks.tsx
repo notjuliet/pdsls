@@ -36,7 +36,7 @@ const Backlinks = ({ links, target }: { links: LinkData; target: string }) => {
           <div class="text-sm">
             <p>
               <span title="Collection containing linking records">{collection}</span>
-              <span class="text-cyan-500">@</span>
+              <span class="text-neutral-400">@</span>
               <span title="Record path where the link is found">{path.slice(1)}</span>
             </p>
             <div class="pl-2">
