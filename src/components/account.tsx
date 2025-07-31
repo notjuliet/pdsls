@@ -75,12 +75,12 @@ const AccountManager = () => {
               {(did) => (
                 <div class="group/select flex w-full items-center justify-between gap-x-2">
                   <button
-                    class="flex max-w-[32ch] basis-full items-center justify-between truncate rounded bg-transparent px-1 text-left group-hover/select:bg-zinc-100 dark:group-hover/select:bg-neutral-600"
+                    class="flex max-w-[32ch] basis-full items-center justify-between gap-1 truncate rounded bg-transparent px-1 text-left group-hover/select:bg-zinc-100 dark:group-hover/select:bg-neutral-600"
                     onclick={() => resumeSession(did as Did)}
                   >
-                    {sessions[did]?.length ? sessions[did] : did}
+                    <span class="truncate">{sessions[did]?.length ? sessions[did] : did}</span>
                     <Show when={did === agent?.sub}>
-                      <div class="i-lucide-check" />
+                      <div class="i-lucide-check shrink-0" />
                     </Show>
                   </button>
                   <button onclick={() => removeSession(did as Did)}>
