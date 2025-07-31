@@ -185,10 +185,7 @@ export const RecordView = () => {
             <Tooltip text={showBacklinks() ? "Show record" : "Show backlinks"}>
               <button onclick={() => setShowBacklinks(!showBacklinks())}>
                 <div
-                  classList={{
-                    "i-lucide-send-to-back text-xl": !showBacklinks(),
-                    "i-lucide-file-json text-xl": showBacklinks(),
-                  }}
+                  class={`${showBacklinks() ? "i-lucide-file-json" : "i-lucide-send-to-back"} text-xl`}
                 />
               </button>
             </Tooltip>

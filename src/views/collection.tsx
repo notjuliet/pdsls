@@ -176,12 +176,7 @@ const CollectionView = () => {
                     }}
                   >
                     <div
-                      classList={{
-                        "flex text-lg items-center": true,
-                        "i-lucide-trash-2": !batchDelete(),
-                        "i-lucide-circle-x hover:text-neutral-600 dark:hover:text-neutral-300":
-                          batchDelete(),
-                      }}
+                      class={`text-lg ${batchDelete() ? "i-lucide-circle-x hover:text-neutral-600 dark:hover:text-neutral-300" : "i-lucide-trash-2"} `}
                     />
                   </button>
                 }
