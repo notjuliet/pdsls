@@ -18,7 +18,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
   let model: monaco.editor.IModel;
   let formRef!: HTMLFormElement;
 
-  const placeholder = (date: string) => {
+  const placeholder = () => {
     return {
       $type: "app.bsky.feed.post",
       text: "This post was sent from PDSls",
@@ -31,7 +31,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
         },
       },
       langs: ["en"],
-      createdAt: date,
+      createdAt: new Date().toISOString(),
     };
   };
 
@@ -163,11 +163,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
   const createModel = () => {
     if (!model)
       model = monaco.editor.createModel(
-        JSON.stringify(
-          props.create ? placeholder(new Date().toISOString()) : props.record,
-          null,
-          2,
-        ),
+        JSON.stringify(props.create ? placeholder() : props.record, null, 2),
         "json",
       );
   };
@@ -279,28 +275,16 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
           </form>
         </div>
       </Modal>
-      <Show when={props.create}>
-        <button
-          onclick={() => {
-            createModel();
-            setOpenDialog(true);
-          }}
-        >
-          <Tooltip text="Create record" children={<div class="i-lucide-square-pen text-xl" />} />
-        </button>
-      </Show>
-      <Show when={!props.create}>
-        <button
-          onclick={() => {
-            createModel();
-            setOpenDialog(true);
-          }}
-        >
-          <Tooltip text="Edit">
-            <div class="i-lucide-pencil text-xl" />
-          </Tooltip>
-        </button>
-      </Show>
+      <button
+        onclick={() => {
+          createModel();
+          setOpenDialog(true);
+        }}
+      >
+        <Tooltip text={`${props.create ? "Create" : "Edit"} record`}>
+          <div class={`${props.create ? "i-lucide-square-pen" : "i-lucide-pencil"} text-xl`} />
+        </Tooltip>
+      </button>
     </>
   );
 };
