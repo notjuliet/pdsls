@@ -24,10 +24,7 @@ const RepoView = () => {
   const [error, setError] = createSignal<string>();
   const [downloading, setDownloading] = createSignal(false);
   const [didDoc, setDidDoc] = createSignal<DidDocument>();
-  const [backlinks, setBacklinks] = createSignal<{
-    links: LinkData;
-    target: string;
-  }>();
+  const [backlinks, setBacklinks] = createSignal<{ links: LinkData; target: string }>();
   const [nsids, setNsids] = createSignal<Record<string, { hidden: boolean; nsids: string[] }>>();
   const [tab, setTab] = createSignal<Tab>("collections");
   const [filter, setFilter] = createSignal<string>();
@@ -48,15 +45,14 @@ const RepoView = () => {
     </button>
   );
 
-  const describeRepo = (repo: string) =>
-    rpc.get("com.atproto.repo.describeRepo", { params: { repo: repo as ActorIdentifier } });
-
   const fetchRepo = async () => {
     pds = await resolvePDS(did);
     setDidDoc(didDocCache[did] as DidDocument);
 
     rpc = new Client({ handler: new CredentialManager({ service: pds }) });
-    const res = await describeRepo(did);
+    const res = await rpc.get("com.atproto.repo.describeRepo", {
+      params: { repo: did as ActorIdentifier },
+    });
     if (res.ok) {
       const collections: Record<string, { hidden: boolean; nsids: string[] }> = {};
       res.data.collections.forEach((c) => {
@@ -81,7 +77,6 @@ const RepoView = () => {
           break;
         default:
           setError("This repository is unreachable");
-          break;
       }
       setTab("doc");
     }
