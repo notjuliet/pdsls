@@ -68,14 +68,14 @@ const AccountManager = () => {
   return (
     <>
       <Modal open={openManager()} onClose={() => setOpenManager(false)}>
-        <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-slate-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-slate-100">
+        <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 w-21rem dark:shadow-dark-900 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-slate-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-slate-100">
           <h3 class="mb-2 font-bold">Manage accounts</h3>
-          <div class="border-b-0.5 mb-2 max-h-[20rem] overflow-y-auto border-neutral-500 pb-2 md:max-h-[25rem]">
+          <div class="mb-3 max-h-[20rem] overflow-y-auto md:max-h-[25rem]">
             <For each={Object.keys(sessions)}>
               {(did) => (
                 <div class="group/select flex w-full items-center justify-between gap-x-2">
                   <button
-                    class="flex max-w-[32ch] basis-full items-center justify-between gap-1 truncate rounded bg-transparent px-1 text-left group-hover/select:bg-zinc-100 dark:group-hover/select:bg-neutral-600"
+                    class="flex basis-full items-center justify-between gap-1 truncate rounded bg-transparent px-1 text-left group-hover/select:bg-zinc-100 dark:group-hover/select:bg-neutral-600"
                     onclick={() => resumeSession(did as Did)}
                   >
                     <span class="truncate">{sessions[did]?.length ? sessions[did] : did}</span>

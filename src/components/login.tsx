@@ -58,8 +58,10 @@ const Login = () => {
 
   return (
     <form class="flex flex-col gap-y-1" onsubmit={(e) => e.preventDefault()}>
-      <label for="handle">Add new account</label>
-      <div class="flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <label for="handle">
+          <div class="i-lucide-user-round-plus text-lg" />
+        </label>
         <TextInput
           id="handle"
           placeholder="user.bsky.social"
@@ -70,7 +72,7 @@ const Login = () => {
           <div class="i-lucide-log-in text-lg" />
         </button>
       </div>
-      <div class="max-w-20rem">{notice()}</div>
+      <div>{notice()}</div>
     </form>
   );
 };
