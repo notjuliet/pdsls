@@ -5,12 +5,13 @@ import { editor, Editor } from "../components/editor.jsx";
 import * as monaco from "monaco-editor";
 import { theme } from "../components/settings.jsx";
 import Tooltip from "./tooltip.jsx";
-import { useParams } from "@solidjs/router";
+import { useNavigate, useParams } from "@solidjs/router";
 import { remove } from "@mary/exif-rm";
 import { TextInput } from "./text-input.jsx";
 import { Modal } from "./modal.jsx";
 
 export const RecordEditor = (props: { create: boolean; record?: any }) => {
+  const navigate = useNavigate();
   const params = useParams();
   const [openDialog, setOpenDialog] = createSignal(false);
   const [notice, setNotice] = createSignal("");
@@ -64,7 +65,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
       return;
     }
     setOpenDialog(false);
-    window.location.href = `/${res.data.uri}`;
+    navigate(`/${res.data.uri}`);
   };
 
   const editRecord = async (formData: FormData) => {

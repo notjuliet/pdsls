@@ -1,6 +1,6 @@
 import { createEffect, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
-import { A, RouteSectionProps, useLocation, useNavigate, useParams } from "@solidjs/router";
-import { agent, loginState, retrieveSession } from "./components/login.jsx";
+import { A, RouteSectionProps, useLocation, useParams } from "@solidjs/router";
+import { loginState } from "./components/login.jsx";
 import { RecordEditor } from "./components/create.jsx";
 import Tooltip from "./components/tooltip.jsx";
 import { NavBar } from "./components/navbar.jsx";
@@ -15,12 +15,9 @@ import { copyNotice } from "./utils/copy.js";
 const Layout = (props: RouteSectionProps<unknown>) => {
   const params = useParams();
   const location = useLocation();
-  const navigate = useNavigate();
 
-  onMount(async () => {
+  onMount(() => {
     if (location.search.includes("kawaii=true")) localStorage.kawaii = "true";
-    await retrieveSession();
-    if (loginState() && location.pathname === "/") navigate(`/at://${agent.sub}`);
   });
 
   createEffect(async () => {

@@ -1,6 +1,6 @@
 import { CredentialManager, Client } from "@atcute/client";
 
-import { useParams } from "@solidjs/router";
+import { useNavigate, useParams } from "@solidjs/router";
 import { createSignal, onMount, Show } from "solid-js";
 
 import { Backlinks } from "../components/backlinks.jsx";
@@ -21,6 +21,7 @@ import Tooltip from "../components/tooltip.jsx";
 import { Modal } from "../components/modal.jsx";
 
 export const RecordView = () => {
+  const navigate = useNavigate();
   const params = useParams();
   const [record, setRecord] =
     createSignal<InferXRPCBodyOutput<ComAtprotoRepoGetRecord.mainSchema["output"]>>();
@@ -109,7 +110,7 @@ export const RecordView = () => {
         rkey: params.rkey,
       },
     });
-    window.location.href = `/at://${params.repo}/${params.collection}`;
+    navigate(`/at://${params.repo}/${params.collection}`);
   };
 
   const checkUri = (uri: string) => {
