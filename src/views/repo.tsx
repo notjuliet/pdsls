@@ -379,7 +379,9 @@ const RepoView = () => {
                         onclick={async () => {
                           if (!plcOps()) {
                             setLoading(true);
-                            const response = await fetch(`https://plc.directory/${did}/log/audit`);
+                            const response = await fetch(
+                              `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}/log/audit`,
+                            );
                             const json = await response.json();
                             const logs = defs.indexedEntryLog.parse(json);
                             const opHistory = createOperationHistory(logs).reverse();
