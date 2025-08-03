@@ -6,6 +6,7 @@ import {
   Suspense,
   ErrorBoundary,
   onMount,
+  JSX,
 } from "solid-js";
 import { Client, CredentialManager } from "@atcute/client";
 import { A, useParams } from "@solidjs/router";
@@ -16,6 +17,9 @@ import { DidDocument } from "@atcute/identity";
 import { BlobView } from "./blob.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
+import { CompatibleOperationOrTombstone, defs, IndexedEntry } from "@atcute/did-plc";
+import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
+import { localDateFromTimestamp } from "../utils/date.js";
 
 type Tab = "collections" | "backlinks" | "doc" | "blobs";
 
@@ -28,6 +32,8 @@ const RepoView = () => {
   const [nsids, setNsids] = createSignal<Record<string, { hidden: boolean; nsids: string[] }>>();
   const [tab, setTab] = createSignal<Tab>("collections");
   const [filter, setFilter] = createSignal<string>();
+  const [plcOps, setPlcOps] =
+    createSignal<[IndexedEntry<CompatibleOperationOrTombstone>, DiffEntry[]][]>();
   let rpc: Client;
   let pds: string;
   const did = params.repo;
@@ -44,6 +50,76 @@ const RepoView = () => {
       {props.label}
     </button>
   );
+
+  const DiffItem = (props: { diff: DiffEntry }) => {
+    const diff = props.diff;
+    const nullified = diff.orig.nullified;
+
+    let title = "Unknown log entry";
+    let icon = "i-lucide-circle-help";
+    let node: JSX.Element;
+
+    if (diff.type === "identity_created") {
+      icon = "i-lucide-bell";
+      title = `Identity created`;
+    } else if (diff.type === "identity_tombstoned") {
+      icon = "i-lucide-skull";
+      title = `Identity tombstoned`;
+    } else if (diff.type === "handle_added") {
+      icon = "i-lucide-at-sign";
+      title = `Alias added`;
+      node = diff.handle;
+    } else if (diff.type === "handle_changed") {
+      icon = "i-lucide-at-sign";
+      title = `Alias updated`;
+      node = `${diff.next_handle}`;
+    } else if (diff.type === "handle_removed") {
+      icon = "i-lucide-at-sign";
+      title = `Alias removed`;
+      node = diff.handle;
+    } else if (diff.type === "rotation_key_added") {
+      icon = "i-lucide-key-round";
+      title = `Rotation key added`;
+      node = diff.rotation_key;
+    } else if (diff.type === "rotation_key_removed") {
+      icon = "i-lucide-key-round";
+      title = `Rotation key removed`;
+      node = diff.rotation_key;
+    } else if (diff.type === "service_added") {
+      icon = "i-lucide-server";
+      title = `Service ${diff.service_id} added`;
+      node = `${diff.service_endpoint}`;
+    } else if (diff.type === "service_changed") {
+      icon = "i-lucide-server";
+      title = `Service ${diff.service_id} updated`;
+      node = `${diff.next_service_endpoint}`;
+    } else if (diff.type === "service_removed") {
+      icon = "i-lucide-server";
+      title = `Service ${diff.service_id} removed`;
+      node = `${diff.service_endpoint}`;
+    } else if (diff.type === "verification_method_added") {
+      icon = "i-lucide-shield-check";
+      title = `Verification method ${diff.method_id} added`;
+      node = `${diff.method_key}`;
+    } else if (diff.type === "verification_method_changed") {
+      icon = "i-lucide-shield-check";
+      title = `Verification method ${diff.method_id} updated`;
+      node = `${diff.next_method_key}`;
+    } else if (diff.type === "verification_method_removed") {
+      icon = "i-lucide-shield-check";
+      title = `Verification method ${diff.method_id} removed`;
+      node = `${diff.method_key}`;
+    }
+
+    return (
+      <div class="grid grid-cols-[min-content_1fr] items-center">
+        <div class={icon + ` mr-1 shrink-0 text-lg`} />
+        <p class={!nullified ? ` ` : `text-gray-600 line-through`}>{title}</p>
+        <div></div>
+        {node}
+      </div>
+    );
+  };
 
   const fetchRepo = async () => {
     pds = await resolvePDS(did);
@@ -95,6 +171,12 @@ const RepoView = () => {
         console.error(e);
       }
     }
+
+    const response = await fetch(`https://plc.directory/${did}/log/audit`);
+    const json = await response.json();
+    const logs = defs.indexedEntryLog.parse(json);
+    const opHistory = createOperationHistory(logs).reverse();
+    setPlcOps(Array.from(groupBy(opHistory, (item) => item.orig)));
   });
 
   const downloadRepo = async () => {
@@ -287,15 +369,6 @@ const RepoView = () => {
                     </For>
                   </ul>
                 </div>
-                <Show when={did.startsWith("did:plc")}>
-                  <a
-                    class="flex w-fit items-center text-blue-400 hover:underline"
-                    href={`https://boat.kelinci.net/plc-oplogs?q=${did}`}
-                    target="_blank"
-                  >
-                    PLC operation logs <div class="i-lucide-external-link ml-0.5 text-sm" />
-                  </a>
-                </Show>
                 <Show when={error()?.length === 0 || error() === undefined}>
                   <div class="flex items-center gap-1">
                     <button
@@ -309,6 +382,20 @@ const RepoView = () => {
                     <Show when={downloading()}>
                       <div class="i-lucide-loader-circle animate-spin text-xl" />
                     </Show>
+                  </div>
+                </Show>
+                <Show when={did.startsWith("did:plc")}>
+                  <div class="flex flex-col gap-1">
+                    <For each={plcOps()}>
+                      {([entry, diffs]) => (
+                        <div class="flex flex-col">
+                          <span>{localDateFromTimestamp(new Date(entry.createdAt).getTime())}</span>
+                          {diffs.map((diff) => (
+                            <DiffItem diff={diff} />
+                          ))}
+                        </div>
+                      )}
+                    </For>
                   </div>
                 </Show>
               </div>
