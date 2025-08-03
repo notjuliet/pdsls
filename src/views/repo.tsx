@@ -72,7 +72,7 @@ const RepoView = () => {
     } else if (diff.type === "handle_changed") {
       icon = "i-lucide-at-sign";
       title = `Alias updated`;
-      node = `${diff.next_handle}`;
+      node = `${diff.prev_handle} → ${diff.next_handle}`;
     } else if (diff.type === "handle_removed") {
       icon = "i-lucide-at-sign";
       title = `Alias removed`;
@@ -92,7 +92,7 @@ const RepoView = () => {
     } else if (diff.type === "service_changed") {
       icon = "i-lucide-server";
       title = `Service ${diff.service_id} updated`;
-      node = `${diff.next_service_endpoint}`;
+      node = `${diff.prev_service_endpoint} → ${diff.next_service_endpoint}`;
     } else if (diff.type === "service_removed") {
       icon = "i-lucide-server";
       title = `Service ${diff.service_id} removed`;
@@ -104,7 +104,7 @@ const RepoView = () => {
     } else if (diff.type === "verification_method_changed") {
       icon = "i-lucide-shield-check";
       title = `Verification method ${diff.method_id} updated`;
-      node = `${diff.next_method_key}`;
+      node = `${diff.prev_method_key} → ${diff.next_method_key}`;
     } else if (diff.type === "verification_method_removed") {
       icon = "i-lucide-shield-check";
       title = `Verification method ${diff.method_id} removed`;
