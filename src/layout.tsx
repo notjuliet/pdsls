@@ -1,4 +1,4 @@
-import { createEffect, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
+import { createEffect, ErrorBoundary, Show, Suspense } from "solid-js";
 import { A, RouteSectionProps, useLocation, useParams } from "@solidjs/router";
 import { loginState } from "./components/login.jsx";
 import { RecordEditor } from "./components/create.jsx";
@@ -15,10 +15,7 @@ import { copyNotice } from "./utils/copy.js";
 const Layout = (props: RouteSectionProps<unknown>) => {
   const params = useParams();
   const location = useLocation();
-
-  onMount(() => {
-    if (location.search.includes("kawaii=true")) localStorage.kawaii = "true";
-  });
+  if (location.search.includes("kawaii=true")) localStorage.kawaii = "true";
 
   createEffect(async () => {
     if (params.repo && !params.repo.startsWith("did:")) {
@@ -47,7 +44,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <A href="/" class="font-mono font-bold hover:underline">
             PDSls
           </A>
-          <Show when={location.search.includes("kawaii=true") || kawaii()}>
+          <Show when={localStorage.kawaii === "true" || kawaii()}>
             <a
               href="https://bsky.app/profile/ninikyuu.bsky.social/post/3l3tq5xwqf22o"
               target="_blank"
