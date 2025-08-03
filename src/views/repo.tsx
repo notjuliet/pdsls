@@ -34,6 +34,8 @@ const RepoView = () => {
   const [filter, setFilter] = createSignal<string>();
   const [plcOps, setPlcOps] =
     createSignal<[IndexedEntry<CompatibleOperationOrTombstone>, DiffEntry[]][]>();
+  const [showPlcLogs, setShowPlcLogs] = createSignal(false);
+  const [loading, setLoading] = createSignal(false);
   let rpc: Client;
   let pds: string;
   const did = params.repo;
@@ -114,7 +116,13 @@ const RepoView = () => {
     return (
       <div class="grid grid-cols-[min-content_1fr] items-center">
         <div class={icon + ` mr-1 shrink-0 text-lg`} />
-        <p class={!nullified ? ` ` : `text-gray-600 line-through`}>{title}</p>
+        <p
+          class={
+            `font-semibold ` + (!nullified ? ` ` : `text-gray-500 line-through dark:text-gray-400`)
+          }
+        >
+          {title}
+        </p>
         <div></div>
         {node}
       </div>
@@ -171,12 +179,6 @@ const RepoView = () => {
         console.error(e);
       }
     }
-
-    const response = await fetch(`https://plc.directory/${did}/log/audit`);
-    const json = await response.json();
-    const logs = defs.indexedEntryLog.parse(json);
-    const opHistory = createOperationHistory(logs).reverse();
-    setPlcOps(Array.from(groupBy(opHistory, (item) => item.orig)));
   });
 
   const downloadRepo = async () => {
@@ -310,86 +312,117 @@ const RepoView = () => {
         <Show when={tab() === "doc"}>
           <Show when={didDoc()}>
             {(didDocument) => (
-              <div class="break-anywhere flex flex-col gap-y-1">
-                <div class="flex items-center justify-between gap-2">
-                  <div>
-                    <span class="font-semibold text-stone-600 dark:text-stone-400">ID </span>
-                    <span>{didDocument().id}</span>
+              <div class="break-anywhere flex flex-col gap-y-2">
+                <div class="flex flex-col gap-y-1">
+                  <div class="flex items-center justify-between gap-2">
+                    <div>
+                      <span class="font-semibold text-stone-600 dark:text-stone-400">ID </span>
+                      <span>{didDocument().id}</span>
+                    </div>
+                    <Tooltip text="DID Document">
+                      <a
+                        href={
+                          did.startsWith("did:plc") ?
+                            `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
+                          : `https://${did.split("did:web:")[1]}/.well-known/did.json`
+                        }
+                        target="_blank"
+                      >
+                        <div class="i-lucide-external-link text-lg" />
+                      </a>
+                    </Tooltip>
                   </div>
-                  <Tooltip text="DID Document">
-                    <a
-                      href={
-                        did.startsWith("did:plc") ?
-                          `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
-                        : `https://${did.split("did:web:")[1]}/.well-known/did.json`
-                      }
-                      target="_blank"
-                    >
-                      <div class="i-lucide-external-link text-lg" />
-                    </a>
-                  </Tooltip>
+                  <div>
+                    <p class="font-semibold text-stone-600 dark:text-stone-400">Identities</p>
+                    <ul class="ml-2">
+                      <For each={didDocument().alsoKnownAs}>{(alias) => <li>{alias}</li>}</For>
+                    </ul>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-stone-600 dark:text-stone-400">Services</p>
+                    <ul class="ml-2">
+                      <For each={didDocument().service}>
+                        {(service) => (
+                          <li class="flex flex-col">
+                            <span>#{service.id.split("#")[1]}</span>
+                            <a
+                              class="w-fit text-blue-400 hover:underline"
+                              href={service.serviceEndpoint.toString()}
+                              target="_blank"
+                            >
+                              {service.serviceEndpoint.toString()}
+                            </a>
+                          </li>
+                        )}
+                      </For>
+                    </ul>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-stone-600 dark:text-stone-400">
+                      Verification methods
+                    </p>
+                    <ul class="ml-2">
+                      <For each={didDocument().verificationMethod}>
+                        {(verif) => (
+                          <li class="flex flex-col">
+                            <span>#{verif.id.split("#")[1]}</span>
+                            <span>{verif.publicKeyMultibase}</span>
+                          </li>
+                        )}
+                      </For>
+                    </ul>
+                  </div>
                 </div>
-                <div>
-                  <p class="font-semibold text-stone-600 dark:text-stone-400">Identities</p>
-                  <ul class="ml-2">
-                    <For each={didDocument().alsoKnownAs}>{(alias) => <li>{alias}</li>}</For>
-                  </ul>
-                </div>
-                <div>
-                  <p class="font-semibold text-stone-600 dark:text-stone-400">Services</p>
-                  <ul class="ml-2">
-                    <For each={didDocument().service}>
-                      {(service) => (
-                        <li class="flex flex-col">
-                          <span>#{service.id.split("#")[1]}</span>
-                          <a
-                            class="w-fit text-blue-400 hover:underline"
-                            href={service.serviceEndpoint.toString()}
-                            target="_blank"
-                          >
-                            {service.serviceEndpoint.toString()}
-                          </a>
-                        </li>
-                      )}
-                    </For>
-                  </ul>
-                </div>
-                <div>
-                  <p class="font-semibold text-stone-600 dark:text-stone-400">
-                    Verification methods
-                  </p>
-                  <ul class="ml-2">
-                    <For each={didDocument().verificationMethod}>
-                      {(verif) => (
-                        <li class="flex flex-col">
-                          <span>#{verif.id.split("#")[1]}</span>
-                          <span>{verif.publicKeyMultibase}</span>
-                        </li>
-                      )}
-                    </For>
-                  </ul>
-                </div>
-                <Show when={error()?.length === 0 || error() === undefined}>
+                <div class="flex justify-between">
                   <div class="flex items-center gap-1">
                     <button
                       type="button"
-                      onclick={() => downloadRepo()}
+                      onclick={async () => {
+                        if (!plcOps()) {
+                          setLoading(true);
+                          const response = await fetch(`https://plc.directory/${did}/log/audit`);
+                          const json = await response.json();
+                          const logs = defs.indexedEntryLog.parse(json);
+                          const opHistory = createOperationHistory(logs).reverse();
+                          setPlcOps(Array.from(groupBy(opHistory, (item) => item.orig)));
+                          setLoading(false);
+                        }
+
+                        setShowPlcLogs(!showPlcLogs());
+                      }}
                       class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 dark:shadow-dark-900 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50 focus:outline-slate-900 dark:focus:outline-slate-100"
                     >
-                      <div class="i-lucide-download text-sm" />
-                      Export Repo
+                      <div class="i-lucide-logs text-sm" />
+                      {showPlcLogs() ? "Hide" : "Show"} PLC logs
                     </button>
-                    <Show when={downloading()}>
+                    <Show when={loading()}>
                       <div class="i-lucide-loader-circle animate-spin text-xl" />
                     </Show>
                   </div>
-                </Show>
-                <Show when={did.startsWith("did:plc")}>
-                  <div class="flex flex-col gap-1">
+                  <Show when={error()?.length === 0 || error() === undefined}>
+                    <div class="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onclick={() => downloadRepo()}
+                        class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 dark:shadow-dark-900 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50 focus:outline-slate-900 dark:focus:outline-slate-100"
+                      >
+                        <div class="i-lucide-download text-sm" />
+                        Export Repo
+                      </button>
+                      <Show when={downloading()}>
+                        <div class="i-lucide-loader-circle animate-spin text-xl" />
+                      </Show>
+                    </div>
+                  </Show>
+                </div>
+                <Show when={did.startsWith("did:plc") && showPlcLogs()}>
+                  <div class="flex flex-col gap-1 text-sm">
                     <For each={plcOps()}>
                       {([entry, diffs]) => (
                         <div class="flex flex-col">
-                          <span>{localDateFromTimestamp(new Date(entry.createdAt).getTime())}</span>
+                          <span class="text-neutral-500 dark:text-neutral-400">
+                            {localDateFromTimestamp(new Date(entry.createdAt).getTime())}
+                          </span>
                           {diffs.map((diff) => (
                             <DiffItem diff={diff} />
                           ))}
