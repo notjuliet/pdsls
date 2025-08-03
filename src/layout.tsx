@@ -1,5 +1,5 @@
 import { createEffect, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
-import { A, RouteSectionProps, useLocation, useParams } from "@solidjs/router";
+import { A, RouteSectionProps, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { agent, loginState, retrieveSession } from "./components/login.jsx";
 import { RecordEditor } from "./components/create.jsx";
 import Tooltip from "./components/tooltip.jsx";
@@ -15,11 +15,12 @@ import { copyNotice } from "./utils/copy.js";
 const Layout = (props: RouteSectionProps<unknown>) => {
   const params = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
 
   onMount(async () => {
     if (location.search.includes("kawaii=true")) localStorage.kawaii = "true";
     await retrieveSession();
-    if (loginState() && location.pathname === "/") window.location.href = `/at://${agent.sub}`;
+    if (loginState() && location.pathname === "/") navigate(`/at://${agent.sub}`);
   });
 
   createEffect(async () => {

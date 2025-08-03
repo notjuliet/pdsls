@@ -1,5 +1,5 @@
 import { resolveHandle } from "../utils/api.js";
-import { A } from "@solidjs/router";
+import { A, useNavigate } from "@solidjs/router";
 import Tooltip from "./tooltip.jsx";
 import { createSignal, onCleanup, onMount, Show } from "solid-js";
 import { agent, loginState } from "../components/login.jsx";
@@ -8,6 +8,7 @@ import { Handle } from "@atcute/lexicons";
 const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 1;
 
 const Search = () => {
+  const navigate = useNavigate();
   let searchInput!: HTMLInputElement;
   const [loading, setLoading] = createSignal(false);
 
@@ -20,7 +21,7 @@ const Search = () => {
       !input.startsWith("https://deer.social/") &&
       (input.startsWith("https://") || input.startsWith("http://"))
     ) {
-      window.location.href = `/${input.replace("https://", "").replace("http://", "").replace("/", "")}`;
+      navigate(`/${input.replace("https://", "").replace("http://", "").replace("/", "")}`);
       return;
     }
 
@@ -37,10 +38,11 @@ const Search = () => {
       did = uri.startsWith("did:") ? actor : await resolveHandle(actor as Handle);
       setLoading(false);
     } catch {
-      window.location.href = `/${actor}`;
+      setLoading(false);
+      navigate(`/${actor}`);
       return;
     }
-    window.location.href = `/at://${did}${uriParts.length > 1 ? `/${uriParts.slice(1).join("/")}` : ""}`;
+    navigate(`/at://${did}${uriParts.length > 1 ? `/${uriParts.slice(1).join("/")}` : ""}`);
   };
 
   onMount(() => window.addEventListener("keydown", keyEvent));
