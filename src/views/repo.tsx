@@ -6,7 +6,6 @@ import {
   Suspense,
   ErrorBoundary,
   onMount,
-  JSX,
 } from "solid-js";
 import { Client, CredentialManager } from "@atcute/client";
 import { A, useParams } from "@solidjs/router";
@@ -55,11 +54,9 @@ const RepoView = () => {
 
   const DiffItem = (props: { diff: DiffEntry }) => {
     const diff = props.diff;
-    const nullified = diff.orig.nullified;
-
     let title = "Unknown log entry";
     let icon = "i-lucide-circle-help";
-    let node: JSX.Element;
+    let value = "";
 
     if (diff.type === "identity_created") {
       icon = "i-lucide-bell";
@@ -69,62 +66,63 @@ const RepoView = () => {
       title = `Identity tombstoned`;
     } else if (diff.type === "handle_added") {
       icon = "i-lucide-at-sign";
-      title = `Alias added`;
-      node = diff.handle;
+      title = "Alias added";
+      value = diff.handle;
     } else if (diff.type === "handle_changed") {
       icon = "i-lucide-at-sign";
-      title = `Alias updated`;
-      node = `${diff.prev_handle} → ${diff.next_handle}`;
+      title = "Alias updated";
+      value = `${diff.prev_handle} → ${diff.next_handle}`;
     } else if (diff.type === "handle_removed") {
       icon = "i-lucide-at-sign";
       title = `Alias removed`;
-      node = diff.handle;
+      value = diff.handle;
     } else if (diff.type === "rotation_key_added") {
       icon = "i-lucide-key-round";
       title = `Rotation key added`;
-      node = diff.rotation_key;
+      value = diff.rotation_key;
     } else if (diff.type === "rotation_key_removed") {
       icon = "i-lucide-key-round";
       title = `Rotation key removed`;
-      node = diff.rotation_key;
+      value = diff.rotation_key;
     } else if (diff.type === "service_added") {
       icon = "i-lucide-server";
       title = `Service ${diff.service_id} added`;
-      node = `${diff.service_endpoint}`;
+      value = `${diff.service_endpoint}`;
     } else if (diff.type === "service_changed") {
       icon = "i-lucide-server";
       title = `Service ${diff.service_id} updated`;
-      node = `${diff.prev_service_endpoint} → ${diff.next_service_endpoint}`;
+      value = `${diff.prev_service_endpoint} → ${diff.next_service_endpoint}`;
     } else if (diff.type === "service_removed") {
       icon = "i-lucide-server";
       title = `Service ${diff.service_id} removed`;
-      node = `${diff.service_endpoint}`;
+      value = `${diff.service_endpoint}`;
     } else if (diff.type === "verification_method_added") {
       icon = "i-lucide-shield-check";
       title = `Verification method ${diff.method_id} added`;
-      node = `${diff.method_key}`;
+      value = `${diff.method_key}`;
     } else if (diff.type === "verification_method_changed") {
       icon = "i-lucide-shield-check";
       title = `Verification method ${diff.method_id} updated`;
-      node = `${diff.prev_method_key} → ${diff.next_method_key}`;
+      value = `${diff.prev_method_key} → ${diff.next_method_key}`;
     } else if (diff.type === "verification_method_removed") {
       icon = "i-lucide-shield-check";
       title = `Verification method ${diff.method_id} removed`;
-      node = `${diff.method_key}`;
+      value = `${diff.method_key}`;
     }
 
     return (
       <div class="grid grid-cols-[min-content_1fr] items-center">
         <div class={icon + ` mr-1 shrink-0 text-lg`} />
         <p
-          class={
-            `font-semibold ` + (!nullified ? ` ` : `text-gray-500 line-through dark:text-gray-400`)
-          }
+          classList={{
+            "font-semibold": true,
+            "text-gray-500 line-through dark:text-gray-400": diff.orig.nullified,
+          }}
         >
           {title}
         </p>
         <div></div>
-        {node}
+        {value}
       </div>
     );
   };
@@ -401,6 +399,9 @@ const RepoView = () => {
                   </div>
                   <Show when={error()?.length === 0 || error() === undefined}>
                     <div class="flex items-center gap-1">
+                      <Show when={downloading()}>
+                        <div class="i-lucide-loader-circle animate-spin text-xl" />
+                      </Show>
                       <button
                         type="button"
                         onclick={() => downloadRepo()}
@@ -409,9 +410,6 @@ const RepoView = () => {
                         <div class="i-lucide-download text-sm" />
                         Export Repo
                       </button>
-                      <Show when={downloading()}>
-                        <div class="i-lucide-loader-circle animate-spin text-xl" />
-                      </Show>
                     </div>
                   </Show>
                 </div>
