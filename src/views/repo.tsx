@@ -16,6 +16,9 @@ import { DidDocument } from "@atcute/identity";
 import { BlobView } from "./blob.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
+import { CompatibleOperationOrTombstone, defs, IndexedEntry } from "@atcute/did-plc";
+import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
+import { localDateFromTimestamp } from "../utils/date.js";
 
 type Tab = "collections" | "backlinks" | "doc" | "blobs";
 
@@ -28,6 +31,10 @@ const RepoView = () => {
   const [nsids, setNsids] = createSignal<Record<string, { hidden: boolean; nsids: string[] }>>();
   const [tab, setTab] = createSignal<Tab>("collections");
   const [filter, setFilter] = createSignal<string>();
+  const [plcOps, setPlcOps] =
+    createSignal<[IndexedEntry<CompatibleOperationOrTombstone>, DiffEntry[]][]>();
+  const [showPlcLogs, setShowPlcLogs] = createSignal(false);
+  const [loading, setLoading] = createSignal(false);
   let rpc: Client;
   let pds: string;
   const did = params.repo;
@@ -44,6 +51,81 @@ const RepoView = () => {
       {props.label}
     </button>
   );
+
+  const DiffItem = (props: { diff: DiffEntry }) => {
+    const diff = props.diff;
+    let title = "Unknown log entry";
+    let icon = "i-lucide-circle-help";
+    let value = "";
+
+    if (diff.type === "identity_created") {
+      icon = "i-lucide-bell";
+      title = `Identity created`;
+    } else if (diff.type === "identity_tombstoned") {
+      icon = "i-lucide-skull";
+      title = `Identity tombstoned`;
+    } else if (diff.type === "handle_added") {
+      icon = "i-lucide-at-sign";
+      title = "Alias added";
+      value = diff.handle;
+    } else if (diff.type === "handle_changed") {
+      icon = "i-lucide-at-sign";
+      title = "Alias updated";
+      value = `${diff.prev_handle} → ${diff.next_handle}`;
+    } else if (diff.type === "handle_removed") {
+      icon = "i-lucide-at-sign";
+      title = `Alias removed`;
+      value = diff.handle;
+    } else if (diff.type === "rotation_key_added") {
+      icon = "i-lucide-key-round";
+      title = `Rotation key added`;
+      value = diff.rotation_key;
+    } else if (diff.type === "rotation_key_removed") {
+      icon = "i-lucide-key-round";
+      title = `Rotation key removed`;
+      value = diff.rotation_key;
+    } else if (diff.type === "service_added") {
+      icon = "i-lucide-server";
+      title = `Service ${diff.service_id} added`;
+      value = `${diff.service_endpoint}`;
+    } else if (diff.type === "service_changed") {
+      icon = "i-lucide-server";
+      title = `Service ${diff.service_id} updated`;
+      value = `${diff.prev_service_endpoint} → ${diff.next_service_endpoint}`;
+    } else if (diff.type === "service_removed") {
+      icon = "i-lucide-server";
+      title = `Service ${diff.service_id} removed`;
+      value = `${diff.service_endpoint}`;
+    } else if (diff.type === "verification_method_added") {
+      icon = "i-lucide-shield-check";
+      title = `Verification method ${diff.method_id} added`;
+      value = `${diff.method_key}`;
+    } else if (diff.type === "verification_method_changed") {
+      icon = "i-lucide-shield-check";
+      title = `Verification method ${diff.method_id} updated`;
+      value = `${diff.prev_method_key} → ${diff.next_method_key}`;
+    } else if (diff.type === "verification_method_removed") {
+      icon = "i-lucide-shield-check";
+      title = `Verification method ${diff.method_id} removed`;
+      value = `${diff.method_key}`;
+    }
+
+    return (
+      <div class="grid grid-cols-[min-content_1fr] items-center">
+        <div class={icon + ` mr-1 shrink-0 text-lg`} />
+        <p
+          classList={{
+            "font-semibold": true,
+            "text-gray-500 line-through dark:text-gray-400": diff.orig.nullified,
+          }}
+        >
+          {title}
+        </p>
+        <div></div>
+        {value}
+      </div>
+    );
+  };
 
   const fetchRepo = async () => {
     pds = await resolvePDS(did);
@@ -228,87 +310,130 @@ const RepoView = () => {
         <Show when={tab() === "doc"}>
           <Show when={didDoc()}>
             {(didDocument) => (
-              <div class="break-anywhere flex flex-col gap-y-1">
-                <div class="flex items-center justify-between gap-2">
-                  <div>
-                    <span class="font-semibold text-stone-600 dark:text-stone-400">ID </span>
-                    <span>{didDocument().id}</span>
+              <div class="break-anywhere flex flex-col gap-y-2">
+                <div class="flex flex-col gap-y-1">
+                  <div class="flex items-center justify-between gap-2">
+                    <div>
+                      <span class="font-semibold text-stone-600 dark:text-stone-400">ID </span>
+                      <span>{didDocument().id}</span>
+                    </div>
+                    <Tooltip text="DID Document">
+                      <a
+                        href={
+                          did.startsWith("did:plc") ?
+                            `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
+                          : `https://${did.split("did:web:")[1]}/.well-known/did.json`
+                        }
+                        target="_blank"
+                      >
+                        <div class="i-lucide-external-link text-lg" />
+                      </a>
+                    </Tooltip>
                   </div>
-                  <Tooltip text="DID Document">
-                    <a
-                      href={
-                        did.startsWith("did:plc") ?
-                          `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
-                        : `https://${did.split("did:web:")[1]}/.well-known/did.json`
-                      }
-                      target="_blank"
+                  <div>
+                    <p class="font-semibold text-stone-600 dark:text-stone-400">Identities</p>
+                    <ul class="ml-2">
+                      <For each={didDocument().alsoKnownAs}>{(alias) => <li>{alias}</li>}</For>
+                    </ul>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-stone-600 dark:text-stone-400">Services</p>
+                    <ul class="ml-2">
+                      <For each={didDocument().service}>
+                        {(service) => (
+                          <li class="flex flex-col">
+                            <span>#{service.id.split("#")[1]}</span>
+                            <a
+                              class="w-fit text-blue-400 hover:underline"
+                              href={service.serviceEndpoint.toString()}
+                              target="_blank"
+                            >
+                              {service.serviceEndpoint.toString()}
+                            </a>
+                          </li>
+                        )}
+                      </For>
+                    </ul>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-stone-600 dark:text-stone-400">
+                      Verification methods
+                    </p>
+                    <ul class="ml-2">
+                      <For each={didDocument().verificationMethod}>
+                        {(verif) => (
+                          <li class="flex flex-col">
+                            <span>#{verif.id.split("#")[1]}</span>
+                            <span>{verif.publicKeyMultibase}</span>
+                          </li>
+                        )}
+                      </For>
+                    </ul>
+                  </div>
+                </div>
+                <div class="flex justify-between">
+                  <Show when={did.startsWith("did:plc")}>
+                    <div class="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onclick={async () => {
+                          if (!plcOps()) {
+                            setLoading(true);
+                            const response = await fetch(`https://plc.directory/${did}/log/audit`);
+                            const json = await response.json();
+                            const logs = defs.indexedEntryLog.parse(json);
+                            const opHistory = createOperationHistory(logs).reverse();
+                            setPlcOps(Array.from(groupBy(opHistory, (item) => item.orig)));
+                            setLoading(false);
+                          }
+
+                          setShowPlcLogs(!showPlcLogs());
+                        }}
+                        class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 dark:shadow-dark-900 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50 focus:outline-slate-900 dark:focus:outline-slate-100"
+                      >
+                        <div class="i-lucide-logs text-sm" />
+                        {showPlcLogs() ? "Hide" : "Show"} PLC logs
+                      </button>
+                      <Show when={loading()}>
+                        <div class="i-lucide-loader-circle animate-spin text-xl" />
+                      </Show>
+                    </div>
+                  </Show>
+                  <Show when={error()?.length === 0 || error() === undefined}>
+                    <div
+                      classList={{
+                        "flex items-center gap-1": true,
+                        "flex-row-reverse": did.startsWith("did:web"),
+                      }}
                     >
-                      <div class="i-lucide-external-link text-lg" />
-                    </a>
-                  </Tooltip>
+                      <Show when={downloading()}>
+                        <div class="i-lucide-loader-circle animate-spin text-xl" />
+                      </Show>
+                      <button
+                        type="button"
+                        onclick={() => downloadRepo()}
+                        class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 dark:shadow-dark-900 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50 focus:outline-slate-900 dark:focus:outline-slate-100"
+                      >
+                        <div class="i-lucide-download text-sm" />
+                        Export Repo
+                      </button>
+                    </div>
+                  </Show>
                 </div>
-                <div>
-                  <p class="font-semibold text-stone-600 dark:text-stone-400">Identities</p>
-                  <ul class="ml-2">
-                    <For each={didDocument().alsoKnownAs}>{(alias) => <li>{alias}</li>}</For>
-                  </ul>
-                </div>
-                <div>
-                  <p class="font-semibold text-stone-600 dark:text-stone-400">Services</p>
-                  <ul class="ml-2">
-                    <For each={didDocument().service}>
-                      {(service) => (
-                        <li class="flex flex-col">
-                          <span>#{service.id.split("#")[1]}</span>
-                          <a
-                            class="w-fit text-blue-400 hover:underline"
-                            href={service.serviceEndpoint.toString()}
-                            target="_blank"
-                          >
-                            {service.serviceEndpoint.toString()}
-                          </a>
-                        </li>
+                <Show when={showPlcLogs()}>
+                  <div class="flex flex-col gap-1 text-sm">
+                    <For each={plcOps()}>
+                      {([entry, diffs]) => (
+                        <div class="flex flex-col">
+                          <span class="text-neutral-500 dark:text-neutral-400">
+                            {localDateFromTimestamp(new Date(entry.createdAt).getTime())}
+                          </span>
+                          {diffs.map((diff) => (
+                            <DiffItem diff={diff} />
+                          ))}
+                        </div>
                       )}
                     </For>
-                  </ul>
-                </div>
-                <div>
-                  <p class="font-semibold text-stone-600 dark:text-stone-400">
-                    Verification methods
-                  </p>
-                  <ul class="ml-2">
-                    <For each={didDocument().verificationMethod}>
-                      {(verif) => (
-                        <li class="flex flex-col">
-                          <span>#{verif.id.split("#")[1]}</span>
-                          <span>{verif.publicKeyMultibase}</span>
-                        </li>
-                      )}
-                    </For>
-                  </ul>
-                </div>
-                <Show when={did.startsWith("did:plc")}>
-                  <a
-                    class="flex w-fit items-center text-blue-400 hover:underline"
-                    href={`https://boat.kelinci.net/plc-oplogs?q=${did}`}
-                    target="_blank"
-                  >
-                    PLC operation logs <div class="i-lucide-external-link ml-0.5 text-sm" />
-                  </a>
-                </Show>
-                <Show when={error()?.length === 0 || error() === undefined}>
-                  <div class="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onclick={() => downloadRepo()}
-                      class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 dark:shadow-dark-900 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50 focus:outline-slate-900 dark:focus:outline-slate-100"
-                    >
-                      <div class="i-lucide-download text-sm" />
-                      Export Repo
-                    </button>
-                    <Show when={downloading()}>
-                      <div class="i-lucide-loader-circle animate-spin text-xl" />
-                    </Show>
                   </div>
                 </Show>
               </div>
