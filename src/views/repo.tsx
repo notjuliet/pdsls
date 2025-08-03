@@ -372,33 +372,40 @@ const RepoView = () => {
                   </div>
                 </div>
                 <div class="flex justify-between">
-                  <div class="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onclick={async () => {
-                        if (!plcOps()) {
-                          setLoading(true);
-                          const response = await fetch(`https://plc.directory/${did}/log/audit`);
-                          const json = await response.json();
-                          const logs = defs.indexedEntryLog.parse(json);
-                          const opHistory = createOperationHistory(logs).reverse();
-                          setPlcOps(Array.from(groupBy(opHistory, (item) => item.orig)));
-                          setLoading(false);
-                        }
-
-                        setShowPlcLogs(!showPlcLogs());
-                      }}
-                      class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 dark:shadow-dark-900 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50 focus:outline-slate-900 dark:focus:outline-slate-100"
-                    >
-                      <div class="i-lucide-logs text-sm" />
-                      {showPlcLogs() ? "Hide" : "Show"} PLC logs
-                    </button>
-                    <Show when={loading()}>
-                      <div class="i-lucide-loader-circle animate-spin text-xl" />
-                    </Show>
-                  </div>
-                  <Show when={error()?.length === 0 || error() === undefined}>
+                  <Show when={did.startsWith("did:plc")}>
                     <div class="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onclick={async () => {
+                          if (!plcOps()) {
+                            setLoading(true);
+                            const response = await fetch(`https://plc.directory/${did}/log/audit`);
+                            const json = await response.json();
+                            const logs = defs.indexedEntryLog.parse(json);
+                            const opHistory = createOperationHistory(logs).reverse();
+                            setPlcOps(Array.from(groupBy(opHistory, (item) => item.orig)));
+                            setLoading(false);
+                          }
+
+                          setShowPlcLogs(!showPlcLogs());
+                        }}
+                        class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 dark:shadow-dark-900 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50 focus:outline-slate-900 dark:focus:outline-slate-100"
+                      >
+                        <div class="i-lucide-logs text-sm" />
+                        {showPlcLogs() ? "Hide" : "Show"} PLC logs
+                      </button>
+                      <Show when={loading()}>
+                        <div class="i-lucide-loader-circle animate-spin text-xl" />
+                      </Show>
+                    </div>
+                  </Show>
+                  <Show when={error()?.length === 0 || error() === undefined}>
+                    <div
+                      classList={{
+                        "flex items-center gap-1": true,
+                        "flex-row-reverse": did.startsWith("did:web"),
+                      }}
+                    >
                       <Show when={downloading()}>
                         <div class="i-lucide-loader-circle animate-spin text-xl" />
                       </Show>
@@ -413,7 +420,7 @@ const RepoView = () => {
                     </div>
                   </Show>
                 </div>
-                <Show when={did.startsWith("did:plc") && showPlcLogs()}>
+                <Show when={showPlcLogs()}>
                   <div class="flex flex-col gap-1 text-sm">
                     <For each={plcOps()}>
                       {([entry, diffs]) => (
