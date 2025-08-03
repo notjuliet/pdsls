@@ -389,7 +389,7 @@ const RepoView = () => {
 
                           setShowPlcLogs(!showPlcLogs());
                         }}
-                        class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 dark:shadow-dark-900 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50 focus:outline-slate-900 dark:focus:outline-slate-100"
+                        class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
                       >
                         <div class="i-lucide-logs text-sm" />
                         {showPlcLogs() ? "Hide" : "Show"} PLC logs
@@ -412,7 +412,7 @@ const RepoView = () => {
                       <button
                         type="button"
                         onclick={() => downloadRepo()}
-                        class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 dark:shadow-dark-900 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50 focus:outline-slate-900 dark:focus:outline-slate-100"
+                        class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
                       >
                         <div class="i-lucide-download text-sm" />
                         Export Repo

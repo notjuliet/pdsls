@@ -217,7 +217,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
               </div>
               <div class="flex items-center gap-2">
                 <Show when={!uploading()}>
-                  <div class="dark:hover:bg-dark-100 dark:bg-dark-300 focus-within:outline-1.5 dark:shadow-dark-900 dark:within-focus:outline-slate-100 flex rounded-lg bg-white text-xs font-bold shadow-sm focus-within:outline-slate-900 hover:bg-zinc-100">
+                  <div class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900 flex rounded-lg bg-white text-xs font-bold shadow-sm hover:bg-zinc-100">
                     <input type="file" id="blob" hidden onChange={() => uploadBlob()} />
                     <label class="flex items-center gap-1 px-2 py-1.5" for="blob">
                       <div class="i-lucide-upload text-sm" />
@@ -267,7 +267,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                       createRecord(new FormData(formRef))
                     : editRecord(new FormData(formRef))
                   }
-                  class="dark:hover:bg-dark-100 dark:bg-dark-300 focus:outline-1.5 dark:shadow-dark-900 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-100 focus:outline-slate-900 sm:text-sm dark:focus:outline-slate-100"
+                  class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-100 sm:text-sm"
                 >
                   {props.create ? "Create" : "Edit"}
                 </button>
