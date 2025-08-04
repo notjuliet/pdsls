@@ -431,17 +431,17 @@ const RepoView = () => {
                               `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}/log/audit`,
                             );
                             const json = await response.json();
-                            const logs = defs.indexedEntryLog.parse(json);
                             try {
+                              const logs = defs.indexedEntryLog.parse(json);
                               await processIndexedEntryLog(did as any, logs);
+                              const opHistory = createOperationHistory(logs).reverse();
+                              setPlcOps(Array.from(groupBy(opHistory, (item) => item.orig)));
+                              setLoading(false);
                             } catch (e: any) {
                               setNotice(e);
                               console.error(e);
                               setLoading(false);
                             }
-                            const opHistory = createOperationHistory(logs).reverse();
-                            setPlcOps(Array.from(groupBy(opHistory, (item) => item.orig)));
-                            setLoading(false);
                           }
 
                           setShowPlcLogs(!showPlcLogs());
