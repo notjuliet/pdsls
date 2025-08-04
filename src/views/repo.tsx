@@ -111,8 +111,8 @@ const RepoView = () => {
     }
 
     return (
-      <div class="grid grid-cols-[min-content_1fr] items-center">
-        <div class={icon + ` mr-1 shrink-0 text-lg`} />
+      <div class="grid grid-cols-[min-content_1fr] items-center gap-x-1">
+        <div class={icon + ` shrink-0 text-lg`} />
         <p
           classList={{
             "font-semibold": true,
@@ -254,7 +254,7 @@ const RepoView = () => {
             onInput={(e) => setFilter(e.currentTarget.value)}
           />
           <div class="flex flex-col font-mono">
-            <div class="grid grid-cols-[min-content_1fr] items-center gap-x-1 overflow-hidden text-sm">
+            <div class="grid grid-cols-[min-content_1fr] items-center gap-x-2 overflow-hidden text-sm">
               <For
                 each={Object.keys(nsids() ?? {}).filter((authority) =>
                   filter() ?
@@ -264,16 +264,14 @@ const RepoView = () => {
               >
                 {(authority) => (
                   <>
-                    <Show when={nsids()?.[authority].hidden}>
-                      <button onclick={() => toggleCollection(authority)}>
-                        <div class="i-lucide-chevron-right mr-1 text-lg" />
-                      </button>
-                    </Show>
-                    <Show when={!nsids()?.[authority].hidden}>
-                      <button onclick={() => toggleCollection(authority)}>
-                        <div class="i-lucide-chevron-down mr-1 text-lg" />
-                      </button>
-                    </Show>
+                    <button onclick={() => toggleCollection(authority)}>
+                      <div
+                        classList={{
+                          "i-lucide-chevron-down text-lg transition-transform": true,
+                          "-rotate-90": nsids()?.[authority].hidden,
+                        }}
+                      />
+                    </button>
                     <button
                       class="break-anywhere bg-transparent text-left"
                       onclick={() => toggleCollection(authority)}
