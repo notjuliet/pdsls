@@ -62,7 +62,7 @@ const Settings = () => {
           <div class="flex w-full gap-2">
             <button
               classList={{
-                "basis-1/3 py-1 rounded-lg": true,
+                "basis-1/3 py-1 rounded-lg justify-center flex items-center gap-1": true,
                 "bg-transparent hover:bg-neutral-100 dark:hover:bg-dark-200": !theme().system,
                 "bg-white dark:bg-neutral-600 font-semibold": theme().system,
               }}
@@ -74,28 +74,31 @@ const Settings = () => {
                 })
               }
             >
+              <div class="i-lucide-monitor" />
               System
             </button>
             <button
               classList={{
-                "basis-1/3 py-1 rounded-lg": true,
+                "basis-1/3 py-1 rounded-lg justify-center flex items-center gap-1": true,
                 "bg-transparent hover:bg-neutral-100 dark:hover:bg-dark-200":
                   theme().color !== "light" || theme().system,
                 "bg-white font-semibold": theme().color === "light" && !theme().system,
               }}
               onclick={() => updateTheme({ color: "light", system: false })}
             >
+              <div class="i-lucide-sun" />
               Light
             </button>
             <button
               classList={{
-                "basis-1/3 py-1 rounded-lg": true,
+                "basis-1/3 py-1 justify-center rounded-lg flex items-center gap-1": true,
                 "bg-transparent hover:bg-neutral-100 dark:hover:bg-dark-200":
                   theme().color !== "dark" || theme().system,
                 "bg-neutral-600 font-semibold": theme().color === "dark" && !theme().system,
               }}
               onclick={() => updateTheme({ color: "dark", system: false })}
             >
+              <div class="i-lucide-moon" />
               Dark
             </button>
           </div>
