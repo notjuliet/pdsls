@@ -110,7 +110,7 @@ const PlcLogView = (props: {
         <Tooltip text="Filter operations">
           <div class="i-lucide-filter text-xl" />
         </Tooltip>
-        <div class="dark:shadow-dark-900 flex w-fit items-center rounded-full bg-neutral-200 shadow-md dark:bg-neutral-700">
+        <div class="dark:shadow-dark-900/80 flex w-fit items-center rounded-full bg-neutral-200 shadow-md dark:bg-neutral-700">
           <FilterButton icon="i-lucide-at-sign" event="handle" />
           <FilterButton icon="i-lucide-key-round" event="rotation_key" />
           <FilterButton icon="i-lucide-server" event="service" />
@@ -162,7 +162,7 @@ const RepoView = () => {
     <button
       classList={{
         "rounded-lg flex flex-1 py-1 justify-center": true,
-        "bg-zinc-200/70 dark:bg-dark-200 shadow-sm dark:shadow-dark-900": tab() === props.tab,
+        "bg-zinc-200/70 dark:bg-dark-200 shadow-sm dark:shadow-dark-900/80": tab() === props.tab,
         "bg-transparent hover:bg-zinc-200/50 dark:hover:bg-dark-300": tab() !== props.tab,
       }}
       onclick={() => setTab(props.tab)}
@@ -433,7 +433,7 @@ const RepoView = () => {
 
                           setShowPlcLogs(!showPlcLogs());
                         }}
-                        class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
+                        class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
                       >
                         <div class="i-lucide-logs text-sm" />
                         {showPlcLogs() ? "Hide" : "Show"} PLC logs
@@ -456,7 +456,7 @@ const RepoView = () => {
                       <button
                         type="button"
                         onclick={() => downloadRepo()}
-                        class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
+                        class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
                       >
                         <div class="i-lucide-download text-sm" />
                         Export Repo

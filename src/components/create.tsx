@@ -172,7 +172,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
   return (
     <>
       <Modal open={openDialog()} onClose={() => setOpenDialog(false)}>
-        <div class="w-21rem sm:w-xl lg:w-50rem starting:opacity-0 dark:bg-dark-800/70 left-50% backdrop-blur-xs border-0.5 dark:shadow-dark-900 absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-2 text-slate-900 shadow-md transition-opacity duration-300 sm:p-4 dark:border-neutral-700 dark:text-slate-100">
+        <div class="w-21rem sm:w-xl lg:w-50rem starting:opacity-0 dark:bg-dark-800/70 left-50% backdrop-blur-xs border-0.5 dark:shadow-dark-900/80 absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-2 text-slate-900 shadow-md transition-opacity duration-300 sm:p-4 dark:border-neutral-700 dark:text-slate-100">
           <div class="mb-2 flex w-full justify-between">
             <h3 class="font-bold">{props.create ? "Creating" : "Editing"} record</h3>
             <div
@@ -208,7 +208,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                 <select
                   name="validate"
                   id="validate"
-                  class="dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900 rounded-lg bg-white px-1 py-1 shadow-sm focus:outline-slate-900 dark:focus:outline-slate-100"
+                  class="dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900/80 rounded-lg bg-white px-1 py-1 shadow-sm focus:outline-slate-900 dark:focus:outline-slate-100"
                 >
                   <option value="unset">Unset</option>
                   <option value="true">True</option>
@@ -217,7 +217,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
               </div>
               <div class="flex items-center gap-2">
                 <Show when={!uploading()}>
-                  <div class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900 flex rounded-lg bg-white text-xs font-bold shadow-sm hover:bg-zinc-100">
+                  <div class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex rounded-lg bg-white text-xs font-bold shadow-sm hover:bg-zinc-100">
                     <input type="file" id="blob" hidden onChange={() => uploadBlob()} />
                     <label class="flex items-center gap-1 px-2 py-1.5" for="blob">
                       <div class="i-lucide-upload text-sm" />
@@ -267,7 +267,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                       createRecord(new FormData(formRef))
                     : editRecord(new FormData(formRef))
                   }
-                  class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-100 sm:text-sm"
+                  class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-100 sm:text-sm"
                 >
                   {props.create ? "Create" : "Edit"}
                 </button>

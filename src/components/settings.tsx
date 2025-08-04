@@ -56,7 +56,7 @@ const Settings = () => {
   return (
     <>
       <Modal open={openSettings()} onClose={() => setOpenSettings(false)}>
-        <div class="starting:opacity-0 w-21rem dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-slate-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-slate-100">
+        <div class="starting:opacity-0 w-21rem dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900/80 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-slate-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-slate-100">
           <h3 class="border-b-0.5 mb-2 border-neutral-500 pb-2 font-bold">Settings</h3>
           <h4 class="mb-1 font-semibold">Theme</h4>
           <div class="flex w-full gap-2">

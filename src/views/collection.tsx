@@ -50,7 +50,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
       <Show when={hover()}>
         <span
           ref={previewRef}
-          class={`dark:bg-dark-500/70 left-50% max-h-md z-25 backdrop-blur-xs border-0.5 dark:shadow-dark-900 pointer-events-none absolute block w-max max-w-sm -translate-x-1/2 overflow-hidden whitespace-pre-wrap rounded-md border-neutral-300 bg-zinc-100/70 p-2 text-xs shadow-md lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
+          class={`dark:bg-dark-500/70 left-50% max-h-md z-25 backdrop-blur-xs border-0.5 dark:shadow-dark-900/80 pointer-events-none absolute block w-max max-w-sm -translate-x-1/2 overflow-hidden whitespace-pre-wrap rounded-md border-neutral-300 bg-zinc-100/70 p-2 text-xs shadow-md lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
         >
           <JSONValue
             data={props.record.record.value as JSONType}
@@ -236,7 +236,7 @@ const CollectionView = () => {
                 <button
                   type="button"
                   onclick={() => refetch()}
-                  class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
+                  class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
                 >
                   Load More
                 </button>
