@@ -1,11 +1,9 @@
 import { resolveHandle } from "../utils/api.js";
 import { A, useNavigate } from "@solidjs/router";
 import Tooltip from "./tooltip.jsx";
-import { createSignal, onCleanup, onMount, Show } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import { agent, loginState } from "../components/login.jsx";
 import { Handle } from "@atcute/lexicons";
-
-const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 1;
 
 const Search = () => {
   const navigate = useNavigate();
@@ -45,20 +43,6 @@ const Search = () => {
     navigate(`/at://${did}${uriParts.length > 1 ? `/${uriParts.slice(1).join("/")}` : ""}`);
   };
 
-  onMount(() => window.addEventListener("keydown", keyEvent));
-  onCleanup(() => window.removeEventListener("keydown", keyEvent));
-
-  const keyEvent = (event: KeyboardEvent) => {
-    if (event.key == "/" && document.activeElement !== searchInput) {
-      event.preventDefault();
-      searchInput.focus();
-    }
-    if (event.key == "Escape" && document.activeElement === searchInput) {
-      event.preventDefault();
-      searchInput.blur();
-    }
-  };
-
   return (
     <form
       class="flex w-full max-w-[21rem] flex-col sm:max-w-[24rem]"
@@ -77,7 +61,6 @@ const Search = () => {
             spellcheck={false}
             ref={searchInput}
             id="input"
-            placeholder={isTouchDevice ? "" : "Type / to search"}
             class="grow focus:outline-none"
           />
           <Show when={loading()}>
