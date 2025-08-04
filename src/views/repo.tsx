@@ -16,7 +16,12 @@ import { DidDocument } from "@atcute/identity";
 import { BlobView } from "./blob.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
-import { CompatibleOperationOrTombstone, defs, IndexedEntry } from "@atcute/did-plc";
+import {
+  CompatibleOperationOrTombstone,
+  defs,
+  IndexedEntry,
+  processIndexedEntryLog,
+} from "@atcute/did-plc";
 import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 
@@ -154,6 +159,7 @@ const RepoView = () => {
     createSignal<[IndexedEntry<CompatibleOperationOrTombstone>, DiffEntry[]][]>();
   const [showPlcLogs, setShowPlcLogs] = createSignal(false);
   const [loading, setLoading] = createSignal(false);
+  const [notice, setNotice] = createSignal<string>();
   let rpc: Client;
   let pds: string;
   const did = params.repo;
@@ -426,6 +432,13 @@ const RepoView = () => {
                             );
                             const json = await response.json();
                             const logs = defs.indexedEntryLog.parse(json);
+                            try {
+                              await processIndexedEntryLog(did as any, logs);
+                            } catch (e: any) {
+                              setNotice(e);
+                              console.error(e);
+                              setLoading(false);
+                            }
                             const opHistory = createOperationHistory(logs).reverse();
                             setPlcOps(Array.from(groupBy(opHistory, (item) => item.orig)));
                             setLoading(false);
@@ -465,6 +478,9 @@ const RepoView = () => {
                   </Show>
                 </div>
                 <Show when={showPlcLogs()}>
+                  <Show when={notice()}>
+                    <div>{notice()}</div>
+                  </Show>
                   <PlcLogView plcOps={plcOps() ?? []} />
                 </Show>
               </div>
