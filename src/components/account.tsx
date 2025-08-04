@@ -7,17 +7,14 @@ import { resolveDidDoc } from "../utils/api.js";
 import { createStore } from "solid-js/store";
 import { Client, CredentialManager } from "@atcute/client";
 import { Modal } from "./modal.jsx";
-import { useNavigate } from "@solidjs/router";
 
 const AccountManager = () => {
-  const navigate = useNavigate();
   const [openManager, setOpenManager] = createSignal(false);
   const [sessions, setSessions] = createStore<Record<string, string | undefined>>();
   const [avatar, setAvatar] = createSignal<string>();
 
   onMount(async () => {
     await retrieveSession();
-    if (loginState() && location.pathname === "/") navigate(`/at://${agent.sub}`);
 
     const storedSessions = localStorage.getItem("atcute-oauth:sessions");
     if (storedSessions) {
