@@ -29,6 +29,7 @@ type Tab = "collections" | "backlinks" | "doc" | "blobs";
 type PlcEvent = "handle" | "rotation_key" | "service" | "verification_method";
 
 const PlcLogView = (props: {
+  did: string;
   plcOps: [IndexedEntry<CompatibleOperationOrTombstone>, DiffEntry[]][];
 }) => {
   const [activePlcEvent, setActivePlcEvent] = createSignal<PlcEvent | undefined>();
@@ -111,16 +112,26 @@ const PlcLogView = (props: {
 
   return (
     <>
-      <div class="flex items-center gap-1">
-        <Tooltip text="Filter operations">
-          <div class="i-lucide-filter text-xl" />
-        </Tooltip>
-        <div class="dark:shadow-dark-900/80 flex w-fit items-center rounded-full bg-neutral-200 shadow-md dark:bg-neutral-700">
-          <FilterButton icon="i-lucide-at-sign" event="handle" />
-          <FilterButton icon="i-lucide-key-round" event="rotation_key" />
-          <FilterButton icon="i-lucide-server" event="service" />
-          <FilterButton icon="i-lucide-shield-check" event="verification_method" />
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1">
+          <Tooltip text="Filter operations">
+            <div class="i-lucide-filter text-xl" />
+          </Tooltip>
+          <div class="dark:shadow-dark-900/80 flex w-fit items-center rounded-full bg-neutral-200 shadow-md dark:bg-neutral-700">
+            <FilterButton icon="i-lucide-at-sign" event="handle" />
+            <FilterButton icon="i-lucide-key-round" event="rotation_key" />
+            <FilterButton icon="i-lucide-server" event="service" />
+            <FilterButton icon="i-lucide-shield-check" event="verification_method" />
+          </div>
         </div>
+        <Tooltip text="Audit log">
+          <a
+            href={`${localStorage.plcDirectory ?? "https://plc.directory"}/${props.did}/log/audit`}
+            target="_blank"
+          >
+            <div class="i-lucide-external-link text-lg" />
+          </a>
+        </Tooltip>
       </div>
       <div class="flex flex-col gap-1 text-sm">
         <For each={props.plcOps}>
@@ -481,7 +492,7 @@ const RepoView = () => {
                   <Show when={notice()}>
                     <div>{notice()}</div>
                   </Show>
-                  <PlcLogView plcOps={plcOps() ?? []} />
+                  <PlcLogView plcOps={plcOps() ?? []} did={did} />
                 </Show>
               </div>
             )}
