@@ -128,7 +128,10 @@ const CollectionView = () => {
         },
       });
     }
-    window.location.reload();
+    setBatchDelete(false);
+    setRecords([]);
+    setCursor(undefined);
+    refetch();
   };
 
   const handleSelectionClick = (e: MouseEvent, index: number) => {
