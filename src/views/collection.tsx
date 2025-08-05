@@ -208,19 +208,19 @@ const CollectionView = () => {
           />
         </div>
         <div class="flex items-center gap-x-2">
-          <label class="flex select-none items-center gap-x-1">
-            <input
-              type="checkbox"
-              checked={reverse()}
-              onchange={async (e) => {
-                setReverse(e.currentTarget.checked);
-                setRecords([]);
-                setCursor(undefined);
-                await fetchRecords();
-              }}
-            />
+          <button
+            type="button"
+            onclick={async () => {
+              setReverse(!reverse());
+              setRecords([]);
+              setCursor(undefined);
+              await fetchRecords();
+            }}
+            class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
+          >
+            <div class={`${reverse() ? "i-lucide-rotate-ccw" : "i-lucide-rotate-cw"} text-sm`} />
             Reverse
-          </label>
+          </button>
           <div>
             <Show when={batchDelete()}>
               <span>{records.filter((rec) => rec.toDelete).length}</span>
@@ -231,7 +231,7 @@ const CollectionView = () => {
             </span>
           </div>
           <Show when={cursor()}>
-            <div class="flex h-[2rem] w-[5.5rem] items-center justify-center text-nowrap">
+            <div class="flex w-[5rem] items-center justify-center">
               <Show when={!response.loading}>
                 <button
                   type="button"
