@@ -208,19 +208,21 @@ const CollectionView = () => {
           />
         </div>
         <div class="flex items-center gap-x-2">
-          <button
-            type="button"
-            onclick={async () => {
-              setReverse(!reverse());
-              setRecords([]);
-              setCursor(undefined);
-              await fetchRecords();
-            }}
-            class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
-          >
-            <div class={`${reverse() ? "i-lucide-rotate-ccw" : "i-lucide-rotate-cw"} text-sm`} />
-            Reverse
-          </button>
+          <Show when={records.length > 1}>
+            <button
+              type="button"
+              onclick={async () => {
+                setReverse(!reverse());
+                setRecords([]);
+                setCursor(undefined);
+                await fetchRecords();
+              }}
+              class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
+            >
+              <div class={`${reverse() ? "i-lucide-rotate-ccw" : "i-lucide-rotate-cw"} text-sm`} />
+              Reverse
+            </button>
+          </Show>
           <div>
             <Show when={batchDelete()}>
               <span>{records.filter((rec) => rec.toDelete).length}</span>
