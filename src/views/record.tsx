@@ -5,7 +5,7 @@ import { createSignal, onMount, Show } from "solid-js";
 
 import { Backlinks } from "../components/backlinks.jsx";
 import { JSONValue } from "../components/json.jsx";
-import { agent, loginState } from "../components/login.jsx";
+import { agent } from "../components/login.jsx";
 import { setCID, setValidRecord, setValidSchema, validRecord } from "../components/navbar.jsx";
 
 import { didDocCache, getAllBacklinks, LinkData, resolvePDS } from "../utils/api.js";
@@ -102,7 +102,7 @@ export const RecordView = () => {
     });
 
   const deleteRecord = async () => {
-    rpc = new Client({ handler: agent });
+    rpc = new Client({ handler: agent()! });
     await rpc.post("com.atproto.repo.deleteRecord", {
       input: {
         repo: params.repo as ActorIdentifier,
@@ -142,7 +142,7 @@ export const RecordView = () => {
               <div class="i-lucide-copy text-xl" />
             </button>
           </Tooltip>
-          <Show when={loginState() && agent.sub === record()?.uri.split("/")[2]}>
+          <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
             <RecordEditor create={false} record={record()?.value} />
             <div class="relative flex">
               <Tooltip text="Delete">

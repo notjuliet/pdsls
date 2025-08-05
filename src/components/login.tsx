@@ -21,8 +21,7 @@ configureOAuth({
   },
 });
 
-export const [loginState, setLoginState] = createSignal(false);
-let agent: OAuthUserAgent;
+export const [agent, setAgent] = createSignal<OAuthUserAgent | undefined>();
 
 const Login = () => {
   const [notice, setNotice] = createSignal("");
@@ -106,10 +105,7 @@ const retrieveSession = async () => {
 
   const session = await init().catch(() => {});
 
-  if (session) {
-    agent = new OAuthUserAgent(session);
-    setLoginState(true);
-  }
+  if (session) setAgent(new OAuthUserAgent(session));
 };
 
-export { Login, retrieveSession, agent };
+export { Login, retrieveSession };

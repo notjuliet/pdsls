@@ -2,7 +2,7 @@ import { resolveHandle } from "../utils/api.js";
 import { A, useNavigate } from "@solidjs/router";
 import Tooltip from "./tooltip.jsx";
 import { createSignal, Show } from "solid-js";
-import { agent, loginState } from "../components/login.jsx";
+import { agent } from "../components/login.jsx";
 import { Handle } from "@atcute/lexicons";
 
 const Search = () => {
@@ -72,11 +72,11 @@ const Search = () => {
             </button>
           </Show>
         </div>
-        <Show when={loginState()}>
+        <Show when={agent()}>
           <Tooltip
             text="Repository"
             children={
-              <A href={`/at://${agent.sub}`} class="flex">
+              <A href={`/at://${agent()?.sub}`} class="flex">
                 <div class="i-lucide-house text-xl" />
               </A>
             }

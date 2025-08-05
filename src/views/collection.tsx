@@ -4,7 +4,7 @@ import { A, useParams } from "@solidjs/router";
 import { resolvePDS } from "../utils/api.js";
 import * as TID from "@atcute/tid";
 import { JSONType, JSONValue } from "../components/json.jsx";
-import { agent, loginState } from "../components/login.jsx";
+import { agent } from "../components/login.jsx";
 import { createStore } from "solid-js/store";
 import Tooltip from "../components/tooltip.jsx";
 import { localDateFromTimestamp } from "../utils/date.js";
@@ -119,11 +119,11 @@ const CollectionView = () => {
       });
 
     const BATCHSIZE = 200;
-    rpc = new Client({ handler: agent });
+    rpc = new Client({ handler: agent()! });
     for (let i = 0; i < writes.length; i += BATCHSIZE) {
       await rpc.post("com.atproto.repo.applyWrites", {
         input: {
-          repo: agent.sub,
+          repo: agent()!.sub,
           writes: writes.slice(i, i + BATCHSIZE),
         },
       });
@@ -159,7 +159,7 @@ const CollectionView = () => {
     <Show when={records.length || response()}>
       <div class="z-5 dark:bg-dark-500/70 backdrop-blur-xs sticky top-0 flex w-screen flex-col items-center justify-center gap-2 bg-zinc-100/70 py-3">
         <div class="w-21rem sm:w-24rem flex items-center gap-2">
-          <Show when={loginState() && agent.sub === did}>
+          <Show when={agent() && agent()?.sub === did}>
             <div class="flex items-center gap-x-2">
               <Tooltip
                 text={batchDelete() ? "Cancel" : "Delete"}

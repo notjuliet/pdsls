@@ -1,7 +1,7 @@
 import { createSignal, onMount, For, Show } from "solid-js";
 import Tooltip from "./tooltip.jsx";
 import { deleteStoredSession, getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
-import { agent, Login, loginState, retrieveSession, setLoginState } from "./login.jsx";
+import { agent, Login, retrieveSession, setAgent } from "./login.jsx";
 import { Did } from "@atcute/lexicons";
 import { resolveDidDoc } from "../utils/api.js";
 import { createStore } from "solid-js/store";
@@ -35,13 +35,14 @@ const AccountManager = () => {
     if (repo) setAvatar(await getAvatar(repo as Did));
   });
 
-  const resumeSession = (did: Did) => {
+  const resumeSession = async (did: Did) => {
     localStorage.setItem("lastSignedIn", did);
-    window.location.href = "/";
+    retrieveSession();
+    setAvatar(await getAvatar(did));
   };
 
   const removeSession = async (did: Did) => {
-    const currentSession = agent?.sub;
+    const currentSession = agent()?.sub;
     try {
       const session = await getSession(did, { allowStale: true });
       const agent = new OAuthUserAgent(session);
@@ -50,7 +51,7 @@ const AccountManager = () => {
       deleteStoredSession(did);
     }
     setSessions(did, undefined);
-    if (currentSession === did) setLoginState(false);
+    if (currentSession === did) setAgent(undefined);
   };
 
   const getAvatar = async (did: Did) => {
@@ -78,7 +79,7 @@ const AccountManager = () => {
                     onclick={() => resumeSession(did as Did)}
                   >
                     <span class="truncate">{sessions[did]?.length ? sessions[did] : did}</span>
-                    <Show when={did === agent?.sub}>
+                    <Show when={did === agent()?.sub}>
                       <div class="i-lucide-check shrink-0" />
                     </Show>
                   </button>
@@ -94,7 +95,7 @@ const AccountManager = () => {
       </Modal>
       <button onclick={() => setOpenManager(true)}>
         <Tooltip text="Accounts">
-          {loginState() && avatar() ?
+          {agent() && avatar() ?
             <img src={avatar()} class="dark:shadow-dark-900/80 size-5 rounded-full shadow-sm" />
           : <div class="i-lucide-circle-user-round text-xl" />}
         </Tooltip>

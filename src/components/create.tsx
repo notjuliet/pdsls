@@ -37,7 +37,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
   };
 
   const createRecord = async (formData: FormData) => {
-    const rpc = new Client({ handler: agent });
+    const rpc = new Client({ handler: agent()! });
     const collection = formData.get("collection");
     const rkey = formData.get("rkey");
     const validate = formData.get("validate")?.toString();
@@ -50,7 +50,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
     }
     const res = await rpc.post("com.atproto.repo.createRecord", {
       input: {
-        repo: agent.sub,
+        repo: agent()!.sub,
         collection: collection ? collection.toString() : record.$type,
         rkey: rkey?.toString().length ? rkey?.toString() : undefined,
         record: record,
@@ -75,13 +75,13 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
       : formData.get("validate")?.toString() === "false" ? false
       : undefined;
     if (!record) return;
-    const rpc = new Client({ handler: agent });
+    const rpc = new Client({ handler: agent()! });
     try {
       const editedRecord = JSON.parse(record.toString());
       if (formData.get("recreate")) {
         const res = await rpc.post("com.atproto.repo.applyWrites", {
           input: {
-            repo: agent.sub,
+            repo: agent()!.sub,
             validate: validate,
             writes: [
               {
@@ -105,7 +105,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
       } else {
         const res = await rpc.post("com.atproto.repo.putRecord", {
           input: {
-            repo: agent.sub,
+            repo: agent()!.sub,
             collection: params.collection as `${string}.${string}.${string}`,
             rkey: params.rkey,
             record: editedRecord,
@@ -141,7 +141,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
       if (exifRemoved !== null) blob = new Blob([exifRemoved], { type: blob.type });
     }
 
-    const rpc = new Client({ handler: agent });
+    const rpc = new Client({ handler: agent()! });
     setUploading(true);
     const res = await rpc.post("com.atproto.repo.uploadBlob", {
       input: blob,
