@@ -460,7 +460,7 @@ const RepoView = () => {
                         class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
                       >
                         <div class="i-lucide-logs text-sm" />
-                        {showPlcLogs() ? "Hide" : "Show"} PLC logs
+                        {showPlcLogs() ? "Hide" : "Show"} PLC Logs
                       </button>
                       <Show when={loading()}>
                         <div class="i-lucide-loader-circle animate-spin text-xl" />
