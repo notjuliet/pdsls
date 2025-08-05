@@ -41,7 +41,13 @@ export const RecordView = () => {
     setValidSchema(undefined);
     const pds = await resolvePDS(did);
     rpc = new Client({ handler: new CredentialManager({ service: pds }) });
-    const res = await getRecord(did, params.collection, params.rkey);
+    const res = await rpc.get("com.atproto.repo.getRecord", {
+      params: {
+        repo: did as ActorIdentifier,
+        collection: params.collection as `${string}.${string}.${string}`,
+        rkey: params.rkey,
+      },
+    });
     if (!res.ok) {
       setValidRecord(false);
       setNotice(res.data.error);
@@ -92,15 +98,6 @@ export const RecordView = () => {
     }
   });
 
-  const getRecord = (repo: string, collection: string, rkey: string) =>
-    rpc.get("com.atproto.repo.getRecord", {
-      params: {
-        repo: repo as ActorIdentifier,
-        collection: collection as `${string}.${string}.${string}`,
-        rkey: rkey,
-      },
-    });
-
   const deleteRecord = async () => {
     rpc = new Client({ handler: agent()! });
     await rpc.post("com.atproto.repo.deleteRecord", {
@@ -117,11 +114,7 @@ export const RecordView = () => {
     const uriParts = uri.split("/"); // expected: ["at:", "", "repo", "collection", "rkey"]
     if (uriParts.length != 5) return undefined;
     if (uriParts[0] !== "at:" || uriParts[1] !== "") return undefined;
-    const parsedUri: AtUri = {
-      repo: uriParts[2],
-      collection: uriParts[3],
-      rkey: uriParts[4],
-    };
+    const parsedUri: AtUri = { repo: uriParts[2], collection: uriParts[3], rkey: uriParts[4] };
     const template = uriTemplates[parsedUri.collection];
     if (!template) return undefined;
     return template(parsedUri);
