@@ -155,7 +155,7 @@ const StreamView = () => {
           Firehose
         </A>
       </div>
-      <form ref={formRef} class="flex flex-col gap-y-2">
+      <form ref={formRef} class="flex flex-col gap-y-2 text-sm">
         <Show when={!connected()}>
           <label class="flex items-center justify-end gap-x-2">
             <span>Instance</span>
