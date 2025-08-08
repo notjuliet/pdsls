@@ -117,7 +117,7 @@ const PlcLogView = (props: {
           <Tooltip text="Filter operations">
             <div class="i-lucide-filter text-xl" />
           </Tooltip>
-          <div class="dark:shadow-dark-900/80 flex w-fit items-center rounded-full bg-neutral-200 shadow-md dark:bg-neutral-700">
+          <div class="dark:shadow-dark-900/80 dark:bg-dark-300 flex w-fit items-center rounded-full bg-white shadow-sm">
             <FilterButton icon="i-lucide-at-sign" event="handle" />
             <FilterButton icon="i-lucide-key-round" event="rotation_key" />
             <FilterButton icon="i-lucide-server" event="service" />
