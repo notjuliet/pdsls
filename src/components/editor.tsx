@@ -3,6 +3,8 @@ import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 import * as monaco from "monaco-editor";
 import { onMount } from "solid-js";
 
+const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 1;
+
 self.MonacoEnvironment = {
   getWorker(_, label) {
     if (label === "json") return new jsonWorker();
@@ -22,6 +24,9 @@ const Editor = (props: { theme: string; model: monaco.editor.IModel }) => {
       model: props.model,
       wordWrap: "on",
       automaticLayout: true,
+      fontFamily: "Roboto Mono",
+      lineNumbers: isTouchDevice ? "off" : "on",
+      fontSize: 12,
     });
   });
 
