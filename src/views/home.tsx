@@ -21,7 +21,7 @@ const Home = () => {
           <A href="/firehose" class="text-blue-400 hover:underline">
             firehose
           </A>{" "}
-          support.
+          streaming.
         </p>
         <p>
           <A
