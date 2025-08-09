@@ -30,7 +30,6 @@ export const uriTemplates: TemplateMap = {
   "com.whtwnd.blog.entry": (uri) => ({
     label: "WhiteWind",
     link: `https://whtwnd.com/${uri.repo}/${uri.rkey}`,
-    icon: "i-lucide-wind",
   }),
   "com.shinolabs.pinksea.oekaki": (uri) => ({
     label: "PinkSea",
