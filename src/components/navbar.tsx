@@ -186,50 +186,40 @@ const NavBar = (props: { params: Params }) => {
           </div>
         </Show>
         <Show when={props.params.rkey}>
-          <div class="mt-1 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <Tooltip text="Record">
-                <button onclick={() => addToClipboard(props.params.rkey)}>
-                  <div class="i-lucide-braces text-lg" />
-                </button>
-              </Tooltip>
-              <div class="flex gap-1">
-                <span>{props.params.rkey}</span>
-                <Show when={validRecord()}>
-                  <Tooltip text="Valid record">
-                    <div class="i-lucide-lock-keyhole" />
-                  </Tooltip>
-                </Show>
-                <Show when={validRecord() === false}>
-                  <Tooltip text="Invalid record">
-                    <div class="i-lucide-lock-keyhole-open text-red-500 dark:text-red-400" />
-                  </Tooltip>
-                </Show>
-                <Show when={validRecord() === undefined}>
-                  <Tooltip text="Validating">
-                    <div class="i-lucide-loader-circle animate-spin" />
-                  </Tooltip>
-                </Show>
-                <Show when={validSchema()}>
-                  <Tooltip text="Valid schema">
-                    <div class="i-lucide-file-check" />
-                  </Tooltip>
-                </Show>
-                <Show when={validSchema() === false}>
-                  <Tooltip text="Invalid schema">
-                    <div class="i-lucide-file-x text-red-500 dark:text-red-400" />
-                  </Tooltip>
-                </Show>
-              </div>
-            </div>
-            <Tooltip text="Record on PDS">
-              <a
-                href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${props.params.repo}&collection=${props.params.collection}&rkey=${props.params.rkey}`}
-                target="_blank"
-              >
-                <div class="i-lucide-external-link text-lg" />
-              </a>
+          <div class="mt-1 flex items-center gap-2">
+            <Tooltip text="Record">
+              <button onclick={() => addToClipboard(props.params.rkey)}>
+                <div class="i-lucide-braces text-lg" />
+              </button>
             </Tooltip>
+            <div class="flex gap-1">
+              <span>{props.params.rkey}</span>
+              <Show when={validRecord()}>
+                <Tooltip text="Valid record">
+                  <div class="i-lucide-lock-keyhole" />
+                </Tooltip>
+              </Show>
+              <Show when={validRecord() === false}>
+                <Tooltip text="Invalid record">
+                  <div class="i-lucide-lock-keyhole-open text-red-500 dark:text-red-400" />
+                </Tooltip>
+              </Show>
+              <Show when={validRecord() === undefined}>
+                <Tooltip text="Validating">
+                  <div class="i-lucide-loader-circle animate-spin" />
+                </Tooltip>
+              </Show>
+              <Show when={validSchema()}>
+                <Tooltip text="Valid schema">
+                  <div class="i-lucide-file-check" />
+                </Tooltip>
+              </Show>
+              <Show when={validSchema() === false}>
+                <Tooltip text="Invalid schema">
+                  <div class="i-lucide-file-x text-red-500 dark:text-red-400" />
+                </Tooltip>
+              </Show>
+            </div>
           </div>
         </Show>
       </div>

@@ -6,7 +6,7 @@ import { createSignal, onMount, Show } from "solid-js";
 import { Backlinks } from "../components/backlinks.jsx";
 import { JSONValue } from "../components/json.jsx";
 import { agent } from "../components/login.jsx";
-import { setCID, setValidRecord, setValidSchema, validRecord } from "../components/navbar.jsx";
+import { pds, setCID, setValidRecord, setValidSchema, validRecord } from "../components/navbar.jsx";
 
 import { didDocCache, getAllBacklinks, LinkData, resolvePDS } from "../utils/api.js";
 import { AtUri, uriTemplates } from "../utils/templates.js";
@@ -170,11 +170,19 @@ export const RecordView = () => {
             {(externalLink) => (
               <Tooltip text={`Open on ${externalLink().label}`}>
                 <a target="_blank" href={externalLink()?.link}>
-                  <div class={`${externalLink().icon ?? "i-lucide-external-link"} text-xl`} />
+                  <div class={`${externalLink().icon ?? "i-lucide-app-window"} text-xl`} />
                 </a>
               </Tooltip>
             )}
           </Show>
+          <Tooltip text="Record on PDS">
+            <a
+              href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
+              target="_blank"
+            >
+              <div class="i-lucide-external-link text-xl" />
+            </a>
+          </Tooltip>
           <Show when={backlinks()}>
             <Tooltip text={showBacklinks() ? "Show record" : "Show backlinks"}>
               <button onclick={() => setShowBacklinks(!showBacklinks())}>
