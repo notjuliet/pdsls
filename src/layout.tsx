@@ -7,10 +7,14 @@ import { NavBar } from "./components/navbar.jsx";
 import { Search } from "./components/search.jsx";
 import { AccountManager } from "./components/account.jsx";
 import { resolveHandle } from "./utils/api.js";
-import { Meta, MetaProvider } from "@solidjs/meta";
+import { Meta, MetaProvider, Title } from "@solidjs/meta";
 import { kawaii, Settings } from "./components/settings.jsx";
 import { Handle } from "@atcute/lexicons";
 import { copyNotice } from "./utils/copy.js";
+
+const customTitle: Record<string, string> = {
+  "did:plc:hx53snho72xoj7zqt5uice4u": "wrenls",
+};
 
 const Layout = (props: RouteSectionProps<unknown>) => {
   const params = useParams();
@@ -27,11 +31,12 @@ const Layout = (props: RouteSectionProps<unknown>) => {
 
   return (
     <div id="main" class="m-4 flex flex-col items-center text-slate-900 dark:text-slate-100">
-      <Show when={location.pathname !== "/"}>
-        <MetaProvider>
+      <MetaProvider>
+        <Show when={location.pathname !== "/"}>
           <Meta name="robots" content="noindex, nofollow" />
-        </MetaProvider>
-      </Show>
+        </Show>
+        <Title>{customTitle[params.repo] ?? "PDSls"}</Title>
+      </MetaProvider>
       <div class="mb-2 flex w-[21rem] items-center sm:w-[24rem]">
         <div class="flex basis-1/3 gap-x-2">
           <A href="/jetstream">
@@ -43,7 +48,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         </div>
         <div class="flex basis-1/3 items-center justify-center text-center">
           <A href="/" class="font-mono font-bold hover:underline">
-            PDSls
+            {customTitle[params.repo] ?? "PDSls"}
           </A>
           <Show when={localStorage.kawaii === "true" || kawaii()}>
             <a
