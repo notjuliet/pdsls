@@ -129,7 +129,7 @@ export const RecordView = () => {
         <div class="mt-3 break-words text-red-500 dark:text-red-400">{notice()}</div>
       </Show>
       <Show when={record()}>
-        <div class="dark:shadow-dark-900/80 dark:bg-dark-300 my-3 flex gap-3 rounded-full bg-white p-2 shadow-sm">
+        <div class="dark:shadow-dark-900/80 dark:bg-dark-300 my-3 flex gap-3 rounded-full bg-white px-2.5 py-2 shadow-sm">
           <Tooltip text="Copy record">
             <button onclick={() => addToClipboard(JSON.stringify(record()?.value))}>
               <div class="i-lucide-copy text-xl" />
