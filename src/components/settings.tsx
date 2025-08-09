@@ -59,10 +59,10 @@ const Settings = () => {
         <div class="starting:opacity-0 w-21rem dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900/80 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-slate-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-slate-100">
           <h3 class="border-b-0.5 mb-2 border-neutral-500 pb-2 font-bold">Settings</h3>
           <h4 class="mb-1 font-semibold">Theme</h4>
-          <div class="flex w-full gap-2">
+          <div class="flex w-full gap-1">
             <button
               classList={{
-                "basis-1/3 py-1 rounded-lg justify-center flex items-center gap-1": true,
+                "basis-1/3 py-1 rounded-full justify-center flex items-center gap-1": true,
                 "bg-transparent hover:bg-neutral-100 dark:hover:bg-dark-200": !theme().system,
                 "bg-white dark:bg-neutral-600 font-semibold": theme().system,
               }}
@@ -79,7 +79,7 @@ const Settings = () => {
             </button>
             <button
               classList={{
-                "basis-1/3 py-1 rounded-lg justify-center flex items-center gap-1": true,
+                "basis-1/3 py-1 rounded-full justify-center flex items-center gap-1": true,
                 "bg-transparent hover:bg-neutral-100 dark:hover:bg-dark-200":
                   theme().color !== "light" || theme().system,
                 "bg-white font-semibold": theme().color === "light" && !theme().system,
@@ -91,7 +91,7 @@ const Settings = () => {
             </button>
             <button
               classList={{
-                "basis-1/3 py-1 justify-center rounded-lg flex items-center gap-1": true,
+                "basis-1/3 py-1 justify-center rounded-full flex items-center gap-1": true,
                 "bg-transparent hover:bg-neutral-100 dark:hover:bg-dark-200":
                   theme().color !== "dark" || theme().system,
                 "bg-neutral-600 font-semibold": theme().color === "dark" && !theme().system,
