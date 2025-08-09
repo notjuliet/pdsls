@@ -178,7 +178,7 @@ const RepoView = () => {
   const RepoTab = (props: { tab: Tab; label: string }) => (
     <button
       classList={{
-        "rounded-full flex flex-1 py-1 justify-center": true,
+        "rounded-full text-xs sm:text-sm flex flex-1 py-1.5 justify-center": true,
         "bg-white dark:bg-dark-300 shadow-sm dark:shadow-dark-900/80": tab() === props.tab,
         "bg-transparent hover:bg-zinc-200 dark:hover:bg-dark-200": tab() !== props.tab,
       }}
