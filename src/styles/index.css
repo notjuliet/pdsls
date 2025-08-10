@@ -14,10 +14,12 @@ html {
 }
 
 .i-lucide-line-squiggle {
-  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWxpbmUtc3F1aWdnbGUtaWNvbiBsdWNpZGUtbGluZS1zcXVpZ2dsZSI+PHBhdGggZD0iTTcgMy41YzUtMiA3IDIuNSAzIDRDMS41IDEwIDIgMTUgNSAxNmM1IDIgOS0xMCAxNC03cy41IDEzLjUtNCAxMmMtNS0yLjUuNS0xMSA2LTIiLz48L3N2Zz4=")
-    no-repeat;
-  background-size: 100% 100%;
-  background-color: transparent;
+  --un-icon: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 3.5c5-2 7 2.5 3 4C1.5 10 2 15 5 16c5 2 9-10 14-7s.5 13.5-4 12c-5-2.5.5-11 6-2'/%3E%3C/svg%3E");
+  -webkit-mask: var(--un-icon) no-repeat;
+  mask: var(--un-icon) no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
   width: 1em;
   height: 1em;
 }
