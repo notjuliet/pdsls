@@ -4,13 +4,13 @@ Navigate and manage [atproto](https://atproto.com/) repositories and the records
 
 ### Hacking
 
-You will need `node`, `pnpm` and `tsc` to get started:
+You will need `node` and `pnpm` to get started:
 
 ```
-pnpm i          # install deps
-pnpm run dev    # or pnpm run start, runs vite
-pnpm run build  # runs vite build
-pnpm run serve  # runs vite preview
+pnpm i      # install deps
+pnpm dev    # or pnpm run start, runs vite
+pnpm build  # runs vite build
+pnpm serve  # runs vite preview
 ```
 
 ### Credits
