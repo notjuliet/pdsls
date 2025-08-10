@@ -119,7 +119,9 @@ const PdsView = () => {
             </>
           )}
         </Show>
-        <p class="w-full font-semibold text-stone-600 dark:text-stone-400">Repositories</p>
+        <p class="w-full font-semibold text-stone-600 dark:text-stone-400">
+          {repos()?.length} Repositories
+        </p>
         <For each={repos()}>
           {(repo) => (
             <A
