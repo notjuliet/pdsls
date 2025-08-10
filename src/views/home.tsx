@@ -72,6 +72,11 @@ const Home = () => {
             <div class="i-lucide-github text-xl" />
           </A>
         </Tooltip>
+        <Tooltip text="Tangled">
+          <A href="https://tangled.sh/@pdsls.dev/pdsls/" target="_blank">
+            <div class="i-lucide-line-squiggle text-xl" />
+          </A>
+        </Tooltip>
         <Tooltip text="Bluesky">
           <A href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz" target="_blank">
             <div class="i-tabler-brand-bluesky text-xl" />
