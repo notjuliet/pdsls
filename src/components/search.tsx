@@ -51,7 +51,7 @@ const Search = () => {
     >
       <div class="w-full">
         <label for="input" class="ml-0.5 text-sm">
-          PDS URL or AT URI
+          PDS URL or AT URI (at:// optional)
         </label>
       </div>
       <div class="flex w-full items-center gap-2">
