@@ -2,6 +2,17 @@
 
 Navigate and manage [atproto](https://atproto.com/) repositories and the records they contain, as well as watching the relay in real time (firehose + jetstream support).
 
+### Hacking
+
+You will need `node`, `pnpm` and `tsc` to get started:
+
+```
+pnpm i          # install deps
+pnpm run dev    # or pnpm run start, runs vite
+pnpm run build  # runs vite build
+pnpm run serve  # runs vite preview
+```
+
 ### Credits
 
 [atcute](https://github.com/mary-ext/atcute) - atproto SDK\
