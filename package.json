@@ -15,7 +15,7 @@
     "prettier-plugin-tailwindcss": "^0.6.14",
     "typescript": "^5.9.2",
     "unocss": "66.4.2",
-    "vite": "^7.1.1",
+    "vite": "^7.1.2",
     "vite-plugin-solid": "^2.11.8"
   },
   "dependencies": {
@@ -32,6 +32,7 @@
     "@atcute/lexicon-doc": "^1.0.3",
     "@atcute/lexicons": "^1.1.0",
     "@atcute/oauth-browser-client": "^1.0.26",
+    "@atcute/tangled": "^1.0.2",
     "@atcute/tid": "^1.0.2",
     "@atcute/uint8array": "^1.0.3",
     "@mary/exif-rm": "jsr:^0.2.2",
@@ -40,7 +41,7 @@
     "@solidjs/router": "^0.15.3",
     "hls.js": "^1.6.9",
     "monaco-editor": "^0.52.2",
-    "solid-js": "^1.9.8"
+    "solid-js": "^1.9.9"
   },
   "packageManager": "pnpm@10.12.2+sha512.a32540185b964ee30bb4e979e405adc6af59226b438ee4cc19f9e8773667a66d302f5bfee60a39d3cac69e35e4b96e708a71dd002b7e9359c4112a1722ac323f",
   "pnpm": {

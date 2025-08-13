@@ -18,7 +18,29 @@ import {
   ChatBskyActorDeclaration,
 } from "@atcute/bluesky";
 
+import {
+  ShTangledActorProfile,
+  ShTangledFeedStar,
+  ShTangledGraphFollow,
+  ShTangledKnotMember,
+  ShTangledPublicKey,
+  ShTangledRepo,
+  ShTangledRepoArtifact,
+  ShTangledRepoIssue,
+  ShTangledRepoIssueComment,
+  ShTangledRepoIssueState,
+  ShTangledRepoIssueStateClosed,
+  ShTangledRepoIssueStateOpen,
+  ShTangledRepoPull,
+  ShTangledRepoPullComment,
+  ShTangledRepoPullStatus,
+  ShTangledRepoPullStatusClosed,
+  ShTangledRepoPullStatusMerged,
+  ShTangledRepoPullStatusOpen,
+} from "@atcute/tangled";
+
 export const lexicons: Record<string, any> = {
+  // Bluesky
   "app.bsky.actor.profile": AppBskyActorProfile.mainSchema,
   "app.bsky.actor.status": AppBskyActorStatus.mainSchema,
   "app.bsky.feed.generator": AppBskyFeedGenerator.mainSchema,
@@ -36,4 +58,24 @@ export const lexicons: Record<string, any> = {
   "app.bsky.graph.verification": AppBskyGraphVerification.mainSchema,
   "app.bsky.labeler.service": AppBskyLabelerService.mainSchema,
   "chat.bsky.actor.declaration": ChatBskyActorDeclaration.mainSchema,
+
+  // Tangled
+  "sh.tangled.actor.profile": ShTangledActorProfile.mainSchema,
+  "sh.tangled.feed.star": ShTangledFeedStar.mainSchema,
+  "sh.tangled.graph.follow": ShTangledGraphFollow.mainSchema,
+  "sh.tangled.knot.member": ShTangledKnotMember.mainSchema,
+  "sh.tangled.publicKey": ShTangledPublicKey.mainSchema,
+  "sh.tangled.repo": ShTangledRepo.mainSchema,
+  "sh.tangled.repo.artifact": ShTangledRepoArtifact.mainSchema,
+  "sh.tangled.repo.issue": ShTangledRepoIssue.mainSchema,
+  "sh.tangled.repo.issue.comment": ShTangledRepoIssueComment.mainSchema,
+  "sh.tangled.repo.issue.state": ShTangledRepoIssueState.mainSchema,
+  "sh.tangled.repo.issue.state.closed": ShTangledRepoIssueStateClosed.mainSchema,
+  "sh.tangled.repo.issue.state.open": ShTangledRepoIssueStateOpen.mainSchema,
+  "sh.tangled.repo.pull": ShTangledRepoPull.mainSchema,
+  "sh.tangled.repo.pull.comment": ShTangledRepoPullComment.mainSchema,
+  "sh.tangled.repo.pull.status": ShTangledRepoPullStatus.mainSchema,
+  "sh.tangled.repo.pull.status.closed": ShTangledRepoPullStatusClosed.mainSchema,
+  "sh.tangled.repo.pull.status.merged": ShTangledRepoPullStatusMerged.mainSchema,
+  "sh.tangled.repo.pull.status.open": ShTangledRepoPullStatusOpen.mainSchema,
 };
