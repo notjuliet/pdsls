@@ -1,15 +1,7 @@
-import {
-  createSignal,
-  For,
-  Show,
-  createResource,
-  Suspense,
-  ErrorBoundary,
-  onMount,
-} from "solid-js";
+import { createSignal, For, Show, createResource, Suspense, ErrorBoundary } from "solid-js";
 import { Client, CredentialManager } from "@atcute/client";
 import { A, useParams } from "@solidjs/router";
-import { didDocCache, getAllBacklinks, LinkData, resolvePDS } from "../utils/api.js";
+import { didDocCache, resolvePDS } from "../utils/api.js";
 import { Backlinks } from "../components/backlinks.jsx";
 import { ActorIdentifier } from "@atcute/lexicons";
 import { DidDocument } from "@atcute/identity";
@@ -163,7 +155,6 @@ const RepoView = () => {
   const [error, setError] = createSignal<string>();
   const [downloading, setDownloading] = createSignal(false);
   const [didDoc, setDidDoc] = createSignal<DidDocument>();
-  const [backlinks, setBacklinks] = createSignal<{ links: LinkData; target: string }>();
   const [nsids, setNsids] = createSignal<Record<string, { hidden: boolean; nsids: string[] }>>();
   const [tab, setTab] = createSignal<Tab>("collections");
   const [filter, setFilter] = createSignal<string>();
@@ -230,17 +221,6 @@ const RepoView = () => {
 
   const [repo] = createResource(fetchRepo);
 
-  onMount(async () => {
-    if (localStorage.backlinks === "true") {
-      try {
-        const backlinks = await getAllBacklinks(did);
-        setBacklinks({ links: backlinks.links, target: did });
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  });
-
   const downloadRepo = async () => {
     try {
       setDownloading(true);
@@ -293,9 +273,13 @@ const RepoView = () => {
           </Show>
         </div>
         <Show when={tab() === "backlinks"}>
-          <Show when={backlinks()}>
-            {(backlinks) => <Backlinks links={backlinks().links} target={backlinks().target} />}
-          </Show>
+          <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
+            <Suspense
+              fallback={<div class="i-lucide-loader-circle animate-spin self-center text-xl" />}
+            >
+              <Backlinks target={did} />
+            </Suspense>
+          </ErrorBoundary>
         </Show>
         <Show when={tab() === "blobs"}>
           <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>

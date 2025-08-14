@@ -1,14 +1,14 @@
 import { CredentialManager, Client } from "@atcute/client";
 
 import { useNavigate, useParams } from "@solidjs/router";
-import { createSignal, onMount, Show } from "solid-js";
+import { createSignal, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
 
 import { Backlinks } from "../components/backlinks.jsx";
 import { JSONValue } from "../components/json.jsx";
 import { agent } from "../components/login.jsx";
 import { pds, setCID, setValidRecord, setValidSchema, validRecord } from "../components/navbar.jsx";
 
-import { didDocCache, getAllBacklinks, LinkData, resolvePDS } from "../utils/api.js";
+import { didDocCache, resolvePDS } from "../utils/api.js";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 import { verifyRecord } from "../utils/verify.js";
 import { ActorIdentifier, InferXRPCBodyOutput, is } from "@atcute/lexicons";
@@ -26,7 +26,6 @@ export const RecordView = () => {
   const params = useParams();
   const [record, setRecord] =
     createSignal<InferXRPCBodyOutput<ComAtprotoRepoGetRecord.mainSchema["output"]>>();
-  const [backlinks, setBacklinks] = createSignal<{ links: LinkData; target: string }>();
   const [openDelete, setOpenDelete] = createSignal(false);
   const [notice, setNotice] = createSignal("");
   const [showBacklinks, setShowBacklinks] = createSignal(false);
@@ -87,15 +86,6 @@ export const RecordView = () => {
     } catch (err) {
       console.error(err);
       setValidRecord(false);
-    }
-    if (localStorage.backlinks === "true") {
-      try {
-        const backlinkTarget = `at://${did}/${params.collection}/${params.rkey}`;
-        const backlinks = await getAllBacklinks(backlinkTarget);
-        setBacklinks({ links: backlinks.links, target: backlinkTarget });
-      } catch (e) {
-        console.error(e);
-      }
     }
   });
 
@@ -200,9 +190,13 @@ export const RecordView = () => {
           </div>
         </Show>
         <Show when={showBacklinks()}>
-          <Show when={backlinks()}>
-            {(backlinks) => <Backlinks links={backlinks().links} target={backlinks().target} />}
-          </Show>
+          <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
+            <Suspense
+              fallback={<div class="i-lucide-loader-circle animate-spin self-center text-xl" />}
+            >
+              <Backlinks target={`at://${did}/${params.collection}/${params.rkey}`} />
+            </Suspense>
+          </ErrorBoundary>
         </Show>
       </Show>
     </div>

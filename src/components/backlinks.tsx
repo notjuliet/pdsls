@@ -1,5 +1,5 @@
-import { createSignal, createMemo, onMount, Show, For } from "solid-js";
-import { getRecordBacklinks, getDidBacklinks, LinkData } from "../utils/api.js";
+import { createSignal, onMount, Show, For, createResource } from "solid-js";
+import { getRecordBacklinks, getDidBacklinks, getAllBacklinks } from "../utils/api.js";
 import * as TID from "@atcute/tid";
 import { localDateFromTimestamp } from "../utils/date.js";
 
@@ -17,79 +17,102 @@ const linksBySource = (links: Record<string, any>) => {
           out.push({ collection, path, counts: paths[path] });
         });
     });
-  return { links: out };
+  return out;
 };
 
-const Backlinks = ({ links, target }: { links: LinkData; target: string }) => {
+const Backlinks = (props: { target: string }) => {
+  const fetchBacklinks = async () => {
+    const res = await getAllBacklinks(props.target);
+    setBacklinks(linksBySource(res.links));
+    return res;
+  };
+
+  const [response] = createResource(fetchBacklinks);
+  const [backlinks, setBacklinks] = createSignal<any>();
+
   const [show, setShow] = createSignal<{
     collection: string;
     path: string;
     showDids: boolean;
   } | null>();
 
-  const filteredLinks = createMemo(() => linksBySource(links));
-
   return (
-    <div class="break-anywhere flex w-full flex-col gap-1">
-      <For each={filteredLinks().links}>
-        {({ collection, path, counts }) => (
-          <div class="text-sm">
-            <p>
-              <span title="Collection containing linking records">{collection}</span>
-              <span class="text-neutral-400">@</span>
-              <span title="Record path where the link is found">{path.slice(1)}</span>
-            </p>
-            <div class="pl-2">
+    <Show when={response()}>
+      <div class="break-anywhere flex w-full flex-col gap-1">
+        <For each={backlinks()}>
+          {({ collection, path, counts }) => (
+            <div class="text-sm">
               <p>
-                <a
-                  class="text-blue-400 hover:underline"
-                  href="#"
-                  title="Show linking records"
-                  onclick={() =>
-                    (
-                      show()?.collection === collection &&
-                      show()?.path === path &&
-                      !show()?.showDids
-                    ) ?
-                      setShow(null)
-                    : setShow({ collection, path, showDids: false })
-                  }
-                >
-                  {counts.records} record{counts.records < 2 ? "" : "s"}
-                </a>
-                {" from "}
-                <a
-                  class="text-blue-400 hover:underline"
-                  href="#"
-                  title="Show linking DIDs"
-                  onclick={() =>
-                    show()?.collection === collection && show()?.path === path && show()?.showDids ?
-                      setShow(null)
-                    : setShow({ collection, path, showDids: true })
-                  }
-                >
-                  {counts.distinct_dids} DID
-                  {counts.distinct_dids < 2 ? "" : "s"}
-                </a>
+                <span title="Collection containing linking records">{collection}</span>
+                <span class="text-neutral-400">@</span>
+                <span title="Record path where the link is found">{path.slice(1)}</span>
               </p>
-              <Show when={show()?.collection === collection && show()?.path === path}>
-                <Show when={show()?.showDids}>
-                  {/* putting this in the `dids` prop directly failed to re-render. idk how to solidjs. */}
-                  <p class="w-full font-semibold text-stone-600 dark:text-stone-400">
-                    Distinct identities
-                  </p>
-                  <BacklinkItems target={target} collection={collection} path={path} dids={true} />
+              <div class="pl-2">
+                <p>
+                  <a
+                    class="text-blue-400 hover:underline"
+                    href="#"
+                    title="Show linking records"
+                    onclick={() =>
+                      (
+                        show()?.collection === collection &&
+                        show()?.path === path &&
+                        !show()?.showDids
+                      ) ?
+                        setShow(null)
+                      : setShow({ collection, path, showDids: false })
+                    }
+                  >
+                    {counts.records} record{counts.records < 2 ? "" : "s"}
+                  </a>
+                  {" from "}
+                  <a
+                    class="text-blue-400 hover:underline"
+                    href="#"
+                    title="Show linking DIDs"
+                    onclick={() =>
+                      (
+                        show()?.collection === collection &&
+                        show()?.path === path &&
+                        show()?.showDids
+                      ) ?
+                        setShow(null)
+                      : setShow({ collection, path, showDids: true })
+                    }
+                  >
+                    {counts.distinct_dids} DID
+                    {counts.distinct_dids < 2 ? "" : "s"}
+                  </a>
+                </p>
+                <Show when={show()?.collection === collection && show()?.path === path}>
+                  <Show when={show()?.showDids}>
+                    {/* putting this in the `dids` prop directly failed to re-render. idk how to solidjs. */}
+                    <p class="w-full font-semibold text-stone-600 dark:text-stone-400">
+                      Distinct identities
+                    </p>
+                    <BacklinkItems
+                      target={props.target}
+                      collection={collection}
+                      path={path}
+                      dids={true}
+                    />
+                  </Show>
+                  <Show when={!show()?.showDids}>
+                    <p class="w-full font-semibold text-stone-600 dark:text-stone-400">Records</p>
+                    <BacklinkItems
+                      target={props.target}
+                      collection={collection}
+                      path={path}
+                      dids={false}
+                    />
+                  </Show>
                 </Show>
-                <Show when={!show()?.showDids}>
-                  <p class="w-full font-semibold text-stone-600 dark:text-stone-400">Records</p>
-                  <BacklinkItems target={target} collection={collection} path={path} dids={false} />
-                </Show>
-              </Show>
+              </div>
             </div>
-          </div>
-        )}
-      </For>
-    </div>
+          )}
+        </For>
+      </div>
+    </Show>
   );
 };
 
