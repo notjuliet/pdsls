@@ -16,7 +16,6 @@ import {
 } from "@atcute/did-plc";
 import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
 import { localDateFromTimestamp } from "../utils/date.js";
-import { backlinksEnabled } from "../components/settings.jsx";
 
 type Tab = "collections" | "backlinks" | "doc" | "blobs";
 type PlcEvent = "handle" | "rotation_key" | "service" | "verification_method";
@@ -268,9 +267,7 @@ const RepoView = () => {
           <Show when={!error()}>
             <RepoTab tab="blobs" label="Blobs" />
           </Show>
-          <Show when={backlinksEnabled()}>
-            <RepoTab tab="backlinks" label="Backlinks" />
-          </Show>
+          <RepoTab tab="backlinks" label="Backlinks" />
         </div>
         <Show when={tab() === "backlinks"}>
           <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>

@@ -24,14 +24,15 @@ const Home = () => {
           streaming.
         </p>
         <p>
+          Backlinks support with{" "}
           <A
             href="https://constellation.microcosm.blue"
             class="text-blue-400 hover:underline"
             target="_blank"
           >
-            Backlinks
-          </A>{" "}
-          can be enabled in the settings.
+            constellation
+          </A>
+          .
         </p>
       </div>
       <div>

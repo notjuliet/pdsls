@@ -15,9 +15,6 @@ const getInitialTheme = () => {
 
 export const [theme, setTheme] = createSignal(getInitialTheme());
 export const [showHandle, setShowHandle] = createSignal(localStorage.showHandle === "true");
-export const [backlinksEnabled, setBacklinksEnabled] = createSignal(
-  localStorage.backlinks === "true",
-);
 export const [hideMedia, setHideMedia] = createSignal(localStorage.hideMedia === "true");
 export const [kawaii, setKawaii] = createSignal(localStorage.kawaii === "true");
 
@@ -103,37 +100,13 @@ const Settings = () => {
             </button>
           </div>
           <div class="border-t-0.5 mt-4 flex flex-col gap-1 border-neutral-500 pt-2">
-            <div class="flex items-center gap-1">
-              <input
-                id="backlinks"
-                class="size-4"
-                type="checkbox"
-                checked={localStorage.backlinks === "true"}
-                onChange={(e) => {
-                  localStorage.backlinks = e.currentTarget.checked;
-                  setBacklinksEnabled(e.currentTarget.checked);
-                }}
-              />
-              <label for="backlinks" class="select-none font-semibold">
-                Backlinks
-              </label>
-              <div class="i-lucide-send-to-back" />
-            </div>
             <div class="flex flex-col gap-1">
-              <label
-                for="constellation"
-                classList={{
-                  "select-none": true,
-                  "text-gray-500": !backlinksEnabled(),
-                }}
-              >
-                Constellation host
+              <label for="constellation" class="select-none font-semibold">
+                Backlinks host
               </label>
               <TextInput
                 id="constellation"
                 value={localStorage.constellationHost || "https://constellation.microcosm.blue"}
-                disabled={!backlinksEnabled()}
-                class="disabled:bg-gray-50 disabled:text-gray-500 dark:disabled:bg-gray-800/20"
                 onInput={(e) => {
                   e.currentTarget.value.length ?
                     (localStorage.constellationHost = e.currentTarget.value)
