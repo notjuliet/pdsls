@@ -19,6 +19,7 @@ import { RecordEditor } from "../components/create.jsx";
 import { addToClipboard } from "../utils/copy.js";
 import Tooltip from "../components/tooltip.jsx";
 import { Modal } from "../components/modal.jsx";
+import { backlinksEnabled } from "../components/settings.jsx";
 
 export const RecordView = () => {
   const navigate = useNavigate();
@@ -183,7 +184,7 @@ export const RecordView = () => {
               <div class="i-lucide-external-link text-xl" />
             </a>
           </Tooltip>
-          <Show when={backlinks()}>
+          <Show when={backlinksEnabled()}>
             <Tooltip text={showBacklinks() ? "Show record" : "Show backlinks"}>
               <button onclick={() => setShowBacklinks(!showBacklinks())}>
                 <div
