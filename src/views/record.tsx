@@ -55,7 +55,7 @@ export const RecordView = () => {
     }
     setRecord(res.data);
     setCID(res.data.cid);
-    setExternalLink(checkUri(res.data.uri));
+    setExternalLink(checkUri(res.data.uri, res.data.value));
 
     try {
       if (params.collection in lexicons) {
@@ -110,14 +110,14 @@ export const RecordView = () => {
     navigate(`/at://${params.repo}/${params.collection}`);
   };
 
-  const checkUri = (uri: string) => {
+  const checkUri = (uri: string, record: any) => {
     const uriParts = uri.split("/"); // expected: ["at:", "", "repo", "collection", "rkey"]
     if (uriParts.length != 5) return undefined;
     if (uriParts[0] !== "at:" || uriParts[1] !== "") return undefined;
     const parsedUri: AtUri = { repo: uriParts[2], collection: uriParts[3], rkey: uriParts[4] };
     const template = uriTemplates[parsedUri.collection];
     if (!template) return undefined;
-    return template(parsedUri);
+    return template(parsedUri, record);
   };
 
   return (

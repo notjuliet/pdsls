@@ -1,5 +1,5 @@
 export type AtUri = { repo: string; collection: string; rkey: string };
-type TemplateFn = (uri: AtUri) => { label: string; link: string; icon?: string };
+type TemplateFn = (uri: AtUri, record?: any) => { label: string; link: string; icon?: string };
 type TemplateMap = Record<string, TemplateFn>;
 
 export const uriTemplates: TemplateMap = {
@@ -38,5 +38,15 @@ export const uriTemplates: TemplateMap = {
   "blue.linkat.board": (uri) => ({
     label: "Linkat",
     link: `https://linkat.blue/${uri.repo}`,
+  }),
+  "sh.tangled.actor.profile": (uri) => ({
+    label: "Tangled",
+    link: `https://tangled.sh/${uri.repo}`,
+    icon: "i-lucide-line-squiggle",
+  }),
+  "sh.tangled.repo": (uri, record) => ({
+    label: "Tangled",
+    link: `https://tangled.sh/${uri.repo}/${record.name}`,
+    icon: "i-lucide-line-squiggle",
   }),
 };
