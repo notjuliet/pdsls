@@ -5,6 +5,24 @@ const Home = () => {
   return (
     <div class="w-21rem sm:w-24rem mt-4 flex flex-col gap-2 break-words">
       <div>
+        <span>
+          <a
+            href="https://atproto.com/guides/glossary#pds-personal-data-server"
+            class="hover:underline"
+            target="_blank"
+          >
+            <b>P</b>ersonal <b>D</b>ata <b>S</b>erver
+          </a>{" "}
+          <a
+            href="https://man7.org/linux/man-pages/man1/ls.1.html"
+            class="hover:underline"
+            target="_blank"
+          >
+            <b>l</b>i<b>s</b>t<span class="text-sm">(1)</span>
+          </a>
+        </span>
+      </div>
+      <div>
         <p>
           Browse the public data on{" "}
           <a class="text-blue-400 hover:underline" href="https://atproto.com" target="_blank">
