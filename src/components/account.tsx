@@ -69,7 +69,10 @@ const AccountManager = () => {
     <>
       <Modal open={openManager()} onClose={() => setOpenManager(false)}>
         <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 w-21rem dark:shadow-dark-900/80 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-slate-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-slate-100">
-          <h3 class="mb-2 font-bold">Manage accounts</h3>
+          <div class="mb-2 flex items-center gap-1 font-bold">
+            <div class="i-lucide-user-round" />
+            <span>Manage accounts</span>
+          </div>
           <div class="mb-3 max-h-[20rem] overflow-y-auto md:max-h-[25rem]">
             <For each={Object.keys(sessions)}>
               {(did) => (

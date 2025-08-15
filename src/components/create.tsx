@@ -174,7 +174,10 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
       <Modal open={openDialog()} onClose={() => setOpenDialog(false)}>
         <div class="w-21rem sm:w-xl lg:w-48rem starting:opacity-0 dark:bg-dark-800/70 left-50% backdrop-blur-xs border-0.5 dark:shadow-dark-900/80 absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-2 text-slate-900 shadow-md transition-opacity duration-300 sm:p-4 dark:border-neutral-700 dark:text-slate-100">
           <div class="mb-2 flex w-full justify-between">
-            <h3 class="font-bold">{props.create ? "Creating" : "Editing"} record</h3>
+            <div class="flex items-center gap-1 font-bold">
+              <div class="i-lucide-square-pen" />
+              <span class="font-bold">{props.create ? "Creating" : "Editing"} record</span>
+            </div>
             <div
               class="i-lucide-x text-xl hover:text-red-500 dark:hover:text-red-400"
               onclick={() => setOpenDialog(false)}

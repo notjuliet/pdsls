@@ -54,7 +54,10 @@ const Settings = () => {
     <>
       <Modal open={openSettings()} onClose={() => setOpenSettings(false)}>
         <div class="starting:opacity-0 w-21rem dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900/80 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-slate-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-slate-100">
-          <h3 class="border-b-0.5 mb-2 border-neutral-500 pb-2 font-bold">Settings</h3>
+          <div class="mb-3 flex items-center gap-1 font-bold">
+            <div class="i-lucide-settings" />
+            <span>Settings</span>
+          </div>
           <h4 class="mb-1 font-semibold">Theme</h4>
           <div class="flex w-full gap-1">
             <button
@@ -99,8 +102,8 @@ const Settings = () => {
               Dark
             </button>
           </div>
-          <div class="border-t-0.5 mt-4 flex flex-col gap-1 border-neutral-500 pt-2">
-            <div class="flex flex-col gap-1">
+          <div class="mt-3 flex flex-col gap-1">
+            <div class="flex flex-col gap-0.5">
               <label for="constellation" class="select-none font-semibold">
                 Backlinks host
               </label>
@@ -114,8 +117,8 @@ const Settings = () => {
                 }}
               />
             </div>
-            <div class="border-t-0.5 mt-2 flex flex-col gap-1 border-neutral-500 pt-2">
-              <div class="flex flex-col gap-1">
+            <div class="mt-3 flex flex-col gap-1">
+              <div class="flex flex-col gap-0.5">
                 <label for="plcDirectory" class="select-none font-semibold">
                   PLC Directory
                 </label>
@@ -130,7 +133,7 @@ const Settings = () => {
                 />
               </div>
             </div>
-            <div class="border-t-0.5 mt-2 flex flex-col gap-1 border-neutral-500 pt-2">
+            <div class="mt-3 flex flex-col gap-1">
               <div class="flex items-center gap-1">
                 <input
                   id="showHandle"
