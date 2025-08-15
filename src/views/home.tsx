@@ -23,15 +23,22 @@ const Home = () => {
         </span>
       </div>
       <div>
-        <p>
-          Browse the public data on{" "}
-          <a class="text-blue-400 hover:underline" href="https://atproto.com" target="_blank">
-            AT Protocol
-          </a>
-          .
-        </p>
-        <p>Login to manage records in your repository.</p>
-        <p>
+        <div class="flex items-center gap-1">
+          <div class="i-lucide-search" />
+          <span>
+            Browse the public data on{" "}
+            <a class="text-blue-400 hover:underline" href="https://atproto.com" target="_blank">
+              AT Protocol
+            </a>
+            .
+          </span>
+        </div>
+        <div class="flex items-center gap-1">
+          <div class="i-lucide-user-round" />
+          <span>Login to manage records in your repository.</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <div class="i-lucide-radio-tower" />
           <A href="/jetstream" class="text-blue-400 hover:underline">
             Jetstream
           </A>{" "}
@@ -40,18 +47,21 @@ const Home = () => {
             firehose
           </A>{" "}
           streaming.
-        </p>
-        <p>
-          Backlinks support with{" "}
-          <A
-            href="https://constellation.microcosm.blue"
-            class="text-blue-400 hover:underline"
-            target="_blank"
-          >
-            constellation
-          </A>
-          .
-        </p>
+        </div>
+        <div class="flex items-center gap-1">
+          <div class="i-lucide-send-to-back" />
+          <span>
+            Backlinks support with{" "}
+            <A
+              href="https://constellation.microcosm.blue"
+              class="text-blue-400 hover:underline"
+              target="_blank"
+            >
+              constellation
+            </A>
+            .
+          </span>
+        </div>
       </div>
       <div>
         <span class="font-semibold">Examples</span>
