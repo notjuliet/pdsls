@@ -189,7 +189,7 @@ const NavBar = (props: { params: Params }) => {
           <div class="mt-1 flex items-center gap-2">
             <Tooltip text="Record">
               <button onclick={() => addToClipboard(props.params.rkey)}>
-                <div class="i-lucide-braces text-lg" />
+                <div class="i-lucide-file-json text-lg" />
               </button>
             </Tooltip>
             <div class="flex gap-1">
