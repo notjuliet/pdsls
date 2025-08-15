@@ -35,7 +35,7 @@ const Home = () => {
         </div>
         <div class="flex items-center gap-1">
           <div class="i-lucide-user-round" />
-          <span>Login to manage records in your repository.</span>
+          <span>Login to manage records in your repo.</span>
         </div>
         <div class="flex items-center gap-1">
           <div class="i-lucide-radio-tower" />
