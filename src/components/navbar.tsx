@@ -168,7 +168,7 @@ const NavBar = (props: { params: Params }) => {
           <div class="mt-1 flex items-center gap-2">
             <Tooltip text="Collection">
               <button onclick={() => addToClipboard(props.params.collection)}>
-                <div class="i-lucide-list text-lg" />
+                <div class="i-lucide-folder-open text-lg" />
               </button>
             </Tooltip>
             <Show when={props.params.rkey}>
