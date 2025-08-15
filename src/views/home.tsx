@@ -55,12 +55,14 @@ const Home = () => {
       </div>
       <div>
         <span class="font-semibold">Examples</span>
-        <div>
+        <div class="flex items-center gap-1">
+          <div class="i-lucide-server" />
           <A href="/pds.kelinci.net" class="text-sm text-blue-400 hover:underline sm:text-base">
             https://pds.kelinci.net
           </A>
         </div>
-        <div>
+        <div class="flex items-center gap-1">
+          <div class="i-lucide-at-sign" />
           <A
             href="/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2"
             class="text-sm text-blue-400 hover:underline sm:text-base"
@@ -68,15 +70,17 @@ const Home = () => {
             at://did:plc:vwzwgnygau7ed7b7wt5ux7y2
           </A>
         </div>
-        <div>
+        <div class="flex items-center gap-1">
+          <div class="i-lucide-file-json shrink-0" />
           <A
-            href="/at://did:plc:oisofpd7lj26yvgiivf3lxsi/app.bsky.feed.post/3l2zpbbhuvw2h"
+            href="/at://did:plc:oisofpd7lj26yvgiivf3lxsi/app.bsky.actor.profile/self"
             class="text-sm text-blue-400 hover:underline sm:text-base"
           >
-            at://hailey.at/app.bsky.feed.post/3l2zpbbhuvw2h
+            at://hailey.at/app.bsky.actor.profile/self
           </A>
         </div>
-        <div>
+        <div class="flex items-center gap-1">
+          <div class="i-lucide-tag" />
           <A
             href="/at://did:plc:wkoofae5uytcm7bjncmev6n6/labels"
             class="text-sm text-blue-400 hover:underline sm:text-base"
@@ -85,27 +89,31 @@ const Home = () => {
           </A>
         </div>
       </div>
-      <div class="flex gap-2">
-        <Tooltip text="GitHub">
-          <A href="https://github.com/notjuliet/pdsls" target="_blank">
-            <div class="i-lucide-github text-xl" />
-          </A>
-        </Tooltip>
-        <Tooltip text="Tangled">
-          <A href="https://tangled.sh/@pdsls.dev/pdsls/" target="_blank">
-            <div class="i-lucide-line-squiggle text-xl" />
-          </A>
-        </Tooltip>
-        <Tooltip text="Bluesky">
-          <A href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz" target="_blank">
-            <div class="i-tabler-brand-bluesky text-xl" />
-          </A>
-        </Tooltip>
-        <Tooltip text="Donate on Ko-fi">
-          <A href="https://ko-fi.com/notjuliet" target="_blank">
-            <div class="i-lucide-coffee text-xl" />
-          </A>
-        </Tooltip>
+      <div class="flex justify-between">
+        <div class="flex gap-2">
+          <Tooltip text="GitHub">
+            <A href="https://github.com/notjuliet/pdsls" target="_blank">
+              <div class="i-lucide-github text-xl" />
+            </A>
+          </Tooltip>
+          <Tooltip text="Tangled">
+            <A href="https://tangled.sh/@pdsls.dev/pdsls/" target="_blank">
+              <div class="i-lucide-line-squiggle text-xl" />
+            </A>
+          </Tooltip>
+        </div>
+        <div class="flex gap-2">
+          <Tooltip text="Bluesky">
+            <A href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz" target="_blank">
+              <div class="i-tabler-brand-bluesky text-xl" />
+            </A>
+          </Tooltip>
+          <Tooltip text="Donate on Ko-fi">
+            <A href="https://ko-fi.com/notjuliet" target="_blank">
+              <div class="i-lucide-coffee text-xl" />
+            </A>
+          </Tooltip>
+        </div>
       </div>
     </div>
   );
