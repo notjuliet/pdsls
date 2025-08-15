@@ -12,3 +12,14 @@ html {
   width: 1em;
   height: 1em;
 }
+
+.i-tangled {
+  --un-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2232%22%20height%3D%2232%22%3E%3Cg%20style%3D%22display%3Ainline%22%3E%3Cpath%20d%3D%22M0-2.117h62.177v25.135H0z%22%20style%3D%22display%3Ainline%3Bfill%3Anone%3Bfill-opacity%3A1%3Bstroke-width%3A.396875%22%20transform%3D%22translate(11.01%206.9)%22%2F%3E%3Cpath%20d%3D%22M3.64%2022.787c-1.697%200-2.943-.45-3.74-1.35-.77-.9-1.156-2.094-1.156-3.585%200-.36.013-.72.038-1.08.052-.385.129-.873.232-1.464L.44%206.826h-5.089l.733-4.394h3.2c.822%200%201.439-.168%201.85-.502.437-.334.72-.938.848-1.812l.771-4.703h5.243L6.84%202.432h7.787l-.733%204.394H6.107L4.257%2017.93l.77.27%206.015-4.742%202.775%203.161-2.313%202.005c-.822.694-1.568%201.31-2.236%201.85-.668.515-1.31.952-1.927%201.311a7.406%207.406%200%200%201-1.774.733c-.59.18-1.233.27-1.927.27z%22%20%20%20%20%20%20%20aria-label%3D%22tangled.sh%22%20%20%20%20%20%20transform%3D%22translate(11.01%206.9)%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  -webkit-mask: var(--un-icon) no-repeat;
+  mask: var(--un-icon) no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+  width: 1em;
+  height: 1em;
+}

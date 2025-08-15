@@ -93,7 +93,7 @@ const Home = () => {
           </Tooltip>
           <Tooltip text="Tangled">
             <A href="https://tangled.sh/@pdsls.dev/pdsls/" target="_blank">
-              <div class="i-lucide-line-squiggle text-xl" />
+              <div class="i-tangled text-xl" />
             </A>
           </Tooltip>
         </div>
