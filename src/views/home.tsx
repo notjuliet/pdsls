@@ -24,14 +24,16 @@ const Home = () => {
         </div>
         <div class="flex items-center gap-1">
           <div class="i-lucide-radio-tower" />
-          <A href="/jetstream" class="text-blue-400 hover:underline">
-            Jetstream
-          </A>{" "}
-          and{" "}
-          <A href="/firehose" class="text-blue-400 hover:underline">
-            firehose
-          </A>{" "}
-          streaming.
+          <div>
+            <A href="/jetstream" class="text-blue-400 hover:underline">
+              Jetstream
+            </A>{" "}
+            and{" "}
+            <A href="/firehose" class="text-blue-400 hover:underline">
+              firehose
+            </A>{" "}
+            streaming.
+          </div>
         </div>
         <div class="flex items-center gap-1">
           <div class="i-lucide-send-to-back" />
