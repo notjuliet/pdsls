@@ -19,6 +19,7 @@ import { RecordEditor } from "../components/create.jsx";
 import { addToClipboard } from "../utils/copy.js";
 import Tooltip from "../components/tooltip.jsx";
 import { Modal } from "../components/modal.jsx";
+import { Button } from "../components/button.jsx";
 
 export const RecordView = () => {
   const navigate = useNavigate();
@@ -137,20 +138,13 @@ export const RecordView = () => {
                 <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900/80 backdrop-blur-xs left-50% top-70 absolute -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-slate-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-slate-100">
                   <h2 class="mb-2 font-bold">Delete this record?</h2>
                   <div class="flex justify-end gap-2">
-                    <button
-                      type="button"
-                      onclick={() => setOpenDelete(false)}
-                      class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1.5 text-sm font-bold shadow-sm hover:bg-zinc-100"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      onclick={deleteRecord}
-                      class="dark:shadow-dark-900/80 rounded-lg bg-red-500 px-2 py-1.5 text-sm font-bold text-slate-100 shadow-sm hover:bg-red-400"
+                    <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
+                    <Button
+                      onClick={deleteRecord}
+                      class="dark:shadow-dark-900/80 rounded-lg bg-red-500 px-2 py-1.5 text-xs font-bold text-slate-100 shadow-sm hover:bg-red-400"
                     >
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </Modal>

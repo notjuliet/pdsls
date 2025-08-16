@@ -1,5 +1,6 @@
 import { createResource, createSignal, For, Show } from "solid-js";
 import { Client, CredentialManager } from "@atcute/client";
+import { Button } from "../components/button";
 
 const LIMIT = 1000;
 
@@ -50,13 +51,7 @@ const BlobView = (props: { pds: string; repo: string }) => {
         </div>
       </Show>
       <Show when={cursor() && !response.loading}>
-        <button
-          type="button"
-          onclick={() => refetch()}
-          class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
-        >
-          Load More
-        </button>
+        <Button onClick={() => refetch()}>Load More</Button>
       </Show>
       <Show when={response.loading}>
         <div class="i-lucide-loader-circle mt-2 animate-spin text-xl" />

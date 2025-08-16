@@ -11,6 +11,7 @@ import { localDateFromTimestamp } from "../utils/date.js";
 import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import { ComAtprotoRepoApplyWrites, ComAtprotoRepoGetRecord } from "@atcute/atproto";
 import { TextInput } from "../components/text-input.jsx";
+import { Button } from "../components/button.jsx";
 
 interface AtprotoRecord {
   rkey: string;
@@ -212,19 +213,17 @@ const CollectionView = () => {
         </div>
         <div class="flex items-center gap-x-2">
           <Show when={records.length > 1}>
-            <button
-              type="button"
-              onclick={() => {
+            <Button
+              onClick={() => {
                 setReverse(!reverse());
                 setRecords([]);
                 setCursor(undefined);
                 refetch();
               }}
-              class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
             >
               <div class={`${reverse() ? "i-lucide-rotate-ccw" : "i-lucide-rotate-cw"} text-sm`} />
               Reverse
-            </button>
+            </Button>
           </Show>
           <div>
             <Show when={batchDelete()}>
@@ -238,13 +237,7 @@ const CollectionView = () => {
           <Show when={cursor()}>
             <div class="flex w-[5rem] items-center justify-center">
               <Show when={!response.loading}>
-                <button
-                  type="button"
-                  onclick={() => refetch()}
-                  class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
-                >
-                  Load More
-                </button>
+                <Button onClick={() => refetch()}>Load More</Button>
               </Show>
               <Show when={response.loading}>
                 <div class="i-lucide-loader-circle animate-spin text-xl" />

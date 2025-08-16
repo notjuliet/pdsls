@@ -5,6 +5,7 @@ import { labelerCache, resolvePDS } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { ComAtprotoLabelDefs } from "@atcute/atproto";
 import { TextInput } from "../components/text-input.jsx";
+import { Button } from "../components/button.jsx";
 
 const LabelView = () => {
   const params = useParams();
@@ -103,13 +104,7 @@ const LabelView = () => {
           <Show when={cursor()}>
             <div class="flex h-[2rem] w-[5.5rem] items-center justify-center text-nowrap">
               <Show when={!response.loading}>
-                <button
-                  type="button"
-                  onclick={() => refetch()}
-                  class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
-                >
-                  Load More
-                </button>
+                <Button onClick={() => refetch()}>Load More</Button>
               </Show>
               <Show when={response.loading}>
                 <div class="i-lucide-loader-circle animate-spin text-xl" />

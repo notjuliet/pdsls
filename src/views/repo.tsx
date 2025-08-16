@@ -16,6 +16,7 @@ import {
 } from "@atcute/did-plc";
 import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
 import { localDateFromTimestamp } from "../utils/date.js";
+import { Button } from "../components/button.jsx";
 
 type Tab = "collections" | "backlinks" | "doc" | "blobs";
 type PlcEvent = "handle" | "rotation_key" | "service" | "verification_method";
@@ -411,9 +412,8 @@ const RepoView = () => {
                 <div class="flex justify-between">
                   <Show when={did.startsWith("did:plc")}>
                     <div class="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onclick={async () => {
+                      <Button
+                        onClick={async () => {
                           if (!plcOps()) {
                             setLoading(true);
                             const response = await fetch(
@@ -435,11 +435,10 @@ const RepoView = () => {
 
                           setShowPlcLogs(!showPlcLogs());
                         }}
-                        class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
                       >
                         <div class="i-lucide-logs text-sm" />
                         {showPlcLogs() ? "Hide" : "Show"} PLC Logs
-                      </button>
+                      </Button>
                       <Show when={loading()}>
                         <div class="i-lucide-loader-circle animate-spin text-xl" />
                       </Show>
@@ -455,14 +454,10 @@ const RepoView = () => {
                       <Show when={downloading()}>
                         <div class="i-lucide-loader-circle animate-spin text-xl" />
                       </Show>
-                      <button
-                        type="button"
-                        onclick={() => downloadRepo()}
-                        class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
-                      >
+                      <Button onClick={() => downloadRepo()}>
                         <div class="i-lucide-download text-sm" />
                         Export Repo
-                      </button>
+                      </Button>
                     </div>
                   </Show>
                 </div>

@@ -3,6 +3,7 @@ import { JSONValue } from "../components/json";
 import { A, useLocation, useSearchParams } from "@solidjs/router";
 import { Firehose } from "@skyware/firehose";
 import { TextInput } from "../components/text-input";
+import { Button } from "../components/button";
 
 const LIMIT = 25;
 type Parameter = { name: string; param: string | string[] | undefined };
@@ -235,13 +236,9 @@ const StreamView = () => {
           </div>
         </Show>
         <div class="flex justify-end">
-          <button
-            type="button"
-            onclick={() => connectSocket(new FormData(formRef))}
-            class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 w-fit rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
-          >
+          <Button onClick={() => connectSocket(new FormData(formRef))}>
             {connected() ? "Disconnect" : "Connect"}
-          </button>
+          </Button>
         </div>
       </form>
       <Show when={notice().length}>

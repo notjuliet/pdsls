@@ -9,6 +9,7 @@ import { useNavigate, useParams } from "@solidjs/router";
 import { remove } from "@mary/exif-rm";
 import { TextInput } from "./text-input.jsx";
 import { Modal } from "./modal.jsx";
+import { Button } from "./button.jsx";
 
 export const RecordEditor = (props: { create: boolean; record?: any }) => {
   const navigate = useNavigate();
@@ -263,17 +264,15 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                     </label>
                   </div>
                 </Show>
-                <button
-                  type="button"
-                  onclick={() =>
+                <Button
+                  onClick={() =>
                     props.create ?
                       createRecord(new FormData(formRef))
                     : editRecord(new FormData(formRef))
                   }
-                  class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-100 sm:text-sm"
                 >
                   {props.create ? "Create" : "Edit"}
-                </button>
+                </Button>
               </div>
             </div>
           </form>

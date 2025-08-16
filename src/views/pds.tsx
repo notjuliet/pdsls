@@ -7,6 +7,7 @@ import { InferXRPCBodyOutput } from "@atcute/lexicons";
 import { ComAtprotoServerDescribeServer, ComAtprotoSyncListRepos } from "@atcute/atproto";
 import * as TID from "@atcute/tid";
 import { localDateFromTimestamp } from "../utils/date";
+import { Button } from "../components/button";
 
 const LIMIT = 1000;
 
@@ -148,18 +149,12 @@ const PdsView = () => {
             </A>
           )}
         </For>
-        <div class="flex w-full justify-center">
+        <div class="mt-2 flex w-full justify-center">
           <Show when={cursor() && !response.loading}>
-            <button
-              type="button"
-              onclick={() => refetch()}
-              class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 mt-2 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
-            >
-              Load More
-            </button>
+            <Button onClick={() => refetch()}>Load More</Button>
           </Show>
           <Show when={response.loading}>
-            <div class="i-lucide-loader-circle mt-2 animate-spin text-xl" />
+            <div class="i-lucide-loader-circle animate-spin text-xl" />
           </Show>
         </div>
       </div>

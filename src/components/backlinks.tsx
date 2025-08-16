@@ -2,6 +2,7 @@ import { createSignal, onMount, Show, For, createResource } from "solid-js";
 import { getRecordBacklinks, getDidBacklinks, getAllBacklinks } from "../utils/api.js";
 import * as TID from "@atcute/tid";
 import { localDateFromTimestamp } from "../utils/date.js";
+import { Button } from "./button.jsx";
 
 // the actual backlink api will probably become closer to this
 const linksBySource = (links: Record<string, any>) => {
@@ -178,18 +179,7 @@ const BacklinkItems = ({
         </For>
       </Show>
       <Show when={links().cursor}>
-        <Show
-          when={more()}
-          fallback={
-            <button
-              type="button"
-              onclick={() => setMore(true)}
-              class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200/50"
-            >
-              Load More
-            </button>
-          }
-        >
+        <Show when={more()} fallback={<Button onClick={() => setMore(true)}>Load More</Button>}>
           <BacklinkItems
             target={target}
             collection={collection}
