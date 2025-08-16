@@ -3,7 +3,7 @@ import Tooltip from "../components/tooltip";
 
 const Home = () => {
   return (
-    <div class="w-21rem sm:w-24rem mt-4 flex flex-col gap-2 break-words">
+    <div class="w-22rem sm:w-24rem mt-4 flex flex-col gap-2 break-words">
       <div>
         <div>
           <span class="font-semibold">AT Protocol Explorer</span>

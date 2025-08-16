@@ -66,7 +66,7 @@ const LabelView = () => {
             URI Patterns (comma-separated)
           </label>
         </div>
-        <div class="w-21rem sm:w-24rem flex items-center gap-x-2">
+        <div class="w-22rem sm:w-24rem flex items-center gap-x-2">
           <textarea
             id="patterns"
             name="patterns"
@@ -91,7 +91,7 @@ const LabelView = () => {
         <TextInput
           placeholder="Filter by label"
           onInput={(e) => setFilter(e.currentTarget.value)}
-          class="w-21rem sm:w-24rem"
+          class="w-22rem sm:w-24rem"
         />
         <div class="flex items-center gap-x-2">
           <Show when={labelCount() && labels().length}>

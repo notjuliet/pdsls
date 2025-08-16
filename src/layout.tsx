@@ -37,7 +37,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         </Show>
         <Title>{customTitle[params.repo] ?? "PDSls"}</Title>
       </MetaProvider>
-      <div class="mb-2 flex w-[21rem] items-center sm:w-[24rem]">
+      <div class="mb-2 flex w-[22rem] items-center sm:w-[24rem]">
         <div class="flex basis-1/3 gap-x-2">
           <A href="/jetstream">
             <Tooltip text="Relay">
@@ -71,7 +71,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <Settings />
         </div>
       </div>
-      <div class="min-w-21rem sm:min-w-24rem z-1 dark:bg-dark-500 mb-4 flex max-w-full flex-col items-center text-pretty bg-zinc-100 md:max-w-screen-md">
+      <div class="min-w-22rem sm:min-w-24rem z-1 dark:bg-dark-500 mb-4 flex max-w-full flex-col items-center text-pretty bg-zinc-100 md:max-w-screen-md">
         <Show when={location.pathname !== "/jetstream" && location.pathname !== "/firehose"}>
           <Search />
         </Show>

@@ -167,15 +167,16 @@ const RepoView = () => {
   let pds: string;
   const did = params.repo;
 
-  const RepoTab = (props: { tab: Tab; label: string }) => (
+  const RepoTab = (props: { tab: Tab; label: string; icon: string }) => (
     <button
       classList={{
-        "rounded-full text-xs sm:text-sm flex flex-1 py-1.5 justify-center": true,
+        "rounded-full text-xs flex flex-1 items-center gap-0.5 py-1.5 justify-center": true,
         "bg-white dark:bg-dark-300 shadow-sm dark:shadow-dark-900/80": tab() === props.tab,
         "bg-transparent hover:bg-zinc-200 dark:hover:bg-dark-200": tab() !== props.tab,
       }}
       onclick={() => setTab(props.tab)}
     >
+      <div class={props.icon} />
       {props.label}
     </button>
   );
@@ -254,7 +255,7 @@ const RepoView = () => {
 
   return (
     <Show when={repo()}>
-      <div class="mt-3 flex w-[21rem] flex-col gap-2 break-words sm:w-[24rem]">
+      <div class="mt-3 flex w-[22rem] flex-col gap-2 break-words sm:w-[24rem]">
         <Show when={error()}>
           <div class="rounded-md bg-red-100 p-2 text-sm text-red-700 dark:bg-red-200 dark:text-red-600">
             {error()}
@@ -262,13 +263,13 @@ const RepoView = () => {
         </Show>
         <div class="flex gap-1 text-sm">
           <Show when={!error()}>
-            <RepoTab tab="collections" label="Collections" />
+            <RepoTab tab="collections" label="Collections" icon="i-lucide-folder-open" />
           </Show>
-          <RepoTab tab="doc" label="DID Doc" />
+          <RepoTab tab="doc" label="DID Doc" icon="i-lucide-id-card" />
           <Show when={!error()}>
-            <RepoTab tab="blobs" label="Blobs" />
+            <RepoTab tab="blobs" label="Blobs" icon="i-lucide-file-digit" />
           </Show>
-          <RepoTab tab="backlinks" label="Backlinks" />
+          <RepoTab tab="backlinks" label="Backlinks" icon="i-lucide-send-to-back" />
         </div>
         <Show when={tab() === "backlinks"}>
           <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
