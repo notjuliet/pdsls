@@ -8,7 +8,7 @@ const Tooltip = (props: { text: string; children: JSX.Element }) => (
     <Show when={!isTouchDevice}>
       <span
         style={`transform: translate(-50%, 28px)`}
-        class={`left-50% border-0.5 dark:shadow-dark-900/80 pointer-events-none absolute z-10 hidden min-w-fit select-none whitespace-nowrap rounded border-neutral-300 bg-white p-1 text-center font-sans text-xs text-neutral-900 shadow-md group-hover/tooltip:inline dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100`}
+        class={`left-50% border-0.5 dark:shadow-dark-900/80 pointer-events-none absolute z-10 hidden min-w-fit select-none whitespace-nowrap rounded border-neutral-300 bg-white p-1 text-center font-sans text-xs text-neutral-900 shadow-md group-hover/tooltip:inline dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200`}
       >
         {props.text}
       </span>

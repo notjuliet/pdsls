@@ -179,7 +179,7 @@ const StreamView = () => {
                 spellcheck={false}
                 placeholder="Comma-separated list of collections"
                 value={searchParams.collections ?? ""}
-                class="w-16rem dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-neutral-900 dark:focus:outline-neutral-100"
+                class="w-16rem dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-neutral-900 dark:focus:outline-neutral-200"
               />
             </label>
           </Show>
@@ -191,7 +191,7 @@ const StreamView = () => {
                 spellcheck={false}
                 placeholder="Comma-separated list of DIDs"
                 value={searchParams.dids ?? ""}
-                class="w-16rem dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-neutral-900 dark:focus:outline-neutral-100"
+                class="w-16rem dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-neutral-900 dark:focus:outline-neutral-200"
               />
             </label>
           </Show>
