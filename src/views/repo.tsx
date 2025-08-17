@@ -358,7 +358,7 @@ const RepoView = () => {
                         <div class="i-lucide-id-card" />
                         <p class="font-semibold">ID</p>
                       </div>
-                      <span>{didDocument().id}</span>
+                      <span class="text-sm">{didDocument().id}</span>
                     </div>
                     <Tooltip text="DID Document">
                       <a
@@ -379,7 +379,9 @@ const RepoView = () => {
                       <p class="font-semibold">Aliases</p>
                     </div>
                     <ul>
-                      <For each={didDocument().alsoKnownAs}>{(alias) => <li>{alias}</li>}</For>
+                      <For each={didDocument().alsoKnownAs}>
+                        {(alias) => <li class="text-sm">{alias}</li>}
+                      </For>
                     </ul>
                   </div>
                   <div>
@@ -390,7 +392,7 @@ const RepoView = () => {
                     <ul>
                       <For each={didDocument().service}>
                         {(service) => (
-                          <li class="flex flex-col">
+                          <li class="flex flex-col text-sm">
                             <span>#{service.id.split("#")[1]}</span>
                             <a
                               class="w-fit text-blue-400 hover:underline"
@@ -414,7 +416,7 @@ const RepoView = () => {
                         {(verif) => (
                           <Show when={verif.publicKeyMultibase}>
                             {(key) => (
-                              <li class="flex flex-col">
+                              <li class="flex flex-col text-sm">
                                 <span class="flex justify-between gap-1">
                                   <span>#{verif.id.split("#")[1]}</span>
                                   <span>{parsePublicMultikey(key()).type}</span>
