@@ -37,7 +37,7 @@ const PlcLogView = (props: {
       onclick={() => setActivePlcEvent(activePlcEvent() === props.event ? undefined : props.event)}
     >
       <div
-        class={`${props.icon} text-xl ${activePlcEvent() === props.event ? "text-neutral-200 dark:text-neutral-900" : ""}`}
+        class={`${props.icon} ${activePlcEvent() === props.event ? "text-neutral-200 dark:text-neutral-900" : ""}`}
       />
     </button>
   );
@@ -107,9 +107,9 @@ const PlcLogView = (props: {
   return (
     <>
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-1">
+        <div class="flex items-center gap-1 text-lg">
           <Tooltip text="Filter operations">
-            <div class="i-lucide-filter text-xl" />
+            <div class="i-lucide-filter" />
           </Tooltip>
           <div class="dark:shadow-dark-900/80 dark:bg-dark-300 flex w-fit items-center rounded-full bg-white shadow-sm">
             <FilterButton icon="i-lucide-at-sign" event="handle" />
