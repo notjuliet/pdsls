@@ -11,7 +11,6 @@ import { Button } from "../components/button";
 
 const LIMIT = 1000;
 
-// TODO: move this somewhere else
 const Field = ({
   label,
   value,
@@ -26,18 +25,21 @@ const Field = ({
   const [fullField, setFullField] = createSignal(false);
 
   return (
-    <div classList={{ "flex gap-x-1": true, "flex-col": !inline }}>
-      <span class="font-semibold text-stone-600 dark:text-stone-400">{label}</span>
+    <div classList={{ "flex items-baseline gap-x-1": true, "flex-col": !inline }}>
+      <span class="font-semibold">{label}</span>
       <Show when={truncate}>
         <button
-          classList={{ "bg-transparent break-anywhere text-left": true, truncate: !fullField() }}
+          classList={{
+            "bg-transparent text-sm break-anywhere text-left": true,
+            truncate: !fullField(),
+          }}
           onclick={() => setFullField(!fullField())}
         >
           {value}
         </button>
       </Show>
       <Show when={!truncate}>
-        <span class="break-anywhere">{value}</span>
+        <span class="break-anywhere text-sm">{value}</span>
       </Show>
     </div>
   );
@@ -94,7 +96,6 @@ const PdsView = () => {
         <Show when={serverInfos()}>
           {(server) => (
             <>
-              <Field label="DID" value={server().did} truncate />
               <Show when={server().inviteCodeRequired}>
                 <Field
                   label="Invite Code Required"
@@ -109,20 +110,16 @@ const PdsView = () => {
               </Show>
               <Show when={server().availableUserDomains.length}>
                 <div class="flex flex-col">
-                  <span class="font-semibold text-stone-600 dark:text-stone-400">
-                    Available User Domains
-                  </span>
+                  <span class="font-semibold">Available User Domains</span>
                   <For each={server().availableUserDomains}>
-                    {(domain) => <span class="break-anywhere">{domain}</span>}
+                    {(domain) => <span class="break-anywhere text-sm">{domain}</span>}
                   </For>
                 </div>
               </Show>
             </>
           )}
         </Show>
-        <p class="w-full font-semibold text-stone-600 dark:text-stone-400">
-          {repos()?.length} Repositories
-        </p>
+        <p class="w-full font-semibold">{repos()?.length} Repositories</p>
         <For each={repos()}>
           {(repo) => (
             <A
@@ -140,7 +137,7 @@ const PdsView = () => {
                   </Tooltip>
                 </div>
               </Show>
-              <span class="text-xs sm:text-sm">{repo.did}</span>
+              <span class="text-sm">{repo.did}</span>
               <Show when={TID.validate(repo.rev)}>
                 <span class="text-xs text-neutral-500 dark:text-neutral-400">
                   {localDateFromTimestamp(TID.parse(repo.rev).timestamp / 1000).split(" ")[0]}
