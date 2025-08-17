@@ -358,7 +358,7 @@ const RepoView = () => {
                         <div class="i-lucide-id-card" />
                         <p class="font-semibold">ID</p>
                       </div>
-                      <span class="text-sm">{didDocument().id}</span>
+                      <div class="text-sm">{didDocument().id}</div>
                     </div>
                     <Tooltip text="DID Document">
                       <a
