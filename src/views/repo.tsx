@@ -419,7 +419,10 @@ const RepoView = () => {
                               <li class="flex flex-col text-sm">
                                 <span class="flex justify-between gap-1">
                                   <span>#{verif.id.split("#")[1]}</span>
-                                  <span>{parsePublicMultikey(key()).type}</span>
+                                  <span class="flex items-center gap-0.5">
+                                    <div class="i-lucide-key-round" />
+                                    {parsePublicMultikey(key()).type}
+                                  </span>
                                 </span>
                                 <span>{key()}</span>
                               </li>
