@@ -120,9 +120,7 @@ const LabelView = () => {
               <div class="flex items-center justify-between gap-2 pb-2">
                 <div class="flex flex-col">
                   <div class="flex items-center gap-x-2">
-                    <div class="min-w-[5rem] font-semibold text-stone-600 dark:text-stone-400">
-                      URI
-                    </div>
+                    <div class="min-w-[5rem] font-semibold">URI</div>
                     <A
                       href={`/at://${label.uri.replace("at://", "")}`}
                       target="_blank"
@@ -133,30 +131,22 @@ const LabelView = () => {
                   </div>
                   <Show when={label.cid}>
                     <div class="flex items-center gap-x-2">
-                      <div class="min-w-[5rem] font-semibold text-stone-600 dark:text-stone-400">
-                        CID
-                      </div>
+                      <div class="min-w-[5rem] font-semibold">CID</div>
                       {label.cid}
                     </div>
                   </Show>
                   <div class="flex items-center gap-x-2">
-                    <div class="min-w-[5rem] font-semibold text-stone-600 dark:text-stone-400">
-                      Label
-                    </div>
+                    <div class="min-w-[5rem] font-semibold">Label</div>
                     {label.val}
                   </div>
                   <div class="flex items-center gap-x-2">
-                    <div class="min-w-[5rem] font-semibold text-stone-600 dark:text-stone-400">
-                      Created
-                    </div>
+                    <div class="min-w-[5rem] font-semibold">Created</div>
                     {localDateFromTimestamp(new Date(label.cts).getTime())}
                   </div>
                   <Show when={label.exp}>
                     {(exp) => (
                       <div class="flex items-center gap-x-2">
-                        <div class="min-w-[5rem] font-semibold text-stone-600 dark:text-stone-400">
-                          Expires
-                        </div>
+                        <div class="min-w-[5rem] font-semibold">Expires</div>
                         {localDateFromTimestamp(new Date(exp()).getTime())}
                       </div>
                     )}

@@ -225,9 +225,7 @@ const StreamView = () => {
               {(param) => (
                 <Show when={param.param}>
                   <div class="flex">
-                    <div class="min-w-6rem font-semibold text-stone-600 dark:text-stone-400">
-                      {param.name}
-                    </div>
+                    <div class="min-w-6rem font-semibold">{param.name}</div>
                     {param.param}
                   </div>
                 </Show>

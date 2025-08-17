@@ -88,9 +88,7 @@ const Backlinks = (props: { target: string }) => {
                 <Show when={show()?.collection === collection && show()?.path === path}>
                   <Show when={show()?.showDids}>
                     {/* putting this in the `dids` prop directly failed to re-render. idk how to solidjs. */}
-                    <p class="w-full font-semibold text-stone-600 dark:text-stone-400">
-                      Distinct identities
-                    </p>
+                    <p class="w-full font-semibold">Distinct identities</p>
                     <BacklinkItems
                       target={props.target}
                       collection={collection}
@@ -99,7 +97,7 @@ const Backlinks = (props: { target: string }) => {
                     />
                   </Show>
                   <Show when={!show()?.showDids}>
-                    <p class="w-full font-semibold text-stone-600 dark:text-stone-400">Records</p>
+                    <p class="w-full font-semibold">Records</p>
                     <BacklinkItems
                       target={props.target}
                       collection={collection}
