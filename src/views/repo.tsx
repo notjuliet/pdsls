@@ -123,7 +123,7 @@ const PlcLogView = (props: {
             href={`${localStorage.plcDirectory ?? "https://plc.directory"}/${props.did}/log/audit`}
             target="_blank"
           >
-            <div class="i-lucide-external-link text-lg" />
+            <div class="i-lucide-external-link" />
           </a>
         </Tooltip>
       </div>
