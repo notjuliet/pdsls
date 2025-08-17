@@ -17,6 +17,7 @@ import {
 import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { Button } from "../components/button.jsx";
+import { parsePublicMultikey } from "@atcute/crypto";
 
 type Tab = "collections" | "backlinks" | "doc" | "blobs";
 type PlcEvent = "handle" | "rotation_key" | "service" | "verification_method";
@@ -88,7 +89,7 @@ const PlcLogView = (props: {
 
     return (
       <div class="grid grid-cols-[min-content_1fr] items-center gap-x-1">
-        <div class={icon + ` shrink-0 text-lg`} />
+        <div class={icon + ` shrink-0`} />
         <p
           classList={{
             "font-semibold": true,
@@ -351,9 +352,12 @@ const RepoView = () => {
             {(didDocument) => (
               <div class="break-anywhere flex flex-col gap-y-2">
                 <div class="flex flex-col gap-y-1">
-                  <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-baseline justify-between gap-2">
                     <div>
-                      <span class="font-semibold text-stone-600 dark:text-stone-400">ID </span>
+                      <div class="flex items-center gap-1">
+                        <div class="i-lucide-id-card" />
+                        <p class="font-semibold">ID</p>
+                      </div>
                       <span>{didDocument().id}</span>
                     </div>
                     <Tooltip text="DID Document">
@@ -365,19 +369,25 @@ const RepoView = () => {
                         }
                         target="_blank"
                       >
-                        <div class="i-lucide-external-link text-lg" />
+                        <div class="i-lucide-external-link" />
                       </a>
                     </Tooltip>
                   </div>
                   <div>
-                    <p class="font-semibold text-stone-600 dark:text-stone-400">Identities</p>
-                    <ul class="ml-2">
+                    <div class="flex items-center gap-1">
+                      <div class="i-lucide-at-sign" />
+                      <p class="font-semibold">Aliases</p>
+                    </div>
+                    <ul>
                       <For each={didDocument().alsoKnownAs}>{(alias) => <li>{alias}</li>}</For>
                     </ul>
                   </div>
                   <div>
-                    <p class="font-semibold text-stone-600 dark:text-stone-400">Services</p>
-                    <ul class="ml-2">
+                    <div class="flex items-center gap-1">
+                      <div class="i-lucide-server" />
+                      <p class="font-semibold">Services</p>
+                    </div>
+                    <ul>
                       <For each={didDocument().service}>
                         {(service) => (
                           <li class="flex flex-col">
@@ -395,16 +405,24 @@ const RepoView = () => {
                     </ul>
                   </div>
                   <div>
-                    <p class="font-semibold text-stone-600 dark:text-stone-400">
-                      Verification methods
-                    </p>
-                    <ul class="ml-2">
+                    <div class="flex items-center gap-1">
+                      <div class="i-lucide-shield-check" />
+                      <p class="font-semibold">Verification methods</p>
+                    </div>
+                    <ul>
                       <For each={didDocument().verificationMethod}>
                         {(verif) => (
-                          <li class="flex flex-col">
-                            <span>#{verif.id.split("#")[1]}</span>
-                            <span>{verif.publicKeyMultibase}</span>
-                          </li>
+                          <Show when={verif.publicKeyMultibase}>
+                            {(key) => (
+                              <li class="flex flex-col">
+                                <span class="flex justify-between gap-1">
+                                  <span>#{verif.id.split("#")[1]}</span>
+                                  <span>{parsePublicMultikey(key()).type}</span>
+                                </span>
+                                <span>{key()}</span>
+                              </li>
+                            )}
+                          </Show>
                         )}
                       </For>
                     </ul>
