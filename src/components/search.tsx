@@ -55,7 +55,7 @@ const Search = () => {
         </label>
       </div>
       <div class="flex w-full items-center gap-2">
-        <div class="dark:bg-dark-100 focus-within:outline-1.5 dark:shadow-dark-900/80 flex grow items-center gap-2 rounded-lg bg-white px-2 py-1 shadow-sm focus-within:outline-slate-900 dark:focus-within:outline-slate-100">
+        <div class="dark:bg-dark-100 focus-within:outline-1.5 dark:shadow-dark-900/80 flex grow items-center gap-2 rounded-lg bg-white px-2 py-1 shadow-sm focus-within:outline-neutral-900 dark:focus-within:outline-neutral-100">
           <input
             type="text"
             spellcheck={false}

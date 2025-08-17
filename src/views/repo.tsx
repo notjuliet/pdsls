@@ -37,7 +37,7 @@ const PlcLogView = (props: {
       onclick={() => setActivePlcEvent(activePlcEvent() === props.event ? undefined : props.event)}
     >
       <div
-        class={`${props.icon} text-xl ${activePlcEvent() === props.event ? "text-slate-100 dark:text-slate-900" : ""}`}
+        class={`${props.icon} text-xl ${activePlcEvent() === props.event ? "text-neutral-100 dark:text-neutral-900" : ""}`}
       />
     </button>
   );

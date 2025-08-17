@@ -53,7 +53,7 @@ const Settings = () => {
   return (
     <>
       <Modal open={openSettings()} onClose={() => setOpenSettings(false)}>
-        <div class="starting:opacity-0 w-22rem dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900/80 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-slate-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-slate-100">
+        <div class="starting:opacity-0 w-22rem dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900/80 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-neutral-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-100">
           <div class="mb-3 flex items-center gap-1 font-bold">
             <div class="i-lucide-settings" />
             <span>Settings</span>

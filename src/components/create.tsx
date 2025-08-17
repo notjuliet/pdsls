@@ -173,7 +173,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
   return (
     <>
       <Modal open={openDialog()} onClose={() => setOpenDialog(false)}>
-        <div class="w-22rem sm:w-xl lg:w-48rem starting:opacity-0 dark:bg-dark-800/70 left-50% backdrop-blur-xs border-0.5 dark:shadow-dark-900/80 absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-2 text-slate-900 shadow-md transition-opacity duration-300 sm:p-4 dark:border-neutral-700 dark:text-slate-100">
+        <div class="w-22rem sm:w-xl lg:w-48rem starting:opacity-0 dark:bg-dark-800/70 left-50% backdrop-blur-xs border-0.5 dark:shadow-dark-900/80 absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-2 text-neutral-900 shadow-md transition-opacity duration-300 sm:p-4 dark:border-neutral-700 dark:text-neutral-100">
           <div class="mb-2 flex w-full justify-between">
             <div class="flex items-center gap-1 font-bold">
               <div class="i-lucide-square-pen" />
@@ -212,7 +212,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                 <select
                   name="validate"
                   id="validate"
-                  class="dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900/80 rounded-lg bg-white px-1 py-1 shadow-sm focus:outline-slate-900 dark:focus:outline-slate-100"
+                  class="dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900/80 rounded-lg bg-white px-1 py-1 shadow-sm focus:outline-neutral-900 dark:focus:outline-neutral-100"
                 >
                   <option value="unset">Unset</option>
                   <option value="true">True</option>
