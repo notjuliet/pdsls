@@ -54,16 +54,13 @@ const Home = () => {
         <span class="font-semibold">Examples</span>
         <div class="flex items-center gap-1">
           <div class="i-lucide-server" />
-          <A href="/pds.kelinci.net" class="text-sm text-blue-400 hover:underline sm:text-base">
+          <A href="/pds.kelinci.net" class="text-blue-400 hover:underline">
             https://pds.kelinci.net
           </A>
         </div>
         <div class="flex items-center gap-1">
           <div class="i-lucide-at-sign" />
-          <A
-            href="/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2"
-            class="text-sm text-blue-400 hover:underline sm:text-base"
-          >
+          <A href="/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2" class="text-blue-400 hover:underline">
             at://did:plc:vwzwgnygau7ed7b7wt5ux7y2
           </A>
         </div>
@@ -71,7 +68,7 @@ const Home = () => {
           <div class="i-lucide-file-json shrink-0" />
           <A
             href="/at://did:plc:oisofpd7lj26yvgiivf3lxsi/app.bsky.actor.profile/self"
-            class="text-sm text-blue-400 hover:underline sm:text-base"
+            class="text-blue-400 hover:underline"
           >
             at://hailey.at/app.bsky.actor.profile/self
           </A>
@@ -80,9 +77,9 @@ const Home = () => {
           <div class="i-lucide-tag" />
           <A
             href="/at://did:plc:wkoofae5uytcm7bjncmev6n6/labels"
-            class="text-sm text-blue-400 hover:underline sm:text-base"
+            class="text-blue-400 hover:underline"
           >
-            at://did:plc:wkoofae5uytcm7bjncmev6n6/labels
+            at://pronouns.diy/labels
           </A>
         </div>
       </div>
