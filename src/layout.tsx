@@ -47,7 +47,14 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <AccountManager />
         </div>
         <div class="flex basis-1/3 items-center justify-center text-center">
-          <A href="/" class="font-mono font-bold hover:underline">
+          <A
+            href="/"
+            classList={{
+              "font-mono font-bold hover:underline": true,
+              "hover:scale-2000 hover:translate-y-100 hover:bg-linear-to-r z-50 bg-clip-text transition-all duration-1000 hover:animate-spin hover:from-white hover:to-pink-500 hover:text-transparent ":
+                !!customTitle[params.repo],
+            }}
+          >
             {customTitle[params.repo] ?? "PDSls"}
           </A>
           <Show when={localStorage.kawaii === "true" || kawaii()}>
