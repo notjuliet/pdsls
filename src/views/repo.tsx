@@ -93,7 +93,7 @@ const PlcLogView = (props: {
         <p
           classList={{
             "font-semibold": true,
-            "text-gray-500 line-through dark:text-gray-400": diff.orig.nullified,
+            "text-neutral-400 line-through dark:text-neutral-600": diff.orig.nullified,
           }}
         >
           {title}
