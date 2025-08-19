@@ -37,7 +37,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
 
   return (
     <span
-      class="relative flex items-baseline rounded px-0.5 hover:bg-zinc-200 dark:hover:bg-neutral-700"
+      class="relative flex items-baseline rounded px-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700"
       ref={rkeyRef}
       onmouseover={() => setHover(true)}
       onmouseleave={() => setHover(false)}
@@ -51,7 +51,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
       <Show when={hover()}>
         <span
           ref={previewRef}
-          class={`dark:bg-dark-500/70 left-50% max-h-md z-25 backdrop-blur-xs border-0.5 dark:shadow-dark-900/80 pointer-events-none absolute block w-max max-w-sm -translate-x-1/2 overflow-hidden whitespace-pre-wrap rounded-md border-neutral-300 bg-zinc-100/70 p-2 text-xs shadow-md lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
+          class={`dark:bg-dark-500/70 left-50% max-h-md z-25 backdrop-blur-xs border-0.5 dark:shadow-dark-900/80 pointer-events-none absolute block w-max max-w-sm -translate-x-1/2 overflow-hidden whitespace-pre-wrap rounded-md border-neutral-300 bg-neutral-100/70 p-2 text-xs shadow-md lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
         >
           <JSONValue
             data={props.record.record.value as JSONType}
@@ -161,7 +161,7 @@ const CollectionView = () => {
 
   return (
     <Show when={records.length || response()}>
-      <div class="z-5 dark:bg-dark-500/70 backdrop-blur-xs sticky top-0 flex w-screen flex-col items-center justify-center gap-2 bg-zinc-100/70 py-3">
+      <div class="z-5 dark:bg-dark-500/70 backdrop-blur-xs sticky top-0 flex w-screen flex-col items-center justify-center gap-2 bg-neutral-100/70 py-3">
         <div class="w-22rem sm:w-24rem flex items-center gap-2">
           <Show when={agent() && agent()?.sub === did}>
             <div class="flex items-center gap-x-2">

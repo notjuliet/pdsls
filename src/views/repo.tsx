@@ -173,7 +173,7 @@ const RepoView = () => {
       classList={{
         "rounded-full text-xs flex flex-1 items-center gap-0.5 py-1.5 justify-center": true,
         "bg-white dark:bg-dark-300 shadow-sm dark:shadow-dark-900/80": tab() === props.tab,
-        "bg-transparent hover:bg-zinc-200 dark:hover:bg-dark-200": tab() !== props.tab,
+        "bg-transparent hover:bg-neutral-200 dark:hover:bg-dark-200": tab() !== props.tab,
       }}
       onclick={() => setTab(props.tab)}
     >

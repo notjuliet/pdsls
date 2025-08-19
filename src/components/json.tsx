@@ -97,7 +97,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
         >
           <span
             classList={{
-              "dark:bg-dark-500 absolute w-5 -left-5 bg-zinc-100 text-sm": true,
+              "dark:bg-dark-500 absolute w-5 -left-5 bg-neutral-100 text-sm": true,
               "hidden group-hover/clip:block": show(),
             }}
           >

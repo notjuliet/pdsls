@@ -12,7 +12,7 @@ export const Button = (props: ButtonProps) => {
       type="button"
       class={
         props.class ??
-        "dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-zinc-200"
+        "dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-bold shadow-sm hover:bg-neutral-200"
       }
       onClick={props.onClick}
     >

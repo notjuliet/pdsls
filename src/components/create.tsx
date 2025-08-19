@@ -173,7 +173,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
   return (
     <>
       <Modal open={openDialog()} onClose={() => setOpenDialog(false)}>
-        <div class="w-22rem sm:w-xl lg:w-48rem starting:opacity-0 dark:bg-dark-800/70 left-50% backdrop-blur-xs border-0.5 dark:shadow-dark-900/80 absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-2 text-neutral-900 shadow-md transition-opacity duration-300 sm:p-4 dark:border-neutral-700 dark:text-neutral-200">
+        <div class="w-22rem sm:w-xl lg:w-48rem starting:opacity-0 dark:bg-dark-800/70 left-50% backdrop-blur-xs border-0.5 dark:shadow-dark-900/80 absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-neutral-200/70 p-2 text-neutral-900 shadow-md transition-opacity duration-300 sm:p-4 dark:border-neutral-700 dark:text-neutral-200">
           <div class="mb-2 flex w-full justify-between">
             <div class="flex items-center gap-1 font-bold">
               <div class="i-lucide-square-pen" />
@@ -221,7 +221,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
               </div>
               <div class="flex items-center gap-2">
                 <Show when={!uploading()}>
-                  <div class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex rounded-lg bg-white text-xs font-bold shadow-sm hover:bg-zinc-100">
+                  <div class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex rounded-lg bg-white text-xs font-bold shadow-sm hover:bg-neutral-100">
                     <input type="file" id="blob" hidden onChange={() => uploadBlob()} />
                     <label class="flex items-center gap-1 px-2 py-1.5" for="blob">
                       <div class="i-lucide-upload text-sm" />

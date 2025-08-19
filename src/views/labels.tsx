@@ -87,7 +87,7 @@ const LabelView = () => {
           </div>
         </div>
       </form>
-      <div class="z-5 dark:bg-dark-500/70 backdrop-blur-xs sticky top-0 flex w-screen flex-col items-center justify-center gap-3 bg-zinc-100/70 py-3">
+      <div class="z-5 dark:bg-dark-500/70 backdrop-blur-xs sticky top-0 flex w-screen flex-col items-center justify-center gap-3 bg-neutral-100/70 py-3">
         <TextInput
           placeholder="Filter by label"
           onInput={(e) => setFilter(e.currentTarget.value)}

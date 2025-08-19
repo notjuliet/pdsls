@@ -68,7 +68,7 @@ const AccountManager = () => {
   return (
     <>
       <Modal open={openManager()} onClose={() => setOpenManager(false)}>
-        <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 w-22rem dark:shadow-dark-900/80 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-zinc-200/70 p-4 text-neutral-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200">
+        <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 w-22rem dark:shadow-dark-900/80 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-neutral-200/70 p-4 text-neutral-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200">
           <div class="mb-2 flex items-center gap-1 font-bold">
             <div class="i-lucide-user-round" />
             <span>Manage accounts</span>
@@ -78,7 +78,7 @@ const AccountManager = () => {
               {(did) => (
                 <div class="group/select flex w-full items-center justify-between gap-x-2">
                   <button
-                    class="flex basis-full items-center justify-between gap-1 truncate rounded bg-transparent px-1 text-left group-hover/select:bg-zinc-100 dark:group-hover/select:bg-neutral-600"
+                    class="flex basis-full items-center justify-between gap-1 truncate rounded bg-transparent px-1 text-left group-hover/select:bg-neutral-100 dark:group-hover/select:bg-neutral-600"
                     onclick={() => resumeSession(did as Did)}
                   >
                     <span class="truncate">{sessions[did]?.length ? sessions[did] : did}</span>
