@@ -180,7 +180,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
               <span class="font-bold">{props.create ? "Creating" : "Editing"} record</span>
             </div>
             <div
-              class="i-lucide-x text-xl hover:text-red-500 dark:hover:text-red-400"
+              class="i-lucide-x text-xl hover:text-neutral-400 dark:hover:text-neutral-500"
               onclick={() => setOpenDialog(false)}
             />
           </div>

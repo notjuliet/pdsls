@@ -56,7 +56,7 @@ const Login = () => {
   };
 
   return (
-    <form class="flex flex-col gap-y-1" onsubmit={(e) => e.preventDefault()}>
+    <form class="flex flex-col gap-y-2" onsubmit={(e) => e.preventDefault()}>
       <div class="flex items-center gap-2">
         <label for="handle">
           <div class="i-lucide-user-round-plus text-lg" />
