@@ -1,8 +1,16 @@
-## PDSls
+# PDSls - AT Protocol Explorer
 
-Navigate and manage [atproto](https://atproto.com/) repositories and the records they contain, as well as watching the relay in real time (firehose + jetstream support).
+Lightweight and client-side web app to navigate [atproto](https://atproto.com/).
 
-### Hacking
+## Features
+
+- Browse the public data on PDSes (Personal Data Servers).
+- Login to manage records in your repository.
+- Jetstream and firehose streaming.
+- Backlinks support with [constellation](https://constellation.microcosm.blue/).
+- Query moderation labels.
+
+## Hacking
 
 You will need `node` and `pnpm` to get started:
 
@@ -13,7 +21,7 @@ pnpm build  # runs vite build
 pnpm serve  # runs vite preview
 ```
 
-### Credits
+## Credits
 
 [atcute](https://github.com/mary-ext/atcute) - atproto SDK\
 [@skyware/firehose](https://github.com/skyware-js/firehose) - Firehose client\
