@@ -68,7 +68,7 @@ const AccountManager = () => {
   return (
     <>
       <Modal open={openManager()} onClose={() => setOpenManager(false)}>
-        <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 w-22rem dark:shadow-dark-900/80 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-md border-neutral-300 bg-neutral-200/70 p-4 text-neutral-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200">
+        <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 w-22rem dark:shadow-dark-900/80 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-lg border-neutral-300 bg-neutral-200/70 p-4 text-neutral-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200">
           <div class="mb-2 flex items-center gap-1 font-bold">
             <div class="i-lucide-user-round" />
             <span>Manage accounts</span>
