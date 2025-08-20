@@ -95,6 +95,7 @@ const StreamView = () => {
       firehose = new Firehose({
         relay: url,
         cursor: cursor,
+        autoReconnect: false,
       });
       firehose.on("error", (err) => {
         console.error(err);
