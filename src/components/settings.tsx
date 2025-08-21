@@ -1,4 +1,4 @@
-import { createSignal, onMount, Show, onCleanup } from "solid-js";
+import { createSignal, onMount, onCleanup } from "solid-js";
 import Tooltip from "./tooltip.jsx";
 import { TextInput } from "./text-input.jsx";
 import { Modal } from "./modal.jsx";
@@ -16,7 +16,6 @@ const getInitialTheme = () => {
 export const [theme, setTheme] = createSignal(getInitialTheme());
 export const [showHandle, setShowHandle] = createSignal(localStorage.showHandle === "true");
 export const [hideMedia, setHideMedia] = createSignal(localStorage.hideMedia === "true");
-export const [kawaii, setKawaii] = createSignal(localStorage.kawaii === "true");
 
 const Settings = () => {
   const [openSettings, setOpenSettings] = createSignal(false);
@@ -164,23 +163,6 @@ const Settings = () => {
                   Hide media embeds
                 </label>
               </div>
-              <Show when={localStorage.kawaii}>
-                <div class="flex items-center gap-1">
-                  <input
-                    id="enableKawaii"
-                    class="size-4"
-                    type="checkbox"
-                    checked={localStorage.kawaii === "true"}
-                    onChange={(e) => {
-                      localStorage.kawaii = e.currentTarget.checked;
-                      setKawaii(e.currentTarget.checked);
-                    }}
-                  />
-                  <label for="enableKawaii" class="select-none">
-                    Kawaii mode
-                  </label>
-                </div>
-              </Show>
             </div>
           </div>
         </div>

@@ -8,7 +8,7 @@ import { Search } from "./components/search.jsx";
 import { AccountManager } from "./components/account.jsx";
 import { resolveHandle } from "./utils/api.js";
 import { Meta, MetaProvider, Title } from "@solidjs/meta";
-import { kawaii, Settings } from "./components/settings.jsx";
+import { Settings } from "./components/settings.jsx";
 import { Handle } from "@atcute/lexicons";
 import { copyNotice } from "./utils/copy.js";
 
@@ -20,7 +20,6 @@ const Layout = (props: RouteSectionProps<unknown>) => {
   const params = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  if (location.search.includes("kawaii=true")) localStorage.kawaii = "true";
 
   createEffect(async () => {
     if (params.repo && !params.repo.startsWith("did:")) {
@@ -47,29 +46,9 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <AccountManager />
         </div>
         <div class="flex basis-1/3 items-center justify-center text-center">
-          <A
-            href="/"
-            classList={{
-              "font-mono font-bold hover:underline": true,
-              "hover:scale-2000 hover:translate-y-100 hover:bg-linear-to-r z-50 bg-clip-text transition-all duration-1000 hover:animate-spin hover:from-white hover:to-pink-500 hover:text-transparent ":
-                !!customTitle[params.repo],
-            }}
-          >
+          <A href="/" class="font-mono font-bold hover:underline">
             {customTitle[params.repo] ?? "PDSls"}
           </A>
-          <Show when={localStorage.kawaii === "true" || kawaii()}>
-            <a
-              href="https://bsky.app/profile/ninikyuu.bsky.social/post/3l3tq5xwqf22o"
-              target="_blank"
-              class="h-25px sm:fixed sm:bottom-4 sm:left-0 sm:h-auto"
-            >
-              <img
-                src="/bluetan.png"
-                title="Art by nico ღ (ninikyuu.bsky.social)"
-                class="w-45px sm:w-150px md:w-200px z-0"
-              />
-            </a>
-          </Show>
         </div>
         <div class="justify-right flex basis-1/3 items-center gap-x-2">
           <Show when={agent()}>
