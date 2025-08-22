@@ -426,7 +426,7 @@ const RepoView = () => {
                                     </ErrorBoundary>
                                   </span>
                                 </span>
-                                <span>{key()}</span>
+                                <span class="truncate text-xs">{key()}</span>
                               </li>
                             )}
                           </Show>
