@@ -180,7 +180,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
               <span class="font-bold">{props.create ? "Creating" : "Editing"} record</span>
             </div>
             <div
-              class="i-lucide-x text-xl hover:text-neutral-400 dark:hover:text-neutral-500"
+              class="i-lucide-x text-xl hover:text-neutral-500 dark:hover:text-neutral-400"
               onclick={() => setOpenDialog(false)}
             />
           </div>
@@ -285,7 +285,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
         }}
       >
         <Tooltip text={`${props.create ? "Create" : "Edit"} record`}>
-          <div class={`${props.create ? "i-lucide-square-pen" : "i-lucide-pencil"} text-xl`} />
+          <div class={props.create ? "i-lucide-square-pen text-xl" : "i-lucide-pencil text-lg"} />
         </Tooltip>
       </button>
     </>

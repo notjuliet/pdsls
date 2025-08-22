@@ -80,7 +80,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
       </div>
       <Show when={copyNotice()}>
         <div class="backdrop-blur-xs border-0.5 dark:shadow-dark-900/80 dark:bg-dark-100/70 fixed bottom-10 z-50 flex items-center rounded-lg border-neutral-300 bg-neutral-100/70 p-2 shadow-md dark:border-neutral-700">
-          <div class="i-lucide-clipboard-check mr-1 text-xl" />
+          <div class="i-lucide-clipboard-check mr-1" />
           Copied to clipboard
         </div>
       </Show>

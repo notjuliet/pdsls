@@ -123,7 +123,7 @@ export const RecordView = () => {
         <div class="dark:shadow-dark-900/80 dark:bg-dark-300 my-3 flex gap-3 rounded-full bg-white px-2.5 py-2 shadow-sm">
           <Tooltip text="Copy record">
             <button onclick={() => addToClipboard(JSON.stringify(record()?.value, null, 2))}>
-              <div class="i-lucide-copy text-xl" />
+              <div class="i-lucide-copy text-lg" />
             </button>
           </Tooltip>
           <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
@@ -131,7 +131,7 @@ export const RecordView = () => {
             <div class="relative flex">
               <Tooltip text="Delete">
                 <button onclick={() => setOpenDelete(true)}>
-                  <div class="i-lucide-trash-2 text-xl" />
+                  <div class="i-lucide-trash-2 text-lg" />
                 </button>
               </Tooltip>
               <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
@@ -154,7 +154,7 @@ export const RecordView = () => {
             {(externalLink) => (
               <Tooltip text={`Open on ${externalLink().label}`}>
                 <a target="_blank" href={externalLink()?.link}>
-                  <div class={`${externalLink().icon ?? "i-lucide-app-window"} text-xl`} />
+                  <div class={`${externalLink().icon ?? "i-lucide-app-window"} text-lg`} />
                 </a>
               </Tooltip>
             )}
@@ -164,13 +164,13 @@ export const RecordView = () => {
               href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
               target="_blank"
             >
-              <div class="i-lucide-external-link text-xl" />
+              <div class="i-lucide-external-link text-lg" />
             </a>
           </Tooltip>
           <Tooltip text={showBacklinks() ? "Show record" : "Show backlinks"}>
             <button onclick={() => setShowBacklinks(!showBacklinks())}>
               <div
-                class={`${showBacklinks() ? "i-lucide-file-json" : "i-lucide-send-to-back"} text-xl`}
+                class={`${showBacklinks() ? "i-lucide-file-json" : "i-lucide-send-to-back"} text-lg`}
               />
             </button>
           </Tooltip>
