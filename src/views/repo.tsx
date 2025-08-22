@@ -421,7 +421,9 @@ const RepoView = () => {
                                   <span>#{verif.id.split("#")[1]}</span>
                                   <span class="flex items-center gap-0.5">
                                     <div class="i-lucide-key-round" />
-                                    {parsePublicMultikey(key()).type}
+                                    <ErrorBoundary fallback={<>unknown</>}>
+                                      {parsePublicMultikey(key()).type}
+                                    </ErrorBoundary>
                                   </span>
                                 </span>
                                 <span>{key()}</span>
