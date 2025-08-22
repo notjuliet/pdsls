@@ -24,4 +24,4 @@ pnpm serve  # runs vite preview
 ## Credits
 
 [atcute](https://github.com/mary-ext/atcute) - atproto SDK\
-[@skyware/firehose](https://github.com/skyware-js/firehose) - Firehose client\
+[@skyware/firehose](https://github.com/skyware-js/firehose) - Firehose client
