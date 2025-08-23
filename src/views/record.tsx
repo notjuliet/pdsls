@@ -120,7 +120,7 @@ export const RecordView = () => {
         <div class="mt-3 break-words text-red-500 dark:text-red-400">{notice()}</div>
       </Show>
       <Show when={record()}>
-        <div class="w-22rem sm:w-24rem dark:shadow-dark-900/80 dark:bg-dark-300 my-3 flex justify-between rounded-lg bg-white p-2 shadow-sm">
+        <div class="w-22rem sm:w-24rem dark:shadow-dark-900/80 dark:bg-dark-300 my-3 flex justify-between rounded-lg bg-white px-2 py-1.5 shadow-sm">
           <div class="flex gap-3 text-sm">
             <button
               classList={{
@@ -148,7 +148,7 @@ export const RecordView = () => {
           <div class="flex gap-3">
             <Tooltip text="Copy record">
               <button onclick={() => addToClipboard(JSON.stringify(record()?.value, null, 2))}>
-                <div class="i-lucide-copy text-lg" />
+                <div class="i-lucide-copy" />
               </button>
             </Tooltip>
             <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
@@ -156,7 +156,7 @@ export const RecordView = () => {
               <div class="relative flex">
                 <Tooltip text="Delete">
                   <button onclick={() => setOpenDelete(true)}>
-                    <div class="i-lucide-trash-2 text-lg" />
+                    <div class="i-lucide-trash-2" />
                   </button>
                 </Tooltip>
                 <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
@@ -179,7 +179,7 @@ export const RecordView = () => {
               {(externalLink) => (
                 <Tooltip text={`Open on ${externalLink().label}`}>
                   <a target="_blank" href={externalLink()?.link}>
-                    <div class={`${externalLink().icon ?? "i-lucide-app-window"} text-lg`} />
+                    <div class={`${externalLink().icon ?? "i-lucide-app-window"}`} />
                   </a>
                 </Tooltip>
               )}
@@ -189,7 +189,7 @@ export const RecordView = () => {
                 href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
                 target="_blank"
               >
-                <div class="i-lucide-external-link text-lg" />
+                <div class="i-lucide-external-link" />
               </a>
             </Tooltip>
           </div>
