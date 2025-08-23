@@ -171,7 +171,7 @@ const RepoView = () => {
   const RepoTab = (props: { tab: Tab; label: string; icon: string }) => (
     <button
       classList={{
-        "border-b-2 flex flex-1 items-center gap-1 py-1 justify-center": true,
+        "border-b-2 flex items-center gap-1 py-1": true,
         "border-transparent hover:border-neutral-300 dark:hover:border-neutral-700":
           tab() !== props.tab,
       }}
@@ -262,7 +262,7 @@ const RepoView = () => {
             {error()}
           </div>
         </Show>
-        <div class="flex text-sm">
+        <div class="flex justify-between text-sm">
           <Show when={!error()}>
             <RepoTab tab="collections" label="Collections" icon="i-lucide-folder-open" />
           </Show>
