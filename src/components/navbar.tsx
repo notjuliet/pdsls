@@ -18,19 +18,12 @@ const swapIcons: Record<string, string> = {
   "did:plc:uu5axsmbm2or2dngy4gwchec": "i-lucide-train-track",
   "did:plc:7x6rtuenkuvxq3zsvffp2ide": "i-lucide-rabbit",
   "did:plc:ia76kvnndjutgedggx2ibrem": "i-lucide-rabbit",
-  "did:plc:5rowvb4jjbm26fdkx6a5rxls": "i-lucide-rabbit",
-  "did:plc:hdhoaan3xa3jiuq4fg4mefid": "i-lucide-lab-shark",
   "did:plc:hvakvedv6byxhufjl23mfmsd": "i-lucide-rat",
   "did:plc:ezhjhbzqt32bqprrn6qjlkri": "i-lucide-film",
   "did:plc:6v6jqsy7swpzuu53rmzaybjy": "i-lucide-fish",
   "did:plc:hx53snho72xoj7zqt5uice4u": "i-lucide-rose",
   "did:plc:wzsilnxf24ehtmmc3gssy5bu": "i-lucide-music-2",
   "did:plc:bnqkww7bjxaacajzvu5gswdf": "i-lucide-gem",
-  "did:plc:pm6jxakrtzmkorra62cr43kr": "i-lucide-flag",
-  "did:plc:355lbopbpckczt672hss2ra4": "i-lucide-lab-basketball",
-  "did:plc:44ybard66vv44zksje25o7dz": "i-lucide-mountain-snow",
-  "did:plc:q6gjnaw2blty4crticxkmujt": "i-lucide-cat",
-  "did:plc:oky5czdrnfjpqslsw2a5iclo": "i-tabler-brand-bluesky",
 };
 
 const NavBar = (props: { params: Params }) => {
