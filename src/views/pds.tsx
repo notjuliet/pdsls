@@ -131,9 +131,9 @@ const PdsView = () => {
               }}
             >
               <Show when={!repo.active}>
-                <div class="absolute -left-5">
+                <div class="absolute -left-4">
                   <Tooltip text={repo.status ?? "???"}>
-                    <div class="i-lucide-skull text-lg" />
+                    <div class="i-lucide-skull text-base" />
                   </Tooltip>
                 </div>
               </Show>
