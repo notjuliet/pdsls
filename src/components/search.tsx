@@ -77,7 +77,7 @@ const Search = () => {
             text="Repository"
             children={
               <A href={`/at://${agent()?.sub}`} class="flex">
-                <div class="i-lucide-house text-lg" />
+                <div class="i-lucide-book-user text-lg" />
               </A>
             }
           />
