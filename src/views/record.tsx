@@ -120,60 +120,79 @@ export const RecordView = () => {
         <div class="mt-3 break-words text-red-500 dark:text-red-400">{notice()}</div>
       </Show>
       <Show when={record()}>
-        <div class="dark:shadow-dark-900/80 dark:bg-dark-300 my-3 flex gap-3 rounded-full bg-white px-2.5 py-2 shadow-sm">
-          <Tooltip text="Copy record">
-            <button onclick={() => addToClipboard(JSON.stringify(record()?.value, null, 2))}>
-              <div class="i-lucide-copy text-lg" />
-            </button>
-          </Tooltip>
-          <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
-            <RecordEditor create={false} record={record()?.value} />
-            <div class="relative flex">
-              <Tooltip text="Delete">
-                <button onclick={() => setOpenDelete(true)}>
-                  <div class="i-lucide-trash-2 text-lg" />
-                </button>
-              </Tooltip>
-              <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
-                <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900/80 backdrop-blur-xs left-50% top-70 absolute -translate-x-1/2 rounded-lg border-neutral-300 bg-neutral-200/70 p-4 text-neutral-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200">
-                  <h2 class="mb-2 font-bold">Delete this record?</h2>
-                  <div class="flex justify-end gap-2">
-                    <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
-                    <Button
-                      onClick={deleteRecord}
-                      class="dark:shadow-dark-900/80 rounded-lg bg-red-500 px-2 py-1.5 text-xs font-bold text-neutral-200 shadow-sm hover:bg-red-400"
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              </Modal>
-            </div>
-          </Show>
-          <Show when={externalLink()}>
-            {(externalLink) => (
-              <Tooltip text={`Open on ${externalLink().label}`}>
-                <a target="_blank" href={externalLink()?.link}>
-                  <div class={`${externalLink().icon ?? "i-lucide-app-window"} text-lg`} />
-                </a>
-              </Tooltip>
-            )}
-          </Show>
-          <Tooltip text="Record on PDS">
-            <a
-              href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
-              target="_blank"
+        <div class="w-22rem sm:w-24rem dark:shadow-dark-900/80 dark:bg-dark-300 my-3 flex justify-between rounded-lg bg-white p-2 shadow-sm">
+          <div class="flex gap-3 text-sm">
+            <button
+              classList={{
+                "flex items-center gap-1 border-b-2": true,
+                "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
+                  showBacklinks(),
+              }}
+              onclick={() => setShowBacklinks(!showBacklinks())}
             >
-              <div class="i-lucide-external-link text-lg" />
-            </a>
-          </Tooltip>
-          <Tooltip text={showBacklinks() ? "Show record" : "Show backlinks"}>
-            <button onclick={() => setShowBacklinks(!showBacklinks())}>
-              <div
-                class={`${showBacklinks() ? "i-lucide-file-json" : "i-lucide-send-to-back"} text-lg`}
-              />
+              <div class="i-lucide-file-json" />
+              Record
             </button>
-          </Tooltip>
+            <button
+              classList={{
+                "flex items-center gap-1 border-b-2": true,
+                "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
+                  !showBacklinks(),
+              }}
+              onclick={() => setShowBacklinks(!showBacklinks())}
+            >
+              <div class="i-lucide-send-to-back" />
+              Backlinks
+            </button>
+          </div>
+          <div class="flex gap-3">
+            <Tooltip text="Copy record">
+              <button onclick={() => addToClipboard(JSON.stringify(record()?.value, null, 2))}>
+                <div class="i-lucide-copy text-lg" />
+              </button>
+            </Tooltip>
+            <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
+              <RecordEditor create={false} record={record()?.value} />
+              <div class="relative flex">
+                <Tooltip text="Delete">
+                  <button onclick={() => setOpenDelete(true)}>
+                    <div class="i-lucide-trash-2 text-lg" />
+                  </button>
+                </Tooltip>
+                <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
+                  <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900/80 backdrop-blur-xs left-50% top-70 absolute -translate-x-1/2 rounded-lg border-neutral-300 bg-neutral-200/70 p-4 text-neutral-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200">
+                    <h2 class="mb-2 font-bold">Delete this record?</h2>
+                    <div class="flex justify-end gap-2">
+                      <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
+                      <Button
+                        onClick={deleteRecord}
+                        class="dark:shadow-dark-900/80 rounded-lg bg-red-500 px-2 py-1.5 text-xs font-bold text-neutral-200 shadow-sm hover:bg-red-400"
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+                </Modal>
+              </div>
+            </Show>
+            <Show when={externalLink()}>
+              {(externalLink) => (
+                <Tooltip text={`Open on ${externalLink().label}`}>
+                  <a target="_blank" href={externalLink()?.link}>
+                    <div class={`${externalLink().icon ?? "i-lucide-app-window"} text-lg`} />
+                  </a>
+                </Tooltip>
+              )}
+            </Show>
+            <Tooltip text="Record on PDS">
+              <a
+                href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
+                target="_blank"
+              >
+                <div class="i-lucide-external-link text-lg" />
+              </a>
+            </Tooltip>
+          </div>
         </div>
         <Show when={!showBacklinks()}>
           <div class="break-anywhere w-full whitespace-pre-wrap font-mono text-xs sm:text-sm">
