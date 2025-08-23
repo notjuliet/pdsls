@@ -151,16 +151,16 @@ const StreamView = () => {
     <div class="mt-2 flex flex-col items-center gap-y-3">
       <div class="flex gap-2 text-sm">
         <A
-          class="flex items-center gap-0.5 border-b-2 pb-1"
-          inactiveClass="border-transparent"
+          class="flex items-center gap-0.5 border-b-2 p-1"
+          inactiveClass="border-transparent hover:border-neutral-400 dark:hover:border-neutral-600"
           href="/jetstream"
         >
           <div class="i-lucide-wind" />
           Jetstream
         </A>
         <A
-          class="flex items-center gap-0.5 border-b-2 pb-1"
-          inactiveClass="border-transparent"
+          class="flex items-center gap-0.5 border-b-2 p-1"
+          inactiveClass="border-transparent hover:border-neutral-400 dark:hover:border-neutral-600"
           href="/firehose"
         >
           <div class="i-lucide-fire-extinguisher" />
