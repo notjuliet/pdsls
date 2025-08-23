@@ -171,7 +171,7 @@ const RepoView = () => {
   const RepoTab = (props: { tab: Tab; label: string; icon: string }) => (
     <button
       classList={{
-        "border-b-2 flex flex-1 items-center gap-0.5 py-1 justify-center": true,
+        "border-b-2 flex flex-1 items-center gap-1 py-1 justify-center": true,
         "border-transparent hover:border-neutral-300 dark:hover:border-neutral-700":
           tab() !== props.tab,
       }}
@@ -266,7 +266,7 @@ const RepoView = () => {
           <Show when={!error()}>
             <RepoTab tab="collections" label="Collections" icon="i-lucide-folder-open" />
           </Show>
-          <RepoTab tab="doc" label="DID Doc" icon="i-lucide-id-card" />
+          <RepoTab tab="doc" label="Identity" icon="i-lucide-id-card" />
           <Show when={!error()}>
             <RepoTab tab="blobs" label="Blobs" icon="i-lucide-file-digit" />
           </Show>
