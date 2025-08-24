@@ -39,16 +39,21 @@ const Backlinks = (props: { target: string }) => {
 
   return (
     <Show when={response()}>
-      <div class="break-anywhere flex w-full flex-col gap-1">
+      <div class="break-anywhere flex w-full flex-col gap-1 text-sm">
         <For each={backlinks()}>
           {({ collection, path, counts }) => (
-            <div class="text-sm">
-              <p>
-                <span title="Collection containing linking records">{collection}</span>
-                <span class="text-neutral-400">@</span>
-                <span title="Record path where the link is found">{path.slice(1)}</span>
-              </p>
-              <div class="pl-2">
+            <div>
+              <div>
+                <div title="Collection containing linking records" class="flex items-center gap-1">
+                  <div class="i-lucide-book-text shrink-0" />
+                  {collection}
+                </div>
+                <div title="Record path where the link is found" class="flex items-center gap-1">
+                  <div class="i-lucide-route shrink-0" />
+                  {path.slice(1)}
+                </div>
+              </div>
+              <div class="ml-4.5">
                 <p>
                   <a
                     class="text-blue-400 hover:underline"
