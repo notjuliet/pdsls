@@ -211,8 +211,8 @@ const CollectionView = () => {
             onInput={(e) => setFilter(e.currentTarget.value)}
           />
         </div>
-        <div class="flex items-center gap-x-2">
-          <Show when={records.length > 1}>
+        <Show when={records.length > 1}>
+          <div class="w-22rem sm:w-24rem flex items-center justify-between gap-x-2">
             <Button
               onClick={() => {
                 setReverse(!reverse());
@@ -224,27 +224,25 @@ const CollectionView = () => {
               <div class={`${reverse() ? "i-lucide-rotate-ccw" : "i-lucide-rotate-cw"} text-sm`} />
               Reverse
             </Button>
-          </Show>
-          <div>
-            <Show when={batchDelete()}>
-              <span>{records.filter((rec) => rec.toDelete).length}</span>
-              <span>/</span>
-            </Show>
-            <span>
-              {records.length} record{records.length > 1 ? "s" : ""}
-            </span>
-          </div>
-          <Show when={cursor()}>
-            <div class="flex w-[5rem] items-center justify-center">
-              <Show when={!response.loading}>
-                <Button onClick={() => refetch()}>Load More</Button>
+            <div>
+              <Show when={batchDelete()}>
+                <span>{records.filter((rec) => rec.toDelete).length}</span>
+                <span>/</span>
               </Show>
-              <Show when={response.loading}>
-                <div class="i-lucide-loader-circle animate-spin text-xl" />
+              <span>{records.length} records</span>
+            </div>
+            <div class="flex w-[5rem] items-center justify-center">
+              <Show when={cursor()}>
+                <Show when={!response.loading}>
+                  <Button onClick={() => refetch()}>Load More</Button>
+                </Show>
+                <Show when={response.loading}>
+                  <div class="i-lucide-loader-circle animate-spin text-xl" />
+                </Show>
               </Show>
             </div>
-          </Show>
-        </div>
+          </div>
+        </Show>
       </div>
       <div class="flex max-w-full flex-col font-mono">
         <For
