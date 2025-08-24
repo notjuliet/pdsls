@@ -133,7 +133,7 @@ const PdsView = () => {
               <Show when={!repo.active}>
                 <div class="absolute -left-4">
                   <Tooltip text={repo.status ?? "???"}>
-                    <div class="i-lucide-skull text-base" />
+                    <div class="i-lucide-skull" />
                   </Tooltip>
                 </div>
               </Show>

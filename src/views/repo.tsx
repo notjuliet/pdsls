@@ -107,7 +107,7 @@ const PlcLogView = (props: {
   return (
     <>
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-1 text-lg">
+        <div class="flex items-center gap-1">
           <Tooltip text="Filter operations">
             <div class="i-lucide-filter" />
           </Tooltip>

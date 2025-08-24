@@ -53,7 +53,7 @@ const Settings = () => {
     <>
       <Modal open={openSettings()} onClose={() => setOpenSettings(false)}>
         <div class="starting:opacity-0 w-22rem dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900/80 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-lg border-neutral-300 bg-neutral-200/70 p-4 text-neutral-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200">
-          <div class="mb-3 flex items-center gap-1 font-bold">
+          <div class="mb-2 flex items-center gap-1 font-bold">
             <div class="i-lucide-settings" />
             <span>Settings</span>
           </div>
@@ -63,7 +63,7 @@ const Settings = () => {
               classList={{
                 "basis-1/3 py-1 rounded-full justify-center flex items-center gap-1": true,
                 "bg-transparent hover:bg-neutral-100 dark:hover:bg-dark-200": !theme().system,
-                "bg-white dark:bg-neutral-600 font-semibold": theme().system,
+                "bg-white dark:bg-dark-100 font-semibold": theme().system,
               }}
               onclick={() =>
                 updateTheme({
@@ -93,7 +93,7 @@ const Settings = () => {
                 "basis-1/3 py-1 justify-center rounded-full flex items-center gap-1": true,
                 "bg-transparent hover:bg-neutral-100 dark:hover:bg-dark-200":
                   theme().color !== "dark" || theme().system,
-                "bg-neutral-600 font-semibold": theme().color === "dark" && !theme().system,
+                "bg-dark-100 font-semibold": theme().color === "dark" && !theme().system,
               }}
               onclick={() => updateTheme({ color: "dark", system: false })}
             >
@@ -101,7 +101,7 @@ const Settings = () => {
               Dark
             </button>
           </div>
-          <div class="mt-3 flex flex-col gap-1">
+          <div class="mt-2 flex flex-col gap-1">
             <div class="flex flex-col gap-0.5">
               <label for="constellation" class="select-none font-semibold">
                 Backlinks host
@@ -116,7 +116,7 @@ const Settings = () => {
                 }}
               />
             </div>
-            <div class="mt-3 flex flex-col gap-1">
+            <div class="mt-2 flex flex-col gap-1">
               <div class="flex flex-col gap-0.5">
                 <label for="plcDirectory" class="select-none font-semibold">
                   PLC Directory
@@ -132,7 +132,7 @@ const Settings = () => {
                 />
               </div>
             </div>
-            <div class="mt-3 flex flex-col gap-1">
+            <div class="mt-2 flex flex-col gap-1">
               <div class="flex items-center gap-1">
                 <input
                   id="showHandle"
