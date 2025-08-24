@@ -146,11 +146,6 @@ export const RecordView = () => {
             </button>
           </div>
           <div class="flex gap-3">
-            <Tooltip text="Copy record">
-              <button onclick={() => addToClipboard(JSON.stringify(record()?.value, null, 2))}>
-                <div class="i-lucide-copy" />
-              </button>
-            </Tooltip>
             <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
               <RecordEditor create={false} record={record()?.value} />
               <div class="relative flex">
@@ -175,6 +170,11 @@ export const RecordView = () => {
                 </Modal>
               </div>
             </Show>
+            <Tooltip text="Copy record">
+              <button onclick={() => addToClipboard(JSON.stringify(record()?.value, null, 2))}>
+                <div class="i-lucide-copy" />
+              </button>
+            </Tooltip>
             <Show when={externalLink()}>
               {(externalLink) => (
                 <Tooltip text={`Open on ${externalLink().label}`}>
