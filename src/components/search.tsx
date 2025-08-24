@@ -68,7 +68,7 @@ const Search = () => {
           </Show>
           <Show when={!loading()}>
             <button type="submit" onclick={() => processInput(searchInput.value)}>
-              <div class="i-lucide-search text-lg text-neutral-500 dark:text-neutral-400" />
+              <div class="i-lucide-arrow-right text-lg text-neutral-500 dark:text-neutral-400" />
             </button>
           </Show>
         </div>
