@@ -151,7 +151,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
             <Show when={blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4"}>
               <Tooltip text={hide() ? "Show" : "Hide"}>
                 <button onclick={() => setHide(!hide())}>
-                  <div class={`text-lg ${hide() ? "i-lucide-eye-off" : "i-lucide-eye"}`} />
+                  <div class={`text-base ${hide() ? "i-lucide-eye-off" : "i-lucide-eye"}`} />
                 </button>
               </Tooltip>
             </Show>
@@ -162,7 +162,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
                 class="size-fit"
               >
                 <Tooltip text="Blob link">
-                  <div class="i-lucide-external-link text-lg" />
+                  <div class="i-lucide-external-link text-base" />
                 </Tooltip>
               </a>
             </Show>
