@@ -161,7 +161,7 @@ export const RecordView = () => {
                       <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
                       <Button
                         onClick={deleteRecord}
-                        class="dark:shadow-dark-900/80 rounded-lg bg-red-500 px-2 py-1.5 text-xs font-bold text-neutral-200 shadow-sm hover:bg-red-400"
+                        class="dark:shadow-dark-900/80 rounded-lg bg-red-500 px-2 py-1.5 text-xs font-semibold text-neutral-200 shadow-sm hover:bg-red-400"
                       >
                         Delete
                       </Button>

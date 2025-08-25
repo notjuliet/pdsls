@@ -177,7 +177,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
           <div class="mb-2 flex w-full justify-between">
             <div class="flex items-center gap-1 font-bold">
               <div class="i-lucide-square-pen" />
-              <span class="font-bold">{props.create ? "Creating" : "Editing"} record</span>
+              <span>{props.create ? "Creating" : "Editing"} record</span>
             </div>
             <div
               class="i-lucide-x text-lg hover:text-neutral-500 dark:hover:text-neutral-400"
@@ -221,7 +221,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
               </div>
               <div class="flex items-center gap-2">
                 <Show when={!uploading()}>
-                  <div class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex rounded-lg bg-white text-xs font-bold shadow-sm hover:bg-neutral-50">
+                  <div class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex rounded-lg bg-white text-xs font-semibold shadow-sm hover:bg-neutral-50">
                     <input type="file" id="blob" hidden onChange={() => uploadBlob()} />
                     <label class="flex items-center gap-1 px-2 py-1.5" for="blob">
                       <div class="i-lucide-upload text-sm" />
