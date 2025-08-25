@@ -142,7 +142,7 @@ const NavBar = (props: { params: Params }) => {
                 >
                   <div
                     class={
-                      `duration-400 shrink-0 text-lg ${showHandle() ? "rotate-y-180" : ""} ` +
+                      `duration-400 shrink-0 text-lg transition-transform ${showHandle() ? "rotate-y-180" : ""} ` +
                       (swapIcons[props.params.repo] ?? "i-lucide-arrow-left-right")
                     }
                   />
