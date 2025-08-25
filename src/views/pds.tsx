@@ -22,13 +22,6 @@ const PdsView = () => {
   const pds = params.pds.startsWith("localhost") ? `http://${params.pds}` : `https://${params.pds}`;
   const rpc = new Client({ handler: new CredentialManager({ service: pds }) });
 
-  const listRepos = async (cursor: string | undefined) =>
-    await rpc.get("com.atproto.sync.listRepos", {
-      params: { limit: LIMIT, cursor: cursor },
-    });
-
-  const describeServer = async () => await rpc.get("com.atproto.server.describeServer");
-
   const getVersion = async () => {
     // @ts-expect-error: undocumented endpoint
     const res = await rpc.get("_health", {});
@@ -39,10 +32,12 @@ const PdsView = () => {
     InferXRPCBodyOutput<ComAtprotoSyncListRepos.mainSchema["output"]>
   > => {
     await getVersion();
-    const describeRes = await describeServer();
+    const describeRes = await rpc.get("com.atproto.server.describeServer");
     if (!describeRes.ok) console.error(describeRes.data.error);
     else setServerInfos(describeRes.data);
-    const res = await listRepos(cursor());
+    const res = await rpc.get("com.atproto.sync.listRepos", {
+      params: { limit: LIMIT, cursor: cursor() },
+    });
     if (!res.ok) throw new Error(res.data.error);
     setCursor(res.data.repos.length < LIMIT ? undefined : res.data.cursor);
     setRepos(repos()?.concat(res.data.repos) ?? res.data.repos);
