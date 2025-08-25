@@ -14,7 +14,6 @@ const getInitialTheme = () => {
 };
 
 export const [theme, setTheme] = createSignal(getInitialTheme());
-export const [showHandle, setShowHandle] = createSignal(localStorage.showHandle === "true");
 export const [hideMedia, setHideMedia] = createSignal(localStorage.hideMedia === "true");
 
 const Settings = () => {
@@ -133,21 +132,6 @@ const Settings = () => {
               </div>
             </div>
             <div class="mt-2 flex flex-col gap-1">
-              <div class="flex items-center gap-1">
-                <input
-                  id="showHandle"
-                  class="size-4"
-                  type="checkbox"
-                  checked={localStorage.showHandle === "true"}
-                  onChange={(e) => {
-                    localStorage.showHandle = e.currentTarget.checked;
-                    setShowHandle(e.currentTarget.checked);
-                  }}
-                />
-                <label for="showHandle" class="select-none">
-                  Default to showing handle
-                </label>
-              </div>
               <div class="flex items-center gap-1">
                 <input
                   id="disableMedia"

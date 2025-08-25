@@ -2,7 +2,6 @@ import { A, Params, useLocation } from "@solidjs/router";
 import Tooltip from "./tooltip";
 import { createEffect, createSignal, Show } from "solid-js";
 import { didDocCache, labelerCache, validateHandle } from "../utils/api";
-import { setShowHandle, showHandle } from "./settings";
 import { Did, Handle } from "@atcute/lexicons";
 import { addToClipboard } from "../utils/copy";
 
@@ -32,6 +31,7 @@ const NavBar = (props: { params: Params }) => {
   const [handle, setHandle] = createSignal(props.params.repo);
   const [validHandle, setValidHandle] = createSignal<boolean | undefined>(undefined);
   const [fullCid, setFullCid] = createSignal(false);
+  const [showHandle, setShowHandle] = createSignal(localStorage.showHandle === "true");
 
   createEffect(() => {
     if (cid() !== undefined) setFullCid(false);
@@ -134,7 +134,12 @@ const NavBar = (props: { params: Params }) => {
                 </div>
               </div>
               <Tooltip text={showHandle() ? "Show DID" : "Show Handle"}>
-                <button onclick={() => setShowHandle(!showHandle())}>
+                <button
+                  onclick={() => {
+                    localStorage.showHandle = !showHandle();
+                    setShowHandle(!showHandle());
+                  }}
+                >
                   <div
                     class={
                       `duration-400 shrink-0 text-lg ${showHandle() ? "rotate-y-180" : ""} ` +
