@@ -56,68 +56,22 @@ const Settings = () => {
             <div class="i-lucide-settings" />
             <span>Settings</span>
           </div>
-          <h4 class="mb-1 font-semibold">Theme</h4>
-          <div class="flex w-full gap-1">
-            <button
-              classList={{
-                "basis-1/3 py-1 rounded-full justify-center flex items-center gap-1": true,
-                "bg-transparent hover:bg-neutral-100 dark:hover:bg-dark-200": !theme().system,
-                "bg-white dark:bg-dark-100 font-semibold": theme().system,
-              }}
-              onclick={() =>
-                updateTheme({
-                  color:
-                    window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
-                  system: true,
-                })
-              }
-            >
-              <div class="i-lucide-monitor" />
-              System
-            </button>
-            <button
-              classList={{
-                "basis-1/3 py-1 rounded-full justify-center flex items-center gap-1": true,
-                "bg-transparent hover:bg-neutral-100 dark:hover:bg-dark-200":
-                  theme().color !== "light" || theme().system,
-                "bg-white font-semibold": theme().color === "light" && !theme().system,
-              }}
-              onclick={() => updateTheme({ color: "light", system: false })}
-            >
-              <div class="i-lucide-sun" />
-              Light
-            </button>
-            <button
-              classList={{
-                "basis-1/3 py-1 justify-center rounded-full flex items-center gap-1": true,
-                "bg-transparent hover:bg-neutral-100 dark:hover:bg-dark-200":
-                  theme().color !== "dark" || theme().system,
-                "bg-dark-100 font-semibold": theme().color === "dark" && !theme().system,
-              }}
-              onclick={() => updateTheme({ color: "dark", system: false })}
-            >
-              <div class="i-lucide-moon" />
-              Dark
-            </button>
-          </div>
-          <div class="mt-2 flex flex-col gap-1">
-            <div class="flex flex-col gap-1">
-              <div class="flex flex-col gap-0.5">
-                <label for="plcDirectory" class="select-none font-semibold">
-                  PLC Directory
-                </label>
-                <TextInput
-                  id="plcDirectory"
-                  value={localStorage.plcDirectory || "https://plc.directory"}
-                  onInput={(e) => {
-                    e.currentTarget.value.length ?
-                      (localStorage.plcDirectory = e.currentTarget.value)
-                    : localStorage.removeItem("plcDirectory");
-                  }}
-                />
-              </div>
+          <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-0.5">
+              <label for="plcDirectory" class="select-none">
+                PLC Directory
+              </label>
+              <TextInput
+                id="plcDirectory"
+                value={localStorage.plcDirectory || "https://plc.directory"}
+                onInput={(e) => {
+                  e.currentTarget.value.length ?
+                    (localStorage.plcDirectory = e.currentTarget.value)
+                  : localStorage.removeItem("plcDirectory");
+                }}
+              />
             </div>
-            <div class="mt-2 flex flex-col gap-1">
+            <div class="flex justify-between">
               <div class="flex items-center gap-1">
                 <input
                   id="disableMedia"
@@ -132,6 +86,49 @@ const Settings = () => {
                 <label for="disableMedia" class="select-none">
                   Hide media embeds
                 </label>
+              </div>
+              <div class="dark:shadow-dark-900/80 dark:bg-dark-100 flex w-fit items-center gap-1 rounded-full bg-white p-0.5 text-lg shadow-sm">
+                <Tooltip text="System Theme">
+                  <button
+                    classList={{
+                      "p-1.5 rounded-full": true,
+                      "bg-neutral-200 dark:bg-dark-400": theme().system,
+                    }}
+                    onclick={() =>
+                      updateTheme({
+                        color:
+                          window.matchMedia("(prefers-color-scheme: dark)").matches ?
+                            "dark"
+                          : "light",
+                        system: true,
+                      })
+                    }
+                  >
+                    <div class="i-lucide-monitor" />
+                  </button>
+                </Tooltip>
+                <Tooltip text="Light Theme">
+                  <button
+                    classList={{
+                      "p-1.5 rounded-full": true,
+                      "bg-neutral-200": theme().color === "light" && !theme().system,
+                    }}
+                    onclick={() => updateTheme({ color: "light", system: false })}
+                  >
+                    <div class="i-lucide-sun" />
+                  </button>
+                </Tooltip>
+                <Tooltip text="Dark Theme">
+                  <button
+                    classList={{
+                      "p-1.5 rounded-full": true,
+                      "bg-dark-400": theme().color === "dark" && !theme().system,
+                    }}
+                    onclick={() => updateTheme({ color: "dark", system: false })}
+                  >
+                    <div class="i-lucide-moon" />
+                  </button>
+                </Tooltip>
               </div>
             </div>
           </div>
