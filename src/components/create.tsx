@@ -29,7 +29,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
         external: {
           uri: "https://pdsls.dev",
           title: "PDSls",
-          description: "Browse and manage atproto repositories",
+          description: "Browse the public data on atproto",
         },
       },
       langs: ["en"],
