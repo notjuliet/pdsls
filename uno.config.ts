@@ -8,7 +8,7 @@ export default defineConfig({
       provider: "none",
       fonts: {
         sans: "Inter:400,600,700",
-        mono: "Roboto Mono:400,700",
+        mono: "Roboto Mono:400",
       },
     }),
   ],
