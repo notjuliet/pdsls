@@ -137,7 +137,7 @@ const NavBar = (props: { params: Params }) => {
                 <button onclick={() => setShowHandle(!showHandle())}>
                   <div
                     class={
-                      "shrink-0 text-lg " +
+                      `duration-400 shrink-0 text-lg ${showHandle() ? "rotate-y-180" : ""} ` +
                       (swapIcons[props.params.repo] ?? "i-lucide-arrow-left-right")
                     }
                   />
