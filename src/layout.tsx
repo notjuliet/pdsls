@@ -7,14 +7,10 @@ import { NavBar } from "./components/navbar.jsx";
 import { Search } from "./components/search.jsx";
 import { AccountManager } from "./components/account.jsx";
 import { resolveHandle } from "./utils/api.js";
-import { Meta, MetaProvider, Title } from "@solidjs/meta";
+import { Meta, MetaProvider } from "@solidjs/meta";
 import { Settings } from "./components/settings.jsx";
 import { Handle } from "@atcute/lexicons";
 import { copyNotice } from "./utils/copy.js";
-
-const customTitle: Record<string, string> = {
-  "did:plc:hx53snho72xoj7zqt5uice4u": "wrenls",
-};
 
 const Layout = (props: RouteSectionProps<unknown>) => {
   const params = useParams();
@@ -34,7 +30,6 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         <Show when={location.pathname !== "/"}>
           <Meta name="robots" content="noindex, nofollow" />
         </Show>
-        <Title>{customTitle[params.repo] ?? "PDSls"}</Title>
       </MetaProvider>
       <div class="mb-2 flex w-[22rem] items-center sm:w-[24rem]">
         <div class="flex basis-1/3 gap-x-2">
@@ -47,7 +42,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         </div>
         <div class="flex basis-1/3 items-center justify-center text-center">
           <A href="/" class="font-mono font-bold hover:underline">
-            {customTitle[params.repo] ?? "PDSls"}
+            PDSls
           </A>
         </div>
         <div class="justify-right flex basis-1/3 items-center gap-x-2">
