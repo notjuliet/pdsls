@@ -125,7 +125,7 @@ const getConstellation = async (
   cursor?: string,
   limit?: number,
 ) => {
-  const url = new URL(localStorage.constellationHost || "https://constellation.microcosm.blue");
+  const url = new URL("https://constellation.microcosm.blue");
   url.pathname = endpoint;
   url.searchParams.set("target", target);
   if (collection) {

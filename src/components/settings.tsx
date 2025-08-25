@@ -101,21 +101,7 @@ const Settings = () => {
             </button>
           </div>
           <div class="mt-2 flex flex-col gap-1">
-            <div class="flex flex-col gap-0.5">
-              <label for="constellation" class="select-none font-semibold">
-                Backlinks host
-              </label>
-              <TextInput
-                id="constellation"
-                value={localStorage.constellationHost || "https://constellation.microcosm.blue"}
-                onInput={(e) => {
-                  e.currentTarget.value.length ?
-                    (localStorage.constellationHost = e.currentTarget.value)
-                  : localStorage.removeItem("constellationHost");
-                }}
-              />
-            </div>
-            <div class="mt-2 flex flex-col gap-1">
+            <div class="flex flex-col gap-1">
               <div class="flex flex-col gap-0.5">
                 <label for="plcDirectory" class="select-none font-semibold">
                   PLC Directory
