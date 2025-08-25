@@ -231,13 +231,13 @@ const CollectionView = () => {
               </Show>
               <span>{records.length} records</span>
             </div>
-            <div class="flex w-[5rem] items-center justify-center">
+            <div class="w-5rem flex items-center justify-end">
               <Show when={cursor()}>
                 <Show when={!response.loading}>
                   <Button onClick={() => refetch()}>Load More</Button>
                 </Show>
                 <Show when={response.loading}>
-                  <div class="i-lucide-loader-circle animate-spin text-xl" />
+                  <div class="i-lucide-loader-circle w-5rem animate-spin text-xl" />
                 </Show>
               </Show>
             </div>
