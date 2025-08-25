@@ -11,40 +11,6 @@ import { Button } from "../components/button";
 
 const LIMIT = 1000;
 
-const Field = ({
-  label,
-  value,
-  truncate,
-  inline = true,
-}: {
-  label: string;
-  value: string;
-  truncate?: boolean;
-  inline?: boolean;
-}) => {
-  const [fullField, setFullField] = createSignal(false);
-
-  return (
-    <div classList={{ "flex items-baseline gap-x-1": true, "flex-col": !inline }}>
-      <span class="font-semibold">{label}</span>
-      <Show when={truncate}>
-        <button
-          classList={{
-            "bg-transparent text-sm break-anywhere text-left": true,
-            truncate: !fullField(),
-          }}
-          onclick={() => setFullField(!fullField())}
-        >
-          {value}
-        </button>
-      </Show>
-      <Show when={!truncate}>
-        <span class="break-anywhere text-sm">{value}</span>
-      </Show>
-    </div>
-  );
-};
-
 const PdsView = () => {
   const params = useParams();
   if (params.pds.startsWith("web%2Bat%3A%2F%2F")) return;
@@ -91,22 +57,27 @@ const PdsView = () => {
     <Show when={repos() || response()}>
       <div class="mt-3 flex w-[22rem] flex-col sm:w-[24rem]">
         <Show when={version()}>
-          {(version) => <Field label="Version" value={version()} truncate />}
+          {(version) => (
+            <div class="flex items-baseline gap-x-1">
+              <span class="font-semibold">Version</span>
+              <span class="truncate text-sm">{version()}</span>
+            </div>
+          )}
         </Show>
         <Show when={serverInfos()}>
           {(server) => (
             <>
               <Show when={server().inviteCodeRequired}>
-                <Field
-                  label="Invite Code Required"
-                  value={server().inviteCodeRequired ? "Yes" : "No"}
-                />
+                <div class="flex items-baseline gap-x-1">
+                  <span class="font-semibold">Invite Code Required</span>
+                  <span class="text-sm">{server().inviteCodeRequired ? "Yes" : "No"}</span>
+                </div>
               </Show>
               <Show when={server().phoneVerificationRequired}>
-                <Field
-                  label="Phone Verification Required"
-                  value={server().phoneVerificationRequired ? "Yes" : "No"}
-                />
+                <div class="flex items-baseline gap-x-1">
+                  <span class="font-semibold">Phone Verification Required</span>
+                  <span class="text-sm">{server().phoneVerificationRequired ? "Yes" : "No"}</span>
+                </div>
               </Show>
               <Show when={server().availableUserDomains.length}>
                 <div class="flex flex-col">
