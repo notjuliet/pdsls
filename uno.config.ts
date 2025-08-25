@@ -5,7 +5,7 @@ export default defineConfig({
     presetIcons(),
     presetWind4(),
     presetWebFonts({
-      provider: "bunny",
+      provider: "none",
       fonts: {
         sans: "Inter:400,600,700",
         mono: "Roboto Mono:400,700",
