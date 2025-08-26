@@ -259,7 +259,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                 <Show when={!props.create}>
                   <div class="flex items-center gap-1">
                     <input id="recreate" class="size-4" name="recreate" type="checkbox" />
-                    <label for="recreate" class="select-none">
+                    <label for="recreate" class="select-none text-sm">
                       Recreate record
                     </label>
                   </div>
