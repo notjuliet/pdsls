@@ -148,7 +148,7 @@ const StreamView = () => {
   onCleanup(() => socket?.close());
 
   return (
-    <div class="mt-2 flex flex-col items-center gap-y-3">
+    <div class="mt-2 flex flex-col items-center">
       <div class="flex gap-2 text-sm">
         <A
           class="flex items-center gap-1 border-b-2 p-1"
@@ -167,93 +167,98 @@ const StreamView = () => {
           Firehose
         </A>
       </div>
-      <form ref={formRef} class="flex flex-col gap-y-2 text-sm">
-        <Show when={!connected()}>
-          <label class="flex items-center justify-end gap-x-2">
-            <span>Instance</span>
-            <TextInput
-              name="instance"
-              value={
-                searchParams.instance ??
-                (streamType === StreamType.JETSTREAM ?
-                  "wss://jetstream1.us-east.bsky.network/subscribe"
-                : "wss://bsky.network")
-              }
-              class="w-16rem"
-            />
-          </label>
-          <Show when={streamType === StreamType.JETSTREAM}>
+      <form
+        ref={formRef}
+        class="z-5 dark:bg-dark-500/70 backdrop-blur-xs sticky top-0 flex w-screen flex-col items-center bg-neutral-100/70 px-4 text-sm"
+      >
+        <div class="flex flex-col gap-2 py-3">
+          <Show when={!connected()}>
             <label class="flex items-center justify-end gap-x-2">
-              <span>Collections</span>
-              <textarea
-                name="collections"
-                spellcheck={false}
-                placeholder="Comma-separated list of collections"
-                value={searchParams.collections ?? ""}
-                class="w-16rem dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-neutral-900 dark:focus:outline-neutral-200"
+              <span>Instance</span>
+              <TextInput
+                name="instance"
+                value={
+                  searchParams.instance ??
+                  (streamType === StreamType.JETSTREAM ?
+                    "wss://jetstream1.us-east.bsky.network/subscribe"
+                  : "wss://bsky.network")
+                }
+                class="w-16rem"
               />
             </label>
-          </Show>
-          <Show when={streamType === StreamType.JETSTREAM}>
-            <label class="flex items-center justify-end gap-x-2">
-              <span>DIDs</span>
-              <textarea
-                name="dids"
-                spellcheck={false}
-                placeholder="Comma-separated list of DIDs"
-                value={searchParams.dids ?? ""}
-                class="w-16rem dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-neutral-900 dark:focus:outline-neutral-200"
-              />
-            </label>
-          </Show>
-          <label class="flex items-center justify-end gap-x-2">
-            <span>Cursor</span>
-            <TextInput
-              name="cursor"
-              placeholder="Leave empty for live-tail"
-              value={searchParams.cursor ?? ""}
-              class="w-16rem"
-            />
-          </label>
-          <Show when={streamType === StreamType.JETSTREAM}>
-            <div class="flex items-center justify-end gap-x-1">
-              <input
-                type="checkbox"
-                name="allEvents"
-                id="allEvents"
-                checked={searchParams.allEvents === "on" ? true : false}
-                onChange={(e) => setAllEvents(e.currentTarget.checked)}
-              />
-              <label for="allEvents" class="select-none">
-                Show account and identity events
+            <Show when={streamType === StreamType.JETSTREAM}>
+              <label class="flex items-center justify-end gap-x-2">
+                <span>Collections</span>
+                <textarea
+                  name="collections"
+                  spellcheck={false}
+                  placeholder="Comma-separated list of collections"
+                  value={searchParams.collections ?? ""}
+                  class="w-16rem dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-neutral-900 dark:focus:outline-neutral-200"
+                />
               </label>
+            </Show>
+            <Show when={streamType === StreamType.JETSTREAM}>
+              <label class="flex items-center justify-end gap-x-2">
+                <span>DIDs</span>
+                <textarea
+                  name="dids"
+                  spellcheck={false}
+                  placeholder="Comma-separated list of DIDs"
+                  value={searchParams.dids ?? ""}
+                  class="w-16rem dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-neutral-900 dark:focus:outline-neutral-200"
+                />
+              </label>
+            </Show>
+            <label class="flex items-center justify-end gap-x-2">
+              <span>Cursor</span>
+              <TextInput
+                name="cursor"
+                placeholder="Leave empty for live-tail"
+                value={searchParams.cursor ?? ""}
+                class="w-16rem"
+              />
+            </label>
+            <Show when={streamType === StreamType.JETSTREAM}>
+              <div class="flex items-center justify-end gap-x-1">
+                <input
+                  type="checkbox"
+                  name="allEvents"
+                  id="allEvents"
+                  checked={searchParams.allEvents === "on" ? true : false}
+                  onChange={(e) => setAllEvents(e.currentTarget.checked)}
+                />
+                <label for="allEvents" class="select-none">
+                  Show account and identity events
+                </label>
+              </div>
+            </Show>
+          </Show>
+          <Show when={connected()}>
+            <div class="break-anywhere flex flex-col gap-1">
+              <For each={parameters()}>
+                {(param) => (
+                  <Show when={param.param}>
+                    <div class="flex">
+                      <div class="min-w-6rem font-semibold">{param.name}</div>
+                      {param.param}
+                    </div>
+                  </Show>
+                )}
+              </For>
             </div>
           </Show>
-        </Show>
-        <Show when={connected()}>
-          <div class="break-anywhere flex flex-col gap-1">
-            <For each={parameters()}>
-              {(param) => (
-                <Show when={param.param}>
-                  <div class="flex">
-                    <div class="min-w-6rem font-semibold">{param.name}</div>
-                    {param.param}
-                  </div>
-                </Show>
-              )}
-            </For>
+          <div class="flex justify-end">
+            <Button onClick={() => connectSocket(new FormData(formRef))}>
+              {connected() ? "Disconnect" : "Connect"}
+            </Button>
           </div>
-        </Show>
-        <div class="flex justify-end">
-          <Button onClick={() => connectSocket(new FormData(formRef))}>
-            {connected() ? "Disconnect" : "Connect"}
-          </Button>
         </div>
       </form>
       <Show when={notice().length}>
         <div class="text-red-500 dark:text-red-400">{notice()}</div>
       </Show>
-      <div class="break-anywhere md:w-screen-md divide-y-0.5 flex h-screen w-full flex-col gap-2 divide-neutral-500 overflow-auto whitespace-pre-wrap pl-4 font-mono text-sm">
+      <div class="break-anywhere md:w-screen-md divide-y-0.5 flex w-full flex-col gap-2 divide-neutral-500 whitespace-pre-wrap px-4 font-mono text-sm">
         <For each={records().toReversed()}>
           {(rec) => (
             <div class="pb-2">
