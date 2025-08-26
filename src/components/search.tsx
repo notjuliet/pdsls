@@ -12,7 +12,11 @@ const Search = () => {
 
   const processInput = async (input: string) => {
     (document.getElementById("uriForm") as HTMLFormElement).reset();
-    input = input.trim();
+    input = input
+      .trim()
+      .replace(/\u202c$/, "")
+      .replace(/^\u202a/, "")
+      .replace(/^@/, "");
     if (!input.length) return;
     if (
       !input.startsWith("https://bsky.app/") &&
