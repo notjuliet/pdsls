@@ -34,6 +34,12 @@ export const uriTemplates: TemplateMap = {
   "com.shinolabs.pinksea.oekaki": (uri) => ({
     label: "PinkSea",
     link: `https://pinksea.art/${uri.repo}/oekaki/${uri.rkey}`,
+    icon: "i-pinksea",
+  }),
+  "com.shinolabs.pinksea.profile": (uri) => ({
+    label: "PinkSea",
+    link: `https://pinksea.art/${uri.repo}`,
+    icon: "i-pinksea",
   }),
   "blue.linkat.board": (uri) => ({
     label: "Linkat",
