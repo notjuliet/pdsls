@@ -277,16 +277,17 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
           </form>
         </div>
       </Modal>
-      <button
-        onclick={() => {
-          createModel();
-          setOpenDialog(true);
-        }}
-      >
-        <Tooltip text={`${props.create ? "Create" : "Edit"} record`}>
+      <Tooltip text={`${props.create ? "Create" : "Edit"} record`}>
+        <button
+          class={props.create ? "" : "p-1"}
+          onclick={() => {
+            createModel();
+            setOpenDialog(true);
+          }}
+        >
           <div class={props.create ? "i-lucide-square-pen text-xl" : "i-lucide-pencil"} />
-        </Tooltip>
-      </button>
+        </button>
+      </Tooltip>
     </>
   );
 };

@@ -145,40 +145,41 @@ export const RecordView = () => {
               Backlinks
             </button>
           </div>
-          <div class="flex gap-3">
+          <div class="flex gap-1">
             <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
               <RecordEditor create={false} record={record()?.value} />
-              <div class="relative flex">
-                <Tooltip text="Delete">
-                  <button onclick={() => setOpenDelete(true)}>
-                    <div class="i-lucide-trash-2" />
-                  </button>
-                </Tooltip>
-                <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
-                  <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900/80 backdrop-blur-xs left-50% top-70 absolute -translate-x-1/2 rounded-lg border-neutral-300 bg-neutral-200/70 p-4 text-neutral-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200">
-                    <h2 class="mb-2 font-bold">Delete this record?</h2>
-                    <div class="flex justify-end gap-2">
-                      <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
-                      <Button
-                        onClick={deleteRecord}
-                        class="dark:shadow-dark-900/80 rounded-lg bg-red-500 px-2 py-1.5 text-xs font-semibold text-neutral-200 shadow-sm hover:bg-red-400"
-                      >
-                        Delete
-                      </Button>
-                    </div>
+              <Tooltip text="Delete">
+                <button class="p-1" onclick={() => setOpenDelete(true)}>
+                  <div class="i-lucide-trash-2" />
+                </button>
+              </Tooltip>
+              <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
+                <div class="starting:opacity-0 dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900/80 backdrop-blur-xs left-50% top-70 absolute -translate-x-1/2 rounded-lg border-neutral-300 bg-neutral-200/70 p-4 text-neutral-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200">
+                  <h2 class="mb-2 font-bold">Delete this record?</h2>
+                  <div class="flex justify-end gap-2">
+                    <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
+                    <Button
+                      onClick={deleteRecord}
+                      class="dark:shadow-dark-900/80 rounded-lg bg-red-500 px-2 py-1.5 text-xs font-semibold text-neutral-200 shadow-sm hover:bg-red-400"
+                    >
+                      Delete
+                    </Button>
                   </div>
-                </Modal>
-              </div>
+                </div>
+              </Modal>
             </Show>
             <Tooltip text="Copy record">
-              <button onclick={() => addToClipboard(JSON.stringify(record()?.value, null, 2))}>
+              <button
+                class="p-1"
+                onclick={() => addToClipboard(JSON.stringify(record()?.value, null, 2))}
+              >
                 <div class="i-lucide-copy" />
               </button>
             </Tooltip>
             <Show when={externalLink()}>
               {(externalLink) => (
                 <Tooltip text={`Open on ${externalLink().label}`}>
-                  <a target="_blank" href={externalLink()?.link}>
+                  <a class="p-1" target="_blank" href={externalLink()?.link}>
                     <div class={`${externalLink().icon ?? "i-lucide-app-window"}`} />
                   </a>
                 </Tooltip>
@@ -186,6 +187,7 @@ export const RecordView = () => {
             </Show>
             <Tooltip text="Record on PDS">
               <a
+                class="p-1"
                 href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
                 target="_blank"
               >
