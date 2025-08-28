@@ -279,7 +279,9 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
       </Modal>
       <Tooltip text={`${props.create ? "Create" : "Edit"} record`}>
         <button
-          class={props.create ? "" : "p-1"}
+          class={
+            props.create ? "" : "rounded-sm p-1 hover:bg-neutral-100 dark:hover:bg-neutral-600"
+          }
           onclick={() => {
             createModel();
             setOpenDialog(true);

@@ -149,7 +149,10 @@ export const RecordView = () => {
             <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
               <RecordEditor create={false} record={record()?.value} />
               <Tooltip text="Delete">
-                <button class="p-1" onclick={() => setOpenDelete(true)}>
+                <button
+                  class="rounded-sm p-1 hover:bg-neutral-100 dark:hover:bg-neutral-600"
+                  onclick={() => setOpenDelete(true)}
+                >
                   <div class="i-lucide-trash-2" />
                 </button>
               </Tooltip>
@@ -170,7 +173,7 @@ export const RecordView = () => {
             </Show>
             <Tooltip text="Copy record">
               <button
-                class="p-1"
+                class="rounded-sm p-1 hover:bg-neutral-100 dark:hover:bg-neutral-600"
                 onclick={() => addToClipboard(JSON.stringify(record()?.value, null, 2))}
               >
                 <div class="i-lucide-copy" />
@@ -179,7 +182,11 @@ export const RecordView = () => {
             <Show when={externalLink()}>
               {(externalLink) => (
                 <Tooltip text={`Open on ${externalLink().label}`}>
-                  <a class="p-1" target="_blank" href={externalLink()?.link}>
+                  <a
+                    class="rounded-sm p-1 hover:bg-neutral-100 dark:hover:bg-neutral-600"
+                    target="_blank"
+                    href={externalLink()?.link}
+                  >
                     <div class={`${externalLink().icon ?? "i-lucide-app-window"}`} />
                   </a>
                 </Tooltip>
@@ -187,7 +194,7 @@ export const RecordView = () => {
             </Show>
             <Tooltip text="Record on PDS">
               <a
-                class="p-1"
+                class="rounded-sm p-1 hover:bg-neutral-100 dark:hover:bg-neutral-600"
                 href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
                 target="_blank"
               >
