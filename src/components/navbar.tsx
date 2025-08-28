@@ -94,73 +94,70 @@ const NavBar = (props: { params: Params }) => {
       </div>
       <div class="flex flex-col flex-wrap">
         <Show when={props.params.repo}>
-          <div>
-            <div class="relative mt-1 flex items-center justify-between gap-1">
-              <div class="flex basis-full items-center gap-2">
-                <Tooltip text="Repository">
-                  <button onclick={() => addToClipboard(props.params.repo)}>
-                    <div class="i-lucide-at-sign text-lg" />
-                  </button>
-                </Tooltip>
-                <div class="flex gap-1">
-                  {props.params.collection || location.pathname.includes("/labels") ?
-                    <A
-                      end
-                      href={`/at://${props.params.repo}`}
-                      inactiveClass="text-blue-400 hover:underline"
-                    >
-                      {showHandle() ? handle() : props.params.repo}
-                    </A>
-                  : <span>{showHandle() ? handle() : props.params.repo}</span>}
-                  <Show when={showHandle()}>
-                    <Tooltip
-                      text={
-                        validHandle() === true ? "Valid handle"
-                        : validHandle() === undefined ?
-                          "Validating"
-                        : "Invalid handle"
-                      }
-                    >
-                      <div
-                        classList={{
-                          "i-lucide-circle-check": validHandle() === true,
-                          "i-lucide-circle-x text-red-500 dark:text-red-400":
-                            validHandle() === false,
-                          "i-lucide-loader-circle animate-spin": validHandle() === undefined,
-                        }}
-                      />
-                    </Tooltip>
-                  </Show>
-                </div>
-              </div>
-              <Tooltip text={showHandle() ? "Show DID" : "Show Handle"}>
-                <button
-                  onclick={() => {
-                    localStorage.showHandle = !showHandle();
-                    setShowHandle(!showHandle());
-                  }}
-                >
-                  <div
-                    class={
-                      `duration-400 shrink-0 text-lg transition-transform ${showHandle() ? "rotate-y-180" : ""} ` +
-                      (swapIcons[props.params.repo] ?? "i-lucide-arrow-left-right")
-                    }
-                  />
+          <div class="relative mt-1 flex items-center justify-between gap-1">
+            <div class="flex basis-full items-center gap-2">
+              <Tooltip text="Repository">
+                <button onclick={() => addToClipboard(props.params.repo)}>
+                  <div class="i-lucide-at-sign text-lg" />
                 </button>
               </Tooltip>
-            </div>
-            <Show when={props.params.repo in labelerCache && !props.params.collection}>
-              <div class="mt-1 flex items-center gap-2">
-                <div class="i-lucide-tag text-lg" />
-                <A
-                  end
-                  href={`/at://${props.params.repo}/labels`}
-                  inactiveClass="text-blue-400 grow hover:underline"
-                >
-                  labels
-                </A>
+              <div class="flex w-full gap-1">
+                {props.params.collection || location.pathname.includes("/labels") ?
+                  <A
+                    end
+                    href={`/at://${props.params.repo}`}
+                    inactiveClass={`text-blue-400 hover:underline ${!showHandle() ? "w-full" : ""}`}
+                  >
+                    {showHandle() ? handle() : props.params.repo}
+                  </A>
+                : <span>{showHandle() ? handle() : props.params.repo}</span>}
+                <Show when={showHandle()}>
+                  <Tooltip
+                    text={
+                      validHandle() === true ? "Valid handle"
+                      : validHandle() === undefined ?
+                        "Validating"
+                      : "Invalid handle"
+                    }
+                  >
+                    <div
+                      classList={{
+                        "i-lucide-circle-check": validHandle() === true,
+                        "i-lucide-circle-x text-red-500 dark:text-red-400": validHandle() === false,
+                        "i-lucide-loader-circle animate-spin": validHandle() === undefined,
+                      }}
+                    />
+                  </Tooltip>
+                </Show>
               </div>
-            </Show>
+            </div>
+            <Tooltip text={showHandle() ? "Show DID" : "Show Handle"}>
+              <button
+                onclick={() => {
+                  localStorage.showHandle = !showHandle();
+                  setShowHandle(!showHandle());
+                }}
+              >
+                <div
+                  class={
+                    `duration-400 shrink-0 text-lg transition-transform ${showHandle() ? "rotate-y-180" : ""} ` +
+                    (swapIcons[props.params.repo] ?? "i-lucide-arrow-left-right")
+                  }
+                />
+              </button>
+            </Tooltip>
+          </div>
+        </Show>
+        <Show when={props.params.repo in labelerCache && !props.params.collection}>
+          <div class="mt-1 flex items-center gap-2">
+            <div class="i-lucide-tag text-lg" />
+            <A
+              end
+              href={`/at://${props.params.repo}/labels`}
+              inactiveClass="text-blue-400 grow hover:underline"
+            >
+              labels
+            </A>
           </div>
         </Show>
         <Show when={props.params.collection}>
