@@ -76,9 +76,9 @@ const AccountManager = () => {
           <div class="mb-3 max-h-[20rem] overflow-y-auto md:max-h-[25rem]">
             <For each={Object.keys(sessions)}>
               {(did) => (
-                <div class="group/select flex w-full items-center justify-between gap-x-2">
+                <div class="flex w-full items-center justify-between gap-x-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-600">
                   <button
-                    class="flex basis-full items-center justify-between gap-1 truncate rounded bg-transparent px-1 text-left group-hover/select:bg-neutral-100 dark:group-hover/select:bg-neutral-600"
+                    class="flex basis-full items-center justify-between gap-1 truncate p-1"
                     onclick={() => resumeSession(did as Did)}
                   >
                     <span class="truncate">{sessions[did]?.length ? sessions[did] : did}</span>
@@ -86,8 +86,11 @@ const AccountManager = () => {
                       <div class="i-lucide-check shrink-0" />
                     </Show>
                   </button>
-                  <button onclick={() => removeSession(did as Did)}>
-                    <div class="i-lucide-x text-lg hover:text-red-500 hover:dark:text-red-400" />
+                  <button
+                    onclick={() => removeSession(did as Did)}
+                    class="p-1.5 hover:text-red-500 hover:dark:text-red-400"
+                  >
+                    <div class="i-lucide-user-round-x text-lg" />
                   </button>
                 </div>
               )}

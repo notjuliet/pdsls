@@ -179,10 +179,9 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
               <div class="i-lucide-square-pen" />
               <span>{props.create ? "Creating" : "Editing"} record</span>
             </div>
-            <div
-              class="i-lucide-x text-lg hover:text-neutral-500 dark:hover:text-neutral-400"
-              onclick={() => setOpenDialog(false)}
-            />
+            <button onclick={() => setOpenDialog(false)}>
+              <div class="i-lucide-x text-lg hover:text-neutral-500 dark:hover:text-neutral-400" />
+            </button>
           </div>
           <form ref={formRef} class="flex flex-col gap-y-2">
             <div class="flex w-fit flex-col gap-y-1 text-xs sm:text-sm">
