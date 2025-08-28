@@ -9,7 +9,7 @@
     "serve": "vite preview"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.63",
+    "@iconify-json/lucide": "^1.2.65",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "typescript": "^5.9.2",
@@ -31,14 +31,14 @@
     "@atcute/lexicon-doc": "^1.0.3",
     "@atcute/lexicons": "^1.1.1",
     "@atcute/oauth-browser-client": "^1.0.26",
-    "@atcute/tangled": "^1.0.3",
+    "@atcute/tangled": "^1.0.4",
     "@atcute/tid": "^1.0.2",
     "@atcute/uint8array": "^1.0.3",
     "@mary/exif-rm": "jsr:^0.2.2",
     "@skyware/firehose": "^0.5.2",
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.3",
-    "hls.js": "^1.6.10",
+    "hls.js": "^1.6.11",
     "monaco-editor": "^0.52.2",
     "solid-js": "^1.9.9"
   },
