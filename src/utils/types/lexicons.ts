@@ -22,6 +22,7 @@ import {
   ShTangledActorProfile,
   ShTangledFeedStar,
   ShTangledGraphFollow,
+  ShTangledKnot,
   ShTangledKnotMember,
   ShTangledPublicKey,
   ShTangledRepo,
@@ -78,4 +79,5 @@ export const lexicons: Record<string, any> = {
   "sh.tangled.repo.pull.status.closed": ShTangledRepoPullStatusClosed.mainSchema,
   "sh.tangled.repo.pull.status.merged": ShTangledRepoPullStatusMerged.mainSchema,
   "sh.tangled.repo.pull.status.open": ShTangledRepoPullStatusOpen.mainSchema,
+  "sh.tangled.knot": ShTangledKnot.mainSchema,
 };
