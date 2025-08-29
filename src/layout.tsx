@@ -33,26 +33,24 @@ const Layout = (props: RouteSectionProps<unknown>) => {
       </MetaProvider>
       <div class="mb-2 flex w-[22rem] items-center sm:w-[24rem]">
         <div class="flex basis-1/3 gap-x-2">
-          <A href="/jetstream">
-            <Tooltip text="Relay">
-              <div class="i-lucide-radio-tower text-xl" />
-            </Tooltip>
-          </A>
+          <Tooltip text="Relay">
+            <A href="/jetstream" class="iconify lucide--radio-tower text-xl"></A>
+          </Tooltip>
           <AccountManager />
         </div>
         <div class="flex basis-1/3 items-center justify-center text-center">
-          <A href="/" style='font-feature-settings: "cv05"' class="font-bold hover:underline">
+          <A href="/" style='font-feature-settings: "cv05"' class="font-bold hover:underline active:underline">
             PDSls
           </A>
         </div>
-        <div class="justify-right flex basis-1/3 items-center gap-x-2">
+        <div class="flex basis-1/3 items-center justify-end gap-x-2">
           <Show when={agent()}>
             <RecordEditor create={true} />
           </Show>
           <Settings />
         </div>
       </div>
-      <div class="min-w-22rem sm:min-w-24rem z-1 dark:bg-dark-500 mb-4 flex max-w-full flex-col items-center text-pretty bg-neutral-100 md:max-w-screen-md">
+      <div class="dark:bg-dark-500 z-1 mb-4 flex max-w-full min-w-[22rem] flex-col items-center bg-neutral-100 text-pretty sm:min-w-[24rem] md:max-w-[48rem]">
         <Show when={location.pathname !== "/jetstream" && location.pathname !== "/firehose"}>
           <Search />
         </Show>
@@ -63,15 +61,19 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <ErrorBoundary
             fallback={(err) => <div class="mt-3 break-words">Error: {err.message}</div>}
           >
-            <Suspense fallback={<div class="i-lucide-loader-circle mt-3 animate-spin text-xl" />}>
+            <Suspense
+              fallback={
+                <span class="iconify lucide--loader-circle mt-3 animate-spin text-xl"></span>
+              }
+            >
               {props.children}
             </Suspense>
           </ErrorBoundary>
         </Show>
       </div>
       <Show when={copyNotice()}>
-        <div class="backdrop-blur-xs border-0.5 dark:shadow-dark-900/80 dark:bg-dark-100/70 fixed bottom-10 z-50 flex items-center rounded-lg border-neutral-300 bg-neutral-100/70 p-2 shadow-md dark:border-neutral-700">
-          <div class="i-lucide-clipboard-check mr-1" />
+        <div class="dark:shadow-dark-900/80 dark:bg-dark-100/70 fixed bottom-10 z-50 flex items-center rounded-lg border-[0.5px] border-neutral-300 bg-neutral-100/70 p-2 shadow-md backdrop-blur-xs dark:border-neutral-700">
+          <span class="iconify lucide--clipboard-check mr-1"></span>
           Copied to clipboard
         </div>
       </Show>

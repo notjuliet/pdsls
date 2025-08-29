@@ -59,7 +59,7 @@ const Search = () => {
         </label>
       </div>
       <div class="flex w-full items-center gap-2">
-        <div class="dark:bg-dark-100 focus-within:outline-1.5 dark:shadow-dark-900/80 flex grow items-center gap-2 rounded-lg bg-white px-2 py-1 shadow-sm focus-within:outline-neutral-900 dark:focus-within:outline-neutral-200">
+        <div class="dark:bg-dark-100 dark:shadow-dark-900/80 flex grow items-center gap-2 rounded-lg bg-white px-2 py-1 shadow-sm focus-within:outline-[1.5px] focus-within:outline-neutral-900 dark:focus-within:outline-neutral-200">
           <input
             type="text"
             spellcheck={false}
@@ -68,21 +68,21 @@ const Search = () => {
             class="grow focus:outline-none"
           />
           <Show when={loading()}>
-            <div class="i-lucide-loader-circle animate-spin text-lg" />
+            <span class="iconify lucide--loader-circle animate-spin text-lg"></span>
           </Show>
           <Show when={!loading()}>
-            <button type="submit" onclick={() => processInput(searchInput.value)}>
-              <div class="i-lucide-arrow-right text-lg text-neutral-500 dark:text-neutral-400" />
-            </button>
+            <button
+              type="submit"
+              class="iconify lucide--arrow-right text-lg text-neutral-500 dark:text-neutral-400"
+              onclick={() => processInput(searchInput.value)}
+            ></button>
           </Show>
         </div>
         <Show when={agent()}>
           <Tooltip
             text="Repository"
             children={
-              <A href={`/at://${agent()?.sub}`}>
-                <div class="i-lucide-book-user text-lg" />
-              </A>
+              <A href={`/at://${agent()?.sub}`} class="iconify lucide--book-user text-lg"></A>
             }
           />
         </Show>

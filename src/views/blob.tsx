@@ -36,13 +36,13 @@ const BlobView = (props: { pds: string; repo: string }) => {
         <p>
           {blobs()?.length} blob{(blobs()?.length ?? 0 > 1) ? "s" : ""}
         </p>
-        <div class="break-anywhere flex flex-col gap-0.5 font-mono text-sm lg:break-normal">
+        <div class="flex flex-col gap-0.5 font-mono text-sm wrap-anywhere lg:break-normal">
           <For each={blobs()}>
             {(cid) => (
               <a
                 href={`${props.pds}/xrpc/com.atproto.sync.getBlob?did=${props.repo}&cid=${cid}`}
                 target="_blank"
-                class="rounded px-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                class="rounded px-0.5 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
               >
                 <span class="text-blue-400">{cid}</span>
               </a>
@@ -54,7 +54,7 @@ const BlobView = (props: { pds: string; repo: string }) => {
         <Button onClick={() => refetch()}>Load More</Button>
       </Show>
       <Show when={response.loading}>
-        <div class="i-lucide-loader-circle mt-2 animate-spin text-xl" />
+        <span class="iconify lucide--loader-circle mt-2 animate-spin text-xl"></span>
       </Show>
     </div>
   );

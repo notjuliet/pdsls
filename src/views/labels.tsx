@@ -66,7 +66,7 @@ const LabelView = () => {
             URI Patterns (comma-separated)
           </label>
         </div>
-        <div class="w-22rem sm:w-24rem flex items-center gap-x-2">
+        <div class="flex w-[22rem] items-center gap-x-2 sm:w-[24rem]">
           <textarea
             id="patterns"
             name="patterns"
@@ -77,21 +77,23 @@ const LabelView = () => {
           />
           <div class="flex justify-center">
             <Show when={!response.loading}>
-              <button onclick={() => initQuery()} type="submit">
-                <div class="i-lucide-search text-xl" />
-              </button>
+              <button
+                onclick={() => initQuery()}
+                type="submit"
+                class="iconify lucide--search text-xl"
+              ></button>
             </Show>
             <Show when={response.loading}>
-              <div class="i-lucide-loader-circle animate-spin text-xl" />
+              <div class="iconify lucide--loader-circle animate-spin text-xl" />
             </Show>
           </div>
         </div>
       </form>
-      <div class="z-5 dark:bg-dark-500/70 backdrop-blur-xs sticky top-0 flex w-screen flex-col items-center justify-center gap-3 bg-neutral-100/70 py-3">
+      <div class="dark:bg-dark-500/70 sticky top-0 z-5 flex w-screen flex-col items-center justify-center gap-3 bg-neutral-100/70 py-3 backdrop-blur-xs">
         <TextInput
           placeholder="Filter by label"
           onInput={(e) => setFilter(e.currentTarget.value)}
-          class="w-22rem sm:w-24rem"
+          class="w-[22rem] sm:w-[24rem]"
         />
         <div class="flex items-center gap-x-2">
           <Show when={labelCount() && labels().length}>
@@ -107,14 +109,14 @@ const LabelView = () => {
                 <Button onClick={() => refetch()}>Load More</Button>
               </Show>
               <Show when={response.loading}>
-                <div class="i-lucide-loader-circle animate-spin text-xl" />
+                <div class="iconify lucide--loader-circle animate-spin text-xl" />
               </Show>
             </div>
           </Show>
         </div>
       </div>
       <Show when={labels().length}>
-        <div class="break-anywhere min-w-22rem sm:min-w-24rem divide-y-0.5 flex flex-col gap-2 divide-neutral-400 whitespace-pre-wrap text-sm dark:divide-neutral-600">
+        <div class="flex min-w-[22rem] flex-col gap-2 divide-y-[0.5px] divide-neutral-400 text-sm wrap-anywhere whitespace-pre-wrap sm:min-w-[24rem] dark:divide-neutral-600">
           <For each={filterLabels()}>
             {(label) => (
               <div class="flex items-center justify-between gap-2 pb-2">
@@ -124,7 +126,7 @@ const LabelView = () => {
                     <A
                       href={`/at://${label.uri.replace("at://", "")}`}
                       target="_blank"
-                      class="text-blue-400 hover:underline"
+                      class="text-blue-400 hover:underline active:underline"
                     >
                       {label.uri}
                     </A>
@@ -153,7 +155,7 @@ const LabelView = () => {
                   </Show>
                 </div>
                 <Show when={label.neg}>
-                  <div class="i-lucide-minus shrink-0 text-lg text-red-500 dark:text-red-400" />
+                  <div class="iconify lucide--minus shrink-0 text-lg text-red-500 dark:text-red-400" />
                 </Show>
               </div>
             )}

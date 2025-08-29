@@ -58,8 +58,8 @@ const Login = () => {
   return (
     <form class="flex flex-col gap-y-2" onsubmit={(e) => e.preventDefault()}>
       <div class="flex items-center gap-2">
-        <label for="handle">
-          <div class="i-lucide-user-round-plus text-lg" />
+        <label for="handle" class="flex items-center">
+          <span class="iconify lucide--user-round-plus text-lg"></span>
         </label>
         <TextInput
           id="handle"
@@ -67,9 +67,7 @@ const Login = () => {
           onInput={(e) => setLoginInput(e.currentTarget.value)}
           class="grow"
         />
-        <button onclick={() => login(loginInput())}>
-          <div class="i-lucide-log-in text-lg" />
-        </button>
+        <button onclick={() => login(loginInput())} class="iconify lucide--log-in text-lg"></button>
       </div>
       <div>{notice()}</div>
     </form>

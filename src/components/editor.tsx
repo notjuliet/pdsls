@@ -30,7 +30,9 @@ const Editor = (props: { theme: string; model: monaco.editor.IModel }) => {
     });
   });
 
-  return <div ref={editorDiv} class="h-20rem sm:h-24rem dark:shadow-dark-900/80 shadow-sm"></div>;
+  return (
+    <div ref={editorDiv} class="dark:shadow-dark-900/80 h-[20rem] shadow-sm sm:h-[24rem]"></div>
+  );
 };
 
 export { Editor, editor };

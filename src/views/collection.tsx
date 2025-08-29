@@ -37,7 +37,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
 
   return (
     <span
-      class="relative flex items-baseline rounded px-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+      class="relative flex items-baseline rounded px-0.5 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
       ref={rkeyRef}
       onmouseover={() => setHover(true)}
       onmouseleave={() => setHover(false)}
@@ -51,7 +51,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
       <Show when={hover()}>
         <span
           ref={previewRef}
-          class={`dark:bg-dark-500/70 left-50% max-h-xs sm:max-h-md z-25 backdrop-blur-xs border-0.5 dark:shadow-dark-900/80 pointer-events-none absolute block w-max max-w-sm -translate-x-1/2 overflow-hidden whitespace-pre-wrap rounded-lg border-neutral-300 bg-neutral-100/70 p-2 text-xs shadow-md lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
+          class={`dark:bg-dark-500/70 max-h-xs sm:max-h-md dark:shadow-dark-900/80 pointer-events-none absolute left-[50%] z-25 block w-max max-w-sm -translate-x-1/2 overflow-hidden rounded-lg border-[0.5px] border-neutral-300 bg-neutral-100/70 p-2 text-xs whitespace-pre-wrap shadow-md backdrop-blur-xs lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
         >
           <JSONValue
             data={props.record.record.value as JSONType}
@@ -161,8 +161,8 @@ const CollectionView = () => {
 
   return (
     <Show when={records.length || response()}>
-      <div class="z-5 dark:bg-dark-500/70 backdrop-blur-xs sticky top-0 flex w-screen flex-col items-center justify-center gap-2 bg-neutral-100/70 py-3">
-        <div class="w-22rem sm:w-24rem flex items-center gap-2">
+      <div class="dark:bg-dark-500/70 sticky top-0 z-5 flex w-screen flex-col items-center justify-center gap-2 bg-neutral-100/70 py-3 backdrop-blur-xs">
+        <div class="flex w-[22rem] items-center gap-2 sm:w-[24rem]">
           <Show when={agent() && agent()?.sub === did}>
             <div class="flex items-center gap-x-2">
               <Tooltip
@@ -178,10 +178,11 @@ const CollectionView = () => {
                       setLastSelected(undefined);
                       setBatchDelete(!batchDelete());
                     }}
+                    class="flex items-center"
                   >
-                    <div
-                      class={`text-lg ${batchDelete() ? "i-lucide-circle-x" : "i-lucide-trash-2"} `}
-                    />
+                    <span
+                      class={`iconify text-lg ${batchDelete() ? "lucide--circle-x" : "lucide--trash-2"} `}
+                    ></span>
                   </button>
                 }
               />
@@ -189,16 +190,16 @@ const CollectionView = () => {
                 <Tooltip
                   text="Select All"
                   children={
-                    <button onclick={() => selectAll()}>
-                      <div class="i-lucide-copy-check text-lg" />
+                    <button onclick={() => selectAll()} class="flex items-center">
+                      <span class="iconify lucide--copy-check text-lg"></span>
                     </button>
                   }
                 />
                 <Tooltip
                   text="Confirm"
                   children={
-                    <button onclick={() => deleteRecords()}>
-                      <div class="i-lucide-trash-2 text-lg text-red-500 dark:text-red-400" />
+                    <button onclick={() => deleteRecords()} class="flex items-center">
+                      <span class="iconify lucide--trash-2 text-lg text-red-500 dark:text-red-400"></span>
                     </button>
                   }
                 />
@@ -212,7 +213,7 @@ const CollectionView = () => {
           />
         </div>
         <Show when={records.length > 1}>
-          <div class="w-22rem sm:w-24rem flex items-center justify-between gap-x-2">
+          <div class="flex w-[22rem] items-center justify-between gap-x-2 sm:w-[24rem]">
             <Button
               onClick={() => {
                 setReverse(!reverse());
@@ -221,7 +222,9 @@ const CollectionView = () => {
                 refetch();
               }}
             >
-              <div class={`${reverse() ? "i-lucide-rotate-ccw" : "i-lucide-rotate-cw"} text-sm`} />
+              <span
+                class={`iconify ${reverse() ? "lucide--rotate-ccw" : "lucide--rotate-cw"} text-sm`}
+              ></span>
               Reverse
             </Button>
             <div>
@@ -231,13 +234,13 @@ const CollectionView = () => {
               </Show>
               <span>{records.length} records</span>
             </div>
-            <div class="w-5rem flex items-center justify-end">
+            <div class="flex w-[5rem] items-center justify-end">
               <Show when={cursor()}>
                 <Show when={!response.loading}>
                   <Button onClick={() => refetch()}>Load More</Button>
                 </Show>
                 <Show when={response.loading}>
-                  <div class="i-lucide-loader-circle w-5rem animate-spin text-xl" />
+                  <div class="iconify lucide--loader-circle w-[5rem] animate-spin text-xl" />
                 </Show>
               </Show>
             </div>
@@ -254,7 +257,7 @@ const CollectionView = () => {
             <>
               <Show when={batchDelete()}>
                 <label
-                  class="flex select-none items-center gap-1"
+                  class="flex items-center gap-1 select-none"
                   onclick={(e) => handleSelectionClick(e, index())}
                 >
                   <input

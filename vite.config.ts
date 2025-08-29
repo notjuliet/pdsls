@@ -1,14 +1,14 @@
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
-import UnoCSS from "unocss/vite";
 import metadata from "./public/oauth-client-metadata.json";
+import tailwindcss from "@tailwindcss/vite";
 
 const SERVER_HOST = "127.0.0.1";
 const SERVER_PORT = 13213;
 
 export default defineConfig({
   plugins: [
-    UnoCSS(),
+    tailwindcss(),
     solidPlugin(),
     // Injects OAuth-related variables
     {

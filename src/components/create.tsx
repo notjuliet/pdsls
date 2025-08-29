@@ -173,14 +173,14 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
   return (
     <>
       <Modal open={openDialog()} onClose={() => setOpenDialog(false)}>
-        <div class="w-22rem sm:w-xl lg:w-48rem starting:opacity-0 dark:bg-dark-800/70 left-50% backdrop-blur-xs border-0.5 dark:shadow-dark-900/80 absolute top-12 -translate-x-1/2 rounded-lg border-neutral-300 bg-neutral-200/70 p-2 text-neutral-900 shadow-md transition-opacity duration-300 sm:p-4 dark:border-neutral-700 dark:text-neutral-200">
+        <div class="dark:bg-dark-800/70 dark:shadow-dark-900/80 absolute top-12 left-[50%] w-[22rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-200/70 p-2 text-neutral-900 shadow-md backdrop-blur-xs transition-opacity duration-300 sm:w-xl sm:p-4 lg:w-[48rem] dark:border-neutral-700 dark:text-neutral-200 starting:opacity-0">
           <div class="mb-2 flex w-full justify-between">
             <div class="flex items-center gap-1 font-bold">
-              <div class="i-lucide-square-pen" />
+              <span class="iconify lucide--square-pen"></span>
               <span>{props.create ? "Creating" : "Editing"} record</span>
             </div>
-            <button onclick={() => setOpenDialog(false)}>
-              <div class="i-lucide-x text-lg hover:text-neutral-500 dark:hover:text-neutral-400" />
+            <button onclick={() => setOpenDialog(false)} class="flex items-center">
+              <span class="iconify lucide--x text-lg hover:text-neutral-500 dark:hover:text-neutral-400"></span>
             </button>
           </div>
           <form ref={formRef} class="flex flex-col gap-y-2">
@@ -194,14 +194,14 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                     id="collection"
                     name="collection"
                     placeholder="Optional (default: record type)"
-                    class="w-14rem"
+                    class="w-[14rem]"
                   />
                 </div>
                 <div class="flex items-center gap-x-2">
                   <label for="rkey" class="min-w-20 select-none">
                     Record key
                   </label>
-                  <TextInput id="rkey" name="rkey" placeholder="Optional" class="w-14rem" />
+                  <TextInput id="rkey" name="rkey" placeholder="Optional" class="w-[14rem]" />
                 </div>
               </Show>
               <div class="flex items-center gap-x-2">
@@ -220,17 +220,17 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
               </div>
               <div class="flex items-center gap-2">
                 <Show when={!uploading()}>
-                  <div class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex rounded-lg bg-white text-xs font-semibold shadow-sm hover:bg-neutral-50">
+                  <div class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 dark:active:bg-dark-100 flex rounded-lg bg-white text-xs font-semibold shadow-sm hover:bg-neutral-50 active:bg-neutral-50">
                     <input type="file" id="blob" hidden onChange={() => uploadBlob()} />
                     <label class="flex items-center gap-1 px-2 py-1.5" for="blob">
-                      <div class="i-lucide-upload text-sm" />
+                      <span class="iconify lucide--upload text-sm"></span>
                       Upload
                     </label>
                   </div>
                   <p class="text-xs">Metadata will be pasted after the cursor</p>
                 </Show>
                 <Show when={uploading()}>
-                  <div class="i-lucide-loader-circle animate-spin text-xl" />
+                  <span class="iconify lucide--loader-circle animate-spin text-xl"></span>
                   <p>Uploading...</p>
                 </Show>
               </div>
@@ -239,7 +239,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                   <label for="mimetype" class="min-w-20 select-none">
                     MIME type
                   </label>
-                  <TextInput id="mimetype" placeholder="Optional" class="w-14rem" />
+                  <TextInput id="mimetype" placeholder="Optional" class="w-[14rem]" />
                 </div>
                 <div class="flex items-center gap-1">
                   <input id="exif-rm" class="size-4" type="checkbox" checked />
@@ -258,7 +258,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
                 <Show when={!props.create}>
                   <div class="flex items-center gap-1">
                     <input id="recreate" class="size-4" name="recreate" type="checkbox" />
-                    <label for="recreate" class="select-none text-sm">
+                    <label for="recreate" class="text-sm select-none">
                       Recreate record
                     </label>
                   </div>
@@ -279,15 +279,15 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
       </Modal>
       <Tooltip text={`${props.create ? "Create" : "Edit"} record`}>
         <button
-          class={
-            props.create ? "" : "rounded-sm p-1 hover:bg-neutral-100 dark:hover:bg-neutral-600"
-          }
+          class={`flex items-center ${props.create ? "" : "rounded-sm p-1 hover:bg-neutral-100 active:bg-neutral-100 dark:hover:bg-neutral-600 dark:active:bg-neutral-600"}`}
           onclick={() => {
             createModel();
             setOpenDialog(true);
           }}
         >
-          <div class={props.create ? "i-lucide-square-pen text-xl" : "i-lucide-pencil"} />
+          <div
+            class={props.create ? "iconify lucide--square-pen text-xl" : "iconify lucide--pencil"}
+          />
         </button>
       </Tooltip>
     </>

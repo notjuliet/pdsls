@@ -31,65 +31,65 @@ const PlcLogView = (props: {
   const FilterButton = (props: { icon: string; event: PlcEvent }) => (
     <button
       classList={{
-        "rounded-full p-1.5": true,
+        "flex items-center rounded-full p-1.5": true,
         "bg-neutral-700 dark:bg-neutral-200": activePlcEvent() === props.event,
       }}
       onclick={() => setActivePlcEvent(activePlcEvent() === props.event ? undefined : props.event)}
     >
-      <div
+      <span
         class={`${props.icon} ${activePlcEvent() === props.event ? "text-neutral-200 dark:text-neutral-900" : ""}`}
-      />
+      ></span>
     </button>
   );
 
   const DiffItem = (props: { diff: DiffEntry }) => {
     const diff = props.diff;
     let title = "Unknown log entry";
-    let icon = "i-lucide-circle-help";
+    let icon = "lucide--circle-help";
     let value = "";
 
     if (diff.type === "identity_created") {
-      icon = "i-lucide-bell";
+      icon = "lucide--bell";
       title = `Identity created`;
     } else if (diff.type === "identity_tombstoned") {
-      icon = "i-lucide-skull";
+      icon = "lucide--skull";
       title = `Identity tombstoned`;
     } else if (diff.type === "handle_added" || diff.type === "handle_removed") {
-      icon = "i-lucide-at-sign";
+      icon = "lucide--at-sign";
       title = diff.type === "handle_added" ? "Alias added" : "Alias removed";
       value = diff.handle;
     } else if (diff.type === "handle_changed") {
-      icon = "i-lucide-at-sign";
+      icon = "lucide--at-sign";
       title = "Alias updated";
       value = `${diff.prev_handle} → ${diff.next_handle}`;
     } else if (diff.type === "rotation_key_added" || diff.type === "rotation_key_removed") {
-      icon = "i-lucide-key-round";
+      icon = "lucide--key-round";
       title = diff.type === "rotation_key_added" ? "Rotation key added" : "Rotation key removed";
       value = diff.rotation_key;
     } else if (diff.type === "service_added" || diff.type === "service_removed") {
-      icon = "i-lucide-server";
+      icon = "lucide--server";
       title = `Service ${diff.service_id} ${diff.type === "service_added" ? "added" : "removed"}`;
       value = `${diff.service_endpoint}`;
     } else if (diff.type === "service_changed") {
-      icon = "i-lucide-server";
+      icon = "lucide--server";
       title = `Service ${diff.service_id} updated`;
       value = `${diff.prev_service_endpoint} → ${diff.next_service_endpoint}`;
     } else if (
       diff.type === "verification_method_added" ||
       diff.type === "verification_method_removed"
     ) {
-      icon = "i-lucide-shield-check";
+      icon = "lucide--shield-check";
       title = `Verification method ${diff.method_id} ${diff.type === "verification_method_added" ? "added" : "removed"}`;
       value = `${diff.method_key}`;
     } else if (diff.type === "verification_method_changed") {
-      icon = "i-lucide-shield-check";
+      icon = "lucide--shield-check";
       title = `Verification method ${diff.method_id} updated`;
       value = `${diff.prev_method_key} → ${diff.next_method_key}`;
     }
 
     return (
       <div class="grid grid-cols-[min-content_1fr] items-center gap-x-1">
-        <div class={icon + ` shrink-0`} />
+        <div class={icon + ` iconify shrink-0`} />
         <p
           classList={{
             "font-semibold": true,
@@ -109,21 +109,22 @@ const PlcLogView = (props: {
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-1">
           <Tooltip text="Filter operations">
-            <div class="i-lucide-filter" />
+            <div class="iconify lucide--filter" />
           </Tooltip>
           <div class="dark:shadow-dark-900/80 dark:bg-dark-300 flex w-fit items-center rounded-full bg-white shadow-sm">
-            <FilterButton icon="i-lucide-at-sign" event="handle" />
-            <FilterButton icon="i-lucide-key-round" event="rotation_key" />
-            <FilterButton icon="i-lucide-server" event="service" />
-            <FilterButton icon="i-lucide-shield-check" event="verification_method" />
+            <FilterButton icon="iconify lucide--at-sign" event="handle" />
+            <FilterButton icon="iconify lucide--key-round" event="rotation_key" />
+            <FilterButton icon="iconify lucide--server" event="service" />
+            <FilterButton icon="iconify lucide--shield-check" event="verification_method" />
           </div>
         </div>
         <Tooltip text="Audit log">
           <a
             href={`${localStorage.plcDirectory ?? "https://plc.directory"}/${props.did}/log/audit`}
             target="_blank"
+            class="flex items-center"
           >
-            <div class="i-lucide-external-link" />
+            <span class="iconify lucide--external-link"></span>
           </a>
         </Tooltip>
       </div>
@@ -177,7 +178,7 @@ const RepoView = () => {
       }}
       onclick={() => setTab(props.tab)}
     >
-      <div class={props.icon} />
+      <div class={"iconify " + props.icon} />
       {props.label}
     </button>
   );
@@ -264,18 +265,20 @@ const RepoView = () => {
         </Show>
         <div class="flex justify-between text-sm">
           <Show when={!error()}>
-            <RepoTab tab="collections" label="Collections" icon="i-lucide-folder-open" />
+            <RepoTab tab="collections" label="Collections" icon="lucide--folder-open" />
           </Show>
-          <RepoTab tab="doc" label="Identity" icon="i-lucide-id-card" />
+          <RepoTab tab="doc" label="Identity" icon="lucide--id-card" />
           <Show when={!error()}>
-            <RepoTab tab="blobs" label="Blobs" icon="i-lucide-file-digit" />
+            <RepoTab tab="blobs" label="Blobs" icon="lucide--file-digit" />
           </Show>
-          <RepoTab tab="backlinks" label="Backlinks" icon="i-lucide-send-to-back" />
+          <RepoTab tab="backlinks" label="Backlinks" icon="lucide--send-to-back" />
         </div>
         <Show when={tab() === "backlinks"}>
           <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
             <Suspense
-              fallback={<div class="i-lucide-loader-circle animate-spin self-center text-xl" />}
+              fallback={
+                <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
+              }
             >
               <Backlinks target={did} />
             </Suspense>
@@ -284,7 +287,9 @@ const RepoView = () => {
         <Show when={tab() === "blobs"}>
           <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
             <Suspense
-              fallback={<div class="i-lucide-loader-circle animate-spin self-center text-xl" />}
+              fallback={
+                <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
+              }
             >
               <BlobView pds={pds!} repo={did} />
             </Suspense>
@@ -306,16 +311,16 @@ const RepoView = () => {
               >
                 {(authority) => (
                   <>
-                    <button onclick={() => toggleCollection(authority)}>
-                      <div
+                    <button onclick={() => toggleCollection(authority)} class="flex items-center">
+                      <span
                         classList={{
-                          "i-lucide-chevron-down text-lg transition-transform": true,
+                          "iconify lucide--chevron-down text-lg transition-transform": true,
                           "-rotate-90": nsids()?.[authority].hidden,
                         }}
-                      />
+                      ></span>
                     </button>
                     <button
-                      class="break-anywhere bg-transparent text-left"
+                      class="bg-transparent text-left wrap-anywhere"
                       onclick={() => toggleCollection(authority)}
                     >
                       {authority}
@@ -333,7 +338,7 @@ const RepoView = () => {
                           {(nsid) => (
                             <A
                               href={`/at://${did}/${authority}.${nsid}`}
-                              class="text-blue-400 hover:underline"
+                              class="text-blue-400 hover:underline active:underline"
                             >
                               {authority}.{nsid}
                             </A>
@@ -350,12 +355,12 @@ const RepoView = () => {
         <Show when={tab() === "doc"}>
           <Show when={didDoc()}>
             {(didDocument) => (
-              <div class="break-anywhere flex flex-col gap-y-2">
+              <div class="flex flex-col gap-y-2 wrap-anywhere">
                 <div class="flex flex-col gap-y-1">
                   <div class="flex items-baseline justify-between gap-2">
                     <div>
                       <div class="flex items-center gap-1">
-                        <div class="i-lucide-id-card" />
+                        <div class="iconify lucide--id-card" />
                         <p class="font-semibold">ID</p>
                       </div>
                       <div class="text-sm">{didDocument().id}</div>
@@ -368,14 +373,15 @@ const RepoView = () => {
                           : `https://${did.split("did:web:")[1]}/.well-known/did.json`
                         }
                         target="_blank"
+                        class="flex items-center"
                       >
-                        <div class="i-lucide-external-link" />
+                        <span class="iconify lucide--external-link"></span>
                       </a>
                     </Tooltip>
                   </div>
                   <div>
                     <div class="flex items-center gap-1">
-                      <div class="i-lucide-at-sign" />
+                      <div class="iconify lucide--at-sign" />
                       <p class="font-semibold">Aliases</p>
                     </div>
                     <ul>
@@ -386,7 +392,7 @@ const RepoView = () => {
                   </div>
                   <div>
                     <div class="flex items-center gap-1">
-                      <div class="i-lucide-server" />
+                      <div class="iconify lucide--server" />
                       <p class="font-semibold">Services</p>
                     </div>
                     <ul>
@@ -395,7 +401,7 @@ const RepoView = () => {
                           <li class="flex flex-col text-sm">
                             <span>#{service.id.split("#")[1]}</span>
                             <a
-                              class="w-fit text-blue-400 hover:underline"
+                              class="w-fit text-blue-400 hover:underline active:underline"
                               href={service.serviceEndpoint.toString()}
                               target="_blank"
                             >
@@ -408,7 +414,7 @@ const RepoView = () => {
                   </div>
                   <div>
                     <div class="flex items-center gap-1">
-                      <div class="i-lucide-shield-check" />
+                      <div class="iconify lucide--shield-check" />
                       <p class="font-semibold">Verification methods</p>
                     </div>
                     <ul>
@@ -420,7 +426,7 @@ const RepoView = () => {
                                 <span class="flex justify-between gap-1">
                                   <span>#{verif.id.split("#")[1]}</span>
                                   <span class="flex items-center gap-0.5">
-                                    <div class="i-lucide-key-round" />
+                                    <div class="iconify lucide--key-round" />
                                     <ErrorBoundary fallback={<>unknown</>}>
                                       {parsePublicMultikey(key()).type}
                                     </ErrorBoundary>
@@ -462,11 +468,11 @@ const RepoView = () => {
                           setShowPlcLogs(!showPlcLogs());
                         }}
                       >
-                        <div class="i-lucide-logs text-sm" />
+                        <span class="iconify lucide--logs text-sm"></span>
                         {showPlcLogs() ? "Hide" : "Show"} PLC Logs
                       </Button>
                       <Show when={loading()}>
-                        <div class="i-lucide-loader-circle animate-spin text-xl" />
+                        <div class="iconify lucide--loader-circle animate-spin text-xl" />
                       </Show>
                     </div>
                   </Show>
@@ -478,10 +484,10 @@ const RepoView = () => {
                       }}
                     >
                       <Show when={downloading()}>
-                        <div class="i-lucide-loader-circle animate-spin text-xl" />
+                        <div class="iconify lucide--loader-circle animate-spin text-xl" />
                       </Show>
                       <Button onClick={() => downloadRepo()}>
-                        <div class="i-lucide-download text-sm" />
+                        <span class="iconify lucide--download text-sm"></span>
                         Export Repo
                       </Button>
                     </div>
