@@ -31,7 +31,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <Meta name="robots" content="noindex, nofollow" />
         </Show>
       </MetaProvider>
-      <div class="mb-2 flex w-[22rem] items-center sm:w-[24rem]">
+      <div class="mb-3 flex w-[22rem] items-center sm:w-[24rem]">
         <div class="flex basis-1/3 gap-x-2">
           <Tooltip text="Relay">
             <A href="/jetstream" class="iconify lucide--radio-tower text-xl"></A>
@@ -39,7 +39,11 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <AccountManager />
         </div>
         <div class="flex basis-1/3 items-center justify-center text-center">
-          <A href="/" style='font-feature-settings: "cv05"' class="font-bold hover:underline active:underline">
+          <A
+            href="/"
+            style='font-feature-settings: "cv05"'
+            class="font-bold hover:underline active:underline"
+          >
             PDSls
           </A>
         </div>

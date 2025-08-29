@@ -63,7 +63,11 @@ const NavBar = (props: { params: Params }) => {
           </Tooltip>
           <Show when={pds()}>
             <Show when={props.params.repo}>
-              <A end href={pds()!} inactiveClass="text-blue-400 w-full hover:underline active:underline">
+              <A
+                end
+                href={pds()!}
+                inactiveClass="text-blue-400 w-full hover:underline active:underline"
+              >
                 {pds()}
               </A>
             </Show>

@@ -12,7 +12,11 @@ const Home = () => {
           <div class="iconify lucide--search" />
           <span>
             Browse the public data on{" "}
-            <a class="text-blue-400 hover:underline active:underline" href="https://atproto.com" target="_blank">
+            <a
+              class="text-blue-400 hover:underline active:underline"
+              href="https://atproto.com"
+              target="_blank"
+            >
               atproto
             </a>
             .
@@ -60,7 +64,10 @@ const Home = () => {
         </div>
         <div class="flex items-center gap-1">
           <div class="iconify lucide--at-sign" />
-          <A href="/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2" class="text-blue-400 hover:underline active:underline">
+          <A
+            href="/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2"
+            class="text-blue-400 hover:underline active:underline"
+          >
             at://did:plc:vwzwgnygau7ed7b7wt5ux7y2
           </A>
         </div>

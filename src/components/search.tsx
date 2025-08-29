@@ -53,11 +53,9 @@ const Search = () => {
       id="uriForm"
       onsubmit={(e) => e.preventDefault()}
     >
-      <div class="w-full">
-        <label for="input" class="ml-0.5 text-sm">
-          PDS URL, AT URI, or handle
-        </label>
-      </div>
+      <label for="input" class="ml-0.5 text-sm">
+        PDS URL, AT URI, or handle
+      </label>
       <div class="flex w-full items-center gap-2">
         <div class="dark:bg-dark-100 dark:shadow-dark-900/80 flex grow items-center gap-2 rounded-lg bg-white px-2 py-1 shadow-sm focus-within:outline-[1.5px] focus-within:outline-neutral-900 dark:focus-within:outline-neutral-200">
           <input
