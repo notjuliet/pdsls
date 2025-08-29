@@ -157,7 +157,7 @@ export const RecordView = () => {
                 </button>
               </Tooltip>
               <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
-                <div class="dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900/80 left-50% absolute top-70 -translate-x-1/2 rounded-lg border-neutral-300 bg-neutral-200/70 p-4 text-neutral-900 shadow-md backdrop-blur-xs transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200 starting:opacity-0">
+                <div class="dark:bg-dark-800/70 dark:shadow-dark-900/80 absolute top-70 left-[50%] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-200/70 p-4 text-neutral-900 shadow-md backdrop-blur-xs transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200 starting:opacity-0">
                   <h2 class="mb-2 font-bold">Delete this record?</h2>
                   <div class="flex justify-end gap-2">
                     <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
