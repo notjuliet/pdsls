@@ -116,7 +116,7 @@ const LabelView = () => {
         </div>
       </div>
       <Show when={labels().length}>
-        <div class="flex min-w-[22rem] flex-col gap-2 divide-y-[0.5px] divide-neutral-400 text-sm wrap-anywhere whitespace-pre-wrap sm:min-w-[24rem] dark:divide-neutral-600">
+        <div class="flex w-[22rem] flex-col gap-2 divide-y-[0.5px] divide-neutral-400 text-sm wrap-anywhere whitespace-pre-wrap sm:min-w-[24rem] dark:divide-neutral-600">
           <For each={filterLabels()}>
             {(label) => (
               <div class="flex items-center justify-between gap-2 pb-2">
