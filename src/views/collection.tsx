@@ -51,7 +51,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
       <Show when={hover()}>
         <span
           ref={previewRef}
-          class={`dark:bg-dark-500/70 max-h-xs sm:max-h-md dark:shadow-dark-900/80 pointer-events-none absolute left-[50%] z-25 block w-max max-w-sm -translate-x-1/2 overflow-hidden rounded-lg border-[0.5px] border-neutral-300 bg-neutral-100/70 p-2 text-xs whitespace-pre-wrap shadow-md backdrop-blur-xs lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
+          class={`dark:bg-dark-500/70 dark:shadow-dark-900/80 pointer-events-none absolute left-[50%] z-25 block max-h-[20rem] w-max max-w-sm -translate-x-1/2 overflow-hidden rounded-lg border-[0.5px] border-neutral-300 bg-neutral-100/70 p-2 text-xs whitespace-pre-wrap shadow-md backdrop-blur-xs sm:max-h-[28rem] lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
         >
           <JSONValue
             data={props.record.record.value as JSONType}
