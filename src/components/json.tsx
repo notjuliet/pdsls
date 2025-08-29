@@ -92,7 +92,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
         }}
       >
         <button
-          class="max-w-40% sm:max-w-50% break-anywhere group/clip relative flex size-fit shrink-0 items-center text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
+          class="max-w-40% sm:max-w-50% group/clip relative flex size-fit shrink-0 items-center wrap-anywhere text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
           onclick={() => setShow(!show())}
         >
           <span
@@ -102,15 +102,15 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
             }}
           >
             {show() ?
-              <div class="i-lucide-chevron-down" />
-            : <div class="i-lucide-chevron-right" />}
+              <span class="iconify lucide--chevron-down"></span>
+            : <span class="iconify lucide--chevron-right"></span>}
           </span>
           {key}:
         </button>
         <span
           classList={{
             "self-center": value !== Object(value),
-            "pl-[calc(2ch-1px)] border-l-0.5 border-neutral-500/50 dark:border-neutral-400/50 has-hover:group-hover/indent:border-neutral-700 dark:has-hover:group-hover/indent:border-neutral-300":
+            "pl-[calc(2ch-1px)] border-l-[0.5px] border-neutral-500/50 dark:border-neutral-400/50 has-hover:group-hover/indent:border-neutral-700 dark:has-hover:group-hover/indent:border-neutral-300":
               value === Object(value),
             "invisible h-0": !show(),
           }}
@@ -150,8 +150,10 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
           >
             <Show when={blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4"}>
               <Tooltip text={hide() ? "Show" : "Hide"}>
-                <button onclick={() => setHide(!hide())}>
-                  <div class={`text-base ${hide() ? "i-lucide-eye-off" : "i-lucide-eye"}`} />
+                <button onclick={() => setHide(!hide())} class="flex items-center">
+                  <span
+                    class={`iconify text-base ${hide() ? "lucide--eye-off" : "lucide--eye"}`}
+                  ></span>
                 </button>
               </Tooltip>
             </Show>
@@ -162,7 +164,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
                 class="size-fit"
               >
                 <Tooltip text="Blob link">
-                  <div class="i-lucide-external-link text-base" />
+                  <span class="iconify lucide--external-link text-base"></span>
                 </Tooltip>
               </a>
             </Show>

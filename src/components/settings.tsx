@@ -51,9 +51,9 @@ const Settings = () => {
   return (
     <>
       <Modal open={openSettings()} onClose={() => setOpenSettings(false)}>
-        <div class="starting:opacity-0 w-22rem dark:bg-dark-800/70 border-0.5 dark:shadow-dark-900/80 backdrop-blur-xs left-50% absolute top-12 -translate-x-1/2 rounded-lg border-neutral-300 bg-neutral-200/70 p-4 text-neutral-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200">
+        <div class="dark:bg-dark-800/70 dark:shadow-dark-900/80 absolute top-12 left-[50%] w-[22rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-200/70 p-4 text-neutral-900 shadow-md backdrop-blur-xs transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200 starting:opacity-0">
           <div class="mb-2 flex items-center gap-1 font-bold">
-            <div class="i-lucide-settings" />
+            <span class="iconify lucide--settings"></span>
             <span>Settings</span>
           </div>
           <div class="flex flex-col gap-2">
@@ -87,55 +87,55 @@ const Settings = () => {
                   Hide media embeds
                 </label>
               </div>
-              <div class="dark:shadow-dark-900/80 dark:bg-dark-100 flex w-fit items-center gap-1 rounded-full bg-white p-0.5 text-lg shadow-sm">
-                <Tooltip text="System Theme">
-                  <button
-                    classList={{
-                      "p-1.5 rounded-full": true,
-                      "bg-neutral-200 dark:bg-dark-400": theme().system,
-                    }}
-                    onclick={() =>
-                      updateTheme({
-                        color:
-                          window.matchMedia("(prefers-color-scheme: dark)").matches ?
-                            "dark"
-                          : "light",
-                        system: true,
-                      })
-                    }
-                  >
-                    <div class="i-lucide-monitor" />
-                  </button>
-                </Tooltip>
-                <Tooltip text="Light Theme">
-                  <button
-                    classList={{
-                      "p-1.5 rounded-full": true,
-                      "bg-neutral-200": theme().color === "light" && !theme().system,
-                    }}
-                    onclick={() => updateTheme({ color: "light", system: false })}
-                  >
-                    <div class="i-lucide-sun" />
-                  </button>
-                </Tooltip>
-                <Tooltip text="Dark Theme">
-                  <button
-                    classList={{
-                      "p-1.5 rounded-full": true,
-                      "bg-dark-400": theme().color === "dark" && !theme().system,
-                    }}
-                    onclick={() => updateTheme({ color: "dark", system: false })}
-                  >
-                    <div class="i-lucide-moon" />
-                  </button>
-                </Tooltip>
+              <div class="dark:shadow-dark-900/80 dark:bg-dark-100 flex items-center gap-1 rounded-full bg-white p-0.5 text-lg shadow-sm">
+                <button
+                  name="System Theme"
+                  classList={{
+                    "p-1.5 flex items-center rounded-full": true,
+                    "bg-neutral-200 dark:bg-dark-400": theme().system,
+                  }}
+                  onclick={() =>
+                    updateTheme({
+                      color:
+                        window.matchMedia("(prefers-color-scheme: dark)").matches ?
+                          "dark"
+                        : "light",
+                      system: true,
+                    })
+                  }
+                >
+                  <span class="iconify lucide--monitor"></span>
+                </button>
+                <button
+                  name="Light Theme"
+                  classList={{
+                    "p-1.5 flex items-center rounded-full": true,
+                    "bg-neutral-200": theme().color === "light" && !theme().system,
+                  }}
+                  onclick={() => updateTheme({ color: "light", system: false })}
+                >
+                  <span class="iconify lucide--sun"></span>
+                </button>
+                <button
+                  name="Dark Theme"
+                  classList={{
+                    "p-1.5 flex items-center rounded-full": true,
+                    "bg-dark-400": theme().color === "dark" && !theme().system,
+                  }}
+                  onclick={() => updateTheme({ color: "dark", system: false })}
+                >
+                  <span class="iconify lucide--moon"></span>
+                </button>
               </div>
             </div>
           </div>
         </div>
       </Modal>
       <button onclick={() => setOpenSettings(true)}>
-        <Tooltip text="Settings" children={<div class="i-lucide-settings text-xl" />} />
+        <Tooltip
+          text="Settings"
+          children={<span class="iconify lucide--settings text-xl"></span>}
+        />
       </button>
     </>
   );

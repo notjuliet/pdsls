@@ -15,12 +15,11 @@
     <link rel="preconnect" href="https://fonts.bunny.net" />
     <link href="https://fonts.bunny.net/css?family=roboto-mono:400" rel="stylesheet" />
     <script>
-      if (
+      document.documentElement.classList.toggle(
+        "dark",
         localStorage.theme === "dark" ||
-        (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
-      )
-        document.documentElement.classList.add("dark");
-      else document.documentElement.classList.remove("dark");
+          (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches),
+      );
     </script>
     <script src="/src/index.tsx" type="module"></script>
   </head>

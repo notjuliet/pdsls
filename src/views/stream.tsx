@@ -155,7 +155,7 @@ const StreamView = () => {
           inactiveClass="border-transparent hover:border-neutral-400 dark:hover:border-neutral-600"
           href="/jetstream"
         >
-          <div class="i-lucide-wind" />
+          <span class="iconify lucide--wind"></span>
           Jetstream
         </A>
         <A
@@ -163,13 +163,13 @@ const StreamView = () => {
           inactiveClass="border-transparent hover:border-neutral-400 dark:hover:border-neutral-600"
           href="/firehose"
         >
-          <div class="i-lucide-fire-extinguisher" />
+          <span class="iconify lucide--fire-extinguisher"></span>
           Firehose
         </A>
       </div>
       <form
         ref={formRef}
-        class="z-5 dark:bg-dark-500/70 backdrop-blur-xs sticky top-0 flex w-screen flex-col items-center bg-neutral-100/70 px-4 text-sm"
+        class="dark:bg-dark-500/70 sticky top-0 z-5 flex w-screen flex-col items-center bg-neutral-100/70 px-4 text-sm backdrop-blur-xs"
       >
         <div class="flex flex-col gap-2 py-3">
           <Show when={!connected()}>
@@ -183,7 +183,7 @@ const StreamView = () => {
                     "wss://jetstream1.us-east.bsky.network/subscribe"
                   : "wss://bsky.network")
                 }
-                class="w-16rem"
+                class="w-[16rem]"
               />
             </label>
             <Show when={streamType === StreamType.JETSTREAM}>
@@ -194,7 +194,7 @@ const StreamView = () => {
                   spellcheck={false}
                   placeholder="Comma-separated list of collections"
                   value={searchParams.collections ?? ""}
-                  class="w-16rem dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-neutral-900 dark:focus:outline-neutral-200"
+                  class="dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900/80 w-[16rem] rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-neutral-900 dark:focus:outline-neutral-200"
                 />
               </label>
             </Show>
@@ -206,7 +206,7 @@ const StreamView = () => {
                   spellcheck={false}
                   placeholder="Comma-separated list of DIDs"
                   value={searchParams.dids ?? ""}
-                  class="w-16rem dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900/80 rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-neutral-900 dark:focus:outline-neutral-200"
+                  class="dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-900/80 w-[16rem] rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-neutral-900 dark:focus:outline-neutral-200"
                 />
               </label>
             </Show>
@@ -216,7 +216,7 @@ const StreamView = () => {
                 name="cursor"
                 placeholder="Leave empty for live-tail"
                 value={searchParams.cursor ?? ""}
-                class="w-16rem"
+                class="w-[16rem]"
               />
             </label>
             <Show when={streamType === StreamType.JETSTREAM}>
@@ -235,12 +235,12 @@ const StreamView = () => {
             </Show>
           </Show>
           <Show when={connected()}>
-            <div class="break-anywhere flex flex-col gap-1">
+            <div class="flex flex-col gap-1 wrap-anywhere">
               <For each={parameters()}>
                 {(param) => (
                   <Show when={param.param}>
                     <div class="flex">
-                      <div class="min-w-6rem font-semibold">{param.name}</div>
+                      <div class="min-w-[6rem] font-semibold">{param.name}</div>
                       {param.param}
                     </div>
                   </Show>
@@ -258,7 +258,7 @@ const StreamView = () => {
       <Show when={notice().length}>
         <div class="text-red-500 dark:text-red-400">{notice()}</div>
       </Show>
-      <div class="break-anywhere md:w-screen-md divide-y-0.5 flex w-full flex-col gap-2 divide-neutral-500 whitespace-pre-wrap px-4 font-mono text-sm">
+      <div class="flex w-full flex-col gap-2 divide-y-[0.5px] divide-neutral-500 px-4 font-mono text-sm wrap-anywhere whitespace-pre-wrap md:w-[48rem]">
         <For each={records().toReversed()}>
           {(rec) => (
             <div class="pb-2">

@@ -78,7 +78,7 @@ const PdsView = () => {
                 <div class="flex flex-col">
                   <span class="font-semibold">Available User Domains</span>
                   <For each={server().availableUserDomains}>
-                    {(domain) => <span class="break-anywhere text-sm">{domain}</span>}
+                    {(domain) => <span class="text-sm wrap-anywhere">{domain}</span>}
                   </For>
                 </div>
               </Show>
@@ -99,7 +99,7 @@ const PdsView = () => {
               <Show when={!repo.active}>
                 <div class="absolute -left-4">
                   <Tooltip text={repo.status ?? "???"}>
-                    <div class="i-lucide-skull" />
+                    <span class="iconify lucide--skull"></span>
                   </Tooltip>
                 </div>
               </Show>
@@ -117,7 +117,7 @@ const PdsView = () => {
             <Button onClick={() => refetch()}>Load More</Button>
           </Show>
           <Show when={response.loading}>
-            <div class="i-lucide-loader-circle animate-spin text-xl" />
+            <span class="iconify lucide--loader-circle animate-spin text-xl"></span>
           </Show>
         </div>
       </div>

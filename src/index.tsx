@@ -1,6 +1,5 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
-import "virtual:uno.css";
 import "./styles/index.css";
 import { Route, Router } from "@solidjs/router";
 import { Layout } from "./layout.tsx";

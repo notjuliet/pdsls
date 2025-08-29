@@ -36,7 +36,7 @@ const BlobView = (props: { pds: string; repo: string }) => {
         <p>
           {blobs()?.length} blob{(blobs()?.length ?? 0 > 1) ? "s" : ""}
         </p>
-        <div class="break-anywhere flex flex-col gap-0.5 font-mono text-sm lg:break-normal">
+        <div class="flex flex-col gap-0.5 font-mono text-sm wrap-anywhere lg:break-normal">
           <For each={blobs()}>
             {(cid) => (
               <a
@@ -54,7 +54,7 @@ const BlobView = (props: { pds: string; repo: string }) => {
         <Button onClick={() => refetch()}>Load More</Button>
       </Show>
       <Show when={response.loading}>
-        <div class="i-lucide-loader-circle mt-2 animate-spin text-xl" />
+        <span class="iconify lucide--loader-circle mt-2 animate-spin text-xl"></span>
       </Show>
     </div>
   );
