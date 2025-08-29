@@ -12,7 +12,7 @@ const Home = () => {
           <div class="iconify lucide--search" />
           <span>
             Browse the public data on{" "}
-            <a class="text-blue-400 hover:underline" href="https://atproto.com" target="_blank">
+            <a class="text-blue-400 hover:underline active:underline" href="https://atproto.com" target="_blank">
               atproto
             </a>
             .
@@ -25,11 +25,11 @@ const Home = () => {
         <div class="flex items-center gap-1">
           <div class="iconify lucide--radio-tower" />
           <div>
-            <A href="/jetstream" class="text-blue-400 hover:underline">
+            <A href="/jetstream" class="text-blue-400 hover:underline active:underline">
               Jetstream
             </A>{" "}
             and{" "}
-            <A href="/firehose" class="text-blue-400 hover:underline">
+            <A href="/firehose" class="text-blue-400 hover:underline active:underline">
               firehose
             </A>{" "}
             streaming.
@@ -41,7 +41,7 @@ const Home = () => {
             Backlinks support with{" "}
             <A
               href="https://constellation.microcosm.blue"
-              class="text-blue-400 hover:underline"
+              class="text-blue-400 hover:underline active:underline"
               target="_blank"
             >
               constellation
@@ -54,13 +54,13 @@ const Home = () => {
         <span class="font-semibold">Examples</span>
         <div class="flex items-center gap-1">
           <div class="iconify lucide--server" />
-          <A href="/pds.kelinci.net" class="text-blue-400 hover:underline">
+          <A href="/pds.kelinci.net" class="text-blue-400 hover:underline active:underline">
             https://pds.kelinci.net
           </A>
         </div>
         <div class="flex items-center gap-1">
           <div class="iconify lucide--at-sign" />
-          <A href="/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2" class="text-blue-400 hover:underline">
+          <A href="/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2" class="text-blue-400 hover:underline active:underline">
             at://did:plc:vwzwgnygau7ed7b7wt5ux7y2
           </A>
         </div>
@@ -68,7 +68,7 @@ const Home = () => {
           <div class="iconify lucide--file-json shrink-0" />
           <A
             href="/at://did:plc:oisofpd7lj26yvgiivf3lxsi/app.bsky.actor.profile/self"
-            class="text-blue-400 hover:underline"
+            class="text-blue-400 hover:underline active:underline"
           >
             at://hailey.at/app.bsky.actor.profile/self
           </A>
@@ -77,7 +77,7 @@ const Home = () => {
           <div class="iconify lucide--tag" />
           <A
             href="/at://did:plc:wkoofae5uytcm7bjncmev6n6/labels"
-            class="text-blue-400 hover:underline"
+            class="text-blue-400 hover:underline active:underline"
           >
             at://pronouns.diy/labels
           </A>

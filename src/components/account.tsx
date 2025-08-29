@@ -76,7 +76,7 @@ const AccountManager = () => {
           <div class="mb-3 max-h-[20rem] overflow-y-auto md:max-h-[25rem]">
             <For each={Object.keys(sessions)}>
               {(did) => (
-                <div class="flex w-full items-center justify-between gap-x-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-600">
+                <div class="flex w-full items-center justify-between gap-x-2 rounded-lg hover:bg-neutral-100 active:bg-neutral-100 dark:hover:bg-neutral-600 dark:active:bg-neutral-600">
                   <button
                     class="flex basis-full items-center justify-between gap-1 truncate p-1"
                     onclick={() => resumeSession(did as Did)}

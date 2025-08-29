@@ -220,7 +220,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
               </div>
               <div class="flex items-center gap-2">
                 <Show when={!uploading()}>
-                  <div class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 flex rounded-lg bg-white text-xs font-semibold shadow-sm hover:bg-neutral-50">
+                  <div class="dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-900/80 dark:active:bg-dark-100 flex rounded-lg bg-white text-xs font-semibold shadow-sm hover:bg-neutral-50 active:bg-neutral-50">
                     <input type="file" id="blob" hidden onChange={() => uploadBlob()} />
                     <label class="flex items-center gap-1 px-2 py-1.5" for="blob">
                       <span class="iconify lucide--upload text-sm"></span>
@@ -279,7 +279,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
       </Modal>
       <Tooltip text={`${props.create ? "Create" : "Edit"} record`}>
         <button
-          class={`flex items-center ${props.create ? "" : "rounded-sm p-1 hover:bg-neutral-100 dark:hover:bg-neutral-600"}`}
+          class={`flex items-center ${props.create ? "" : "rounded-sm p-1 hover:bg-neutral-100 active:bg-neutral-100 dark:hover:bg-neutral-600 dark:active:bg-neutral-600"}`}
           onclick={() => {
             createModel();
             setOpenDialog(true);

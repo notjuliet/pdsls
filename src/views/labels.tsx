@@ -126,7 +126,7 @@ const LabelView = () => {
                     <A
                       href={`/at://${label.uri.replace("at://", "")}`}
                       target="_blank"
-                      class="text-blue-400 hover:underline"
+                      class="text-blue-400 hover:underline active:underline"
                     >
                       {label.uri}
                     </A>

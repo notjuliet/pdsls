@@ -35,11 +35,11 @@ const JSONString = ({ data }: { data: string }) => {
         {(part) => (
           <>
             {ATURI_RE.test(part) ?
-              <A class="text-blue-400 hover:underline" href={`/${part}`}>
+              <A class="text-blue-400 hover:underline active:underline" href={`/${part}`}>
                 {part}
               </A>
             : DID_RE.test(part) ?
-              <A class="text-blue-400 hover:underline" href={`/at://${part}`}>
+              <A class="text-blue-400 hover:underline active:underline" href={`/at://${part}`}>
                 {part}
               </A>
             : (
@@ -48,7 +48,7 @@ const JSONString = ({ data }: { data: string }) => {
               part.split("\n").length === 1
             ) ?
               <a
-                class="text-blue-400 hover:underline"
+                class="text-blue-400 hover:underline active:underline"
                 href={part}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -92,13 +92,13 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
         }}
       >
         <button
-          class="max-w-40% sm:max-w-50% group/clip relative flex size-fit shrink-0 items-center wrap-anywhere text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
+          class="max-w-40% sm:max-w-50% group/clip relative flex size-fit shrink-0 items-center wrap-anywhere text-neutral-500 hover:text-neutral-700 active:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 dark:active:text-neutral-300"
           onclick={() => setShow(!show())}
         >
           <span
             classList={{
-              "dark:bg-dark-500 absolute w-5 -left-5 bg-neutral-100 text-sm": true,
-              "hidden group-hover/clip:block": show(),
+              "dark:bg-dark-500 absolute w-5 flex items-center -left-5 bg-neutral-100 text-sm": true,
+              "hidden group-hover/clip:flex": show(),
             }}
           >
             {show() ?
