@@ -102,7 +102,7 @@ const NavBar = (props: { params: Params }) => {
             <div class="flex basis-full items-center gap-2">
               <Tooltip text="Repository">
                 <button
-                  class="iconify lucide--at-sign text-lg"
+                  class="iconify lucide--book-user text-lg"
                   onclick={() => addToClipboard(props.params.repo)}
                 ></button>
               </Tooltip>

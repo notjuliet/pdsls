@@ -80,7 +80,7 @@ const Search = () => {
           <Tooltip
             text="Repository"
             children={
-              <A href={`/at://${agent()?.sub}`} class="iconify lucide--book-user text-lg"></A>
+              <A href={`/at://${agent()?.sub}`} class="iconify lucide--book-user text-xl"></A>
             }
           />
         </Show>

@@ -63,7 +63,7 @@ const Home = () => {
           </A>
         </div>
         <div class="flex items-center gap-1">
-          <div class="iconify lucide--at-sign" />
+          <div class="iconify lucide--book-user" />
           <A
             href="/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2"
             class="text-blue-400 hover:underline active:underline"
