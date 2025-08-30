@@ -92,7 +92,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
         }}
       >
         <button
-          class="max-w-40% sm:max-w-50% group/clip relative flex size-fit shrink-0 items-center wrap-anywhere text-neutral-500 hover:text-neutral-700 active:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 dark:active:text-neutral-300"
+          class="group/clip relative flex size-fit max-w-[40%] shrink-0 items-center wrap-anywhere text-neutral-500 hover:text-neutral-700 active:text-neutral-700 sm:max-w-[50%] dark:text-neutral-400 dark:hover:text-neutral-300 dark:active:text-neutral-300"
           onclick={() => setShow(!show())}
         >
           <span
