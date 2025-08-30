@@ -67,11 +67,11 @@ const PlcLogView = (props: {
       title = diff.type === "rotation_key_added" ? "Rotation key added" : "Rotation key removed";
       value = diff.rotation_key;
     } else if (diff.type === "service_added" || diff.type === "service_removed") {
-      icon = "lucide--server";
+      icon = "lucide--hard-drive";
       title = `Service ${diff.service_id} ${diff.type === "service_added" ? "added" : "removed"}`;
       value = `${diff.service_endpoint}`;
     } else if (diff.type === "service_changed") {
-      icon = "lucide--server";
+      icon = "lucide--hard-drive";
       title = `Service ${diff.service_id} updated`;
       value = `${diff.prev_service_endpoint} → ${diff.next_service_endpoint}`;
     } else if (
@@ -114,7 +114,7 @@ const PlcLogView = (props: {
           <div class="dark:shadow-dark-900/80 dark:bg-dark-300 flex w-fit items-center rounded-full bg-white shadow-sm">
             <FilterButton icon="iconify lucide--at-sign" event="handle" />
             <FilterButton icon="iconify lucide--key-round" event="rotation_key" />
-            <FilterButton icon="iconify lucide--server" event="service" />
+            <FilterButton icon="iconify lucide--hard-drive" event="service" />
             <FilterButton icon="iconify lucide--shield-check" event="verification_method" />
           </div>
         </div>
@@ -392,7 +392,7 @@ const RepoView = () => {
                   </div>
                   <div>
                     <div class="flex items-center gap-1">
-                      <div class="iconify lucide--server" />
+                      <div class="iconify lucide--hard-drive" />
                       <p class="font-semibold">Services</p>
                     </div>
                     <ul>

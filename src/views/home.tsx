@@ -57,7 +57,7 @@ const Home = () => {
       <div>
         <span class="font-semibold">Examples</span>
         <div class="flex items-center gap-1">
-          <div class="iconify lucide--server" />
+          <div class="iconify lucide--hard-drive" />
           <A href="/pds.kelinci.net" class="text-blue-400 hover:underline active:underline">
             https://pds.kelinci.net
           </A>

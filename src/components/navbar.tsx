@@ -57,7 +57,7 @@ const NavBar = (props: { params: Params }) => {
         <div class="flex min-h-[1.25rem] basis-full items-center gap-2">
           <Tooltip text="PDS">
             <button
-              class="iconify lucide--server shrink-0 text-lg"
+              class="iconify lucide--hard-drive shrink-0 text-lg"
               onclick={() => addToClipboard(pds()!)}
             ></button>
           </Tooltip>
