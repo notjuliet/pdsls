@@ -1,7 +1,7 @@
 import { CredentialManager, Client } from "@atcute/client";
 
 import { useNavigate, useParams } from "@solidjs/router";
-import { createSignal, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
+import { createResource, createSignal, ErrorBoundary, Show, Suspense } from "solid-js";
 
 import { Backlinks } from "../components/backlinks.jsx";
 import { JSONValue } from "../components/json.jsx";
@@ -11,9 +11,8 @@ import { pds, setCID, setValidRecord, setValidSchema, validRecord } from "../com
 import { didDocCache, resolvePDS } from "../utils/api.js";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 import { verifyRecord } from "../utils/verify.js";
-import { ActorIdentifier, InferXRPCBodyOutput, is } from "@atcute/lexicons";
+import { ActorIdentifier, is } from "@atcute/lexicons";
 import { lexiconDoc } from "@atcute/lexicon-doc";
-import { ComAtprotoRepoGetRecord } from "@atcute/atproto";
 import { lexicons } from "../utils/types/lexicons.js";
 import { RecordEditor } from "../components/create.jsx";
 import { addToClipboard } from "../utils/copy.js";
@@ -24,8 +23,6 @@ import { Button } from "../components/button.jsx";
 export const RecordView = () => {
   const navigate = useNavigate();
   const params = useParams();
-  const [record, setRecord] =
-    createSignal<InferXRPCBodyOutput<ComAtprotoRepoGetRecord.mainSchema["output"]>>();
   const [openDelete, setOpenDelete] = createSignal(false);
   const [notice, setNotice] = createSignal("");
   const [showBacklinks, setShowBacklinks] = createSignal(false);
@@ -35,7 +32,7 @@ export const RecordView = () => {
   const did = params.repo;
   let rpc: Client;
 
-  onMount(async () => {
+  const fetchRecord = async () => {
     setCID(undefined);
     setValidRecord(undefined);
     setValidSchema(undefined);
@@ -53,7 +50,6 @@ export const RecordView = () => {
       setNotice(res.data.error);
       throw new Error(res.data.error);
     }
-    setRecord(res.data);
     setCID(res.data.cid);
     setExternalLink(checkUri(res.data.uri, res.data.value));
 
@@ -87,7 +83,11 @@ export const RecordView = () => {
       console.error(err);
       setValidRecord(false);
     }
-  });
+
+    return res.data;
+  };
+
+  const [record, { refetch }] = createResource(fetchRecord);
 
   const deleteRecord = async () => {
     rpc = new Client({ handler: agent()! });
@@ -112,14 +112,8 @@ export const RecordView = () => {
   };
 
   return (
-    <div class="flex w-full flex-col items-center">
-      <Show when={record() === undefined && validRecord() !== false}>
-        <div class="iconify lucide--loader-circle mt-3 animate-spin text-xl" />
-      </Show>
-      <Show when={validRecord() === false}>
-        <div class="mt-3 break-words text-red-500 dark:text-red-400">{notice()}</div>
-      </Show>
-      <Show when={record()}>
+    <Show when={record()} keyed>
+      <div class="flex w-full flex-col items-center">
         <div class="dark:shadow-dark-900/80 dark:bg-dark-300 my-3 flex w-[22rem] justify-between rounded-lg bg-white px-2 py-1.5 shadow-sm sm:w-[24rem]">
           <div class="flex gap-3 text-sm">
             <button
@@ -147,7 +141,7 @@ export const RecordView = () => {
           </div>
           <div class="flex gap-1">
             <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
-              <RecordEditor create={false} record={record()?.value} />
+              <RecordEditor create={false} record={record()?.value} refetch={refetch} />
               <Tooltip text="Delete">
                 <button
                   class="flex items-center rounded-sm p-1 hover:bg-neutral-100 active:bg-neutral-100 dark:hover:bg-neutral-600 dark:active:bg-neutral-600"
@@ -204,6 +198,9 @@ export const RecordView = () => {
           </div>
         </div>
         <Show when={!showBacklinks()}>
+          <Show when={validRecord() === false}>
+            <div class="mb-2 break-words text-red-500 dark:text-red-400">{notice()}</div>
+          </Show>
           <div class="w-[22rem] font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-full sm:text-sm">
             <JSONValue data={record()?.value as any} repo={record()!.uri.split("/")[2]} />
           </div>
@@ -219,7 +216,7 @@ export const RecordView = () => {
             </Suspense>
           </ErrorBoundary>
         </Show>
-      </Show>
-    </div>
+      </div>
+    </Show>
   );
 };

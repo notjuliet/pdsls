@@ -11,7 +11,7 @@ import { TextInput } from "./text-input.jsx";
 import { Modal } from "./modal.jsx";
 import { Button } from "./button.jsx";
 
-export const RecordEditor = (props: { create: boolean; record?: any }) => {
+export const RecordEditor = (props: { create: boolean; record?: any; refetch?: any }) => {
   const navigate = useNavigate();
   const params = useParams();
   const [openDialog, setOpenDialog] = createSignal(false);
@@ -119,7 +119,7 @@ export const RecordEditor = (props: { create: boolean; record?: any }) => {
         }
       }
       setOpenDialog(false);
-      window.location.reload();
+      props.refetch();
     } catch (err: any) {
       setNotice(err.message);
     }

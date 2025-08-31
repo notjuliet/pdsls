@@ -75,21 +75,18 @@ const CollectionView = () => {
   let pds: string;
   let rpc: Client;
 
-  const listRecords = (did: string, collection: string, cursor: string | undefined) =>
-    rpc.get("com.atproto.repo.listRecords", {
-      params: {
-        repo: did as ActorIdentifier,
-        collection: collection as `${string}.${string}.${string}`,
-        limit: LIMIT,
-        cursor: cursor,
-        reverse: reverse(),
-      },
-    });
-
   const fetchRecords = async () => {
     if (!pds) pds = await resolvePDS(did);
     if (!rpc) rpc = new Client({ handler: new CredentialManager({ service: pds }) });
-    const res = await listRecords(did, params.collection, cursor());
+    const res = await rpc.get("com.atproto.repo.listRecords", {
+      params: {
+        repo: did as ActorIdentifier,
+        collection: params.collection as `${string}.${string}.${string}`,
+        limit: LIMIT,
+        cursor: cursor(),
+        reverse: reverse(),
+      },
+    });
     if (!res.ok) throw new Error(res.data.error);
     setCursor(res.data.records.length < LIMIT ? undefined : res.data.cursor);
     const tmpRecords: AtprotoRecord[] = [];

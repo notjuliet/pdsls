@@ -28,9 +28,7 @@ const PdsView = () => {
     setVersion((res.data as any).version);
   };
 
-  const fetchRepos = async (): Promise<
-    InferXRPCBodyOutput<ComAtprotoSyncListRepos.mainSchema["output"]>
-  > => {
+  const fetchRepos = async () => {
     await getVersion();
     const describeRes = await rpc.get("com.atproto.server.describeServer");
     if (!describeRes.ok) console.error(describeRes.data.error);

@@ -8,18 +8,15 @@ const BlobView = (props: { pds: string; repo: string }) => {
   const [cursor, setCursor] = createSignal<string>();
   let rpc: Client;
 
-  const listBlobs = (did: string, cursor: string | undefined) =>
-    rpc.get("com.atproto.sync.listBlobs", {
-      params: {
-        did: did as `did:${string}:${string}`,
-        limit: LIMIT,
-        cursor: cursor,
-      },
-    });
-
   const fetchBlobs = async () => {
     if (!rpc) rpc = new Client({ handler: new CredentialManager({ service: props.pds }) });
-    const res = await listBlobs(props.repo, cursor());
+    const res = await rpc.get("com.atproto.sync.listBlobs", {
+      params: {
+        did: props.repo as `did:${string}:${string}`,
+        limit: LIMIT,
+        cursor: cursor(),
+      },
+    });
     if (!res.ok) throw new Error(res.data.error);
     if (!res.data.cids) return [];
     setCursor(res.data.cids.length < LIMIT ? undefined : res.data.cursor);
