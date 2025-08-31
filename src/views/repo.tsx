@@ -454,7 +454,11 @@ const RepoView = () => {
                             const json = await response.json();
                             try {
                               const logs = defs.indexedEntryLog.parse(json);
-                              await processIndexedEntryLog(did as any, logs);
+                              try {
+                                await processIndexedEntryLog(did as any, logs);
+                              } catch (e) {
+                                console.error(e);
+                              }
                               const opHistory = createOperationHistory(logs).reverse();
                               setPlcOps(Array.from(groupBy(opHistory, (item) => item.orig)));
                               setLoading(false);
