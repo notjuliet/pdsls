@@ -365,7 +365,7 @@ const RepoView = () => {
                       </div>
                       <div class="text-sm">{didDocument().id}</div>
                     </div>
-                    <Tooltip text="DID Document">
+                    <Tooltip text="DID document">
                       <a
                         href={
                           did.startsWith("did:plc") ?

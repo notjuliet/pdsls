@@ -137,7 +137,7 @@ const NavBar = (props: { params: Params }) => {
                 </Show>
               </div>
             </div>
-            <Tooltip text={showHandle() ? "Show DID" : "Show Handle"}>
+            <Tooltip text={showHandle() ? "Show DID" : "Show handle"}>
               <button
                 onclick={() => {
                   localStorage.showHandle = !showHandle();

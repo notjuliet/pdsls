@@ -188,7 +188,7 @@ const CollectionView = () => {
               />
               <Show when={batchDelete()}>
                 <Tooltip
-                  text="Select All"
+                  text="Select all"
                   children={
                     <button onclick={() => selectAll()} class="flex items-center">
                       <span class="iconify lucide--copy-check text-lg"></span>
