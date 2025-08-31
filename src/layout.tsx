@@ -53,12 +53,10 @@ const Layout = (props: RouteSectionProps<unknown>) => {
             <Tooltip text="Go to repo">
               <A href={`/at://${agent()?.sub}`} class="iconify lucide--book-user text-xl"></A>
             </Tooltip>
-          </Show>
-          <Show when={agent()}>
             <RecordEditor create={true} />
           </Show>
         </div>
-        <div class="flex basis-1/3 items-center justify-center text-center">
+        <div class="flex basis-1/3 justify-center">
           <A
             href="/"
             style='font-feature-settings: "cv05"'
@@ -95,7 +93,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
       </div>
       <Show when={notif().show}>
         <button
-          class="dark:shadow-dark-900/80 dark:bg-dark-100/70 fixed bottom-10 z-50 flex items-center rounded-lg border-[0.5px] border-neutral-300 bg-neutral-100/70 p-2 shadow-md backdrop-blur-xs dark:border-neutral-700"
+          class="dark:shadow-dark-900/80 dark:bg-dark-100/70 fixed bottom-10 z-50 flex items-center rounded-lg border-[0.5px] border-neutral-300 bg-white/70 p-2 shadow-md backdrop-blur-xs dark:border-neutral-700"
           onClick={() => setNotif({ show: false })}
         >
           <span class={`iconify ${notif().icon} mr-1`}></span>
