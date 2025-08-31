@@ -12,6 +12,7 @@ import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import { ComAtprotoRepoApplyWrites, ComAtprotoRepoGetRecord } from "@atcute/atproto";
 import { TextInput } from "../components/text-input.jsx";
 import { Button } from "../components/button.jsx";
+import { setNotif } from "../layout.jsx";
 
 interface AtprotoRecord {
   rkey: string;
@@ -106,15 +107,14 @@ const CollectionView = () => {
   const [response, { refetch }] = createResource(fetchRecords);
 
   const deleteRecords = async () => {
-    const writes = records
-      .filter((record) => record.toDelete)
-      .map((record): $type.enforce<ComAtprotoRepoApplyWrites.Delete> => {
-        return {
-          $type: "com.atproto.repo.applyWrites#delete",
-          collection: params.collection as `${string}.${string}.${string}`,
-          rkey: record.rkey,
-        };
-      });
+    const recsToDel = records.filter((record) => record.toDelete);
+    const writes = recsToDel.map((record): $type.enforce<ComAtprotoRepoApplyWrites.Delete> => {
+      return {
+        $type: "com.atproto.repo.applyWrites#delete",
+        collection: params.collection as `${string}.${string}.${string}`,
+        rkey: record.rkey,
+      };
+    });
 
     const BATCHSIZE = 200;
     rpc = new Client({ handler: agent()! });
@@ -126,6 +126,7 @@ const CollectionView = () => {
         },
       });
     }
+    setNotif({ show: true, icon: "lucide--trash-2", text: `${recsToDel.length} records deleted` });
     setBatchDelete(false);
     setRecords([]);
     setCursor(undefined);

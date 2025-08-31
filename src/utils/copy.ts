@@ -1,12 +1,6 @@
-import { createSignal } from "solid-js";
-
-export const [copyNotice, setCopyNotice] = createSignal(false);
-
-let timeout: number;
+import { setNotif } from "../layout";
 
 export const addToClipboard = (text: string) => {
   navigator.clipboard.writeText(text);
-  setCopyNotice(true);
-  clearTimeout(timeout);
-  timeout = setTimeout(() => setCopyNotice(false), 3000);
+  setNotif({ show: true, icon: "lucide--clipboard-check", text: "Copied to clipboard" });
 };

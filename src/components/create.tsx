@@ -10,6 +10,7 @@ import { remove } from "@mary/exif-rm";
 import { TextInput } from "./text-input.jsx";
 import { Modal } from "./modal.jsx";
 import { Button } from "./button.jsx";
+import { setNotif } from "../layout.jsx";
 
 export const RecordEditor = (props: { create: boolean; record?: any; refetch?: any }) => {
   const navigate = useNavigate();
@@ -66,6 +67,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
       return;
     }
     setOpenDialog(false);
+    setNotif({ show: true, icon: "lucide--file-check", text: "Record created" });
     navigate(`/${res.data.uri}`);
   };
 
@@ -119,6 +121,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
         }
       }
       setOpenDialog(false);
+      setNotif({ show: true, icon: "lucide--file-check", text: "Record edited" });
       props.refetch();
     } catch (err: any) {
       setNotice(err.message);

@@ -19,6 +19,7 @@ import { addToClipboard } from "../utils/copy.js";
 import Tooltip from "../components/tooltip.jsx";
 import { Modal } from "../components/modal.jsx";
 import { Button } from "../components/button.jsx";
+import { setNotif } from "../layout.jsx";
 
 export const RecordView = () => {
   const navigate = useNavigate();
@@ -98,6 +99,7 @@ export const RecordView = () => {
         rkey: params.rkey,
       },
     });
+    setNotif({ show: true, icon: "lucide--trash-2", text: "Record deleted" });
     navigate(`/at://${params.repo}/${params.collection}`);
   };
 

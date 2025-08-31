@@ -1,4 +1,4 @@
-import { createEffect, ErrorBoundary, Show, Suspense } from "solid-js";
+import { createEffect, createSignal, ErrorBoundary, Show, Suspense } from "solid-js";
 import { A, RouteSectionProps, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { agent } from "./components/login.jsx";
 import { RecordEditor } from "./components/create.jsx";
@@ -10,17 +10,30 @@ import { resolveHandle } from "./utils/api.js";
 import { Meta, MetaProvider } from "@solidjs/meta";
 import { Settings } from "./components/settings.jsx";
 import { Handle } from "@atcute/lexicons";
-import { copyNotice } from "./utils/copy.js";
+
+export const [notif, setNotif] = createSignal<{
+  show: boolean;
+  icon?: string;
+  text?: string;
+}>({ show: false });
 
 const Layout = (props: RouteSectionProps<unknown>) => {
   const params = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  let timeout: number;
 
   createEffect(async () => {
     if (params.repo && !params.repo.startsWith("did:")) {
       const did = await resolveHandle(params.repo as Handle);
       navigate(location.pathname.replace(params.repo, did));
+    }
+  });
+
+  createEffect(() => {
+    if (notif().show) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => setNotif({ show: false }), 3000);
     }
   });
 
@@ -80,10 +93,10 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           </ErrorBoundary>
         </Show>
       </div>
-      <Show when={copyNotice()}>
+      <Show when={notif().show}>
         <div class="dark:shadow-dark-900/80 dark:bg-dark-100/70 fixed bottom-10 z-50 flex items-center rounded-lg border-[0.5px] border-neutral-300 bg-neutral-100/70 p-2 shadow-md backdrop-blur-xs dark:border-neutral-700">
-          <span class="iconify lucide--clipboard-check mr-1"></span>
-          Copied to clipboard
+          <span class={`iconify ${notif().icon} mr-1`}></span>
+          {notif().text}
         </div>
       </Show>
     </div>
