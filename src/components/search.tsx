@@ -1,8 +1,6 @@
 import { resolveHandle } from "../utils/api.js";
-import { A, useNavigate } from "@solidjs/router";
-import Tooltip from "./tooltip.jsx";
+import { useNavigate } from "@solidjs/router";
 import { createSignal, Show } from "solid-js";
-import { agent } from "../components/login.jsx";
 import { Handle } from "@atcute/lexicons";
 
 const Search = () => {
@@ -76,14 +74,6 @@ const Search = () => {
             ></button>
           </Show>
         </div>
-        <Show when={agent()}>
-          <Tooltip
-            text="Repository"
-            children={
-              <A href={`/at://${agent()?.sub}`} class="iconify lucide--book-user text-xl"></A>
-            }
-          />
-        </Show>
       </div>
     </form>
   );

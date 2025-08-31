@@ -31,12 +31,19 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <Meta name="robots" content="noindex, nofollow" />
         </Show>
       </MetaProvider>
-      <div class="mb-3 flex w-[22rem] items-center sm:w-[24rem]">
+      <header class="mb-3 flex w-[22rem] items-center sm:w-[24rem]">
         <div class="flex basis-1/3 gap-x-2">
           <Tooltip text="Relay">
             <A href="/jetstream" class="iconify lucide--radio-tower text-xl"></A>
           </Tooltip>
-          <AccountManager />
+          <Show when={agent()}>
+            <Tooltip text="Go to Repo">
+              <A href={`/at://${agent()?.sub}`} class="iconify lucide--book-user text-xl"></A>
+            </Tooltip>
+          </Show>
+          <Show when={agent()}>
+            <RecordEditor create={true} />
+          </Show>
         </div>
         <div class="flex basis-1/3 items-center justify-center text-center">
           <A
@@ -48,12 +55,10 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           </A>
         </div>
         <div class="flex basis-1/3 items-center justify-end gap-x-2">
-          <Show when={agent()}>
-            <RecordEditor create={true} />
-          </Show>
+          <AccountManager />
           <Settings />
         </div>
-      </div>
+      </header>
       <div class="dark:bg-dark-500 z-1 mb-4 flex max-w-full min-w-[22rem] flex-col items-center bg-neutral-100 text-pretty sm:min-w-[24rem] md:max-w-[48rem]">
         <Show when={location.pathname !== "/jetstream" && location.pathname !== "/firehose"}>
           <Search />
