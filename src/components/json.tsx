@@ -163,7 +163,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
                 target="_blank"
                 class="size-fit"
               >
-                <Tooltip text="Blob link">
+                <Tooltip text="Blob PDS link">
                   <span class="iconify lucide--external-link text-base"></span>
                 </Tooltip>
               </a>
