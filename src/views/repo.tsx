@@ -1,6 +1,6 @@
 import { createSignal, For, Show, createResource, Suspense, ErrorBoundary } from "solid-js";
 import { Client, CredentialManager } from "@atcute/client";
-import { A, useParams } from "@solidjs/router";
+import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { didDocCache, resolvePDS } from "../utils/api.js";
 import { Backlinks } from "../components/backlinks.jsx";
 import { ActorIdentifier } from "@atcute/lexicons";
@@ -19,7 +19,7 @@ import { localDateFromTimestamp } from "../utils/date.js";
 import { Button } from "../components/button.jsx";
 import { parsePublicMultikey } from "@atcute/crypto";
 
-type Tab = "collections" | "backlinks" | "doc" | "blobs";
+type Tab = "collections" | "backlinks" | "identity" | "blobs";
 type PlcEvent = "handle" | "rotation_key" | "service" | "verification_method";
 
 const PlcLogView = (props: {
@@ -154,11 +154,12 @@ const PlcLogView = (props: {
 
 const RepoView = () => {
   const params = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [error, setError] = createSignal<string>();
   const [downloading, setDownloading] = createSignal(false);
   const [didDoc, setDidDoc] = createSignal<DidDocument>();
   const [nsids, setNsids] = createSignal<Record<string, { hidden: boolean; nsids: string[] }>>();
-  const [tab, setTab] = createSignal<Tab>("collections");
   const [filter, setFilter] = createSignal<string>();
   const [plcOps, setPlcOps] =
     createSignal<[IndexedEntry<CompatibleOperationOrTombstone>, DiffEntry[]][]>();
@@ -170,17 +171,18 @@ const RepoView = () => {
   const did = params.repo;
 
   const RepoTab = (props: { tab: Tab; label: string; icon: string }) => (
-    <button
+    <A
       classList={{
-        "border-b-2 flex items-center gap-1 py-1": true,
+        "flex items-center border-b-2 gap-1 py-1": true,
         "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
-          tab() !== props.tab,
+          (location.hash !== `#${props.tab}` && !!location.hash) ||
+          (!location.hash && props.tab !== "collections"),
       }}
-      onclick={() => setTab(props.tab)}
+      href={`/at://${params.repo}#${props.tab}`}
     >
       <div class={"iconify " + props.icon} />
       {props.label}
-    </button>
+    </A>
   );
 
   const fetchRepo = async () => {
@@ -216,7 +218,7 @@ const RepoView = () => {
         default:
           setError("This repository is unreachable");
       }
-      setTab("doc");
+      navigate("#identity");
     }
 
     return res.data;
@@ -267,13 +269,13 @@ const RepoView = () => {
           <Show when={!error()}>
             <RepoTab tab="collections" label="Collections" icon="lucide--folder-open" />
           </Show>
-          <RepoTab tab="doc" label="Identity" icon="lucide--id-card" />
+          <RepoTab tab="identity" label="Identity" icon="lucide--id-card" />
           <Show when={!error()}>
             <RepoTab tab="blobs" label="Blobs" icon="lucide--file-digit" />
           </Show>
           <RepoTab tab="backlinks" label="Backlinks" icon="lucide--send-to-back" />
         </div>
-        <Show when={tab() === "backlinks"}>
+        <Show when={location.hash === "#backlinks"}>
           <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
             <Suspense
               fallback={
@@ -284,7 +286,7 @@ const RepoView = () => {
             </Suspense>
           </ErrorBoundary>
         </Show>
-        <Show when={tab() === "blobs"}>
+        <Show when={location.hash === "#blobs"}>
           <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
             <Suspense
               fallback={
@@ -295,7 +297,7 @@ const RepoView = () => {
             </Suspense>
           </ErrorBoundary>
         </Show>
-        <Show when={nsids() && tab() === "collections"}>
+        <Show when={nsids() && (!location.hash || location.hash === "#collections")}>
           <TextInput
             placeholder="Filter collections"
             onInput={(e) => setFilter(e.currentTarget.value)}
@@ -352,7 +354,7 @@ const RepoView = () => {
             </div>
           </div>
         </Show>
-        <Show when={tab() === "doc"}>
+        <Show when={location.hash === "#identity"}>
           <Show when={didDoc()}>
             {(didDocument) => (
               <div class="flex flex-col gap-y-2 wrap-anywhere">
