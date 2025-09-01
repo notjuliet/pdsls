@@ -45,9 +45,10 @@ const Layout = (props: RouteSectionProps<unknown>) => {
       </MetaProvider>
       <header class="mb-4 flex w-[22rem] items-center sm:w-[24rem]">
         <div class="flex basis-1/3 gap-x-2">
-          <Tooltip text="Relay">
-            <A href="/jetstream" class="iconify lucide--radio-tower text-xl"></A>
-          </Tooltip>
+          <AccountManager />
+          <Show when={agent()}>
+            <RecordEditor create={true} />
+          </Show>
         </div>
         <div class="flex basis-1/3 justify-center">
           <A
@@ -60,10 +61,9 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           </A>
         </div>
         <div class="flex basis-1/3 items-center justify-end gap-x-2">
-          <Show when={agent()}>
-            <RecordEditor create={true} />
-          </Show>
-          <AccountManager />
+          <Tooltip text="Relay">
+            <A href="/jetstream" class="iconify lucide--radio-tower text-xl"></A>
+          </Tooltip>
           <Settings />
         </div>
       </header>
