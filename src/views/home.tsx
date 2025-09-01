@@ -1,5 +1,4 @@
 import { A } from "@solidjs/router";
-import Tooltip from "../components/tooltip";
 
 const Home = () => {
   return (
@@ -91,16 +90,12 @@ const Home = () => {
         </div>
       </div>
       <div class="flex gap-2">
-        <Tooltip text="Tangled">
-          <A href="https://tangled.sh/@pdsls.dev/pdsls/" target="_blank">
-            <div class="i-tangled text-xl" />
-          </A>
-        </Tooltip>
-        <Tooltip text="Bluesky">
-          <A href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz" target="_blank">
-            <div class="i-tabler-brand-bluesky text-xl" />
-          </A>
-        </Tooltip>
+        <A href="https://tangled.sh/@pdsls.dev/pdsls/" target="_blank">
+          <div class="iconify i-tangled text-xl" />
+        </A>
+        <A href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz" target="_blank">
+          <div class="iconify tabler--brand-bluesky text-xl" />
+        </A>
       </div>
     </div>
   );
