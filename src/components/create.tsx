@@ -3,7 +3,7 @@ import { Client } from "@atcute/client";
 import { agent } from "../components/login.jsx";
 import { editor, Editor } from "../components/editor.jsx";
 import * as monaco from "monaco-editor";
-import { theme } from "../components/settings.jsx";
+import { theme } from "./theme.jsx";
 import Tooltip from "./tooltip.jsx";
 import { useNavigate, useParams } from "@solidjs/router";
 import { remove } from "@mary/exif-rm";
@@ -282,7 +282,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
       </Modal>
       <Tooltip text={`${props.create ? "Create" : "Edit"} record`}>
         <button
-          class={`flex items-center ${props.create ? "" : "rounded-sm p-1 hover:bg-neutral-100 active:bg-neutral-100 dark:hover:bg-neutral-600 dark:active:bg-neutral-600"}`}
+          class={`flex items-center p-1 ${props.create ? "rounded-lg hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700" : "rounded-sm hover:bg-neutral-100 active:bg-neutral-100 dark:hover:bg-neutral-600 dark:active:bg-neutral-600"}`}
           onclick={() => {
             createModel();
             setOpenDialog(true);

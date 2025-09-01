@@ -3,7 +3,7 @@ import { createEffect, createSignal, For, Show } from "solid-js";
 import { A } from "@solidjs/router";
 import { pds } from "./navbar";
 import Tooltip from "./tooltip";
-import { hideMedia } from "./settings";
+import { hideMedia } from "../views/settings";
 
 interface AtBlob {
   $type: string;

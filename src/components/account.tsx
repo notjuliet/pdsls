@@ -1,5 +1,4 @@
 import { createSignal, onMount, For, Show } from "solid-js";
-import Tooltip from "./tooltip.jsx";
 import { deleteStoredSession, getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { agent, Login, retrieveSession, setAgent } from "./login.jsx";
 import { Did } from "@atcute/lexicons";
@@ -109,12 +108,13 @@ const AccountManager = () => {
           <Login />
         </div>
       </Modal>
-      <button onclick={() => setOpenManager(true)}>
-        <Tooltip text="Accounts">
-          {agent() && avatar() ?
-            <img src={avatar()} class="dark:shadow-dark-900/80 size-5 rounded-full shadow-sm" />
-          : <span class="iconify lucide--circle-user-round text-xl"></span>}
-        </Tooltip>
+      <button
+        onclick={() => setOpenManager(true)}
+        class="flex items-center rounded-full p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+      >
+        {agent() && avatar() ?
+          <img src={avatar()} class="dark:shadow-dark-900/80 size-5 rounded-full shadow-sm" />
+        : <span class="iconify lucide--circle-user-round text-xl"></span>}
       </button>
     </>
   );

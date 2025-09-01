@@ -10,12 +10,14 @@ import { CollectionView } from "./views/collection.tsx";
 import { LabelView } from "./views/labels.tsx";
 import { StreamView } from "./views/stream.tsx";
 import { RecordView } from "./views/record.tsx";
+import { Settings } from "./views/settings.tsx";
 
 render(
   () => (
     <Router root={Layout}>
       <Route path="/" component={Home} />
       <Route path={["/jetstream", "/firehose"]} component={StreamView} />
+      <Route path="/settings" component={Settings} />
       <Route path="/:pds" component={PdsView} />
       <Route path="/:pds/:repo" component={RepoView} />
       <Route path="/:pds/:repo/labels" component={LabelView} />
