@@ -88,7 +88,11 @@ const AccountManager = () => {
                     </Show>
                   </button>
                   <div class="flex items-center gap-1">
-                    <A href={`/at://${did}`} class="flex items-center p-1">
+                    <A
+                      href={`/at://${did}`}
+                      onClick={() => setOpenManager(false)}
+                      class="flex items-center p-1"
+                    >
                       <span class="iconify lucide--book-user text-lg"></span>
                     </A>
                     <button
