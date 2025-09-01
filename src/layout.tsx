@@ -1,5 +1,5 @@
 import { createEffect, createSignal, ErrorBoundary, Show, Suspense } from "solid-js";
-import { A, RouteSectionProps, useLocation, useNavigate, useParams } from "@solidjs/router";
+import { A, RouteSectionProps, useLocation, useNavigate } from "@solidjs/router";
 import { agent } from "./components/login.jsx";
 import { RecordEditor } from "./components/create.jsx";
 import Tooltip from "./components/tooltip.jsx";
@@ -18,15 +18,14 @@ export const [notif, setNotif] = createSignal<{
 }>({ show: false });
 
 const Layout = (props: RouteSectionProps<unknown>) => {
-  const params = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   let timeout: number;
 
   createEffect(async () => {
-    if (params.repo && !params.repo.startsWith("did:")) {
-      const did = await resolveHandle(params.repo as Handle);
-      navigate(location.pathname.replace(params.repo, did));
+    if (props.params.repo && !props.params.repo.startsWith("did:")) {
+      const did = await resolveHandle(props.params.repo as Handle);
+      navigate(location.pathname.replace(props.params.repo, did));
     }
   });
 
@@ -72,8 +71,8 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         <Show when={location.pathname !== "/jetstream" && location.pathname !== "/firehose"}>
           <Search />
         </Show>
-        <Show when={params.pds}>
-          <NavBar params={params} />
+        <Show when={props.params.pds}>
+          <NavBar params={props.params} />
         </Show>
         <Show keyed when={location.pathname}>
           <ErrorBoundary

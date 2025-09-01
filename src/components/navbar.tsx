@@ -12,18 +12,18 @@ export const [validRecord, setValidRecord] = createSignal<boolean | undefined>(u
 export const [validSchema, setValidSchema] = createSignal<boolean | undefined>(undefined);
 
 const swapIcons: Record<string, string> = {
-  "did:plc:vwzwgnygau7ed7b7wt5ux7y2": "iconify lucide--microchip",
-  "did:plc:oisofpd7lj26yvgiivf3lxsi": "iconify lucide--bone",
-  "did:plc:uu5axsmbm2or2dngy4gwchec": "iconify lucide--train-track",
-  "did:plc:7x6rtuenkuvxq3zsvffp2ide": "iconify lucide--rabbit",
-  "did:plc:ia76kvnndjutgedggx2ibrem": "iconify lucide--rabbit",
-  "did:plc:hvakvedv6byxhufjl23mfmsd": "iconify lucide--rat",
-  "did:plc:ezhjhbzqt32bqprrn6qjlkri": "iconify lucide--film",
-  "did:plc:6v6jqsy7swpzuu53rmzaybjy": "iconify lucide--fish",
-  "did:plc:hx53snho72xoj7zqt5uice4u": "iconify lucide--rose",
-  "did:plc:wzsilnxf24ehtmmc3gssy5bu": "iconify lucide--music-2",
-  "did:plc:bnqkww7bjxaacajzvu5gswdf": "iconify lucide--gem",
-  "did:plc:hdhoaan3xa3jiuq4fg4mefid": "iconify lucide--sparkles",
+  "did:plc:vwzwgnygau7ed7b7wt5ux7y2": "lucide--microchip",
+  "did:plc:oisofpd7lj26yvgiivf3lxsi": "lucide--bone",
+  "did:plc:uu5axsmbm2or2dngy4gwchec": "lucide--train-track",
+  "did:plc:7x6rtuenkuvxq3zsvffp2ide": "lucide--rabbit",
+  "did:plc:ia76kvnndjutgedggx2ibrem": "lucide--rabbit",
+  "did:plc:hvakvedv6byxhufjl23mfmsd": "lucide--rat",
+  "did:plc:ezhjhbzqt32bqprrn6qjlkri": "lucide--film",
+  "did:plc:6v6jqsy7swpzuu53rmzaybjy": "lucide--fish",
+  "did:plc:hx53snho72xoj7zqt5uice4u": "lucide--rose",
+  "did:plc:wzsilnxf24ehtmmc3gssy5bu": "lucide--music-2",
+  "did:plc:bnqkww7bjxaacajzvu5gswdf": "lucide--gem",
+  "did:plc:hdhoaan3xa3jiuq4fg4mefid": "lucide--sparkles",
 };
 
 const NavBar = (props: { params: Params }) => {
@@ -144,8 +144,8 @@ const NavBar = (props: { params: Params }) => {
                   setShowHandle(!showHandle());
                 }}
                 class={
-                  `shrink-0 text-lg transition-transform duration-400 ${showHandle() ? "rotate-y-180" : ""} ` +
-                  (swapIcons[props.params.repo] ?? "iconify lucide--arrow-left-right")
+                  `iconify shrink-0 text-lg transition-transform duration-400 ${showHandle() ? "rotate-y-180" : ""} ` +
+                  (swapIcons[props.params.repo] ?? "lucide--arrow-left-right")
                 }
               ></button>
             </Tooltip>
