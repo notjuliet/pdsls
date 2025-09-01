@@ -7,10 +7,7 @@ const getInitialTheme = () => {
   const isDarkMode =
     localStorage.theme === "dark" ||
     (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches);
-  return {
-    color: isDarkMode ? "dark" : "light",
-    system: !("theme" in localStorage),
-  };
+  return { color: isDarkMode ? "dark" : "light", system: !("theme" in localStorage) };
 };
 
 export const [theme, setTheme] = createSignal(getInitialTheme());
@@ -22,11 +19,7 @@ const Settings = () => {
   const themeEvent = () => {
     if (!theme().system) return;
     const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    setTheme(
-      isDark ?
-        { color: "dark", system: theme().system }
-      : { color: "light", system: theme().system },
-    );
+    setTheme({ color: isDark ? "dark" : "light", system: theme().system });
     document.documentElement.classList.toggle("dark", isDark);
   };
 
@@ -41,11 +34,8 @@ const Settings = () => {
   const updateTheme = (newTheme: { color: string; system: boolean }) => {
     setTheme(newTheme);
     document.documentElement.classList.toggle("dark", newTheme.color === "dark");
-    if (newTheme.system) {
-      localStorage.removeItem("theme");
-    } else {
-      localStorage.theme = newTheme.color;
-    }
+    if (newTheme.system) localStorage.removeItem("theme");
+    else localStorage.theme = newTheme.color;
   };
 
   return (
@@ -87,11 +77,11 @@ const Settings = () => {
                   Hide media embeds
                 </label>
               </div>
-              <div class="dark:shadow-dark-900/80 dark:bg-dark-100 flex items-center gap-1 rounded-full bg-white p-0.5 text-lg shadow-sm">
+              <div class="dark:shadow-dark-900/80 dark:bg-dark-100 flex items-center gap-1 rounded-full bg-white p-0.5 shadow-sm">
                 <button
                   name="System Theme"
                   classList={{
-                    "p-1.5 flex items-center rounded-full": true,
+                    "p-1 flex items-center rounded-full": true,
                     "bg-neutral-200 dark:bg-dark-400": theme().system,
                   }}
                   onclick={() =>
@@ -109,7 +99,7 @@ const Settings = () => {
                 <button
                   name="Light Theme"
                   classList={{
-                    "p-1.5 flex items-center rounded-full": true,
+                    "p-1 flex items-center rounded-full": true,
                     "bg-neutral-200": theme().color === "light" && !theme().system,
                   }}
                   onclick={() => updateTheme({ color: "light", system: false })}
@@ -119,7 +109,7 @@ const Settings = () => {
                 <button
                   name="Dark Theme"
                   classList={{
-                    "p-1.5 flex items-center rounded-full": true,
+                    "p-1 flex items-center rounded-full": true,
                     "bg-dark-400": theme().color === "dark" && !theme().system,
                   }}
                   onclick={() => updateTheme({ color: "dark", system: false })}
