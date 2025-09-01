@@ -49,11 +49,6 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <Tooltip text="Relay">
             <A href="/jetstream" class="iconify lucide--radio-tower text-xl"></A>
           </Tooltip>
-          <Show when={agent()}>
-            <Tooltip text="Go to repo">
-              <A href={`/at://${agent()?.sub}`} class="iconify lucide--book-user text-xl"></A>
-            </Tooltip>
-          </Show>
         </div>
         <div class="flex basis-1/3 justify-center">
           <A

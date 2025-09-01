@@ -7,6 +7,7 @@ import { resolveDidDoc } from "../utils/api.js";
 import { createStore } from "solid-js/store";
 import { Client, CredentialManager } from "@atcute/client";
 import { Modal } from "./modal.jsx";
+import { A } from "@solidjs/router";
 
 const AccountManager = () => {
   const [openManager, setOpenManager] = createSignal(false);
@@ -86,12 +87,17 @@ const AccountManager = () => {
                       <span class="iconify lucide--check shrink-0"></span>
                     </Show>
                   </button>
-                  <button
-                    onclick={() => removeSession(did as Did)}
-                    class="flex items-center p-1.5 hover:text-red-500 hover:dark:text-red-400"
-                  >
-                    <span class="iconify lucide--user-round-x text-lg"></span>
-                  </button>
+                  <div class="flex items-center gap-1">
+                    <A href={`/at://${did}`} class="flex items-center p-1">
+                      <span class="iconify lucide--book-user text-lg"></span>
+                    </A>
+                    <button
+                      onclick={() => removeSession(did as Did)}
+                      class="flex items-center p-1 hover:text-red-500 hover:dark:text-red-400"
+                    >
+                      <span class="iconify lucide--user-round-x text-lg"></span>
+                    </button>
+                  </div>
                 </div>
               )}
             </For>
