@@ -53,7 +53,6 @@ const Layout = (props: RouteSectionProps<unknown>) => {
             <Tooltip text="Go to repo">
               <A href={`/at://${agent()?.sub}`} class="iconify lucide--book-user text-xl"></A>
             </Tooltip>
-            <RecordEditor create={true} />
           </Show>
         </div>
         <div class="flex basis-1/3 justify-center">
@@ -66,6 +65,9 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           </A>
         </div>
         <div class="flex basis-1/3 items-center justify-end gap-x-2">
+          <Show when={agent()}>
+            <RecordEditor create={true} />
+          </Show>
           <AccountManager />
           <Settings />
         </div>
