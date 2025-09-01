@@ -1,6 +1,6 @@
 import { CredentialManager, Client } from "@atcute/client";
 
-import { useNavigate, useParams } from "@solidjs/router";
+import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, Show, Suspense } from "solid-js";
 
 import { Backlinks } from "../components/backlinks.jsx";
@@ -22,11 +22,11 @@ import { Button } from "../components/button.jsx";
 import { setNotif } from "../layout.jsx";
 
 export const RecordView = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const params = useParams();
   const [openDelete, setOpenDelete] = createSignal(false);
   const [notice, setNotice] = createSignal("");
-  const [showBacklinks, setShowBacklinks] = createSignal(false);
   const [externalLink, setExternalLink] = createSignal<
     { label: string; link: string; icon?: string } | undefined
   >();
@@ -118,28 +118,28 @@ export const RecordView = () => {
       <div class="flex w-full flex-col items-center">
         <div class="dark:shadow-dark-900/80 dark:bg-dark-300 my-3 flex w-[22rem] justify-between rounded-lg bg-white px-2 py-1.5 shadow-sm sm:w-[24rem]">
           <div class="flex gap-3 text-sm">
-            <button
+            <A
               classList={{
                 "flex items-center gap-1 border-b-2": true,
                 "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
-                  showBacklinks(),
+                  !!location.hash && location.hash !== "#record",
               }}
-              onclick={() => setShowBacklinks(!showBacklinks())}
+              href={`/at://${did}/${params.collection}/${params.rkey}#record`}
             >
               <div class="iconify lucide--file-json" />
               Record
-            </button>
-            <button
+            </A>
+            <A
               classList={{
                 "flex items-center gap-1 border-b-2": true,
                 "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
-                  !showBacklinks(),
+                  location.hash !== "#backlinks",
               }}
-              onclick={() => setShowBacklinks(!showBacklinks())}
+              href={`/at://${did}/${params.collection}/${params.rkey}#backlinks`}
             >
               <div class="iconify lucide--send-to-back" />
               Backlinks
-            </button>
+            </A>
           </div>
           <div class="flex gap-1">
             <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
@@ -199,7 +199,7 @@ export const RecordView = () => {
             </Tooltip>
           </div>
         </div>
-        <Show when={!showBacklinks()}>
+        <Show when={!location.hash || location.hash === "#record"}>
           <Show when={validRecord() === false}>
             <div class="mb-2 break-words text-red-500 dark:text-red-400">{notice()}</div>
           </Show>
@@ -207,7 +207,7 @@ export const RecordView = () => {
             <JSONValue data={record()?.value as any} repo={record()!.uri.split("/")[2]} />
           </div>
         </Show>
-        <Show when={showBacklinks()}>
+        <Show when={location.hash === "#backlinks"}>
           <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
             <Suspense
               fallback={
