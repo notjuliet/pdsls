@@ -108,9 +108,7 @@ const PlcLogView = (props: {
     <>
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-1">
-          <Tooltip text="Filter operations">
-            <div class="iconify lucide--filter" />
-          </Tooltip>
+          <div class="iconify lucide--filter" />
           <div class="dark:shadow-dark-900/80 dark:bg-dark-300 flex w-fit items-center rounded-full bg-white shadow-sm">
             <FilterButton icon="iconify lucide--at-sign" event="handle" />
             <FilterButton icon="iconify lucide--key-round" event="rotation_key" />

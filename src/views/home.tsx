@@ -2,7 +2,7 @@ import { A } from "@solidjs/router";
 
 const Home = () => {
   return (
-    <div class="mt-4 flex w-[22rem] flex-col gap-2 break-words sm:w-[24rem]">
+    <div class="mt-4 flex w-[22rem] flex-col gap-3 break-words sm:w-[24rem]">
       <div>
         <div>
           <span class="font-semibold">AT Protocol Explorer</span>
