@@ -148,7 +148,7 @@ const StreamView = () => {
   onCleanup(() => socket?.close());
 
   return (
-    <div class="mt-2 flex flex-col items-center">
+    <div class="flex flex-col items-center">
       <div class="flex gap-2 text-sm">
         <A
           class="flex items-center gap-1 border-b-2 p-1"

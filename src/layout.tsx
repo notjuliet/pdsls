@@ -44,7 +44,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <Meta name="robots" content="noindex, nofollow" />
         </Show>
       </MetaProvider>
-      <header class="mb-3 flex w-[22rem] items-center sm:w-[24rem]">
+      <header class="mb-4 flex w-[22rem] items-center sm:w-[24rem]">
         <div class="flex basis-1/3 gap-x-2">
           <Tooltip text="Relay">
             <A href="/jetstream" class="iconify lucide--radio-tower text-xl"></A>

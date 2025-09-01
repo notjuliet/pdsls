@@ -51,7 +51,7 @@ const Search = () => {
       id="uriForm"
       onsubmit={(e) => e.preventDefault()}
     >
-      <label for="input" class="ml-0.5 text-sm">
+      <label for="input" class="hidden">
         PDS URL, AT URI, or handle
       </label>
       <div class="flex w-full items-center gap-2">
@@ -59,9 +59,10 @@ const Search = () => {
           <input
             type="text"
             spellcheck={false}
+            placeholder="PDS URL, AT URI, or handle"
             ref={searchInput}
             id="input"
-            class="grow focus:outline-none"
+            class="grow placeholder:text-sm focus:outline-none"
           />
           <Show when={loading()}>
             <span class="iconify lucide--loader-circle animate-spin text-lg"></span>
