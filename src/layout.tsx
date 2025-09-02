@@ -38,15 +38,25 @@ const Layout = (props: RouteSectionProps<unknown>) => {
     }
   });
 
-  const clickEvent = (event: MouseEvent) => {
-    if (!menuButton()?.contains(event.target as Node) && !menu()?.contains(event.target as Node))
-      setShowMenu(false);
-  };
-
   onMount(() => {
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeEvent);
-    window.addEventListener("click", clickEvent);
+    window.addEventListener("click", (ev) => {
+      if (!menuButton()?.contains(ev.target as Node) && !menu()?.contains(ev.target as Node))
+        setShowMenu(false);
+    });
   });
+
+  const NavButton = (props: { href: string; label: string }) => {
+    return (
+      <A
+        href={props.href}
+        onClick={() => setShowMenu(false)}
+        class="rounded-lg p-1 hover:bg-neutral-200/50 active:bg-neutral-200/50 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+      >
+        {props.label}
+      </A>
+    );
+  };
 
   return (
     <div id="main" class="m-4 flex flex-col items-center text-neutral-900 dark:text-neutral-200">
@@ -82,27 +92,9 @@ const Layout = (props: RouteSectionProps<unknown>) => {
                 ref={setMenu}
                 class="dark:bg-dark-300 absolute top-8 right-0 z-20 flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 text-sm shadow-md dark:border-neutral-700"
               >
-                <A
-                  href="/jetstream"
-                  onClick={() => setShowMenu(false)}
-                  class="rounded-lg p-1 hover:bg-neutral-200/50 active:bg-neutral-200/50 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
-                >
-                  <span>Jetstream</span>
-                </A>
-                <A
-                  href="/firehose"
-                  onClick={() => setShowMenu(false)}
-                  class="rounded-lg p-1 hover:bg-neutral-200/50 active:bg-neutral-200/50 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
-                >
-                  <span>Firehose</span>
-                </A>
-                <A
-                  href="/settings"
-                  onClick={() => setShowMenu(false)}
-                  class="rounded-lg p-1 hover:bg-neutral-200/50 active:bg-neutral-200/50 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
-                >
-                  <span>Settings</span>
-                </A>
+                <NavButton href="/jetstream" label="Jetstream" />
+                <NavButton href="/firehose" label="Firehose" />
+                <NavButton href="/settings" label="Settings" />
                 <ThemeSelection />
               </div>
             </Show>

@@ -1,6 +1,6 @@
 import { A, Params, useLocation } from "@solidjs/router";
 import Tooltip from "./tooltip";
-import { createEffect, createSignal, Show } from "solid-js";
+import { createEffect, createSignal, onMount, Show } from "solid-js";
 import { didDocCache, labelerCache, validateHandle } from "../utils/api";
 import { Did, Handle } from "@atcute/lexicons";
 import { addToClipboard } from "../utils/copy";
@@ -32,6 +32,9 @@ const NavBar = (props: { params: Params }) => {
   const [validHandle, setValidHandle] = createSignal<boolean | undefined>(undefined);
   const [fullCid, setFullCid] = createSignal(false);
   const [showHandle, setShowHandle] = createSignal(localStorage.showHandle === "true");
+  const [showCopyMenu, setShowCopyMenu] = createSignal(false);
+  const [copyMenu, setCopyMenu] = createSignal<HTMLDivElement>();
+  const [menuButton, setMenuButton] = createSignal<HTMLButtonElement>();
 
   createEffect(() => {
     if (cid() !== undefined) setFullCid(false);
@@ -51,15 +54,33 @@ const NavBar = (props: { params: Params }) => {
     }
   });
 
+  onMount(() =>
+    window.addEventListener("click", (ev) => {
+      if (!menuButton()?.contains(ev.target as Node) && !copyMenu()?.contains(ev.target as Node))
+        setShowCopyMenu(false);
+    }),
+  );
+
+  const CopyButton = (props: { copyContent: string; label: string }) => {
+    return (
+      <button
+        onClick={() => {
+          addToClipboard(props.copyContent);
+          setShowCopyMenu(false);
+        }}
+        class="flex rounded-lg p-1 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200/50 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+      >
+        {props.label}
+      </button>
+    );
+  };
+
   return (
     <nav class="mt-4 flex w-[22rem] flex-col text-sm wrap-anywhere sm:w-[24rem]">
       <div class="relative flex items-center justify-between gap-1">
         <div class="flex min-h-[1.25rem] basis-full items-center gap-2">
           <Tooltip text="PDS">
-            <button
-              class="iconify lucide--hard-drive shrink-0 text-lg"
-              onclick={() => addToClipboard(pds()!)}
-            ></button>
+            <span class="iconify lucide--hard-drive shrink-0 text-lg"></span>
           </Tooltip>
           <Show when={pds()}>
             <Show when={props.params.repo}>
@@ -76,35 +97,42 @@ const NavBar = (props: { params: Params }) => {
             </Show>
           </Show>
         </div>
-        <Tooltip
-          text={`Copy ${
-            props.params.collection ? "AT URI"
-            : props.params.repo ? "DID"
-            : "PDS"
-          }`}
-        >
+        <div class="relative">
           <button
-            class="iconify lucide--copy shrink-0 text-lg"
-            onclick={() =>
-              addToClipboard(
-                props.params.collection ?
-                  `at://${props.params.repo}/${props.params.collection}${props.params.rkey ? `/${props.params.rkey}` : ""}`
-                : props.params.repo ? props.params.repo
-                : pds()!,
-              )
-            }
-          ></button>
-        </Tooltip>
+            class="flex items-center rounded p-0.5 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+            ref={setMenuButton}
+            onClick={() => setShowCopyMenu(!showCopyMenu())}
+          >
+            <span class="iconify lucide--copy text-base"></span>
+          </button>
+          <Show when={showCopyMenu()}>
+            <div
+              ref={setCopyMenu}
+              class="dark:bg-dark-300 absolute top-6 right-0 z-20 flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-xs shadow-md dark:border-neutral-700"
+            >
+              <Show when={pds()}>
+                <CopyButton copyContent={pds()!} label="Copy PDS" />
+              </Show>
+              <Show when={props.params.repo}>
+                <CopyButton copyContent={props.params.repo} label="Copy DID" />
+                <CopyButton
+                  copyContent={`at://${props.params.repo}${props.params.collection ? `/${props.params.collection}` : ""}${props.params.rkey ? `/${props.params.rkey}` : ""}`}
+                  label="Copy AT URI"
+                />
+              </Show>
+              <Show when={props.params.rkey && cid()}>
+                <CopyButton copyContent={cid()!} label="Copy CID" />
+              </Show>
+            </div>
+          </Show>
+        </div>
       </div>
       <div class="flex flex-col flex-wrap">
         <Show when={props.params.repo}>
           <div class="relative mt-1 flex items-center justify-between gap-1">
             <div class="flex basis-full items-center gap-2">
               <Tooltip text="Repository">
-                <button
-                  class="iconify lucide--book-user text-lg"
-                  onclick={() => addToClipboard(props.params.repo)}
-                ></button>
+                <span class="iconify lucide--book-user text-lg"></span>
               </Tooltip>
               <div class="flex w-full gap-1">
                 {props.params.collection || location.pathname.includes("/labels") ?
@@ -139,15 +167,19 @@ const NavBar = (props: { params: Params }) => {
             </div>
             <Tooltip text={showHandle() ? "Show DID" : "Show handle"}>
               <button
+                class="flex items-center rounded p-0.5 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
                 onclick={() => {
                   localStorage.showHandle = !showHandle();
                   setShowHandle(!showHandle());
                 }}
-                class={
-                  `iconify shrink-0 text-lg transition-transform duration-400 ${showHandle() ? "rotate-y-180" : ""} ` +
-                  (swapIcons[props.params.repo] ?? "lucide--arrow-left-right")
-                }
-              ></button>
+              >
+                <span
+                  class={
+                    `iconify shrink-0 text-base transition-transform duration-400 ${showHandle() ? "rotate-y-180" : ""} ` +
+                    (swapIcons[props.params.repo] ?? "lucide--arrow-left-right")
+                  }
+                ></span>
+              </button>
             </Tooltip>
           </div>
         </Show>
@@ -166,10 +198,7 @@ const NavBar = (props: { params: Params }) => {
         <Show when={props.params.collection}>
           <div class="mt-1 flex items-center gap-2">
             <Tooltip text="Collection">
-              <button
-                onclick={() => addToClipboard(props.params.collection)}
-                class="iconify lucide--folder-open text-lg"
-              ></button>
+              <span class="iconify lucide--folder-open text-lg"></span>
             </Tooltip>
             <Show when={props.params.rkey}>
               <A
@@ -188,10 +217,7 @@ const NavBar = (props: { params: Params }) => {
         <Show when={props.params.rkey}>
           <div class="mt-1 flex items-center gap-2">
             <Tooltip text="Record">
-              <button
-                onclick={() => addToClipboard(props.params.rkey)}
-                class="iconify lucide--file-json text-lg"
-              ></button>
+              <span class="iconify lucide--file-json text-lg"></span>
             </Tooltip>
             <div class="flex gap-1">
               <span>{props.params.rkey}</span>
@@ -228,10 +254,7 @@ const NavBar = (props: { params: Params }) => {
         {(cid) => (
           <div class="mt-1 flex gap-2">
             <Tooltip text="CID">
-              <button
-                onclick={() => addToClipboard(cid())}
-                class="iconify lucide--box text-lg"
-              ></button>
+              <span class="iconify lucide--box text-lg"></span>
             </Tooltip>
             <button
               dir="rtl"
