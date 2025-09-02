@@ -69,7 +69,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         <A
           href="/"
           style='font-feature-settings: "cv05"'
-          class="flex items-center gap-1 rounded-lg px-1 text-lg font-bold hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+          class="flex items-center gap-1 rounded-lg px-1 text-xl font-bold hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
         >
           <span class="iconify tabler--binary-tree-filled text-[#76c4e5]"></span>
           <span>PDSls</span>
