@@ -101,7 +101,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           </div>
         </div>
       </header>
-      <div class="dark:bg-dark-500 z-1 mb-4 flex max-w-full min-w-[22rem] flex-col items-center bg-neutral-100 text-pretty sm:min-w-[24rem] md:max-w-[48rem]">
+      <div class="mb-4 flex max-w-full min-w-[22rem] flex-col items-center text-pretty sm:min-w-[24rem] md:max-w-[48rem]">
         <Show when={!["/jetstream", "/firehose", "/settings"].includes(location.pathname)}>
           <Search />
         </Show>

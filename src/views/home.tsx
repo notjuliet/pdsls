@@ -90,11 +90,19 @@ const Home = () => {
         </div>
       </div>
       <div class="flex gap-2">
-        <A href="https://tangled.sh/@pdsls.dev/pdsls/" target="_blank">
-          <div class="iconify i-tangled text-xl" />
+        <A
+          href="https://tangled.sh/@pdsls.dev/pdsls/"
+          target="_blank"
+          class="flex rounded-full bg-neutral-200 p-1 transition-colors duration-300 hover:bg-neutral-700 hover:text-neutral-200 dark:bg-neutral-700 dark:hover:bg-neutral-200 dark:hover:text-neutral-700"
+        >
+          <span class="iconify i-tangled"></span>
         </A>
-        <A href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz" target="_blank">
-          <div class="iconify tabler--brand-bluesky text-xl" />
+        <A
+          href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz"
+          target="_blank"
+          class="flex rounded-full bg-neutral-200 p-1 transition-colors duration-300 hover:bg-neutral-700 hover:text-neutral-200 dark:bg-neutral-700 dark:hover:bg-neutral-200 dark:hover:text-neutral-700"
+        >
+          <span class="iconify ri--bluesky"></span>
         </A>
       </div>
     </div>
