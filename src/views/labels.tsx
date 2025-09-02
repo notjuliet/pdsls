@@ -66,7 +66,7 @@ const LabelView = () => {
             URI Patterns (comma-separated)
           </label>
         </div>
-        <div class="flex w-[22rem] items-center gap-x-2 sm:w-[24rem]">
+        <div class="flex w-[22rem] items-center gap-x-1 sm:w-[24rem]">
           <textarea
             id="patterns"
             name="patterns"
@@ -80,11 +80,15 @@ const LabelView = () => {
               <button
                 onclick={() => initQuery()}
                 type="submit"
-                class="iconify lucide--search text-xl"
-              ></button>
+                class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+              >
+                <span class="iconify lucide--search text-lg"></span>
+              </button>
             </Show>
             <Show when={response.loading}>
-              <div class="iconify lucide--loader-circle animate-spin text-xl" />
+              <div class="m-1 flex items-center">
+                <span class="iconify lucide--loader-circle animate-spin text-lg"></span>
+              </div>
             </Show>
           </div>
         </div>
