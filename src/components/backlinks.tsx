@@ -55,9 +55,8 @@ const Backlinks = (props: { target: string }) => {
               </div>
               <div class="ml-4.5">
                 <p>
-                  <a
+                  <button
                     class="text-blue-400 hover:underline active:underline"
-                    href="#"
                     title="Show linking records"
                     onclick={() =>
                       (
@@ -70,11 +69,10 @@ const Backlinks = (props: { target: string }) => {
                     }
                   >
                     {counts.records} record{counts.records < 2 ? "" : "s"}
-                  </a>
+                  </button>
                   {" from "}
-                  <a
+                  <button
                     class="text-blue-400 hover:underline active:underline"
-                    href="#"
                     title="Show linking DIDs"
                     onclick={() =>
                       (
@@ -88,7 +86,7 @@ const Backlinks = (props: { target: string }) => {
                   >
                     {counts.distinct_dids} DID
                     {counts.distinct_dids < 2 ? "" : "s"}
-                  </a>
+                  </button>
                 </p>
                 <Show when={show()?.collection === collection && show()?.path === path}>
                   <Show when={show()?.showDids}>
@@ -169,7 +167,10 @@ const BacklinkItems = ({
         <For each={links().linking_records}>
           {({ did, collection, rkey }) => (
             <p class="relative flex w-full items-center gap-1 font-mono">
-              <a href={`/at://${did}/${collection}/${rkey}`} class="text-blue-400 hover:underline active:underline">
+              <a
+                href={`/at://${did}/${collection}/${rkey}`}
+                class="text-blue-400 hover:underline active:underline"
+              >
                 {rkey}
               </a>
               <span class="text-xs text-neutral-500 dark:text-neutral-400">
