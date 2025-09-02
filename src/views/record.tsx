@@ -116,7 +116,7 @@ export const RecordView = () => {
   return (
     <Show when={record()} keyed>
       <div class="flex w-full flex-col items-center">
-        <div class="dark:shadow-dark-900/80 dark:bg-dark-300 my-3 flex w-[22rem] justify-between rounded-lg bg-white px-2 py-1.5 shadow-sm sm:w-[24rem]">
+        <div class="dark:shadow-dark-900/80 dark:bg-dark-300 my-3 flex w-[22rem] justify-between rounded-lg bg-neutral-50 px-2 py-1.5 shadow-sm sm:w-[24rem]">
           <div class="flex gap-3 text-sm">
             <A
               classList={{
@@ -146,7 +146,7 @@ export const RecordView = () => {
               <RecordEditor create={false} record={record()?.value} refetch={refetch} />
               <Tooltip text="Delete">
                 <button
-                  class="flex items-center rounded-sm p-1 hover:bg-neutral-100 active:bg-neutral-100 dark:hover:bg-neutral-600 dark:active:bg-neutral-600"
+                  class="flex items-center rounded-sm p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
                   onclick={() => setOpenDelete(true)}
                 >
                   <span class="iconify lucide--trash-2"></span>
@@ -169,7 +169,7 @@ export const RecordView = () => {
             </Show>
             <Tooltip text="Copy record">
               <button
-                class="flex items-center rounded-sm p-1 hover:bg-neutral-100 active:bg-neutral-100 dark:hover:bg-neutral-600 dark:active:bg-neutral-600"
+                class="flex items-center rounded-sm p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
                 onclick={() => addToClipboard(JSON.stringify(record()?.value, null, 2))}
               >
                 <span class="iconify lucide--copy"></span>
@@ -179,7 +179,7 @@ export const RecordView = () => {
               {(externalLink) => (
                 <Tooltip text={`Open on ${externalLink().label}`}>
                   <a
-                    class="flex items-center rounded-sm p-1 hover:bg-neutral-100 active:bg-neutral-100 dark:hover:bg-neutral-600 dark:active:bg-neutral-600"
+                    class="flex items-center rounded-sm p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
                     target="_blank"
                     href={externalLink()?.link}
                   >
@@ -190,7 +190,7 @@ export const RecordView = () => {
             </Show>
             <Tooltip text="Record on PDS">
               <a
-                class="flex items-center rounded-sm p-1 hover:bg-neutral-100 active:bg-neutral-100 dark:hover:bg-neutral-600 dark:active:bg-neutral-600"
+                class="flex items-center rounded-sm p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
                 href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
                 target="_blank"
               >
