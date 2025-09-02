@@ -3,7 +3,6 @@ import { Client } from "@atcute/client";
 import { agent } from "../components/login.jsx";
 import { editor, Editor } from "../components/editor.jsx";
 import * as monaco from "monaco-editor";
-import { theme } from "./theme.jsx";
 import Tooltip from "./tooltip.jsx";
 import { useNavigate, useParams } from "@solidjs/router";
 import { remove } from "@mary/exif-rm";
@@ -252,7 +251,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                 </div>
               </div>
             </div>
-            <Editor theme={theme().color} model={model!} />
+            <Editor model={model!} />
             <div class="flex flex-col gap-2">
               <Show when={notice()}>
                 <div class="text-red-500 dark:text-red-400">{notice()}</div>

@@ -14,13 +14,13 @@ self.MonacoEnvironment = {
 
 let editor: monaco.editor.IStandaloneCodeEditor;
 
-const Editor = (props: { theme: string; model: monaco.editor.IModel }) => {
+const Editor = (props: { model: monaco.editor.IModel }) => {
   let editorDiv!: HTMLDivElement;
 
   onMount(() => {
     editor = monaco.editor.create(editorDiv, {
       minimap: { enabled: false },
-      theme: props.theme === "dark" ? "vs-dark" : "vs",
+      theme: document.documentElement.classList.contains("dark") ? "vs-dark" : "vs",
       model: props.model,
       wordWrap: "on",
       automaticLayout: true,
