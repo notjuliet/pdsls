@@ -149,7 +149,11 @@ export const verifyRecord = async (opts: VerifyOptions): Promise<VerifyResult> =
     const { sig, ...unsigned } = commit;
 
     const data = CBOR.encode(unsigned);
-    const valid = await verifySig(publicKey, CBOR.fromBytes(sig), data);
+    const valid = await verifySig(
+      publicKey,
+      CBOR.fromBytes(sig) as Uint8Array<ArrayBuffer>,
+      data as Uint8Array<ArrayBuffer>,
+    );
 
     if (!valid) {
       errors.push({ message: `signature verification failed` });
@@ -234,7 +238,7 @@ const dfs = async (
     key = key.substring(0, entry.p) + decoder.decode(CBOR.fromBytes(entry.k));
 
     // Calculate depth based on leading zeros in the hash
-    const keyDigest = await toSha256(encoder.encode(key));
+    const keyDigest = await toSha256(encoder.encode(key) as Uint8Array<ArrayBuffer>);
     let zeroCount = 0;
 
     outerLoop: for (const byte of keyDigest) {
