@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@atcute/atproto':
-        specifier: ^3.1.2
-        version: 3.1.2
+        specifier: ^3.1.3
+        version: 3.1.3
       '@atcute/bluesky':
-        specifier: ^3.2.1
-        version: 3.2.1
+        specifier: ^3.2.2
+        version: 3.2.2
       '@atcute/car':
         specifier: ^3.1.1
         version: 3.1.1
@@ -27,8 +27,8 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3
       '@atcute/crypto':
-        specifier: ^2.2.3
-        version: 2.2.3
+        specifier: ^2.2.4
+        version: 2.2.4
       '@atcute/did-plc':
         specifier: ^0.1.6
         version: 0.1.6
@@ -48,14 +48,14 @@ importers:
         specifier: ^1.0.26
         version: 1.0.26
       '@atcute/tangled':
-        specifier: ^1.0.4
-        version: 1.0.4
+        specifier: ^1.0.5
+        version: 1.0.5
       '@atcute/tid':
         specifier: ^1.0.2
         version: 1.0.2
       '@atcute/uint8array':
-        specifier: ^1.0.3
-        version: 1.0.3
+        specifier: ^1.0.4
+        version: 1.0.4
       '@mary/exif-rm':
         specifier: jsr:^0.2.2
         version: '@jsr/mary__exif-rm@0.2.2'
@@ -118,11 +118,11 @@ packages:
   '@antfu/utils@8.1.1':
     resolution: {integrity: sha512-Mex9nXf9vR6AhcXmMrlz/HVgYYZpVGJ6YlPgwl7UnaFpnshXs6EK/oa5Gpf3CzENMjkvEx2tQtntGnb7UtSTOQ==}
 
-  '@atcute/atproto@3.1.2':
-    resolution: {integrity: sha512-m6OWoGTeL8Wlw7cm8Nrf+NU24rlx5A0DzxEQQPPu1wqYNHw6S33nOU90W+U09vVN0aZGZUrLFfWWhAaSWTp1ZQ==}
+  '@atcute/atproto@3.1.3':
+    resolution: {integrity: sha512-+5u0l+8E7h6wZO7MM1HLXIPoUEbdwRtr28ZRTgsURp+Md9gkoBj9e5iMx/xM8F2Exfyb65J5RchW/WlF2mw/RQ==}
 
-  '@atcute/bluesky@3.2.1':
-    resolution: {integrity: sha512-WehZuGNEC9NNB2y7Jg/i4ANzbMEQzs2EwrLYKWDuvJT3YnPHEol3vkc4DK47TODs3TiacQJp4MWhsQyfktsZ6g==}
+  '@atcute/bluesky@3.2.2':
+    resolution: {integrity: sha512-L8RrMNeRLGvSHMq2KDIAGXrpuNGA87YOXpXHY1yhmovVCjQ5n55FrR6JoQaxhprdXdKKQiefxNwQQQybDrfgFQ==}
 
   '@atcute/car@3.1.1':
     resolution: {integrity: sha512-yhez/LqIl0zHubG6z/G/gqWYHmg7wJ5L4jNkbXj5FvZ4eOvmzsw8+ojbdq6wfMU4p5NhP0pUJNLkTZHbYSPmLg==}
@@ -136,8 +136,8 @@ packages:
   '@atcute/client@4.0.3':
     resolution: {integrity: sha512-RIOZWFVLca/HiPAAUDqQPOdOreCxTbL5cb+WUf5yqQOKIu5yEAP3eksinmlLmgIrlr5qVOE7brazUUzaskFCfw==}
 
-  '@atcute/crypto@2.2.3':
-    resolution: {integrity: sha512-jJI/8WDK6rKvpoUKi0C9Q7pjRRrHGGAagRxnFvpBM5ycZT9eABz7p309LmRKBCWLasmCs/qee8WK4dqOA2e7Dw==}
+  '@atcute/crypto@2.2.4':
+    resolution: {integrity: sha512-88LbuJr63bbdJywd949YgbEiaaW4UU5iXJcFE1WqY/5ItYuoHWVdmL3XsqehiM0AfzvrYEfd5ox2wm9CK9dyQQ==}
 
   '@atcute/did-plc@0.1.6':
     resolution: {integrity: sha512-CaKZpl3UHHUczE4Co7gNi2CR3TPmQgBM0xEkKJJ6Vk4Lu9d+i9GcZQY/VBjmZntfIxHFJgZNdEkMk30lCUVpyw==}
@@ -156,20 +156,20 @@ packages:
   '@atcute/lexicons@1.1.1':
     resolution: {integrity: sha512-k6qy5p3j9fJJ6ekaMPfEfp3ni4TW/XNuH9ZmsuwC0fi0tOjp+Fa8ZQakHwnqOzFt/cVBfGcmYE/lKNAbeTjgUg==}
 
-  '@atcute/multibase@1.1.4':
-    resolution: {integrity: sha512-NUf5AeeSOmuZHGU+4GAaMtISJoG+ZHtW/vUVA4lK/YDt/7LODAW0Fd0NNIIUPVUoW0xJS6zSEIWvwLLuxmEHhA==}
+  '@atcute/multibase@1.1.5':
+    resolution: {integrity: sha512-vbmEFxgpntMuRqVZOCBgf6bgq69UGrlznQCZirVSit/mlcgyFVkSGbSEfkRnpIcrM8SnaySwuKbVvL+EPLh2dw==}
 
   '@atcute/oauth-browser-client@1.0.26':
     resolution: {integrity: sha512-z8VUmwRO1sFu5Dq1qYQOQLenkTSNaOyzlUZhVwFR41ru+AP84MS5UHHW/NsdC1xJAq1v6mlLySJ+pjxdDW8IYA==}
 
-  '@atcute/tangled@1.0.4':
-    resolution: {integrity: sha512-FMASaTyRHcX8T8NuZU0+ENHgRzRVoFZiU1WqhQn4IUinx5sGhtjovMHCP3soGggLsi4+Ar4MWHtYQSc1lOGe1g==}
+  '@atcute/tangled@1.0.5':
+    resolution: {integrity: sha512-aitbeyrFQ0uWLMI/W6uWsQnDaHVCqrRo8hIEoDWd0sAjFmLAMsev6SuRUICDbRHBmj76vK+ZQxGGOf5QfDBa3g==}
 
   '@atcute/tid@1.0.2':
     resolution: {integrity: sha512-ahmjroNyeDPJhtuf3+HTJropaH04HmJ8fhntDu73Gpz/RkAF7+nkz6kcP2QTgfvMCgMPAJUdskAAP82GPDTY9w==}
 
-  '@atcute/uint8array@1.0.3':
-    resolution: {integrity: sha512-M/K+ihiVW8Pl2PFLzaC4E3l4JaZ1IH05Q0AbPWUC4cVHnd/gZ/1kAF5ngdtGvJeDMirHZ2VAy7OmAsPwR/2nlA==}
+  '@atcute/uint8array@1.0.4':
+    resolution: {integrity: sha512-9jASMDghzhhDwjF3+eW+ZIauvytnUWDPfUVGUValRwnf9AZ7Yqqkc76tC89HVzVDAlJdhwQIUG2dQBsiVqumUA==}
 
   '@atcute/util-fetch@1.0.1':
     resolution: {integrity: sha512-Clc0E/5ufyGBVfYBUwWNlHONlZCoblSr4Ho50l1LhmRPGB1Wu/AQ9Sz+rsBg7fdaW/auve8ulmwhRhnX2cGRow==}
@@ -884,8 +884,8 @@ packages:
     resolution: {integrity: sha512-3UDv+G9CsCKO1WKMGw9fwq/SWJYbI0c5Y7LU1AXYoDdbhE2AHQ6N6Nb34sG8Fj7T5APy8qXDCKuuIHd1BR0tVA==}
     engines: {node: '>=8'}
 
-  electron-to-chromium@1.5.211:
-    resolution: {integrity: sha512-IGBvimJkotaLzFnwIVgW9/UD/AOJ2tByUmeOrtqBfACSbAw5b1G0XpvdaieKyc7ULmbwXVx+4e4Be8pOPBrYkw==}
+  electron-to-chromium@1.5.213:
+    resolution: {integrity: sha512-xr9eRzSLNa4neDO0xVFrkXu3vyIzG4Ay08dApecw42Z1NbmCt+keEpXdvlYGVe0wtvY5dhW0Ay0lY0IOfsCg0Q==}
 
   enhanced-resolve@5.18.3:
     resolution: {integrity: sha512-d4lC8xfavMeBjzGr2vECC3fsGXziXZQyJxD868h2M/mBI3PwAuODxAkLkq5HYuvrPYcUtiLzsTo8U3PgX3Ocww==}
@@ -1197,8 +1197,8 @@ packages:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
     hasBin: true
 
-  seroval-plugins@1.3.2:
-    resolution: {integrity: sha512-0QvCV2lM3aj/U3YozDiVwx9zpH0q8A60CTWIv4Jszj/givcudPb48B+rkU5D51NJ0pTpweGMttHjboPa9/zoIQ==}
+  seroval-plugins@1.3.3:
+    resolution: {integrity: sha512-16OL3NnUBw8JG1jBLUoZJsLnQq0n5Ua6aHalhJK4fMQkz1lqR7Osz1sA30trBtd9VUDc2NgkuRCn8+/pBwqZ+w==}
     engines: {node: '>=10'}
     peerDependencies:
       seroval: ^1.0
@@ -1345,54 +1345,54 @@ snapshots:
 
   '@antfu/utils@8.1.1': {}
 
-  '@atcute/atproto@3.1.2':
+  '@atcute/atproto@3.1.3':
     dependencies:
       '@atcute/lexicons': 1.1.1
 
-  '@atcute/bluesky@3.2.1':
+  '@atcute/bluesky@3.2.2':
     dependencies:
-      '@atcute/atproto': 3.1.2
+      '@atcute/atproto': 3.1.3
       '@atcute/lexicons': 1.1.1
 
   '@atcute/car@3.1.1':
     dependencies:
       '@atcute/cbor': 2.2.5
       '@atcute/cid': 2.2.3
-      '@atcute/uint8array': 1.0.3
+      '@atcute/uint8array': 1.0.4
       '@atcute/varint': 1.0.2
       yocto-queue: 1.2.1
 
   '@atcute/cbor@2.2.5':
     dependencies:
       '@atcute/cid': 2.2.3
-      '@atcute/multibase': 1.1.4
-      '@atcute/uint8array': 1.0.3
+      '@atcute/multibase': 1.1.5
+      '@atcute/uint8array': 1.0.4
 
   '@atcute/cid@2.2.3':
     dependencies:
-      '@atcute/multibase': 1.1.4
-      '@atcute/uint8array': 1.0.3
+      '@atcute/multibase': 1.1.5
+      '@atcute/uint8array': 1.0.4
 
   '@atcute/client@4.0.3':
     dependencies:
       '@atcute/identity': 1.1.0
       '@atcute/lexicons': 1.1.1
 
-  '@atcute/crypto@2.2.3':
+  '@atcute/crypto@2.2.4':
     dependencies:
-      '@atcute/multibase': 1.1.4
-      '@atcute/uint8array': 1.0.3
+      '@atcute/multibase': 1.1.5
+      '@atcute/uint8array': 1.0.4
       '@noble/secp256k1': 2.3.0
 
   '@atcute/did-plc@0.1.6':
     dependencies:
       '@atcute/cbor': 2.2.5
       '@atcute/cid': 2.2.3
-      '@atcute/crypto': 2.2.3
+      '@atcute/crypto': 2.2.4
       '@atcute/identity': 1.1.0
       '@atcute/lexicons': 1.1.1
-      '@atcute/multibase': 1.1.4
-      '@atcute/uint8array': 1.0.3
+      '@atcute/multibase': 1.1.5
+      '@atcute/uint8array': 1.0.4
       '@badrap/valita': 0.4.6
 
   '@atcute/identity-resolver@1.1.3(@atcute/identity@1.1.0)':
@@ -1415,27 +1415,27 @@ snapshots:
     dependencies:
       esm-env: 1.2.2
 
-  '@atcute/multibase@1.1.4':
+  '@atcute/multibase@1.1.5':
     dependencies:
-      '@atcute/uint8array': 1.0.3
+      '@atcute/uint8array': 1.0.4
 
   '@atcute/oauth-browser-client@1.0.26':
     dependencies:
       '@atcute/client': 4.0.3
       '@atcute/identity': 1.1.0
       '@atcute/lexicons': 1.1.1
-      '@atcute/multibase': 1.1.4
-      '@atcute/uint8array': 1.0.3
+      '@atcute/multibase': 1.1.5
+      '@atcute/uint8array': 1.0.4
       nanoid: 5.1.5
 
-  '@atcute/tangled@1.0.4':
+  '@atcute/tangled@1.0.5':
     dependencies:
-      '@atcute/atproto': 3.1.2
+      '@atcute/atproto': 3.1.3
       '@atcute/lexicons': 1.1.1
 
   '@atcute/tid@1.0.2': {}
 
-  '@atcute/uint8array@1.0.3': {}
+  '@atcute/uint8array@1.0.4': {}
 
   '@atcute/util-fetch@1.0.1':
     dependencies:
@@ -1958,7 +1958,7 @@ snapshots:
   browserslist@4.25.4:
     dependencies:
       caniuse-lite: 1.0.30001739
-      electron-to-chromium: 1.5.211
+      electron-to-chromium: 1.5.213
       node-releases: 2.0.19
       update-browserslist-db: 1.1.3(browserslist@4.25.4)
 
@@ -1980,7 +1980,7 @@ snapshots:
 
   detect-libc@2.0.4: {}
 
-  electron-to-chromium@1.5.211: {}
+  electron-to-chromium@1.5.213: {}
 
   enhanced-resolve@5.18.3:
     dependencies:
@@ -2246,7 +2246,7 @@ snapshots:
 
   semver@6.3.1: {}
 
-  seroval-plugins@1.3.2(seroval@1.3.2):
+  seroval-plugins@1.3.3(seroval@1.3.2):
     dependencies:
       seroval: 1.3.2
 
@@ -2256,7 +2256,7 @@ snapshots:
     dependencies:
       csstype: 3.1.3
       seroval: 1.3.2
-      seroval-plugins: 1.3.2(seroval@1.3.2)
+      seroval-plugins: 1.3.3(seroval@1.3.2)
 
   solid-refresh@0.6.3(solid-js@1.9.9):
     dependencies:
