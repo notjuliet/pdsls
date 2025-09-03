@@ -3,6 +3,7 @@ import { ComponentProps, onCleanup, onMount, Show } from "solid-js";
 export interface ModalProps extends Pick<ComponentProps<"svg">, "children"> {
   open?: boolean;
   onClose?: () => void;
+  closeOnClick?: boolean;
 }
 
 export const Modal = (props: ModalProps) => {
@@ -18,7 +19,7 @@ export const Modal = (props: ModalProps) => {
           onCleanup(() => node.close());
         }}
         onClick={(ev) => {
-          if (ev.target === ev.currentTarget) {
+          if ((props.closeOnClick ?? true) && ev.target === ev.currentTarget) {
             if (props.onClose) props.onClose();
           }
         }}

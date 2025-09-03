@@ -1,8 +1,7 @@
 import { createSignal, Show } from "solid-js";
 import { Client } from "@atcute/client";
 import { agent } from "../components/login.jsx";
-import { editor, Editor } from "../components/editor.jsx";
-import * as monaco from "monaco-editor";
+import { Editor, editorView } from "../components/editor.jsx";
 import Tooltip from "./tooltip.jsx";
 import { useNavigate, useParams } from "@solidjs/router";
 import { remove } from "@mary/exif-rm";
@@ -17,7 +16,6 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   const [openDialog, setOpenDialog] = createSignal(false);
   const [notice, setNotice] = createSignal("");
   const [uploading, setUploading] = createSignal(false);
-  let model: monaco.editor.IModel;
   let formRef!: HTMLFormElement;
 
   const placeholder = () => {
@@ -44,7 +42,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     const validate = formData.get("validate")?.toString();
     let record: any;
     try {
-      record = JSON.parse(model.getValue());
+      record = JSON.parse(editorView.state.doc.toString());
     } catch (e: any) {
       setNotice(e.message);
       return;
@@ -71,7 +69,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   };
 
   const editRecord = async (formData: FormData) => {
-    const record = model.getValue();
+    const record = editorView.state.doc.toString();
     const validate =
       formData.get("validate")?.toString() === "true" ? true
       : formData.get("validate")?.toString() === "false" ? false
@@ -79,7 +77,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     if (!record) return;
     const rpc = new Client({ handler: agent()! });
     try {
-      const editedRecord = JSON.parse(record.toString());
+      const editedRecord = JSON.parse(record);
       if (formData.get("recreate")) {
         const res = await rpc.post("com.atproto.repo.applyWrites", {
           input: {
@@ -155,26 +153,17 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
       setNotice(res.data.error);
       return;
     }
-    editor.executeEdits("editor", [
-      {
-        range: editor.getSelection() as monaco.IRange,
-        text: JSON.stringify(res.data.blob, null, 2),
+    editorView.dispatch({
+      changes: {
+        from: editorView.state.selection.main.head,
+        insert: JSON.stringify(res.data.blob, null, 2),
       },
-    ]);
-    editor.trigger("editor", "editor.action.formatDocument", {});
-  };
-
-  const createModel = () => {
-    if (!model)
-      model = monaco.editor.createModel(
-        JSON.stringify(props.create ? placeholder() : props.record, null, 2),
-        "json",
-      );
+    });
   };
 
   return (
     <>
-      <Modal open={openDialog()} onClose={() => setOpenDialog(false)}>
+      <Modal open={openDialog()} onClose={() => setOpenDialog(false)} closeOnClick={false}>
         <div class="dark:bg-dark-800/70 dark:shadow-dark-900/80 absolute top-12 left-[50%] w-[22rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-200/70 p-2 text-neutral-900 shadow-md backdrop-blur-xs transition-opacity duration-300 sm:w-xl sm:p-4 lg:w-[48rem] dark:border-neutral-700 dark:text-neutral-200 starting:opacity-0">
           <div class="mb-2 flex w-full justify-between">
             <div class="flex items-center gap-1 font-semibold">
@@ -251,7 +240,9 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                 </div>
               </div>
             </div>
-            <Editor model={model!} />
+            <Editor
+              content={JSON.stringify(props.create ? placeholder() : props.record, null, 2)}
+            />
             <div class="flex flex-col gap-2">
               <Show when={notice()}>
                 <div class="text-red-500 dark:text-red-400">{notice()}</div>
@@ -283,7 +274,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
         <button
           class={`flex items-center p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700 ${props.create ? "rounded-lg" : "rounded-sm"}`}
           onclick={() => {
-            createModel();
+            setNotice("");
             setOpenDialog(true);
           }}
         >
