@@ -155,7 +155,7 @@ const StreamView = () => {
           inactiveClass="border-transparent hover:border-neutral-400 dark:hover:border-neutral-600"
           href="/jetstream"
         >
-          <span class="iconify lucide--wind"></span>
+          <span class="iconify lucide--radio-tower"></span>
           Jetstream
         </A>
         <A
@@ -163,7 +163,7 @@ const StreamView = () => {
           inactiveClass="border-transparent hover:border-neutral-400 dark:hover:border-neutral-600"
           href="/firehose"
         >
-          <span class="iconify lucide--fire-extinguisher"></span>
+          <span class="iconify lucide--waves"></span>
           Firehose
         </A>
       </div>

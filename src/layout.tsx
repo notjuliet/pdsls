@@ -46,14 +46,15 @@ const Layout = (props: RouteSectionProps<unknown>) => {
     });
   });
 
-  const NavButton = (props: { href: string; label: string }) => {
+  const NavButton = (props: { href: string; label: string; icon: string }) => {
     return (
       <A
         href={props.href}
         onClick={() => setShowMenu(false)}
-        class="rounded-lg p-1 hover:bg-neutral-200/50 active:bg-neutral-200/50 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+        class="flex items-center gap-1 rounded-lg p-1 hover:bg-neutral-200/50 active:bg-neutral-200/50 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
       >
-        {props.label}
+        <span class={"iconify " + props.icon}></span>
+        <span>{props.label}</span>
       </A>
     );
   };
@@ -92,9 +93,9 @@ const Layout = (props: RouteSectionProps<unknown>) => {
                 ref={setMenu}
                 class="dark:bg-dark-300 absolute top-8 right-0 z-20 flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 text-sm shadow-md dark:border-neutral-700"
               >
-                <NavButton href="/jetstream" label="Jetstream" />
-                <NavButton href="/firehose" label="Firehose" />
-                <NavButton href="/settings" label="Settings" />
+                <NavButton href="/jetstream" label="Jetstream" icon="lucide--radio-tower" />
+                <NavButton href="/firehose" label="Firehose" icon="lucide--waves" />
+                <NavButton href="/settings" label="Settings" icon="lucide--settings" />
                 <ThemeSelection />
               </div>
             </Show>

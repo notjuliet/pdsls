@@ -6,7 +6,7 @@ Lightweight and client-side web app to navigate [atproto](https://atproto.com/).
 
 - Browse the public data on PDSes (Personal Data Servers).
 - Login to manage records in your repository.
-- Jetstream and firehose streaming.
+- Jetstream and firehose (com.atproto.sync.subscribeRepos) streaming.
 - Backlinks support with [constellation](https://constellation.microcosm.blue/).
 - Query moderation labels.
 
