@@ -6,6 +6,7 @@ import { createResource, createSignal, ErrorBoundary, Show, Suspense } from "sol
 import { Backlinks } from "../components/backlinks.jsx";
 import { Button } from "../components/button.jsx";
 import { RecordEditor } from "../components/create.jsx";
+import { CopyMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
 import { JSONValue } from "../components/json.jsx";
 import { agent } from "../components/login.jsx";
 import { Modal } from "../components/modal.jsx";
@@ -13,7 +14,6 @@ import { pds, setCID, setValidRecord, setValidSchema, validRecord } from "../com
 import Tooltip from "../components/tooltip.jsx";
 import { setNotif } from "../layout.jsx";
 import { didDocCache, resolvePDS } from "../utils/api.js";
-import { addToClipboard } from "../utils/copy.js";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 import { lexicons } from "../utils/types/lexicons.js";
 import { verifyRecord } from "../utils/verify.js";
@@ -113,7 +113,7 @@ export const RecordView = () => {
   return (
     <Show when={record()} keyed>
       <div class="flex w-full flex-col items-center">
-        <div class="dark:shadow-dark-900/80 dark:bg-dark-300 my-3 flex w-[22rem] justify-between rounded-lg bg-neutral-50 px-2 py-1.5 shadow-sm sm:w-[24rem]">
+        <div class="dark:shadow-dark-800 dark:bg-dark-300 my-3 flex w-[22rem] justify-between rounded-lg bg-neutral-50 px-2 py-1.5 shadow-sm sm:w-[24rem]">
           <div class="flex gap-3 text-sm">
             <A
               classList={{
@@ -150,13 +150,13 @@ export const RecordView = () => {
                 </button>
               </Tooltip>
               <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
-                <div class="dark:bg-dark-800/70 dark:shadow-dark-900/80 absolute top-70 left-[50%] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-200/70 p-4 text-neutral-900 shadow-md backdrop-blur-xs transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200 starting:opacity-0">
+                <div class="dark:bg-dark-800/70 dark:shadow-dark-800 absolute top-70 left-[50%] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-200/70 p-4 text-neutral-900 shadow-md backdrop-blur-xs transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200 starting:opacity-0">
                   <h2 class="mb-2 font-semibold">Delete this record?</h2>
                   <div class="flex justify-end gap-2">
                     <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
                     <Button
                       onClick={deleteRecord}
-                      class="dark:shadow-dark-900/80 rounded-lg bg-red-500 px-2 py-1.5 text-xs font-semibold text-neutral-200 shadow-sm hover:bg-red-400 active:bg-red-400"
+                      class="dark:shadow-dark-800 rounded-lg bg-red-500 px-2 py-1.5 text-xs font-semibold text-neutral-200 shadow-sm hover:bg-red-400 active:bg-red-400"
                     >
                       Delete
                     </Button>
@@ -164,36 +164,35 @@ export const RecordView = () => {
                 </div>
               </Modal>
             </Show>
-            <Tooltip text="Copy record">
-              <button
-                class="flex items-center rounded-sm p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
-                onclick={() => addToClipboard(JSON.stringify(record()?.value, null, 2))}
+            <MenuProvider>
+              <DropdownMenu
+                icon="lucide--ellipsis-vertical "
+                buttonClass="rounded-sm p-1"
+                menuClass="top-8 p-2 text-sm"
               >
-                <span class="iconify lucide--copy"></span>
-              </button>
-            </Tooltip>
-            <Show when={externalLink()}>
-              {(externalLink) => (
-                <Tooltip text={`Open on ${externalLink().label}`}>
-                  <a
-                    class="flex items-center rounded-sm p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
-                    target="_blank"
-                    href={externalLink()?.link}
-                  >
-                    <span class={`iconify ${externalLink().icon ?? "lucide--app-window"}`}></span>
-                  </a>
-                </Tooltip>
-              )}
-            </Show>
-            <Tooltip text="Record on PDS">
-              <a
-                class="flex items-center rounded-sm p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
-                href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
-                target="_blank"
-              >
-                <span class="iconify lucide--external-link"></span>
-              </a>
-            </Tooltip>
+                <CopyMenu
+                  copyContent={JSON.stringify(record()?.value, null, 2)}
+                  label="Copy record"
+                  icon="lucide--copy"
+                />
+                <Show when={externalLink()}>
+                  {(externalLink) => (
+                    <NavMenu
+                      href={externalLink()?.link}
+                      icon={`${externalLink().icon ?? "lucide--app-window"}`}
+                      label={`Open on ${externalLink().label}`}
+                      newTab
+                    />
+                  )}
+                </Show>
+                <NavMenu
+                  href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
+                  icon="lucide--external-link"
+                  label="Record on PDS"
+                  newTab
+                />
+              </DropdownMenu>
+            </MenuProvider>
           </div>
         </div>
         <Show when={!location.hash || location.hash === "#record"}>

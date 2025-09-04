@@ -98,7 +98,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
       </div>
       <Show when={notif().show}>
         <button
-          class="dark:shadow-dark-900/80 dark:bg-dark-100/70 fixed bottom-10 z-50 flex items-center rounded-lg border-[0.5px] border-neutral-300 bg-white/70 p-2 shadow-md backdrop-blur-xs dark:border-neutral-700"
+          class="dark:shadow-dark-800 dark:bg-dark-100/70 fixed bottom-10 z-50 flex items-center rounded-lg border-[0.5px] border-neutral-300 bg-white/70 p-2 shadow-md backdrop-blur-xs dark:border-neutral-700"
           onClick={() => setNotif({ show: false })}
         >
           <span class={`iconify ${notif().icon} mr-1`}></span>

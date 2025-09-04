@@ -24,7 +24,7 @@ export const MenuProvider = (props: { children?: JSX.Element }) => {
   return <MenuContext.Provider value={value}>{props.children}</MenuContext.Provider>;
 };
 
-export const CopyMenu = (props: { copyContent: string; label: string }) => {
+export const CopyMenu = (props: { copyContent: string; label: string; icon?: string }) => {
   const ctx = useContext(MenuContext);
 
   return (
@@ -33,24 +33,28 @@ export const CopyMenu = (props: { copyContent: string; label: string }) => {
         addToClipboard(props.copyContent);
         ctx?.setShowMenu(false);
       }}
-      class="flex rounded-lg p-1 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200/50 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+      class="flex items-center gap-1.5 rounded-lg p-1 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200/50 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
     >
-      {props.label}
+      <Show when={props.icon}>
+        <span class={"iconify shrink-0 " + props.icon}></span>
+      </Show>
+      <span class="whitespace-nowrap">{props.label}</span>
     </button>
   );
 };
 
-export const NavMenu = (props: { href: string; label: string; icon: string }) => {
+export const NavMenu = (props: { href: string; label: string; icon: string; newTab?: boolean }) => {
   const ctx = useContext(MenuContext);
 
   return (
     <A
       href={props.href}
       onClick={() => ctx?.setShowMenu(false)}
-      class="flex items-center gap-1 rounded-lg p-1 hover:bg-neutral-200/50 active:bg-neutral-200/50 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+      class="flex items-center gap-1.5 rounded-lg p-1 hover:bg-neutral-200/50 active:bg-neutral-200/50 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+      target={props.newTab ? "_blank" : undefined}
     >
-      <span class={"iconify " + props.icon}></span>
-      <span>{props.label}</span>
+      <span class={"iconify shrink-0 " + props.icon}></span>
+      <span class="whitespace-nowrap">{props.label}</span>
     </A>
   );
 };
@@ -89,7 +93,7 @@ export const DropdownMenu = (props: {
         <div
           ref={setMenu}
           class={
-            "dark:bg-dark-300 absolute right-0 z-20 flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 shadow-md dark:border-neutral-700 " +
+            "dark:bg-dark-300 dark:shadow-dark-800 absolute right-0 z-20 flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 shadow-md dark:border-neutral-700 " +
             props.menuClass
           }
         >

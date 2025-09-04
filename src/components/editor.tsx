@@ -54,7 +54,7 @@ const Editor = (props: { content: string }) => {
     window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", themeEvent),
   );
 
-  return <div ref={editorDiv} class="dark:shadow-dark-900/80 shadow-sm"></div>;
+  return <div ref={editorDiv} class="dark:shadow-dark-800 shadow-sm"></div>;
 };
 
 export { Editor };
