@@ -5,6 +5,8 @@ import { linter } from "@codemirror/lint";
 import { basicLight } from "@fsegurai/codemirror-theme-basic-light";
 import { basicDark } from "@fsegurai/codemirror-theme-basic-dark";
 import { Compartment } from "@codemirror/state";
+import { indentWithTab } from "@codemirror/commands";
+import { keymap } from "@codemirror/view";
 
 export let editorView: EditorView;
 
@@ -41,6 +43,7 @@ const Editor = (props: { content: string }) => {
         basicSetup,
         theme,
         json(),
+        keymap.of([indentWithTab]),
         linter(jsonParseLinter()),
         themeColor.of(document.documentElement.classList.contains("dark") ? basicDark : basicLight),
       ],
