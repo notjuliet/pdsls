@@ -1,6 +1,6 @@
 import { Did, Handle } from "@atcute/lexicons";
 import { A, Params, useLocation } from "@solidjs/router";
-import { createEffect, createSignal, onMount, Show } from "solid-js";
+import { createEffect, createSignal, onCleanup, onMount, Show } from "solid-js";
 import { didDocCache, labelerCache, validateHandle } from "../utils/api";
 import { addToClipboard } from "../utils/copy";
 import Tooltip from "./tooltip";
@@ -34,7 +34,7 @@ const NavBar = (props: { params: Params }) => {
   const [showHandle, setShowHandle] = createSignal(localStorage.showHandle === "true");
   const [showCopyMenu, setShowCopyMenu] = createSignal(false);
   const [copyMenu, setCopyMenu] = createSignal<HTMLDivElement>();
-  const [menuButton, setMenuButton] = createSignal<HTMLButtonElement>();
+  const [copyButton, setCopyButton] = createSignal<HTMLButtonElement>();
 
   createEffect(() => {
     if (cid() !== undefined) setFullCid(false);
@@ -54,12 +54,13 @@ const NavBar = (props: { params: Params }) => {
     }
   });
 
-  onMount(() =>
-    window.addEventListener("click", (ev) => {
-      if (!menuButton()?.contains(ev.target as Node) && !copyMenu()?.contains(ev.target as Node))
-        setShowCopyMenu(false);
-    }),
-  );
+  const clickEvent = (event: MouseEvent) => {
+    const target = event.target as Node;
+    if (!copyButton()?.contains(target) && !copyMenu()?.contains(target)) setShowCopyMenu(false);
+  };
+
+  onMount(() => window.addEventListener("click", clickEvent));
+  onCleanup(() => window.removeEventListener("click", clickEvent));
 
   const CopyButton = (props: { copyContent: string; label: string }) => {
     return (
@@ -100,7 +101,7 @@ const NavBar = (props: { params: Params }) => {
         <div class="relative">
           <button
             class="flex items-center rounded p-0.5 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
-            ref={setMenuButton}
+            ref={setCopyButton}
             onClick={() => setShowCopyMenu(!showCopyMenu())}
           >
             <span class="iconify lucide--copy text-base"></span>
