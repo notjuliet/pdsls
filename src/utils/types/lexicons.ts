@@ -17,7 +17,6 @@ import {
   AppBskyLabelerService,
   ChatBskyActorDeclaration,
 } from "@atcute/bluesky";
-
 import {
   ShTangledActorProfile,
   ShTangledFeedStar,

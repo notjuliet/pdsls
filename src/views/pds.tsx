@@ -1,13 +1,13 @@
-import { createSignal, For, Show, createResource } from "solid-js";
+import { ComAtprotoServerDescribeServer, ComAtprotoSyncListRepos } from "@atcute/atproto";
 import { Client, CredentialManager } from "@atcute/client";
+import { InferXRPCBodyOutput } from "@atcute/lexicons";
+import * as TID from "@atcute/tid";
 import { A, useParams } from "@solidjs/router";
+import { createResource, createSignal, For, Show } from "solid-js";
+import { Button } from "../components/button";
 import { setPDS } from "../components/navbar";
 import Tooltip from "../components/tooltip";
-import { InferXRPCBodyOutput } from "@atcute/lexicons";
-import { ComAtprotoServerDescribeServer, ComAtprotoSyncListRepos } from "@atcute/atproto";
-import * as TID from "@atcute/tid";
 import { localDateFromTimestamp } from "../utils/date";
-import { Button } from "../components/button";
 
 const LIMIT = 1000;
 

@@ -1,25 +1,22 @@
-import { CredentialManager, Client } from "@atcute/client";
-
+import { Client, CredentialManager } from "@atcute/client";
+import { lexiconDoc } from "@atcute/lexicon-doc";
+import { ActorIdentifier, is } from "@atcute/lexicons";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, Show, Suspense } from "solid-js";
-
 import { Backlinks } from "../components/backlinks.jsx";
+import { Button } from "../components/button.jsx";
+import { RecordEditor } from "../components/create.jsx";
 import { JSONValue } from "../components/json.jsx";
 import { agent } from "../components/login.jsx";
-import { pds, setCID, setValidRecord, setValidSchema, validRecord } from "../components/navbar.jsx";
-
-import { didDocCache, resolvePDS } from "../utils/api.js";
-import { AtUri, uriTemplates } from "../utils/templates.js";
-import { verifyRecord } from "../utils/verify.js";
-import { ActorIdentifier, is } from "@atcute/lexicons";
-import { lexiconDoc } from "@atcute/lexicon-doc";
-import { lexicons } from "../utils/types/lexicons.js";
-import { RecordEditor } from "../components/create.jsx";
-import { addToClipboard } from "../utils/copy.js";
-import Tooltip from "../components/tooltip.jsx";
 import { Modal } from "../components/modal.jsx";
-import { Button } from "../components/button.jsx";
+import { pds, setCID, setValidRecord, setValidSchema, validRecord } from "../components/navbar.jsx";
+import Tooltip from "../components/tooltip.jsx";
 import { setNotif } from "../layout.jsx";
+import { didDocCache, resolvePDS } from "../utils/api.js";
+import { addToClipboard } from "../utils/copy.js";
+import { AtUri, uriTemplates } from "../utils/templates.js";
+import { lexicons } from "../utils/types/lexicons.js";
+import { verifyRecord } from "../utils/verify.js";
 
 export const RecordView = () => {
   const location = useLocation();

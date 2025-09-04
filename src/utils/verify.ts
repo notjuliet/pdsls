@@ -1,9 +1,8 @@
-import { Client } from "@atcute/client";
-
 import * as CAR from "@atcute/car";
 import { CarReader } from "@atcute/car/v4";
 import * as CBOR from "@atcute/cbor";
 import * as CID from "@atcute/cid";
+import { Client } from "@atcute/client";
 import { type FoundPublicKey, getPublicKeyFromDidController, verifySig } from "@atcute/crypto";
 import { type DidDocument, getAtprotoVerificationMaterial } from "@atcute/identity";
 import { Did } from "@atcute/lexicons";

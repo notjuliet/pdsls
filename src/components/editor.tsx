@@ -1,12 +1,12 @@
-import { onCleanup, onMount } from "solid-js";
-import { basicSetup, EditorView } from "codemirror";
+import { indentWithTab } from "@codemirror/commands";
 import { json, jsonParseLinter } from "@codemirror/lang-json";
 import { linter } from "@codemirror/lint";
-import { basicLight } from "@fsegurai/codemirror-theme-basic-light";
-import { basicDark } from "@fsegurai/codemirror-theme-basic-dark";
 import { Compartment } from "@codemirror/state";
-import { indentWithTab } from "@codemirror/commands";
 import { keymap } from "@codemirror/view";
+import { basicDark } from "@fsegurai/codemirror-theme-basic-dark";
+import { basicLight } from "@fsegurai/codemirror-theme-basic-light";
+import { basicSetup, EditorView } from "codemirror";
+import { onCleanup, onMount } from "solid-js";
 
 export let editorView: EditorView;
 

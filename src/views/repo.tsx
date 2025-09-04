@@ -1,23 +1,23 @@
-import { createSignal, For, Show, createResource, Suspense, ErrorBoundary } from "solid-js";
 import { Client, CredentialManager } from "@atcute/client";
-import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
-import { didDocCache, resolvePDS } from "../utils/api.js";
-import { Backlinks } from "../components/backlinks.jsx";
-import { ActorIdentifier } from "@atcute/lexicons";
-import { DidDocument } from "@atcute/identity";
-import { BlobView } from "./blob.jsx";
-import { TextInput } from "../components/text-input.jsx";
-import Tooltip from "../components/tooltip.jsx";
+import { parsePublicMultikey } from "@atcute/crypto";
 import {
   CompatibleOperationOrTombstone,
   defs,
   IndexedEntry,
   processIndexedEntryLog,
 } from "@atcute/did-plc";
-import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
-import { localDateFromTimestamp } from "../utils/date.js";
+import { DidDocument } from "@atcute/identity";
+import { ActorIdentifier } from "@atcute/lexicons";
+import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
+import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from "solid-js";
+import { Backlinks } from "../components/backlinks.jsx";
 import { Button } from "../components/button.jsx";
-import { parsePublicMultikey } from "@atcute/crypto";
+import { TextInput } from "../components/text-input.jsx";
+import Tooltip from "../components/tooltip.jsx";
+import { didDocCache, resolvePDS } from "../utils/api.js";
+import { localDateFromTimestamp } from "../utils/date.js";
+import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
+import { BlobView } from "./blob.jsx";
 
 type Tab = "collections" | "backlinks" | "identity" | "blobs";
 type PlcEvent = "handle" | "rotation_key" | "service" | "verification_method";

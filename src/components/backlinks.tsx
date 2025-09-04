@@ -1,6 +1,6 @@
-import { createSignal, onMount, Show, For, createResource } from "solid-js";
-import { getRecordBacklinks, getDidBacklinks, getAllBacklinks } from "../utils/api.js";
 import * as TID from "@atcute/tid";
+import { createResource, createSignal, For, onMount, Show } from "solid-js";
+import { getAllBacklinks, getDidBacklinks, getRecordBacklinks } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { Button } from "./button.jsx";
 

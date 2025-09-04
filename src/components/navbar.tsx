@@ -1,9 +1,9 @@
+import { Did, Handle } from "@atcute/lexicons";
 import { A, Params, useLocation } from "@solidjs/router";
-import Tooltip from "./tooltip";
 import { createEffect, createSignal, onMount, Show } from "solid-js";
 import { didDocCache, labelerCache, validateHandle } from "../utils/api";
-import { Did, Handle } from "@atcute/lexicons";
 import { addToClipboard } from "../utils/copy";
+import Tooltip from "./tooltip";
 
 export const [pds, setPDS] = createSignal<string>();
 export const [cid, setCID] = createSignal<string>();

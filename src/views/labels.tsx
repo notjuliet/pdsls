@@ -1,11 +1,11 @@
-import { createResource, createSignal, For, onMount, Show } from "solid-js";
+import { ComAtprotoLabelDefs } from "@atcute/atproto";
 import { Client, CredentialManager } from "@atcute/client";
 import { A, useParams, useSearchParams } from "@solidjs/router";
+import { createResource, createSignal, For, onMount, Show } from "solid-js";
+import { Button } from "../components/button.jsx";
+import { TextInput } from "../components/text-input.jsx";
 import { labelerCache, resolvePDS } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
-import { ComAtprotoLabelDefs } from "@atcute/atproto";
-import { TextInput } from "../components/text-input.jsx";
-import { Button } from "../components/button.jsx";
 
 const LabelView = () => {
   const params = useParams();

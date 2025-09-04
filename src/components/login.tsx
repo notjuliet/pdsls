@@ -1,4 +1,5 @@
-import { createSignal } from "solid-js";
+import { Did } from "@atcute/lexicons";
+import { isHandle } from "@atcute/lexicons/syntax";
 import {
   configureOAuth,
   createAuthorizationUrl,
@@ -10,8 +11,7 @@ import {
   resolveFromService,
   type Session,
 } from "@atcute/oauth-browser-client";
-import { Did } from "@atcute/lexicons";
-import { isHandle } from "@atcute/lexicons/syntax";
+import { createSignal } from "solid-js";
 import { TextInput } from "./text-input";
 
 configureOAuth({

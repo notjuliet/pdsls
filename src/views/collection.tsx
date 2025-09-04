@@ -1,18 +1,18 @@
-import { createEffect, createResource, createSignal, For, Show, untrack } from "solid-js";
-import { CredentialManager, Client } from "@atcute/client";
-import { A, useParams } from "@solidjs/router";
-import { resolvePDS } from "../utils/api.js";
+import { ComAtprotoRepoApplyWrites, ComAtprotoRepoGetRecord } from "@atcute/atproto";
+import { Client, CredentialManager } from "@atcute/client";
+import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
+import { A, useParams } from "@solidjs/router";
+import { createEffect, createResource, createSignal, For, Show, untrack } from "solid-js";
+import { createStore } from "solid-js/store";
+import { Button } from "../components/button.jsx";
 import { JSONType, JSONValue } from "../components/json.jsx";
 import { agent } from "../components/login.jsx";
-import { createStore } from "solid-js/store";
-import Tooltip from "../components/tooltip.jsx";
-import { localDateFromTimestamp } from "../utils/date.js";
-import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
-import { ComAtprotoRepoApplyWrites, ComAtprotoRepoGetRecord } from "@atcute/atproto";
 import { TextInput } from "../components/text-input.jsx";
-import { Button } from "../components/button.jsx";
+import Tooltip from "../components/tooltip.jsx";
 import { setNotif } from "../layout.jsx";
+import { resolvePDS } from "../utils/api.js";
+import { localDateFromTimestamp } from "../utils/date.js";
 
 interface AtprotoRecord {
   rkey: string;

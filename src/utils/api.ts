@@ -1,5 +1,3 @@
-import { createStore } from "solid-js/store";
-
 import "@atcute/atproto";
 import {
   type DidDocument,
@@ -18,7 +16,7 @@ import {
 } from "@atcute/identity-resolver";
 import { Did, Handle } from "@atcute/lexicons";
 import { isHandle } from "@atcute/lexicons/syntax";
-
+import { createStore } from "solid-js/store";
 import { setPDS } from "../components/navbar";
 
 const didDocumentResolver = new CompositeDidDocumentResolver({
@@ -167,9 +165,9 @@ export {
   getPDS,
   getRecordBacklinks,
   labelerCache,
-  resolveHandle,
   resolveDidDoc,
-  validateHandle,
+  resolveHandle,
   resolvePDS,
+  validateHandle,
   type LinkData,
 };

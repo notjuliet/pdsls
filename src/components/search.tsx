@@ -1,7 +1,7 @@
-import { resolveHandle } from "../utils/api.js";
+import { Handle } from "@atcute/lexicons";
 import { useNavigate } from "@solidjs/router";
 import { createSignal, Show } from "solid-js";
-import { Handle } from "@atcute/lexicons";
+import { resolveHandle } from "../utils/api.js";
 
 const Search = () => {
   const navigate = useNavigate();

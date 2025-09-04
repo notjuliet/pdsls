@@ -1,14 +1,14 @@
-import { createSignal, Show } from "solid-js";
 import { Client } from "@atcute/client";
-import { agent } from "../components/login.jsx";
-import { Editor, editorView } from "../components/editor.jsx";
-import Tooltip from "./tooltip.jsx";
-import { useNavigate, useParams } from "@solidjs/router";
 import { remove } from "@mary/exif-rm";
-import { TextInput } from "./text-input.jsx";
-import { Modal } from "./modal.jsx";
-import { Button } from "./button.jsx";
+import { useNavigate, useParams } from "@solidjs/router";
+import { createSignal, Show } from "solid-js";
+import { Editor, editorView } from "../components/editor.jsx";
+import { agent } from "../components/login.jsx";
 import { setNotif } from "../layout.jsx";
+import { Button } from "./button.jsx";
+import { Modal } from "./modal.jsx";
+import { TextInput } from "./text-input.jsx";
+import Tooltip from "./tooltip.jsx";
 
 export const RecordEditor = (props: { create: boolean; record?: any; refetch?: any }) => {
   const navigate = useNavigate();

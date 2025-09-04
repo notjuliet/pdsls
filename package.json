@@ -13,6 +13,7 @@
     "@iconify/tailwind4": "^1.0.6",
     "@tailwindcss/vite": "^4.1.12",
     "prettier": "^3.6.2",
+    "prettier-plugin-organize-imports": "^4.2.0",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "tailwindcss": "^4.1.12",
     "typescript": "^5.9.2",

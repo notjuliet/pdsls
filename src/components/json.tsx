@@ -1,9 +1,9 @@
-import VideoPlayer from "./video-player";
-import { createEffect, createSignal, For, Show } from "solid-js";
 import { A } from "@solidjs/router";
+import { createEffect, createSignal, For, Show } from "solid-js";
+import { hideMedia } from "../views/settings";
 import { pds } from "./navbar";
 import Tooltip from "./tooltip";
-import { hideMedia } from "../views/settings";
+import VideoPlayer from "./video-player";
 
 interface AtBlob {
   $type: string;

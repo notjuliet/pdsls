@@ -1,14 +1,14 @@
-import { createEffect, createSignal, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
+import { Handle } from "@atcute/lexicons";
+import { Meta, MetaProvider } from "@solidjs/meta";
 import { A, RouteSectionProps, useLocation, useNavigate } from "@solidjs/router";
-import { agent } from "./components/login.jsx";
+import { createEffect, createSignal, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
+import { AccountManager } from "./components/account.jsx";
 import { RecordEditor } from "./components/create.jsx";
+import { agent } from "./components/login.jsx";
 import { NavBar } from "./components/navbar.jsx";
 import { Search } from "./components/search.jsx";
-import { AccountManager } from "./components/account.jsx";
-import { resolveHandle } from "./utils/api.js";
-import { Meta, MetaProvider } from "@solidjs/meta";
-import { Handle } from "@atcute/lexicons";
 import { themeEvent, ThemeSelection } from "./components/theme.jsx";
+import { resolveHandle } from "./utils/api.js";
 
 export const [notif, setNotif] = createSignal<{
   show: boolean;

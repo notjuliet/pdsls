@@ -1,12 +1,12 @@
-import { createSignal, onMount, For, Show } from "solid-js";
-import { deleteStoredSession, getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
-import { agent, Login, retrieveSession, setAgent } from "./login.jsx";
-import { Did } from "@atcute/lexicons";
-import { resolveDidDoc } from "../utils/api.js";
-import { createStore } from "solid-js/store";
 import { Client, CredentialManager } from "@atcute/client";
-import { Modal } from "./modal.jsx";
+import { Did } from "@atcute/lexicons";
+import { deleteStoredSession, getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { A } from "@solidjs/router";
+import { createSignal, For, onMount, Show } from "solid-js";
+import { createStore } from "solid-js/store";
+import { resolveDidDoc } from "../utils/api.js";
+import { agent, Login, retrieveSession, setAgent } from "./login.jsx";
+import { Modal } from "./modal.jsx";
 
 const AccountManager = () => {
   const [openManager, setOpenManager] = createSignal(false);

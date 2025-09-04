@@ -111,9 +111,12 @@ importers:
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
+      prettier-plugin-organize-imports:
+        specifier: ^4.2.0
+        version: 4.2.0(prettier@3.6.2)(typescript@5.9.2)
       prettier-plugin-tailwindcss:
         specifier: ^0.6.14
-        version: 0.6.14(prettier@3.6.2)
+        version: 0.6.14(prettier-plugin-organize-imports@4.2.0(prettier@3.6.2)(typescript@5.9.2))(prettier@3.6.2)
       tailwindcss:
         specifier: ^4.1.12
         version: 4.1.12
@@ -1194,6 +1197,16 @@ packages:
   postcss@8.5.6:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
+
+  prettier-plugin-organize-imports@4.2.0:
+    resolution: {integrity: sha512-Zdy27UhlmyvATZi67BTnLcKTo8fm6Oik59Sz6H64PgZJVs6NJpPD1mT240mmJn62c98/QaL+r3kx9Q3gRpDajg==}
+    peerDependencies:
+      prettier: '>=2.0'
+      typescript: '>=2.9'
+      vue-tsc: ^2.1.0 || 3
+    peerDependenciesMeta:
+      vue-tsc:
+        optional: true
 
   prettier-plugin-tailwindcss@0.6.14:
     resolution: {integrity: sha512-pi2e/+ZygeIqntN+vC573BcW5Cve8zUB0SSAGxqpB4f96boZF4M3phPVoOFCeypwkpRYdi7+jQ5YJJUwrkGUAg==}
@@ -2384,9 +2397,16 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  prettier-plugin-tailwindcss@0.6.14(prettier@3.6.2):
+  prettier-plugin-organize-imports@4.2.0(prettier@3.6.2)(typescript@5.9.2):
     dependencies:
       prettier: 3.6.2
+      typescript: 5.9.2
+
+  prettier-plugin-tailwindcss@0.6.14(prettier-plugin-organize-imports@4.2.0(prettier@3.6.2)(typescript@5.9.2))(prettier@3.6.2):
+    dependencies:
+      prettier: 3.6.2
+    optionalDependencies:
+      prettier-plugin-organize-imports: 4.2.0(prettier@3.6.2)(typescript@5.9.2)
 
   prettier@3.6.2: {}
 
