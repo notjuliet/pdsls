@@ -1,8 +1,8 @@
 import { Did, Handle } from "@atcute/lexicons";
 import { A, Params, useLocation } from "@solidjs/router";
-import { createEffect, createSignal, onCleanup, onMount, Show } from "solid-js";
+import { createEffect, createSignal, Show } from "solid-js";
 import { didDocCache, labelerCache, validateHandle } from "../utils/api";
-import { addToClipboard } from "../utils/copy";
+import { CopyMenu, DropdownMenu, MenuProvider } from "./dropdown";
 import Tooltip from "./tooltip";
 
 export const [pds, setPDS] = createSignal<string>();
@@ -32,9 +32,6 @@ const NavBar = (props: { params: Params }) => {
   const [validHandle, setValidHandle] = createSignal<boolean | undefined>(undefined);
   const [fullCid, setFullCid] = createSignal(false);
   const [showHandle, setShowHandle] = createSignal(localStorage.showHandle === "true");
-  const [showCopyMenu, setShowCopyMenu] = createSignal(false);
-  const [copyMenu, setCopyMenu] = createSignal<HTMLDivElement>();
-  const [copyButton, setCopyButton] = createSignal<HTMLButtonElement>();
 
   createEffect(() => {
     if (cid() !== undefined) setFullCid(false);
@@ -53,28 +50,6 @@ const NavBar = (props: { params: Params }) => {
       }
     }
   });
-
-  const clickEvent = (event: MouseEvent) => {
-    const target = event.target as Node;
-    if (!copyButton()?.contains(target) && !copyMenu()?.contains(target)) setShowCopyMenu(false);
-  };
-
-  onMount(() => window.addEventListener("click", clickEvent));
-  onCleanup(() => window.removeEventListener("click", clickEvent));
-
-  const CopyButton = (props: { copyContent: string; label: string }) => {
-    return (
-      <button
-        onClick={() => {
-          addToClipboard(props.copyContent);
-          setShowCopyMenu(false);
-        }}
-        class="flex rounded-lg p-1 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200/50 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
-      >
-        {props.label}
-      </button>
-    );
-  };
 
   return (
     <nav class="mt-4 flex w-[22rem] flex-col text-sm wrap-anywhere sm:w-[24rem]">
@@ -98,35 +73,27 @@ const NavBar = (props: { params: Params }) => {
             </Show>
           </Show>
         </div>
-        <div class="relative">
-          <button
-            class="flex items-center rounded p-0.5 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
-            ref={setCopyButton}
-            onClick={() => setShowCopyMenu(!showCopyMenu())}
+        <MenuProvider>
+          <DropdownMenu
+            icon="lucide--copy text-base"
+            buttonClass="rounded p-0.5"
+            menuClass="top-6 p-2 text-xs"
           >
-            <span class="iconify lucide--copy text-base"></span>
-          </button>
-          <Show when={showCopyMenu()}>
-            <div
-              ref={setCopyMenu}
-              class="dark:bg-dark-300 absolute top-6 right-0 z-20 flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-xs shadow-md dark:border-neutral-700"
-            >
-              <Show when={pds()}>
-                <CopyButton copyContent={pds()!} label="Copy PDS" />
-              </Show>
-              <Show when={props.params.repo}>
-                <CopyButton copyContent={props.params.repo} label="Copy DID" />
-                <CopyButton
-                  copyContent={`at://${props.params.repo}${props.params.collection ? `/${props.params.collection}` : ""}${props.params.rkey ? `/${props.params.rkey}` : ""}`}
-                  label="Copy AT URI"
-                />
-              </Show>
-              <Show when={props.params.rkey && cid()}>
-                <CopyButton copyContent={cid()!} label="Copy CID" />
-              </Show>
-            </div>
-          </Show>
-        </div>
+            <Show when={pds()}>
+              <CopyMenu copyContent={pds()!} label="Copy PDS" />
+            </Show>
+            <Show when={props.params.repo}>
+              <CopyMenu copyContent={props.params.repo} label="Copy DID" />
+              <CopyMenu
+                copyContent={`at://${props.params.repo}${props.params.collection ? `/${props.params.collection}` : ""}${props.params.rkey ? `/${props.params.rkey}` : ""}`}
+                label="Copy AT URI"
+              />
+            </Show>
+            <Show when={props.params.rkey && cid()}>
+              <CopyMenu copyContent={cid()!} label="Copy CID" />
+            </Show>
+          </DropdownMenu>
+        </MenuProvider>
       </div>
       <div class="flex flex-col flex-wrap">
         <Show when={props.params.repo}>

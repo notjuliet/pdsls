@@ -4,6 +4,7 @@ import { A, RouteSectionProps, useLocation, useNavigate } from "@solidjs/router"
 import { createEffect, createSignal, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
 import { AccountManager } from "./components/account.jsx";
 import { RecordEditor } from "./components/create.jsx";
+import { DropdownMenu, MenuProvider, NavMenu } from "./components/dropdown.jsx";
 import { agent } from "./components/login.jsx";
 import { NavBar } from "./components/navbar.jsx";
 import { Search } from "./components/search.jsx";
@@ -20,9 +21,6 @@ const Layout = (props: RouteSectionProps<unknown>) => {
   const location = useLocation();
   const navigate = useNavigate();
   let timeout: number;
-  const [showMenu, setShowMenu] = createSignal(false);
-  const [menu, setMenu] = createSignal<HTMLDivElement>();
-  const [menuButton, setMenuButton] = createSignal<HTMLButtonElement>();
 
   createEffect(async () => {
     if (props.params.repo && !props.params.repo.startsWith("did:")) {
@@ -40,24 +38,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
 
   onMount(() => {
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeEvent);
-    window.addEventListener("click", (ev) => {
-      if (!menuButton()?.contains(ev.target as Node) && !menu()?.contains(ev.target as Node))
-        setShowMenu(false);
-    });
   });
-
-  const NavButton = (props: { href: string; label: string; icon: string }) => {
-    return (
-      <A
-        href={props.href}
-        onClick={() => setShowMenu(false)}
-        class="flex items-center gap-1 rounded-lg p-1 hover:bg-neutral-200/50 active:bg-neutral-200/50 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
-      >
-        <span class={"iconify " + props.icon}></span>
-        <span>{props.label}</span>
-      </A>
-    );
-  };
 
   return (
     <div id="main" class="m-4 flex flex-col items-center text-neutral-900 dark:text-neutral-200">
@@ -80,26 +61,18 @@ const Layout = (props: RouteSectionProps<unknown>) => {
             <RecordEditor create={true} />
           </Show>
           <AccountManager />
-          <div class="relative">
-            <button
-              onClick={() => setShowMenu(!showMenu())}
-              ref={setMenuButton}
-              class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+          <MenuProvider>
+            <DropdownMenu
+              icon="lucide--menu text-xl"
+              buttonClass="rounded-lg p-1"
+              menuClass="top-8 p-3 text-sm"
             >
-              <span class="iconify lucide--menu text-xl"></span>
-            </button>
-            <Show when={showMenu()}>
-              <div
-                ref={setMenu}
-                class="dark:bg-dark-300 absolute top-8 right-0 z-20 flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 text-sm shadow-md dark:border-neutral-700"
-              >
-                <NavButton href="/jetstream" label="Jetstream" icon="lucide--radio-tower" />
-                <NavButton href="/firehose" label="Firehose" icon="lucide--waves" />
-                <NavButton href="/settings" label="Settings" icon="lucide--settings" />
-                <ThemeSelection />
-              </div>
-            </Show>
-          </div>
+              <NavMenu href="/jetstream" label="Jetstream" icon="lucide--radio-tower" />
+              <NavMenu href="/firehose" label="Firehose" icon="lucide--waves" />
+              <NavMenu href="/settings" label="Settings" icon="lucide--settings" />
+              <ThemeSelection />
+            </DropdownMenu>
+          </MenuProvider>
         </div>
       </header>
       <div class="mb-4 flex max-w-full min-w-[22rem] flex-col items-center text-pretty sm:min-w-[24rem] md:max-w-[48rem]">
