@@ -53,8 +53,8 @@ const Home = () => {
           </span>
         </div>
       </div>
-      <div>
-        <span class="font-semibold">Examples</span>
+      <div class="text-sm">
+        <span class="text-base font-semibold">Examples</span>
         <div class="flex items-center gap-1">
           <div class="iconify lucide--hard-drive" />
           <A href="/pds.kelinci.net" class="text-blue-400 hover:underline active:underline">
@@ -67,16 +67,16 @@ const Home = () => {
             href="/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2"
             class="text-blue-400 hover:underline active:underline"
           >
-            at://did:plc:vwzwgnygau7ed7b7wt5ux7y2
+            did:plc:vwzwgnygau7ed7b7wt5ux7y2
           </A>
         </div>
         <div class="flex items-center gap-1">
           <div class="iconify lucide--file-json shrink-0" />
           <A
-            href="/at://did:plc:oisofpd7lj26yvgiivf3lxsi/app.bsky.actor.profile/self"
+            href="/at://did:plc:oisofpd7lj26yvgiivf3lxsi/app.bsky.feed.post/3l2zpbbhuvw2h"
             class="text-blue-400 hover:underline active:underline"
           >
-            at://hailey.at/app.bsky.actor.profile/self
+            at://hailey.at/app.bsky.feed.post/3l2zpbbhuvw2h
           </A>
         </div>
         <div class="flex items-center gap-1">
