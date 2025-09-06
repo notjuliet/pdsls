@@ -1,6 +1,6 @@
 import { Client, CredentialManager } from "@atcute/client";
 import { lexiconDoc } from "@atcute/lexicon-doc";
-import { ActorIdentifier, is } from "@atcute/lexicons";
+import { ActorIdentifier, is, ResourceUri } from "@atcute/lexicons";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, Show, Suspense } from "solid-js";
 import { Backlinks } from "../components/backlinks.jsx";
@@ -50,14 +50,23 @@ export const RecordView = () => {
     }
     setCID(res.data.cid);
     setExternalLink(checkUri(res.data.uri, res.data.value));
+    verify(res.data);
 
+    return res.data;
+  };
+
+  const verify = async (record: {
+    uri: ResourceUri;
+    value: Record<string, unknown>;
+    cid?: string | undefined;
+  }) => {
     try {
       if (params.collection in lexicons) {
-        if (is(lexicons[params.collection], res.data.value)) setValidSchema(true);
+        if (is(lexicons[params.collection], record.value)) setValidSchema(true);
         else setValidSchema(false);
       } else if (params.collection === "com.atproto.lexicon.schema") {
         try {
-          lexiconDoc.parse(res.data.value, { mode: "passthrough" });
+          lexiconDoc.parse(record.value, { mode: "passthrough" });
           setValidSchema(true);
         } catch (e) {
           console.error(e);
@@ -66,10 +75,10 @@ export const RecordView = () => {
       }
       const { errors } = await verifyRecord({
         rpc: rpc,
-        uri: res.data.uri,
-        cid: res.data.cid!,
-        record: res.data.value,
-        didDoc: didDocCache[res.data.uri.split("/")[2]],
+        uri: record.uri,
+        cid: record.cid!,
+        record: record.value,
+        didDoc: didDocCache[record.uri.split("/")[2]],
       });
 
       if (errors.length > 0) {
@@ -81,8 +90,6 @@ export const RecordView = () => {
       console.error(err);
       setValidRecord(false);
     }
-
-    return res.data;
   };
 
   const [record, { refetch }] = createResource(fetchRecord);
