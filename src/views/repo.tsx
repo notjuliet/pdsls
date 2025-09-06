@@ -171,7 +171,7 @@ const RepoView = () => {
   const RepoTab = (props: { tab: Tab; label: string; icon: string }) => (
     <A
       classList={{
-        "flex items-center border-b-2 gap-1 py-1": true,
+        "flex items-center border-b-2 gap-1": true,
         "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
           (location.hash !== `#${props.tab}` && !!location.hash) ||
           (!location.hash && props.tab !== "collections"),
@@ -263,7 +263,7 @@ const RepoView = () => {
             {error()}
           </div>
         </Show>
-        <div class="flex justify-between text-sm">
+        <div class="dark:shadow-dark-800 dark:bg-dark-300 flex justify-between rounded-lg bg-neutral-50 px-2 py-1.5 text-sm shadow-sm">
           <Show when={!error()}>
             <RepoTab tab="collections" label="Collections" icon="lucide--folder-open" />
           </Show>
