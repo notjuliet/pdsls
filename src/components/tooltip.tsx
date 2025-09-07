@@ -1,6 +1,5 @@
 import { JSX, Show } from "solid-js";
-
-const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 1;
+import { isTouchDevice } from "../layout";
 
 const Tooltip = (props: { text: string; children: JSX.Element }) => (
   <div class="group/tooltip relative flex items-center">

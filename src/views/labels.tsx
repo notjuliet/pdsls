@@ -59,14 +59,17 @@ const LabelView = () => {
   };
 
   return (
-    <>
-      <form class="mt-3 flex flex-col items-center gap-y-1" onsubmit={(e) => e.preventDefault()}>
+    <div class="flex w-full flex-col items-center">
+      <form
+        class="flex w-[22rem] flex-col items-center gap-y-1 sm:w-[24rem]"
+        onsubmit={(e) => e.preventDefault()}
+      >
         <div class="w-full">
           <label for="patterns" class="ml-0.5 text-sm">
             URI Patterns (comma-separated)
           </label>
         </div>
-        <div class="flex w-[22rem] items-center gap-x-1 sm:w-[24rem]">
+        <div class="flex w-full items-center gap-x-1">
           <textarea
             id="patterns"
             name="patterns"
@@ -120,7 +123,7 @@ const LabelView = () => {
         </div>
       </div>
       <Show when={labels().length}>
-        <div class="flex w-[22rem] flex-col gap-2 divide-y-[0.5px] divide-neutral-400 text-sm wrap-anywhere whitespace-pre-wrap sm:min-w-[24rem] dark:divide-neutral-600">
+        <div class="flex max-w-full min-w-[22rem] flex-col gap-2 divide-y-[0.5px] divide-neutral-400 text-sm wrap-anywhere whitespace-pre-wrap sm:min-w-[24rem] dark:divide-neutral-600">
           <For each={filterLabels()}>
             {(label) => (
               <div class="flex items-center justify-between gap-2 pb-2">
@@ -169,7 +172,7 @@ const LabelView = () => {
       <Show when={!labels().length && !response.loading && searchParams.uriPatterns}>
         <div class="mt-2">No results</div>
       </Show>
-    </>
+    </div>
   );
 };
 

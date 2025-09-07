@@ -52,7 +52,7 @@ const NavBar = (props: { params: Params }) => {
   });
 
   return (
-    <nav class="mt-4 flex w-[22rem] flex-col text-sm wrap-anywhere sm:w-[24rem]">
+    <nav class="flex w-[22rem] flex-col text-sm wrap-anywhere sm:w-[24rem]">
       <div class="relative flex items-center justify-between gap-1">
         <div class="flex min-h-[1.25rem] basis-full items-center gap-2">
           <Tooltip text="PDS">

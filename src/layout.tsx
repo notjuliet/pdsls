@@ -7,9 +7,11 @@ import { RecordEditor } from "./components/create.jsx";
 import { DropdownMenu, MenuProvider, NavMenu } from "./components/dropdown.jsx";
 import { agent } from "./components/login.jsx";
 import { NavBar } from "./components/navbar.jsx";
-import { Search } from "./components/search.jsx";
+import { Search, SearchButton, showSearch } from "./components/search.jsx";
 import { themeEvent, ThemeSelection } from "./components/theme.jsx";
 import { resolveHandle } from "./utils/api.js";
+
+export const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 1;
 
 export const [notif, setNotif] = createSignal<{
   show: boolean;
@@ -57,6 +59,9 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <span>PDSls</span>
         </A>
         <div class="relative flex items-center gap-1">
+          <Show when={location.pathname !== "/"}>
+            <SearchButton />
+          </Show>
           <Show when={agent()}>
             <RecordEditor create={true} />
           </Show>
@@ -75,8 +80,8 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           </MenuProvider>
         </div>
       </header>
-      <div class="mb-4 flex max-w-full min-w-[22rem] flex-col items-center text-pretty sm:min-w-[24rem] md:max-w-[48rem]">
-        <Show when={!["/jetstream", "/firehose", "/settings"].includes(location.pathname)}>
+      <div class="flex max-w-full min-w-[22rem] flex-col items-center gap-4 text-pretty sm:min-w-[24rem] md:max-w-[48rem]">
+        <Show when={showSearch() || location.pathname === "/"}>
           <Search />
         </Show>
         <Show when={props.params.pds}>

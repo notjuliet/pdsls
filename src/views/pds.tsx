@@ -48,7 +48,7 @@ const PdsView = () => {
 
   return (
     <Show when={repos() || response()}>
-      <div class="mt-3 flex w-[22rem] flex-col sm:w-[24rem]">
+      <div class="flex w-[22rem] flex-col sm:w-[24rem]">
         <Show when={version()}>
           {(version) => (
             <div class="flex items-baseline gap-x-1">

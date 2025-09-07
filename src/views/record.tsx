@@ -120,7 +120,7 @@ export const RecordView = () => {
   return (
     <Show when={record()} keyed>
       <div class="flex w-full flex-col items-center">
-        <div class="dark:shadow-dark-800 dark:bg-dark-300 my-3 flex w-[22rem] justify-between rounded-lg bg-neutral-50 px-2 py-1.5 shadow-sm sm:w-[24rem]">
+        <div class="dark:shadow-dark-800 dark:bg-dark-300 mb-3 flex w-[22rem] justify-between rounded-lg bg-neutral-50 px-2 py-1.5 shadow-sm sm:w-[24rem]">
           <div class="flex gap-3 text-sm">
             <A
               classList={{

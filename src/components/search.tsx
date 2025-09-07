@@ -1,12 +1,47 @@
-import { Handle } from "@atcute/lexicons";
-import { useNavigate } from "@solidjs/router";
-import { createSignal, Show } from "solid-js";
-import { resolveHandle } from "../utils/api.js";
+import { useLocation, useNavigate } from "@solidjs/router";
+import { createSignal, onCleanup, onMount, Show } from "solid-js";
+import { isTouchDevice } from "../layout";
+
+export const [showSearch, setShowSearch] = createSignal(false);
+
+const SearchButton = () => {
+  onMount(() => window.addEventListener("keydown", keyEvent));
+  onCleanup(() => window.removeEventListener("keydown", keyEvent));
+
+  const keyEvent = (ev: KeyboardEvent) => {
+    if (document.querySelector("dialog")) return;
+
+    if ((ev.ctrlKey || ev.metaKey) && ev.key == "k") {
+      ev.preventDefault();
+      setShowSearch(!showSearch());
+    } else if (ev.key == "Escape") {
+      ev.preventDefault();
+      setShowSearch(false);
+    }
+  };
+
+  return (
+    <button
+      onclick={() => setShowSearch(!showSearch())}
+      class={`flex items-center gap-0.5 rounded-lg ${isTouchDevice ? "p-1 text-xl hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700" : "bg-neutral-200 p-1.5 text-xs hover:bg-neutral-300 active:bg-neutral-300 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:active:bg-neutral-600"}`}
+    >
+      <span class="iconify lucide--search"></span>
+      <Show when={!isTouchDevice}>
+        <kbd class="font-sans text-neutral-500 dark:text-neutral-400">
+          {/Mac/i.test(navigator.platform) ? "⌘" : "⌃"}K
+        </kbd>
+      </Show>
+    </button>
+  );
+};
 
 const Search = () => {
   const navigate = useNavigate();
   let searchInput!: HTMLInputElement;
-  const [loading, setLoading] = createSignal(false);
+
+  onMount(() => {
+    if (useLocation().pathname !== "/") searchInput.focus();
+  });
 
   const processInput = async (input: string) => {
     (document.getElementById("uriForm") as HTMLFormElement).reset();
@@ -16,7 +51,7 @@ const Search = () => {
       .replace(/^\u202a/, "")
       .replace(/^@/, "");
     if (!input.length) return;
-    (document.getElementById("input") as HTMLInputElement).blur();
+    setShowSearch(false);
     if (
       !input.startsWith("https://bsky.app/") &&
       !input.startsWith("https://deer.social/") &&
@@ -32,18 +67,7 @@ const Search = () => {
       .replace("https://bsky.app/profile/", "")
       .replace("/post/", "/app.bsky.feed.post/");
     const uriParts = uri.split("/");
-    const actor = uriParts[0];
-    let did = "";
-    try {
-      setLoading(true);
-      did = uri.startsWith("did:") ? actor : await resolveHandle(actor as Handle);
-      setLoading(false);
-    } catch {
-      setLoading(false);
-      navigate(`/${actor}`);
-      return;
-    }
-    navigate(`/at://${did}${uriParts.length > 1 ? `/${uriParts.slice(1).join("/")}` : ""}`);
+    navigate(`/at://${uriParts[0]}${uriParts.length > 1 ? `/${uriParts.slice(1).join("/")}` : ""}`);
   };
 
   return (
@@ -65,20 +89,15 @@ const Search = () => {
             id="input"
             class="grow placeholder:text-sm focus:outline-none"
           />
-          <Show when={loading()}>
-            <span class="iconify lucide--loader-circle animate-spin text-lg"></span>
-          </Show>
-          <Show when={!loading()}>
-            <button
-              type="submit"
-              class="iconify lucide--arrow-right text-lg text-neutral-500 dark:text-neutral-400"
-              onclick={() => processInput(searchInput.value)}
-            ></button>
-          </Show>
+          <button
+            type="submit"
+            class="iconify lucide--arrow-right text-lg text-neutral-500 dark:text-neutral-400"
+            onclick={() => processInput(searchInput.value)}
+          ></button>
         </div>
       </div>
     </form>
   );
 };
 
-export { Search };
+export { Search, SearchButton };

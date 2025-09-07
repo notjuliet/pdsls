@@ -159,121 +159,123 @@ const CollectionView = () => {
 
   return (
     <Show when={records.length || response()}>
-      <div class="dark:bg-dark-500/70 sticky top-0 z-5 flex w-screen flex-col items-center justify-center gap-2 bg-neutral-100/70 py-3 backdrop-blur-xs">
-        <div class="flex w-[22rem] items-center gap-2 sm:w-[24rem]">
-          <Show when={agent() && agent()?.sub === did}>
-            <div class="flex items-center gap-x-2">
-              <Tooltip
-                text={batchDelete() ? "Cancel" : "Delete"}
-                children={
-                  <button
-                    onclick={() => {
-                      setRecords(
-                        { from: 0, to: untrack(() => records.length) - 1 },
-                        "toDelete",
-                        false,
-                      );
-                      setLastSelected(undefined);
-                      setBatchDelete(!batchDelete());
-                    }}
-                    class="flex items-center"
-                  >
-                    <span
-                      class={`iconify text-lg ${batchDelete() ? "lucide--circle-x" : "lucide--trash-2"} `}
-                    ></span>
-                  </button>
-                }
-              />
-              <Show when={batchDelete()}>
+      <div class="flex w-full flex-col items-center">
+        <div class="dark:bg-dark-500/70 sticky top-0 z-5 flex w-screen flex-col items-center justify-center gap-2 bg-neutral-100/70 pt-1 pb-3 backdrop-blur-xs">
+          <div class="flex w-[22rem] items-center gap-2 sm:w-[24rem]">
+            <Show when={agent() && agent()?.sub === did}>
+              <div class="flex items-center gap-x-2">
                 <Tooltip
-                  text="Select all"
+                  text={batchDelete() ? "Cancel" : "Delete"}
                   children={
-                    <button onclick={() => selectAll()} class="flex items-center">
-                      <span class="iconify lucide--copy-check text-lg"></span>
+                    <button
+                      onclick={() => {
+                        setRecords(
+                          { from: 0, to: untrack(() => records.length) - 1 },
+                          "toDelete",
+                          false,
+                        );
+                        setLastSelected(undefined);
+                        setBatchDelete(!batchDelete());
+                      }}
+                      class="flex items-center"
+                    >
+                      <span
+                        class={`iconify text-lg ${batchDelete() ? "lucide--circle-x" : "lucide--trash-2"} `}
+                      ></span>
                     </button>
                   }
                 />
-                <Tooltip
-                  text="Confirm"
-                  children={
-                    <button onclick={() => deleteRecords()} class="flex items-center">
-                      <span class="iconify lucide--trash-2 text-lg text-red-500 dark:text-red-400"></span>
-                    </button>
-                  }
-                />
-              </Show>
+                <Show when={batchDelete()}>
+                  <Tooltip
+                    text="Select all"
+                    children={
+                      <button onclick={() => selectAll()} class="flex items-center">
+                        <span class="iconify lucide--copy-check text-lg"></span>
+                      </button>
+                    }
+                  />
+                  <Tooltip
+                    text="Confirm"
+                    children={
+                      <button onclick={() => deleteRecords()} class="flex items-center">
+                        <span class="iconify lucide--trash-2 text-lg text-red-500 dark:text-red-400"></span>
+                      </button>
+                    }
+                  />
+                </Show>
+              </div>
+            </Show>
+            <TextInput
+              placeholder="Filter by substring"
+              class="w-full"
+              onInput={(e) => setFilter(e.currentTarget.value)}
+            />
+          </div>
+          <Show when={records.length > 1}>
+            <div class="flex w-[22rem] items-center justify-between gap-x-2 sm:w-[24rem]">
+              <Button
+                onClick={() => {
+                  setReverse(!reverse());
+                  setRecords([]);
+                  setCursor(undefined);
+                  refetch();
+                }}
+              >
+                <span
+                  class={`iconify ${reverse() ? "lucide--rotate-ccw" : "lucide--rotate-cw"} text-sm`}
+                ></span>
+                Reverse
+              </Button>
+              <div>
+                <Show when={batchDelete()}>
+                  <span>{records.filter((rec) => rec.toDelete).length}</span>
+                  <span>/</span>
+                </Show>
+                <span>{records.length} records</span>
+              </div>
+              <div class="flex w-[5rem] items-center justify-end">
+                <Show when={cursor()}>
+                  <Show when={!response.loading}>
+                    <Button onClick={() => refetch()}>Load More</Button>
+                  </Show>
+                  <Show when={response.loading}>
+                    <div class="iconify lucide--loader-circle w-[5rem] animate-spin text-xl" />
+                  </Show>
+                </Show>
+              </div>
             </div>
           </Show>
-          <TextInput
-            placeholder="Filter by substring"
-            class="w-full"
-            onInput={(e) => setFilter(e.currentTarget.value)}
-          />
         </div>
-        <Show when={records.length > 1}>
-          <div class="flex w-[22rem] items-center justify-between gap-x-2 sm:w-[24rem]">
-            <Button
-              onClick={() => {
-                setReverse(!reverse());
-                setRecords([]);
-                setCursor(undefined);
-                refetch();
-              }}
-            >
-              <span
-                class={`iconify ${reverse() ? "lucide--rotate-ccw" : "lucide--rotate-cw"} text-sm`}
-              ></span>
-              Reverse
-            </Button>
-            <div>
-              <Show when={batchDelete()}>
-                <span>{records.filter((rec) => rec.toDelete).length}</span>
-                <span>/</span>
-              </Show>
-              <span>{records.length} records</span>
-            </div>
-            <div class="flex w-[5rem] items-center justify-end">
-              <Show when={cursor()}>
-                <Show when={!response.loading}>
-                  <Button onClick={() => refetch()}>Load More</Button>
+        <div class="flex max-w-full flex-col font-mono">
+          <For
+            each={records.filter((rec) =>
+              filter() ? JSON.stringify(rec.record.value).includes(filter()!) : true,
+            )}
+          >
+            {(record, index) => (
+              <>
+                <Show when={batchDelete()}>
+                  <label
+                    class="flex items-center gap-1 select-none"
+                    onclick={(e) => handleSelectionClick(e, index())}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={record.toDelete}
+                      onchange={(e) => setRecords(index(), "toDelete", e.currentTarget.checked)}
+                    />
+                    <RecordLink record={record} />
+                  </label>
                 </Show>
-                <Show when={response.loading}>
-                  <div class="iconify lucide--loader-circle w-[5rem] animate-spin text-xl" />
+                <Show when={!batchDelete()}>
+                  <A href={`/at://${did}/${params.collection}/${record.rkey}`}>
+                    <RecordLink record={record} />
+                  </A>
                 </Show>
-              </Show>
-            </div>
-          </div>
-        </Show>
-      </div>
-      <div class="flex max-w-full flex-col font-mono">
-        <For
-          each={records.filter((rec) =>
-            filter() ? JSON.stringify(rec.record.value).includes(filter()!) : true,
-          )}
-        >
-          {(record, index) => (
-            <>
-              <Show when={batchDelete()}>
-                <label
-                  class="flex items-center gap-1 select-none"
-                  onclick={(e) => handleSelectionClick(e, index())}
-                >
-                  <input
-                    type="checkbox"
-                    checked={record.toDelete}
-                    onchange={(e) => setRecords(index(), "toDelete", e.currentTarget.checked)}
-                  />
-                  <RecordLink record={record} />
-                </label>
-              </Show>
-              <Show when={!batchDelete()}>
-                <A href={`/at://${did}/${params.collection}/${record.rkey}`}>
-                  <RecordLink record={record} />
-                </A>
-              </Show>
-            </>
-          )}
-        </For>
+              </>
+            )}
+          </For>
+        </div>
       </div>
     </Show>
   );

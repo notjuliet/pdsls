@@ -7,7 +7,8 @@ import {
   processIndexedEntryLog,
 } from "@atcute/did-plc";
 import { DidDocument } from "@atcute/identity";
-import { ActorIdentifier } from "@atcute/lexicons";
+import { ActorIdentifier, Handle } from "@atcute/lexicons";
+import { resolveHandle } from "@atcute/oauth-browser-client";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from "solid-js";
 import { Backlinks } from "../components/backlinks.jsx";
@@ -184,7 +185,16 @@ const RepoView = () => {
   );
 
   const fetchRepo = async () => {
-    pds = await resolvePDS(did);
+    try {
+      pds = await resolvePDS(did);
+    } catch {
+      try {
+        const did = await resolveHandle(params.repo as Handle);
+        navigate(location.pathname.replace(params.repo, did));
+      } catch {
+        navigate(`/${did}`);
+      }
+    }
     setDidDoc(didDocCache[did] as DidDocument);
 
     rpc = new Client({ handler: new CredentialManager({ service: pds }) });
@@ -257,7 +267,7 @@ const RepoView = () => {
 
   return (
     <Show when={repo()}>
-      <div class="mt-3 flex w-[22rem] flex-col gap-2 break-words sm:w-[24rem]">
+      <div class="flex w-[22rem] flex-col gap-2 break-words sm:w-[24rem]">
         <Show when={error()}>
           <div class="rounded-lg bg-red-100 p-2 text-sm text-red-700 dark:bg-red-200 dark:text-red-600">
             {error()}
