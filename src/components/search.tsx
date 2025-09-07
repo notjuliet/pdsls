@@ -16,6 +16,7 @@ const Search = () => {
       .replace(/^\u202a/, "")
       .replace(/^@/, "");
     if (!input.length) return;
+    (document.getElementById("input") as HTMLInputElement).blur();
     if (
       !input.startsWith("https://bsky.app/") &&
       !input.startsWith("https://deer.social/") &&
