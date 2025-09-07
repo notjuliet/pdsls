@@ -44,17 +44,11 @@ const Search = () => {
   });
 
   const processInput = async (input: string) => {
-    (document.getElementById("uriForm") as HTMLFormElement).reset();
-    input = input
-      .trim()
-      .replace(/\u202c$/, "")
-      .replace(/^\u202a/, "")
-      .replace(/^@/, "");
+    input = input.trim().replace(/^@/, "");
     if (!input.length) return;
     setShowSearch(false);
     if (
       !input.startsWith("https://bsky.app/") &&
-      !input.startsWith("https://deer.social/") &&
       (input.startsWith("https://") || input.startsWith("http://"))
     ) {
       navigate(`/${input.replace("https://", "").replace("http://", "").replace("/", "")}`);
@@ -63,7 +57,6 @@ const Search = () => {
 
     const uri = input
       .replace("at://", "")
-      .replace("https://deer.social/profile/", "")
       .replace("https://bsky.app/profile/", "")
       .replace("/post/", "/app.bsky.feed.post/");
     const uriParts = uri.split("/");
