@@ -67,7 +67,10 @@ const Search = () => {
     <form
       class="flex w-full max-w-[22rem] flex-col sm:max-w-[24rem]"
       id="uriForm"
-      onsubmit={(e) => e.preventDefault()}
+      onsubmit={(e) => {
+        e.preventDefault();
+        processInput(searchInput.value);
+      }}
     >
       <label for="input" class="hidden">
         PDS URL, AT URI, or handle
@@ -85,7 +88,6 @@ const Search = () => {
           <button
             type="submit"
             class="iconify lucide--arrow-right text-lg text-neutral-500 dark:text-neutral-400"
-            onclick={() => processInput(searchInput.value)}
           ></button>
         </div>
       </div>

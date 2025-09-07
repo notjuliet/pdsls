@@ -62,7 +62,10 @@ const LabelView = () => {
     <div class="flex w-full flex-col items-center">
       <form
         class="flex w-[22rem] flex-col items-center gap-y-1 sm:w-[24rem]"
-        onsubmit={(e) => e.preventDefault()}
+        onsubmit={(e) => {
+          e.preventDefault();
+          initQuery();
+        }}
       >
         <div class="w-full">
           <label for="patterns" class="ml-0.5 text-sm">
@@ -76,12 +79,11 @@ const LabelView = () => {
             spellcheck={false}
             rows={3}
             value={searchParams.uriPatterns ?? "*"}
-            class="dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-800 mb-1 grow rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-neutral-900 dark:focus:outline-neutral-200"
+            class="dark:bg-dark-100 dark:shadow-dark-800 mb-1 grow rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-[1.5px] focus:outline-neutral-900 dark:focus:outline-neutral-200"
           />
           <div class="flex justify-center">
             <Show when={!response.loading}>
               <button
-                onclick={() => initQuery()}
                 type="submit"
                 class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
               >

@@ -202,7 +202,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                 <select
                   name="validate"
                   id="validate"
-                  class="dark:bg-dark-100 focus:outline-1.5 dark:shadow-dark-800 rounded-lg bg-white px-1 py-1 shadow-sm focus:outline-neutral-900 dark:focus:outline-neutral-200"
+                  class="dark:bg-dark-100 dark:shadow-dark-800 rounded-lg bg-white px-1 py-1 shadow-sm focus:outline-[1.5px] focus:outline-neutral-900 dark:focus:outline-neutral-200"
                 >
                   <option value="unset">Unset</option>
                   <option value="true">True</option>
