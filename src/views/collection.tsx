@@ -210,14 +210,14 @@ const CollectionView = () => {
 
   return (
     <Show when={records.length || response()}>
-      <div class="flex w-full flex-col items-center">
+      <div class="-mt-2 flex w-full flex-col items-center">
         <div
           ref={(el) => (sticky = el)}
           class="sticky top-2 z-10 flex flex-col items-center justify-center gap-2 rounded-lg p-3 transition-colors"
           classList={{
             "bg-neutral-50 dark:bg-dark-300 border-[0.5px] border-neutral-300 dark:border-neutral-700 shadow-md":
               filterStuck(),
-            "bg-transparent border-transparent shadow-none -mt-2": !filterStuck(),
+            "bg-transparent border-transparent shadow-none": !filterStuck(),
           }}
         >
           <div class="flex w-[22rem] items-center gap-2 sm:w-[24rem]">
