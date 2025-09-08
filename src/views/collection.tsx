@@ -159,7 +159,7 @@ const CollectionView = () => {
       true,
     );
 
-  const NavigationButton = (props: ButtonProps) => {
+  const FilterButton = (props: ButtonProps) => {
 	return <Button
 	    class="flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-semibold border-[0.5px] border-neutral-300 dark:border-neutral-700 shadow-md"
 		classList={{
@@ -266,7 +266,7 @@ const CollectionView = () => {
           </div>
           <Show when={records.length > 1}>
             <div class="flex w-[22rem] items-center justify-between gap-x-2 sm:w-[24rem]">
-              <NavigationButton
+              <FilterButton
                 onClick={() => {
                   setReverse(!reverse());
                   setRecords([]);
@@ -278,7 +278,7 @@ const CollectionView = () => {
                   class={`iconify ${reverse() ? "lucide--rotate-ccw" : "lucide--rotate-cw"} text-sm`}
                 ></span>
                 Reverse
-              </NavigationButton>
+              </FilterButton>
               <div>
                 <Show when={batchDelete()}>
                   <span>{records.filter((rec) => rec.toDelete).length}</span>
@@ -289,7 +289,7 @@ const CollectionView = () => {
               <div class="flex w-[5rem] items-center justify-end">
                 <Show when={cursor()}>
                   <Show when={!response.loading}>
-                    <NavigationButton onClick={() => refetch()}>Load More</NavigationButton>
+                    <FilterButton onClick={() => refetch()}>Load More</FilterButton>
                   </Show>
                   <Show when={response.loading}>
                     <div class="iconify lucide--loader-circle w-[5rem] animate-spin text-xl" />
