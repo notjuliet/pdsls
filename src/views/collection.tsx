@@ -205,6 +205,14 @@ const CollectionView = () => {
                 </Show>
               </div>
             </Show>
+            <Tooltip text="Jetstream">
+              <A
+                href={`/jetstream?collections=${params.collection}&dids=${params.repo}`}
+                class="flex items-center"
+              >
+                <span class="iconify lucide--radio-tower text-lg"></span>
+              </A>
+            </Tooltip>
             <TextInput
               placeholder="Filter by substring"
               class="w-full"

@@ -306,10 +306,18 @@ const RepoView = () => {
           </ErrorBoundary>
         </Show>
         <Show when={nsids() && (!location.hash || location.hash === "#collections")}>
-          <TextInput
-            placeholder="Filter collections"
-            onInput={(e) => setFilter(e.currentTarget.value)}
-          />
+          <div class="flex items-center gap-2">
+            <Tooltip text="Jetstream">
+              <A href={`/jetstream?dids=${params.repo}`} class="flex items-center">
+                <span class="iconify lucide--radio-tower text-lg"></span>
+              </A>
+            </Tooltip>
+            <TextInput
+              placeholder="Filter collections"
+              onInput={(e) => setFilter(e.currentTarget.value)}
+              class="grow"
+            />
+          </div>
           <div class="flex flex-col font-mono">
             <div class="grid grid-cols-[min-content_1fr] items-center gap-x-2 overflow-hidden text-sm">
               <For
