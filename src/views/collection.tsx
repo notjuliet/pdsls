@@ -3,9 +3,18 @@ import { Client, CredentialManager } from "@atcute/client";
 import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
 import { A, useParams } from "@solidjs/router";
-import { createEffect, createResource, createSignal, For, Show, untrack } from "solid-js";
+import {
+  createEffect,
+  createResource,
+  createSignal,
+  For,
+  onCleanup,
+  onMount,
+  Show,
+  untrack,
+} from "solid-js";
 import { createStore } from "solid-js/store";
-import { Button } from "../components/button.jsx";
+import { Button, type ButtonProps } from "../components/button.jsx";
 import { JSONType, JSONValue } from "../components/json.jsx";
 import { agent } from "../components/login.jsx";
 import { TextInput } from "../components/text-input.jsx";
@@ -72,9 +81,11 @@ const CollectionView = () => {
   const [batchDelete, setBatchDelete] = createSignal(false);
   const [lastSelected, setLastSelected] = createSignal<number>();
   const [reverse, setReverse] = createSignal(false);
+  const [filterStuck, setFilterStuck] = createSignal(false);
   const did = params.repo;
   let pds: string;
   let rpc: Client;
+  let sticky!: HTMLDivElement;
 
   const fetchRecords = async () => {
     if (!pds) pds = await resolvePDS(did);
@@ -157,10 +168,58 @@ const CollectionView = () => {
       true,
     );
 
+  const FilterButton = (props: ButtonProps) => {
+    return (
+      <Button
+        class="flex items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1.5 text-xs font-semibold shadow-md dark:border-neutral-700"
+        classList={{
+          "dark:bg-dark-300 dark:hover:bg-dark-100 dark:active:bg-dark-100 bg-white hover:bg-neutral-50 active:bg-neutral-50":
+            !filterStuck(),
+          "dark:bg-dark-100 dark:hover:bg-dark-50 dark:active:bg-dark-50 bg-neutral-50 hover:bg-neutral-200 active:bg-neutral-200":
+            filterStuck(),
+        }}
+        {...props}
+      />
+    );
+  };
+
+  onMount(() => {
+    let ticking = false;
+    const tick = () => {
+      const topPx = parseFloat(getComputedStyle(sticky).top);
+      const { top } = sticky.getBoundingClientRect();
+      setFilterStuck(top <= topPx + 0.5);
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(tick);
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    tick();
+
+    onCleanup(() => {
+      window.removeEventListener("scroll", onScroll);
+    });
+  });
+
   return (
     <Show when={records.length || response()}>
       <div class="flex w-full flex-col items-center">
-        <div class="dark:bg-dark-500 sticky top-0 z-5 flex w-screen flex-col items-center justify-center gap-2 bg-neutral-100 pt-1 pb-3">
+        <div
+          ref={(el) => (sticky = el)}
+          class="sticky top-2 z-10 flex flex-col items-center justify-center gap-2 rounded-lg p-3 transition-colors"
+          classList={{
+            "bg-neutral-50 dark:bg-dark-300 border-[0.5px] border-neutral-300 dark:border-neutral-700 shadow-md":
+              filterStuck(),
+            "bg-transparent border-transparent shadow-none -mt-2": !filterStuck(),
+          }}
+        >
           <div class="flex w-[22rem] items-center gap-2 sm:w-[24rem]">
             <Show when={agent() && agent()?.sub === did}>
               <div class="flex items-center gap-x-2">
@@ -221,7 +280,7 @@ const CollectionView = () => {
           </div>
           <Show when={records.length > 1}>
             <div class="flex w-[22rem] items-center justify-between gap-x-2 sm:w-[24rem]">
-              <Button
+              <FilterButton
                 onClick={() => {
                   setReverse(!reverse());
                   setRecords([]);
@@ -233,7 +292,7 @@ const CollectionView = () => {
                   class={`iconify ${reverse() ? "lucide--rotate-ccw" : "lucide--rotate-cw"} text-sm`}
                 ></span>
                 Reverse
-              </Button>
+              </FilterButton>
               <div>
                 <Show when={batchDelete()}>
                   <span>{records.filter((rec) => rec.toDelete).length}</span>
@@ -244,7 +303,7 @@ const CollectionView = () => {
               <div class="flex w-[5rem] items-center justify-end">
                 <Show when={cursor()}>
                   <Show when={!response.loading}>
-                    <Button onClick={() => refetch()}>Load More</Button>
+                    <FilterButton onClick={() => refetch()}>Load More</FilterButton>
                   </Show>
                   <Show when={response.loading}>
                     <div class="iconify lucide--loader-circle w-[5rem] animate-spin text-xl" />
