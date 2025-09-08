@@ -171,10 +171,10 @@ const StreamView = () => {
         ref={formRef}
         class="dark:bg-dark-500/70 sticky top-0 z-5 flex w-screen flex-col items-center bg-neutral-100/70 px-4 text-sm backdrop-blur-xs"
       >
-        <div class="flex flex-col gap-2 py-3">
+        <div class="flex w-[22rem] flex-col gap-2 py-3 sm:w-[24rem]">
           <Show when={!connected()}>
             <label class="flex items-center justify-end gap-x-2">
-              <span>Instance</span>
+              <span class="min-w-[5rem]">Instance</span>
               <TextInput
                 name="instance"
                 value={
@@ -183,40 +183,40 @@ const StreamView = () => {
                     "wss://jetstream1.us-east.bsky.network/subscribe"
                   : "wss://bsky.network")
                 }
-                class="w-[16rem]"
+                class="grow"
               />
             </label>
             <Show when={streamType === StreamType.JETSTREAM}>
               <label class="flex items-center justify-end gap-x-2">
-                <span>Collections</span>
+                <span class="min-w-[5rem]">Collections</span>
                 <textarea
                   name="collections"
                   spellcheck={false}
                   placeholder="Comma-separated list of collections"
                   value={searchParams.collections ?? ""}
-                  class="dark:bg-dark-100 dark:shadow-dark-800 w-[16rem] rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-[1.5px] focus:outline-neutral-900 dark:focus:outline-neutral-200"
+                  class="dark:bg-dark-100 dark:shadow-dark-800 grow rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-[1.5px] focus:outline-neutral-900 dark:focus:outline-neutral-200"
                 />
               </label>
             </Show>
             <Show when={streamType === StreamType.JETSTREAM}>
               <label class="flex items-center justify-end gap-x-2">
-                <span>DIDs</span>
+                <span class="min-w-[5rem]">DIDs</span>
                 <textarea
                   name="dids"
                   spellcheck={false}
                   placeholder="Comma-separated list of DIDs"
                   value={searchParams.dids ?? ""}
-                  class="dark:bg-dark-100 dark:shadow-dark-800 w-[16rem] rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-[1.5px] focus:outline-neutral-900 dark:focus:outline-neutral-200"
+                  class="dark:bg-dark-100 dark:shadow-dark-800 grow rounded-lg bg-white px-2 py-1 shadow-sm focus:outline-[1.5px] focus:outline-neutral-900 dark:focus:outline-neutral-200"
                 />
               </label>
             </Show>
             <label class="flex items-center justify-end gap-x-2">
-              <span>Cursor</span>
+              <span class="min-w-[5rem]">Cursor</span>
               <TextInput
                 name="cursor"
                 placeholder="Leave empty for live-tail"
                 value={searchParams.cursor ?? ""}
-                class="w-[16rem]"
+                class="grow"
               />
             </label>
             <Show when={streamType === StreamType.JETSTREAM}>
