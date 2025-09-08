@@ -169,7 +169,7 @@ const StreamView = () => {
       </div>
       <form
         ref={formRef}
-        class="dark:bg-dark-500/70 sticky top-0 z-5 flex w-screen flex-col items-center bg-neutral-100/70 px-4 text-sm backdrop-blur-xs"
+        class="dark:bg-dark-500 sticky top-0 z-5 flex w-screen flex-col items-center bg-neutral-100 px-4 text-sm"
       >
         <div class="flex w-[22rem] flex-col gap-2 py-3 sm:w-[24rem]">
           <Show when={!connected()}>

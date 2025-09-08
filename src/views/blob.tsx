@@ -48,7 +48,7 @@ const BlobView = (props: { pds: string; repo: string }) => {
         </div>
       </Show>
       <Show when={cursor()}>
-        <div class="dark:bg-dark-500/70 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100/70 py-3 backdrop-blur-xs">
+        <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 py-3">
           <Show when={!response.loading}>
             <Button onClick={() => refetch()}>Load More</Button>
           </Show>
