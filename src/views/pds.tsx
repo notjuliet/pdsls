@@ -110,15 +110,17 @@ const PdsView = () => {
             </A>
           )}
         </For>
-        <div class="mt-2 flex w-full justify-center">
-          <Show when={cursor() && !response.loading}>
+      </div>
+      <Show when={cursor()}>
+        <div class="dark:bg-dark-500/70 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100/70 py-3 backdrop-blur-xs">
+          <Show when={!response.loading}>
             <Button onClick={() => refetch()}>Load More</Button>
           </Show>
           <Show when={response.loading}>
-            <span class="iconify lucide--loader-circle animate-spin text-xl"></span>
+            <span class="iconify lucide--loader-circle animate-spin py-3.5 text-xl"></span>
           </Show>
         </div>
-      </div>
+      </Show>
     </Show>
   );
 };

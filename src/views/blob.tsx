@@ -47,11 +47,15 @@ const BlobView = (props: { pds: string; repo: string }) => {
           </For>
         </div>
       </Show>
-      <Show when={cursor() && !response.loading}>
-        <Button onClick={() => refetch()}>Load More</Button>
-      </Show>
-      <Show when={response.loading}>
-        <span class="iconify lucide--loader-circle mt-2 animate-spin text-xl"></span>
+      <Show when={cursor()}>
+        <div class="dark:bg-dark-500/70 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100/70 py-3 backdrop-blur-xs">
+          <Show when={!response.loading}>
+            <Button onClick={() => refetch()}>Load More</Button>
+          </Show>
+          <Show when={response.loading}>
+            <span class="iconify lucide--loader-circle animate-spin py-3.5 text-xl"></span>
+          </Show>
+        </div>
       </Show>
     </div>
   );
