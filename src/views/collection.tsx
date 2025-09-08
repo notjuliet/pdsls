@@ -3,7 +3,16 @@ import { Client, CredentialManager } from "@atcute/client";
 import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
 import { A, useParams } from "@solidjs/router";
-import { createEffect, createResource, createSignal, For, Show, untrack, onMount, onCleanup } from "solid-js";
+import {
+  createEffect,
+  createResource,
+  createSignal,
+  For,
+  onCleanup,
+  onMount,
+  Show,
+  untrack,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 import { Button, type ButtonProps } from "../components/button.jsx";
 import { JSONType, JSONValue } from "../components/json.jsx";
@@ -160,15 +169,19 @@ const CollectionView = () => {
     );
 
   const FilterButton = (props: ButtonProps) => {
-	return <Button
-	    class="flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-semibold border-[0.5px] border-neutral-300 dark:border-neutral-700 shadow-md"
-		classList={{
-			"dark:bg-dark-300 dark:hover:bg-dark-100 dark:active:bg-dark-100 bg-white hover:bg-neutral-50 active:bg-neutral-50": !filterStuck(),
-			"dark:bg-dark-100 dark:hover:bg-dark-50 dark:active:bg-dark-50 bg-neutral-50 hover:bg-neutral-200 active:bg-neutral-200": filterStuck()
-		}}
-		{...props}
-	/>
-  }
+    return (
+      <Button
+        class="flex items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1.5 text-xs font-semibold shadow-md dark:border-neutral-700"
+        classList={{
+          "dark:bg-dark-300 dark:hover:bg-dark-100 dark:active:bg-dark-100 bg-white hover:bg-neutral-50 active:bg-neutral-50":
+            !filterStuck(),
+          "dark:bg-dark-100 dark:hover:bg-dark-50 dark:active:bg-dark-50 bg-neutral-50 hover:bg-neutral-200 active:bg-neutral-200":
+            filterStuck(),
+        }}
+        {...props}
+      />
+    );
+  };
 
   onMount(() => {
     let ticking = false;
@@ -198,14 +211,15 @@ const CollectionView = () => {
   return (
     <Show when={records.length || response()}>
       <div class="flex w-full flex-col items-center">
-      <div
-        ref={(el) => (sticky = el)}
-        class="sticky top-2 z-10 flex flex-col items-center justify-center gap-2 rounded-lg p-3 transition-colors"
-        classList={{
-          "bg-neutral-50 dark:bg-dark-300 border-[0.5px] border-neutral-300 dark:border-neutral-700 shadow-md": filterStuck(),
-          "bg-transparent border-transparent shadow-none -mt-2": !filterStuck(),
-        }}
-      >
+        <div
+          ref={(el) => (sticky = el)}
+          class="sticky top-2 z-10 flex flex-col items-center justify-center gap-2 rounded-lg p-3 transition-colors"
+          classList={{
+            "bg-neutral-50 dark:bg-dark-300 border-[0.5px] border-neutral-300 dark:border-neutral-700 shadow-md":
+              filterStuck(),
+            "bg-transparent border-transparent shadow-none -mt-2": !filterStuck(),
+          }}
+        >
           <div class="flex w-[22rem] items-center gap-2 sm:w-[24rem]">
             <Show when={agent() && agent()?.sub === did}>
               <div class="flex items-center gap-x-2">
