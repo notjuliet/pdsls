@@ -5,7 +5,7 @@ import * as TID from "@atcute/tid";
 import { A, useParams } from "@solidjs/router";
 import { createEffect, createResource, createSignal, For, Show, untrack, onMount, onCleanup } from "solid-js";
 import { createStore } from "solid-js/store";
-import { Button } from "../components/button.jsx";
+import { Button, type ButtonProps } from "../components/button.jsx";
 import { JSONType, JSONValue } from "../components/json.jsx";
 import { agent } from "../components/login.jsx";
 import { TextInput } from "../components/text-input.jsx";
@@ -159,6 +159,17 @@ const CollectionView = () => {
       true,
     );
 
+  const NavigationButton = (props: ButtonProps) => {
+	return <Button
+	    class="flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-semibold border-[0.5px] border-neutral-300 dark:border-neutral-700 shadow-md"
+		classList={{
+			"dark:bg-dark-300 dark:hover:bg-dark-100 dark:active:bg-dark-100 bg-white hover:bg-neutral-50 active:bg-neutral-50": !filterStuck(),
+			"dark:bg-dark-100 dark:hover:bg-dark-50 dark:active:bg-dark-50 bg-neutral-50 hover:bg-neutral-200 active:bg-neutral-200": filterStuck()
+		}}
+		{...props}
+	/>
+  }
+
   onMount(() => {
     let ticking = false;
     const tick = () => {
@@ -192,10 +203,10 @@ const CollectionView = () => {
         class="sticky top-2 z-10 flex flex-col items-center justify-center gap-2 rounded-lg p-3 transition-colors"
         classList={{
           "bg-neutral-50 dark:bg-dark-300 border-[0.5px] border-neutral-300 dark:border-neutral-700 shadow-md": filterStuck(),
-          "bg-transparent border-transparent shadow-none": !filterStuck(),
+          "bg-transparent border-transparent shadow-none -mt-2": !filterStuck(),
         }}
       >
-          <div class="z-20 flex w-[22rem] items-center gap-2 sm:w-[24rem]">
+          <div class="flex w-[22rem] items-center gap-2 sm:w-[24rem]">
             <Show when={agent() && agent()?.sub === did}>
               <div class="flex items-center gap-x-2">
                 <Tooltip
@@ -254,8 +265,8 @@ const CollectionView = () => {
             />
           </div>
           <Show when={records.length > 1}>
-            <div class="z-20 flex w-[22rem] items-center justify-between gap-x-2 sm:w-[24rem]">
-              <Button
+            <div class="flex w-[22rem] items-center justify-between gap-x-2 sm:w-[24rem]">
+              <NavigationButton
                 onClick={() => {
                   setReverse(!reverse());
                   setRecords([]);
@@ -267,7 +278,7 @@ const CollectionView = () => {
                   class={`iconify ${reverse() ? "lucide--rotate-ccw" : "lucide--rotate-cw"} text-sm`}
                 ></span>
                 Reverse
-              </Button>
+              </NavigationButton>
               <div>
                 <Show when={batchDelete()}>
                   <span>{records.filter((rec) => rec.toDelete).length}</span>
@@ -278,7 +289,7 @@ const CollectionView = () => {
               <div class="flex w-[5rem] items-center justify-end">
                 <Show when={cursor()}>
                   <Show when={!response.loading}>
-                    <Button onClick={() => refetch()}>Load More</Button>
+                    <NavigationButton onClick={() => refetch()}>Load More</NavigationButton>
                   </Show>
                   <Show when={response.loading}>
                     <div class="iconify lucide--loader-circle w-[5rem] animate-spin text-xl" />

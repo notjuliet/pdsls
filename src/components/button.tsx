@@ -2,6 +2,7 @@ import { JSX } from "solid-js";
 
 export interface ButtonProps {
   class?: string;
+  classList?: Record<string, boolean | undefined>;
   onClick?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
   children?: JSX.Element;
 }
@@ -12,8 +13,9 @@ export const Button = (props: ButtonProps) => {
       type="button"
       class={
         props.class ??
-        "dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-800 dark:active:bg-dark-100 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-semibold shadow-sm hover:bg-neutral-50 active:bg-neutral-50"
+        "dark:hover:bg-dark-100 dark:bg-dark-300 dark:shadow-dark-800 dark:active:bg-dark-100 flex items-center gap-1 rounded-lg bg-white px-2 py-1.5 text-xs font-semibold border-[0.5px] border-neutral-300 dark:border-neutral-700 shadow-md  hover:bg-neutral-50 active:bg-neutral-50"
       }
+      classList={props.classList}
       onClick={props.onClick}
     >
       {props.children}
