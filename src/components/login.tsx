@@ -67,7 +67,12 @@ const Login = () => {
           onInput={(e) => setLoginInput(e.currentTarget.value)}
           class="grow"
         />
-        <button onclick={() => login(loginInput())} class="iconify lucide--log-in text-lg"></button>
+        <button
+          onclick={() => login(loginInput())}
+          class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+        >
+          <span class="iconify lucide--log-in text-lg"></span>
+        </button>
       </div>
       <div>{notice()}</div>
     </form>

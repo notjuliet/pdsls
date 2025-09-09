@@ -33,7 +33,7 @@ export const CopyMenu = (props: { copyContent: string; label: string; icon?: str
         addToClipboard(props.copyContent);
         ctx?.setShowMenu(false);
       }}
-      class="flex items-center gap-1.5 rounded-lg p-1 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200/50 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+      class="flex items-center gap-1.5 rounded-lg p-1 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
     >
       <Show when={props.icon}>
         <span class={"iconify shrink-0 " + props.icon}></span>
@@ -50,7 +50,7 @@ export const NavMenu = (props: { href: string; label: string; icon: string; newT
     <A
       href={props.href}
       onClick={() => ctx?.setShowMenu(false)}
-      class="flex items-center gap-1.5 rounded-lg p-1 hover:bg-neutral-200/50 active:bg-neutral-200/50 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+      class="flex items-center gap-1.5 rounded-lg p-1 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
       target={props.newTab ? "_blank" : undefined}
     >
       <span class={"iconify shrink-0 " + props.icon}></span>
@@ -81,7 +81,7 @@ export const DropdownMenu = (props: {
     <div class="relative">
       <button
         class={
-          "flex items-center hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700 " +
+          "flex items-center hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 " +
           props.buttonClass
         }
         ref={setMenuButton}

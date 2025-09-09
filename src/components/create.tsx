@@ -211,7 +211,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
               </div>
               <div class="flex items-center gap-2">
                 <Show when={!uploading()}>
-                  <div class="dark:hover:bg-dark-100 dark:shadow-dark-800 dark:bg-dark-300 dark:active:bg-dark-100 flex rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 text-xs font-semibold shadow-xs hover:bg-neutral-100 active:bg-neutral-100 dark:border-neutral-700">
+                  <div class="dark:hover:bg-dark-200 dark:shadow-dark-800 dark:bg-dark-300 dark:active:bg-dark-100 flex rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 text-xs font-semibold shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700">
                     <input type="file" id="blob" hidden onChange={() => uploadBlob()} />
                     <label class="flex items-center gap-1 px-2 py-1.5" for="blob">
                       <span class="iconify lucide--upload text-sm"></span>
@@ -272,7 +272,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
       </Modal>
       <Tooltip text={`${props.create ? "Create" : "Edit"} record`}>
         <button
-          class={`flex items-center p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700 ${props.create ? "rounded-lg" : "rounded-sm"}`}
+          class={`flex items-center p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 ${props.create ? "rounded-lg" : "rounded-sm"}`}
           onclick={() => {
             setNotice("");
             setOpenDialog(true);

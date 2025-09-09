@@ -76,7 +76,7 @@ const AccountManager = () => {
           <div class="mb-3 max-h-[20rem] overflow-y-auto md:max-h-[25rem]">
             <For each={Object.keys(sessions)}>
               {(did) => (
-                <div class="flex w-full items-center justify-between gap-x-2 rounded-lg hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-600 dark:active:bg-neutral-600">
+                <div class="flex w-full items-center justify-between gap-x-2 rounded-lg hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600">
                   <button
                     class="flex basis-full items-center justify-between gap-1 truncate p-1"
                     onclick={() => resumeSession(did as Did)}
@@ -110,7 +110,7 @@ const AccountManager = () => {
       </Modal>
       <button
         onclick={() => setOpenManager(true)}
-        class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+        class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
       >
         {agent() && avatar() ?
           <img src={avatar()} class="dark:shadow-dark-800 size-5 rounded-full shadow-xs" />

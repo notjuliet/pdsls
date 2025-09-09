@@ -85,7 +85,7 @@ const LabelView = () => {
             <Show when={!response.loading}>
               <button
                 type="submit"
-                class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+                class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
               >
                 <span class="iconify lucide--search text-lg"></span>
               </button>

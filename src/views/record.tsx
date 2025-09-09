@@ -150,7 +150,7 @@ export const RecordView = () => {
               <RecordEditor create={false} record={record()?.value} refetch={refetch} />
               <Tooltip text="Delete">
                 <button
-                  class="flex items-center rounded-sm p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+                  class="flex items-center rounded-sm p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                   onclick={() => setOpenDelete(true)}
                 >
                   <span class="iconify lucide--trash-2"></span>
