@@ -151,7 +151,12 @@ const NavBar = (props: { params: Params }) => {
             </Tooltip>
           </div>
         </Show>
-        <Show when={props.params.repo in labelerCache && !props.params.collection}>
+        <Show
+          when={
+            !props.params.collection &&
+            (props.params.repo in labelerCache || location.pathname.endsWith("/labels"))
+          }
+        >
           <div class="mt-1 flex items-center gap-2">
             <span class="iconify lucide--tag text-lg"></span>
             <A
