@@ -3,20 +3,12 @@ import { Client, CredentialManager } from "@atcute/client";
 import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
 import { A, useParams } from "@solidjs/router";
-import {
-  createEffect,
-  createResource,
-  createSignal,
-  For,
-  onCleanup,
-  onMount,
-  Show,
-  untrack,
-} from "solid-js";
+import { createEffect, createResource, createSignal, For, Show, untrack } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Button } from "../components/button.jsx";
 import { JSONType, JSONValue } from "../components/json.jsx";
 import { agent } from "../components/login.jsx";
+import { StickyOverlay } from "../components/sticky.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import { setNotif } from "../layout.jsx";
@@ -81,11 +73,9 @@ const CollectionView = () => {
   const [batchDelete, setBatchDelete] = createSignal(false);
   const [lastSelected, setLastSelected] = createSignal<number>();
   const [reverse, setReverse] = createSignal(false);
-  const [filterStuck, setFilterStuck] = createSignal(false);
   const did = params.repo;
   let pds: string;
   let rpc: Client;
-  let sticky!: HTMLDivElement;
 
   const fetchRecords = async () => {
     if (!pds) pds = await resolvePDS(did);
@@ -168,43 +158,10 @@ const CollectionView = () => {
       true,
     );
 
-  onMount(() => {
-    let ticking = false;
-    const tick = () => {
-      const topPx = parseFloat(getComputedStyle(sticky).top);
-      const { top } = sticky.getBoundingClientRect();
-      setFilterStuck(top <= topPx + 0.5);
-      ticking = false;
-    };
-
-    const onScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(tick);
-      }
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    tick();
-
-    onCleanup(() => {
-      window.removeEventListener("scroll", onScroll);
-    });
-  });
-
   return (
     <Show when={records.length || response()}>
       <div class="-mt-2 flex w-full flex-col items-center">
-        <div
-          ref={(el) => (sticky = el)}
-          class="sticky top-2 z-10 flex flex-col items-center justify-center gap-2 rounded-lg p-3 transition-colors"
-          classList={{
-            "bg-neutral-50 dark:bg-dark-300 border-[0.5px] border-neutral-300 dark:border-neutral-700 shadow-md":
-              filterStuck(),
-            "bg-transparent border-transparent shadow-none": !filterStuck(),
-          }}
-        >
+        <StickyOverlay>
           <div class="flex w-[22rem] items-center gap-2 sm:w-[24rem]">
             <Show when={agent() && agent()?.sub === did}>
               <div class="flex items-center gap-x-2">
@@ -297,7 +254,7 @@ const CollectionView = () => {
               </div>
             </div>
           </Show>
-        </div>
+        </StickyOverlay>
         <div class="flex max-w-full flex-col font-mono">
           <For
             each={records.filter((rec) =>

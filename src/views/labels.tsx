@@ -3,6 +3,7 @@ import { Client, CredentialManager } from "@atcute/client";
 import { A, useParams, useSearchParams } from "@solidjs/router";
 import { createResource, createSignal, For, onMount, Show } from "solid-js";
 import { Button } from "../components/button.jsx";
+import { StickyOverlay } from "../components/sticky.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import { labelerCache, resolvePDS } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
@@ -98,7 +99,7 @@ const LabelView = () => {
           </div>
         </div>
       </form>
-      <div class="dark:bg-dark-500 sticky top-0 z-5 flex w-screen flex-col items-center justify-center gap-3 bg-neutral-100 py-3">
+      <StickyOverlay>
         <TextInput
           placeholder="Filter by label"
           onInput={(e) => setFilter(e.currentTarget.value)}
@@ -123,7 +124,7 @@ const LabelView = () => {
             </div>
           </Show>
         </div>
-      </div>
+      </StickyOverlay>
       <Show when={labels().length}>
         <div class="flex max-w-full min-w-[22rem] flex-col gap-2 divide-y-[0.5px] divide-neutral-400 text-sm wrap-anywhere whitespace-pre-wrap sm:min-w-[24rem] dark:divide-neutral-600">
           <For each={filterLabels()}>
