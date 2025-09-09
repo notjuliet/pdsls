@@ -174,7 +174,7 @@ const CollectionView = () => {
         classList={{
           "dark:bg-dark-300 dark:hover:bg-dark-100 dark:active:bg-dark-100 bg-white hover:bg-neutral-50 active:bg-neutral-50":
             !filterStuck(),
-          "dark:bg-dark-100 dark:hover:bg-dark-50 dark:active:bg-dark-50 bg-neutral-50 hover:bg-neutral-200 active:bg-neutral-200":
+          "dark:bg-dark-100 dark:hover:bg-dark-50 dark:active:bg-dark-50 bg-neutral-50 hover:bg-neutral-100 active:bg-neutral-100":
             filterStuck(),
         }}
         {...props}
