@@ -14,9 +14,10 @@ import {
   untrack,
 } from "solid-js";
 import { createStore } from "solid-js/store";
-import { Button, type ButtonProps } from "../components/button.jsx";
+import { Button } from "../components/button.jsx";
 import { JSONType, JSONValue } from "../components/json.jsx";
 import { agent } from "../components/login.jsx";
+import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import { setNotif } from "../layout.jsx";
 import { resolvePDS } from "../utils/api.js";
@@ -167,21 +168,6 @@ const CollectionView = () => {
       true,
     );
 
-  const FilterButton = (props: ButtonProps) => {
-    return (
-      <Button
-        class="flex items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1.5 text-xs font-semibold shadow-sm dark:border-neutral-700"
-        classList={{
-          "dark:bg-dark-300 dark:hover:bg-dark-100 dark:active:bg-dark-100 bg-white hover:bg-neutral-50 active:bg-neutral-50":
-            !filterStuck(),
-          "dark:bg-dark-100 dark:hover:bg-dark-50 dark:active:bg-dark-50 bg-neutral-50 hover:bg-neutral-100 active:bg-neutral-100":
-            filterStuck(),
-        }}
-        {...props}
-      />
-    );
-  };
-
   onMount(() => {
     let ticking = false;
     const tick = () => {
@@ -271,17 +257,15 @@ const CollectionView = () => {
                 <span class="iconify lucide--radio-tower text-lg"></span>
               </A>
             </Tooltip>
-            <input
-              type="text"
-              spellcheck={false}
+            <TextInput
               placeholder="Filter by substring"
-              class="dark:bg-dark-100 grow rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 shadow-sm placeholder:text-sm focus:outline-[1.5px] focus:outline-neutral-900 dark:border-neutral-700 dark:focus:outline-neutral-200"
               onInput={(e) => setFilter(e.currentTarget.value)}
+              class="grow"
             />
           </div>
           <Show when={records.length > 1}>
             <div class="flex w-[22rem] items-center justify-between gap-x-2 sm:w-[24rem]">
-              <FilterButton
+              <Button
                 onClick={() => {
                   setReverse(!reverse());
                   setRecords([]);
@@ -293,7 +277,7 @@ const CollectionView = () => {
                   class={`iconify ${reverse() ? "lucide--rotate-ccw" : "lucide--rotate-cw"} text-sm`}
                 ></span>
                 Reverse
-              </FilterButton>
+              </Button>
               <div>
                 <Show when={batchDelete()}>
                   <span>{records.filter((rec) => rec.toDelete).length}</span>
@@ -304,7 +288,7 @@ const CollectionView = () => {
               <div class="flex w-[5rem] items-center justify-end">
                 <Show when={cursor()}>
                   <Show when={!response.loading}>
-                    <FilterButton onClick={() => refetch()}>Load More</FilterButton>
+                    <Button onClick={() => refetch()}>Load More</Button>
                   </Show>
                   <Show when={response.loading}>
                     <div class="iconify lucide--loader-circle w-[5rem] animate-spin text-xl" />
