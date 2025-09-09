@@ -8,6 +8,7 @@ import { createStore } from "solid-js/store";
 import { Button } from "../components/button.jsx";
 import { JSONType, JSONValue } from "../components/json.jsx";
 import { agent } from "../components/login.jsx";
+import { Modal } from "../components/modal.jsx";
 import { StickyOverlay } from "../components/sticky.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
@@ -73,6 +74,8 @@ const CollectionView = () => {
   const [batchDelete, setBatchDelete] = createSignal(false);
   const [lastSelected, setLastSelected] = createSignal<number>();
   const [reverse, setReverse] = createSignal(false);
+  const [recreate, setRecreate] = createSignal(false);
+  const [openDelete, setOpenDelete] = createSignal(false);
   const did = params.repo;
   let pds: string;
   let rpc: Client;
@@ -109,12 +112,24 @@ const CollectionView = () => {
 
   const deleteRecords = async () => {
     const recsToDel = records.filter((record) => record.toDelete);
-    const writes = recsToDel.map((record): $type.enforce<ComAtprotoRepoApplyWrites.Delete> => {
-      return {
+    let writes: Array<
+      | $type.enforce<ComAtprotoRepoApplyWrites.Delete>
+      | $type.enforce<ComAtprotoRepoApplyWrites.Create>
+    > = [];
+    recsToDel.forEach((record) => {
+      writes.push({
         $type: "com.atproto.repo.applyWrites#delete",
         collection: params.collection as `${string}.${string}.${string}`,
         rkey: record.rkey,
-      };
+      });
+      if (recreate()) {
+        writes.push({
+          $type: "com.atproto.repo.applyWrites#create",
+          collection: params.collection as `${string}.${string}.${string}`,
+          rkey: record.rkey,
+          value: record.record.value,
+        });
+      }
     });
 
     const BATCHSIZE = 200;
@@ -127,10 +142,16 @@ const CollectionView = () => {
         },
       });
     }
-    setNotif({ show: true, icon: "lucide--trash-2", text: `${recsToDel.length} records deleted` });
+    setNotif({
+      show: true,
+      icon: "lucide--trash-2",
+      text: `${recsToDel.length} records ${recreate() ? "recreated" : "deleted"}`,
+    });
     setBatchDelete(false);
     setRecords([]);
     setCursor(undefined);
+    setOpenDelete(false);
+    setRecreate(false);
     refetch();
   };
 
@@ -196,15 +217,52 @@ const CollectionView = () => {
                     }
                   />
                   <Tooltip
-                    text="Confirm"
+                    text="Recreate"
                     children={
-                      <button onclick={() => deleteRecords()} class="flex items-center">
+                      <button
+                        onclick={() => {
+                          setRecreate(true);
+                          setOpenDelete(true);
+                        }}
+                        class="flex items-center"
+                      >
+                        <span class="iconify lucide--recycle text-lg text-green-500 dark:text-green-400"></span>
+                      </button>
+                    }
+                  />
+                  <Tooltip
+                    text="Delete"
+                    children={
+                      <button
+                        onclick={() => {
+                          setRecreate(false);
+                          setOpenDelete(true);
+                        }}
+                        class="flex items-center"
+                      >
                         <span class="iconify lucide--trash-2 text-lg text-red-500 dark:text-red-400"></span>
                       </button>
                     }
                   />
                 </Show>
               </div>
+              <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
+                <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute top-70 left-[50%] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-300 dark:border-neutral-700 starting:opacity-0">
+                  <h2 class="mb-2 font-semibold">
+                    {recreate() ? "Recreate" : "Delete"} {records.filter((r) => r.toDelete).length}{" "}
+                    records?
+                  </h2>
+                  <div class="flex justify-end gap-2">
+                    <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
+                    <Button
+                      onClick={deleteRecords}
+                      class={`dark:shadow-dark-800 rounded-lg px-2 py-1.5 text-xs font-semibold text-neutral-200 shadow-xs ${recreate() ? "bg-green-500 hover:bg-green-400 dark:bg-green-600 dark:hover:bg-green-500" : "bg-red-500 hover:bg-red-400 active:bg-red-400"}`}
+                    >
+                      {recreate() ? "Recreate" : "Delete"}
+                    </Button>
+                  </div>
+                </div>
+              </Modal>
             </Show>
             <Tooltip text="Jetstream">
               <A
