@@ -17,7 +17,6 @@ import { createStore } from "solid-js/store";
 import { Button, type ButtonProps } from "../components/button.jsx";
 import { JSONType, JSONValue } from "../components/json.jsx";
 import { agent } from "../components/login.jsx";
-import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import { setNotif } from "../layout.jsx";
 import { resolvePDS } from "../utils/api.js";
@@ -272,9 +271,11 @@ const CollectionView = () => {
                 <span class="iconify lucide--radio-tower text-lg"></span>
               </A>
             </Tooltip>
-            <TextInput
+            <input
+              type="text"
+              spellcheck={false}
               placeholder="Filter by substring"
-              class="w-full"
+              class="dark:bg-dark-100 grow rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 shadow-sm placeholder:text-sm focus:outline-[1.5px] focus:outline-neutral-900 dark:border-neutral-700 dark:focus:outline-neutral-200"
               onInput={(e) => setFilter(e.currentTarget.value)}
             />
           </div>
