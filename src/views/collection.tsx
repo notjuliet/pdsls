@@ -171,7 +171,7 @@ const CollectionView = () => {
   const FilterButton = (props: ButtonProps) => {
     return (
       <Button
-        class="flex items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1.5 text-xs font-semibold shadow-md dark:border-neutral-700"
+        class="flex items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1.5 text-xs font-semibold shadow-sm dark:border-neutral-700"
         classList={{
           "dark:bg-dark-300 dark:hover:bg-dark-100 dark:active:bg-dark-100 bg-white hover:bg-neutral-50 active:bg-neutral-50":
             !filterStuck(),
