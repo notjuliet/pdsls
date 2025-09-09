@@ -27,7 +27,7 @@ export const Modal = (props: ModalProps) => {
           document.body.style.overflow = "auto";
           if (props.onClose) props.onClose();
         }}
-        class="h-full max-h-none w-full max-w-none bg-transparent backdrop:bg-transparent"
+        class="h-full max-h-none w-full max-w-none bg-transparent text-neutral-900 backdrop:bg-transparent dark:text-neutral-200"
       >
         {props.children}
       </dialog>

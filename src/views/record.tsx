@@ -120,7 +120,7 @@ export const RecordView = () => {
   return (
     <Show when={record()} keyed>
       <div class="flex w-full flex-col items-center">
-        <div class="dark:shadow-dark-800 dark:bg-dark-300 mb-3 flex w-[22rem] justify-between rounded-lg bg-neutral-50 px-2 py-1.5 shadow-sm sm:w-[24rem]">
+        <div class="dark:shadow-dark-800 dark:bg-dark-300 mb-3 flex w-[22rem] justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 shadow-xs sm:w-[24rem] dark:border-neutral-700">
           <div class="flex gap-3 text-sm">
             <A
               classList={{
@@ -157,13 +157,13 @@ export const RecordView = () => {
                 </button>
               </Tooltip>
               <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
-                <div class="dark:bg-dark-800 dark:shadow-dark-800 absolute top-70 left-[50%] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-200 p-4 text-neutral-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200 starting:opacity-0">
+                <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute top-70 left-[50%] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-300 dark:border-neutral-700 starting:opacity-0">
                   <h2 class="mb-2 font-semibold">Delete this record?</h2>
                   <div class="flex justify-end gap-2">
                     <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
                     <Button
                       onClick={deleteRecord}
-                      class="dark:shadow-dark-800 rounded-lg bg-red-500 px-2 py-1.5 text-xs font-semibold text-neutral-200 shadow-sm hover:bg-red-400 active:bg-red-400"
+                      class="dark:shadow-dark-800 rounded-lg bg-red-500 px-2 py-1.5 text-xs font-semibold text-neutral-200 shadow-xs hover:bg-red-400 active:bg-red-400"
                     >
                       Delete
                     </Button>

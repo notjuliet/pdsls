@@ -68,7 +68,7 @@ const AccountManager = () => {
   return (
     <>
       <Modal open={openManager()} onClose={() => setOpenManager(false)}>
-        <div class="dark:bg-dark-800 dark:shadow-dark-800 absolute top-12 left-[50%] w-[22rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-200 p-4 text-neutral-900 shadow-md transition-opacity duration-300 dark:border-neutral-700 dark:text-neutral-200 starting:opacity-0">
+        <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute top-12 left-[50%] w-[22rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-300 sm:w-[24rem] dark:border-neutral-700 starting:opacity-0">
           <div class="mb-2 flex items-center gap-1 font-semibold">
             <span class="iconify lucide--user-round"></span>
             <span>Manage accounts</span>
@@ -76,7 +76,7 @@ const AccountManager = () => {
           <div class="mb-3 max-h-[20rem] overflow-y-auto md:max-h-[25rem]">
             <For each={Object.keys(sessions)}>
               {(did) => (
-                <div class="flex w-full items-center justify-between gap-x-2 rounded-lg hover:bg-neutral-100 active:bg-neutral-100 dark:hover:bg-neutral-600 dark:active:bg-neutral-600">
+                <div class="flex w-full items-center justify-between gap-x-2 rounded-lg hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-600 dark:active:bg-neutral-600">
                   <button
                     class="flex basis-full items-center justify-between gap-1 truncate p-1"
                     onclick={() => resumeSession(did as Did)}
@@ -113,7 +113,7 @@ const AccountManager = () => {
         class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
       >
         {agent() && avatar() ?
-          <img src={avatar()} class="dark:shadow-dark-800 size-5 rounded-full shadow-sm" />
+          <img src={avatar()} class="dark:shadow-dark-800 size-5 rounded-full shadow-xs" />
         : <span class="iconify lucide--circle-user-round text-xl"></span>}
       </button>
     </>

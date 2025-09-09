@@ -110,7 +110,7 @@ const PlcLogView = (props: {
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-1">
           <div class="iconify lucide--filter" />
-          <div class="dark:shadow-dark-800 dark:bg-dark-300 flex w-fit items-center rounded-full border-[0.5px] border-neutral-300 bg-neutral-50 shadow-sm dark:border-neutral-700">
+          <div class="dark:shadow-dark-800 dark:bg-dark-300 flex w-fit items-center rounded-full border-[0.5px] border-neutral-300 bg-neutral-50 shadow-xs dark:border-neutral-700">
             <FilterButton icon="iconify lucide--at-sign" event="handle" />
             <FilterButton icon="iconify lucide--key-round" event="rotation_key" />
             <FilterButton icon="iconify lucide--hard-drive" event="service" />
@@ -273,7 +273,7 @@ const RepoView = () => {
             {error()}
           </div>
         </Show>
-        <div class="dark:shadow-dark-800 dark:bg-dark-300 flex justify-between rounded-lg bg-neutral-50 px-2 py-1.5 text-sm shadow-sm">
+        <div class="dark:shadow-dark-800 dark:bg-dark-300 flex justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700">
           <Show when={!error()}>
             <RepoTab tab="collections" label="Collections" icon="lucide--folder-open" />
           </Show>

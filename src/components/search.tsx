@@ -76,7 +76,7 @@ const Search = () => {
         PDS URL, AT URI, or handle
       </label>
       <div class="flex w-full items-center gap-2">
-        <div class="dark:bg-dark-100 dark:shadow-dark-800 flex grow items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 shadow-sm focus-within:outline-[1.5px] focus-within:outline-neutral-900 dark:border-neutral-700 dark:focus-within:outline-neutral-200">
+        <div class="dark:bg-dark-100 dark:shadow-dark-800 flex grow items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 shadow-xs focus-within:outline-[1.5px] focus-within:outline-neutral-900 dark:border-neutral-700 dark:focus-within:outline-neutral-200">
           <input
             type="text"
             spellcheck={false}
