@@ -3,6 +3,7 @@ import { A, useLocation, useSearchParams } from "@solidjs/router";
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { Button } from "../components/button";
 import { JSONValue } from "../components/json";
+import { StickyOverlay } from "../components/sticky";
 import { TextInput } from "../components/text-input";
 
 const LIMIT = 25;
@@ -167,13 +168,10 @@ const StreamView = () => {
           Firehose
         </A>
       </div>
-      <form
-        ref={formRef}
-        class="dark:bg-dark-500 sticky top-0 z-5 flex w-screen flex-col items-center bg-neutral-100 px-4 text-sm"
-      >
-        <div class="flex w-[22rem] flex-col gap-2 py-3 sm:w-[24rem]">
+      <StickyOverlay>
+        <form ref={formRef} class="flex w-[22rem] flex-col gap-1 text-sm sm:w-[24rem]">
           <Show when={!connected()}>
-            <label class="flex items-center justify-end gap-x-2">
+            <label class="flex items-center justify-end gap-x-1">
               <span class="min-w-[5rem]">Instance</span>
               <TextInput
                 name="instance"
@@ -187,7 +185,7 @@ const StreamView = () => {
               />
             </label>
             <Show when={streamType === StreamType.JETSTREAM}>
-              <label class="flex items-center justify-end gap-x-2">
+              <label class="flex items-center justify-end gap-x-1">
                 <span class="min-w-[5rem]">Collections</span>
                 <textarea
                   name="collections"
@@ -199,7 +197,7 @@ const StreamView = () => {
               </label>
             </Show>
             <Show when={streamType === StreamType.JETSTREAM}>
-              <label class="flex items-center justify-end gap-x-2">
+              <label class="flex items-center justify-end gap-x-1">
                 <span class="min-w-[5rem]">DIDs</span>
                 <textarea
                   name="dids"
@@ -210,7 +208,7 @@ const StreamView = () => {
                 />
               </label>
             </Show>
-            <label class="flex items-center justify-end gap-x-2">
+            <label class="flex items-center justify-end gap-x-1">
               <span class="min-w-[5rem]">Cursor</span>
               <TextInput
                 name="cursor"
@@ -253,8 +251,8 @@ const StreamView = () => {
               {connected() ? "Disconnect" : "Connect"}
             </Button>
           </div>
-        </div>
-      </form>
+        </form>
+      </StickyOverlay>
       <Show when={notice().length}>
         <div class="text-red-500 dark:text-red-400">{notice()}</div>
       </Show>
