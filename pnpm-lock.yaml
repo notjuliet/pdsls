@@ -38,6 +38,9 @@ importers:
       '@atcute/identity-resolver':
         specifier: ^1.1.3
         version: 1.1.3(@atcute/identity@1.1.0)
+      '@atcute/leaflet':
+        specifier: ^1.0.6
+        version: 1.0.6
       '@atcute/lexicon-doc':
         specifier: ^1.0.3
         version: 1.0.3
@@ -173,6 +176,9 @@ packages:
 
   '@atcute/identity@1.1.0':
     resolution: {integrity: sha512-6vRvRqJatDB+JUQsb+UswYmtBGQnSZcqC3a2y6H5DB/v5KcIh+6nFFtc17G0+3W9rxdk7k9M4KkgkdKf/YDNoQ==}
+
+  '@atcute/leaflet@1.0.6':
+    resolution: {integrity: sha512-Q82GhrNdKwA7vd1IchWh4IUjhkDB2jfKGS1LhBeYkJSq4CJKX+nlWosSBSJOfCPY+drSqHWxHrq2bmWCCQJvXg==}
 
   '@atcute/lexicon-doc@1.0.3':
     resolution: {integrity: sha512-U7rinsTOwXGGcrF6/s7GzTXargcQpDr4BTrj5ci/XTK+POEK5jpcI+Ag1fF932pBX3k97em6y4TWwTSO8M/McQ==}
@@ -1504,6 +1510,11 @@ snapshots:
     dependencies:
       '@atcute/lexicons': 1.1.1
       '@badrap/valita': 0.4.6
+
+  '@atcute/leaflet@1.0.6':
+    dependencies:
+      '@atcute/atproto': 3.1.3
+      '@atcute/lexicons': 1.1.1
 
   '@atcute/lexicon-doc@1.0.3':
     dependencies:
