@@ -226,7 +226,7 @@ const RepoView = () => {
         default:
           setError("This repository is unreachable");
       }
-      navigate("#identity");
+      navigate(`/at://${params.repo}#identity`);
     }
 
     return res.data;
