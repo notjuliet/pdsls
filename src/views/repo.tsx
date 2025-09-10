@@ -273,7 +273,9 @@ const RepoView = () => {
             {error()}
           </div>
         </Show>
-        <div class="dark:shadow-dark-800 dark:bg-dark-300 flex justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700">
+        <div
+          class={`dark:shadow-dark-800 dark:bg-dark-300 flex ${error() ? "justify-around" : "justify-between"} rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700`}
+        >
           <Show when={!error()}>
             <RepoTab tab="collections" label="Collections" icon="lucide--folder-open" />
           </Show>
