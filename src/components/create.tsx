@@ -211,7 +211,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
               </div>
               <div class="flex items-center gap-2">
                 <Show when={!uploading()}>
-                  <div class="dark:hover:bg-dark-200 dark:shadow-dark-800 dark:bg-dark-300 dark:active:bg-dark-100 flex rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 text-xs font-semibold shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700">
+                  <div class="dark:hover:bg-dark-200 dark:shadow-dark-800 dark:active:bg-dark-100 flex rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 text-xs font-semibold shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800">
                     <input type="file" id="blob" hidden onChange={() => uploadBlob()} />
                     <label class="flex items-center gap-1 px-2 py-1.5" for="blob">
                       <span class="iconify lucide--upload text-sm"></span>
