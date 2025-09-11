@@ -256,7 +256,7 @@ const CollectionView = () => {
                     <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
                     <Button
                       onClick={deleteRecords}
-                      class={`dark:shadow-dark-800 rounded-lg px-2 py-1.5 text-xs font-semibold text-neutral-200 shadow-xs ${recreate() ? "bg-green-500 hover:bg-green-400 dark:bg-green-600 dark:hover:bg-green-500" : "bg-red-500 hover:bg-red-400 active:bg-red-400"}`}
+                      class={`dark:shadow-dark-800 rounded-lg px-2 py-1.5 text-xs font-semibold text-neutral-200 shadow-xs select-none ${recreate() ? "bg-green-500 hover:bg-green-400 dark:bg-green-600 dark:hover:bg-green-500" : "bg-red-500 hover:bg-red-400 active:bg-red-400"}`}
                     >
                       {recreate() ? "Recreate" : "Delete"}
                     </Button>

@@ -27,7 +27,7 @@ const SearchButton = () => {
     >
       <span class="iconify lucide--search"></span>
       <Show when={!isTouchDevice}>
-        <kbd class="font-sans text-neutral-500 dark:text-neutral-400">
+        <kbd class="font-sans text-neutral-500 select-none dark:text-neutral-400">
           {/Mac/i.test(navigator.platform) ? "⌘" : "⌃"}K
         </kbd>
       </Show>
@@ -83,7 +83,7 @@ const Search = () => {
             placeholder="PDS URL, AT URI, or handle"
             ref={searchInput}
             id="input"
-            class="grow placeholder:text-sm focus:outline-none"
+            class="grow select-none placeholder:text-sm focus:outline-none"
           />
           <button
             type="submit"
