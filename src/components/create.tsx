@@ -167,7 +167,9 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
         <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute top-12 left-[50%] w-[22rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-md transition-opacity duration-300 sm:w-xl sm:p-4 lg:w-[48rem] dark:border-neutral-700 starting:opacity-0">
           <div class="mb-2 flex w-full justify-between">
             <div class="flex items-center gap-1 font-semibold">
-              <span class="iconify lucide--square-pen"></span>
+              <span
+                class={`iconify ${props.create ? "lucide--square-pen" : "lucide--pencil"}`}
+              ></span>
               <span>{props.create ? "Creating" : "Editing"} record</span>
             </div>
             <button onclick={() => setOpenDialog(false)} class="flex items-center">
@@ -185,14 +187,19 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                     id="collection"
                     name="collection"
                     placeholder="Optional (default: record type)"
-                    class="w-[14rem]"
+                    class="w-[15rem]"
                   />
                 </div>
                 <div class="flex items-center gap-x-2">
                   <label for="rkey" class="min-w-20 select-none">
                     Record key
                   </label>
-                  <TextInput id="rkey" name="rkey" placeholder="Optional" class="w-[14rem]" />
+                  <TextInput
+                    id="rkey"
+                    name="rkey"
+                    placeholder="Optional (default: TID)"
+                    class="w-[15rem]"
+                  />
                 </div>
               </Show>
               <div class="flex items-center gap-x-2">
@@ -230,10 +237,10 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                   <label for="mimetype" class="min-w-20 select-none">
                     MIME type
                   </label>
-                  <TextInput id="mimetype" placeholder="Optional" class="w-[14rem]" />
+                  <TextInput id="mimetype" placeholder="Optional" class="w-[15rem]" />
                 </div>
                 <div class="flex items-center gap-1">
-                  <input id="exif-rm" class="size-4" type="checkbox" checked />
+                  <input id="exif-rm" type="checkbox" checked />
                   <label for="exif-rm" class="select-none">
                     Remove EXIF data
                   </label>
@@ -250,7 +257,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
               <div class="flex items-center justify-end gap-2">
                 <Show when={!props.create}>
                   <div class="flex items-center gap-1">
-                    <input id="recreate" class="size-4" name="recreate" type="checkbox" />
+                    <input id="recreate" name="recreate" type="checkbox" />
                     <label for="recreate" class="text-sm select-none">
                       Recreate record
                     </label>

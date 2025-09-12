@@ -61,16 +61,10 @@ const PdsView = () => {
           {(server) => (
             <>
               <Show when={server().inviteCodeRequired}>
-                <div class="flex items-baseline gap-x-1">
-                  <span class="font-semibold">Invite Code Required</span>
-                  <span class="text-sm">{server().inviteCodeRequired ? "Yes" : "No"}</span>
-                </div>
+                <span class="font-semibold">Invite Code Required</span>
               </Show>
               <Show when={server().phoneVerificationRequired}>
-                <div class="flex items-baseline gap-x-1">
-                  <span class="font-semibold">Phone Verification Required</span>
-                  <span class="text-sm">{server().phoneVerificationRequired ? "Yes" : "No"}</span>
-                </div>
+                <span class="font-semibold">Phone Verification Required</span>
               </Show>
               <Show when={server().availableUserDomains.length}>
                 <div class="flex flex-col">

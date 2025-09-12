@@ -31,7 +31,7 @@ const VideoPlayer = ({ did, cid }: VideoPlayerProps) => {
   hls.on(Hls.Events.ERROR, () => setError(true));
 
   return (
-    <div class="max-w-md">
+    <div class="max-w-xs">
       <Show when={!error()}>
         <video
           ref={(node) => {
@@ -58,8 +58,6 @@ const VideoPlayer = ({ did, cid }: VideoPlayerProps) => {
             });
           }}
           controls
-          autoplay
-          muted
           playsinline
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
