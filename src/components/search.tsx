@@ -43,7 +43,7 @@ const Search = () => {
     if (useLocation().pathname !== "/") searchInput.focus();
   });
 
-  const processInput = async (input: string) => {
+  const processInput = (input: string) => {
     input = input.trim().replace(/^@/, "");
     if (!input.length) return;
     setShowSearch(false);
@@ -65,8 +65,7 @@ const Search = () => {
 
   return (
     <form
-      class="flex w-full max-w-[22rem] flex-col sm:max-w-[24rem]"
-      id="uriForm"
+      class="w-[22rem] sm:w-[24rem]"
       onsubmit={(e) => {
         e.preventDefault();
         processInput(searchInput.value);
@@ -75,21 +74,19 @@ const Search = () => {
       <label for="input" class="hidden">
         PDS URL, AT URI, or handle
       </label>
-      <div class="flex w-full items-center gap-2">
-        <div class="dark:bg-dark-100 dark:shadow-dark-800 flex grow items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 shadow-xs focus-within:outline-[1.5px] focus-within:outline-neutral-900 dark:border-neutral-700 dark:focus-within:outline-neutral-200">
-          <input
-            type="text"
-            spellcheck={false}
-            placeholder="PDS URL, AT URI, or handle"
-            ref={searchInput}
-            id="input"
-            class="grow select-none placeholder:text-sm focus:outline-none"
-          />
-          <button
-            type="submit"
-            class="iconify lucide--arrow-right text-lg text-neutral-500 dark:text-neutral-400"
-          ></button>
-        </div>
+      <div class="dark:bg-dark-100 dark:shadow-dark-800 flex items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 shadow-xs focus-within:outline-[1.5px] focus-within:outline-neutral-900 dark:border-neutral-700 dark:focus-within:outline-neutral-200">
+        <input
+          type="text"
+          spellcheck={false}
+          placeholder="PDS URL, AT URI, or handle"
+          ref={searchInput}
+          id="input"
+          class="grow select-none placeholder:text-sm focus:outline-none"
+        />
+        <button
+          type="submit"
+          class="iconify lucide--arrow-right text-lg text-neutral-500 dark:text-neutral-400"
+        ></button>
       </div>
     </form>
   );
