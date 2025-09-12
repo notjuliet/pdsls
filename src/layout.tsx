@@ -49,16 +49,16 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <Meta name="robots" content="noindex, nofollow" />
         </Show>
       </MetaProvider>
-      <header class="mb-4 flex w-[22.5rem] items-center justify-between sm:w-[24.5rem]">
+      <header class="mb-4 flex w-[22rem] items-center justify-between sm:w-[24rem]">
         <A
           href="/"
           style='font-feature-settings: "cv05"'
-          class="flex items-center gap-1 px-1 text-xl font-semibold"
+          class="flex items-center gap-1 text-xl font-semibold"
         >
           <span class="iconify tabler--binary-tree-filled text-[#76c4e5]"></span>
           <span>PDSls</span>
         </A>
-        <div class="relative flex items-center gap-1">
+        <div class="relative -mr-1 flex items-center gap-1">
           <Show when={location.pathname !== "/"}>
             <SearchButton />
           </Show>
