@@ -121,7 +121,7 @@ const PlcLogView = (props: {
           <a
             href={`${localStorage.plcDirectory ?? "https://plc.directory"}/${props.did}/log/audit`}
             target="_blank"
-            class="flex items-center"
+            class="-mr-1 flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
           >
             <span class="iconify lucide--external-link"></span>
           </a>
@@ -308,9 +308,12 @@ const RepoView = () => {
           </ErrorBoundary>
         </Show>
         <Show when={nsids() && (!location.hash || location.hash === "#collections")}>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1">
             <Tooltip text="Jetstream">
-              <A href={`/jetstream?dids=${params.repo}`} class="flex items-center">
+              <A
+                href={`/jetstream?dids=${params.repo}`}
+                class="-ml-1 flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+              >
                 <span class="iconify lucide--radio-tower text-lg"></span>
               </A>
             </Tooltip>
@@ -393,7 +396,7 @@ const RepoView = () => {
                           : `https://${did.split("did:web:")[1]}/.well-known/did.json`
                         }
                         target="_blank"
-                        class="flex items-center"
+                        class="-mr-1 flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                       >
                         <span class="iconify lucide--external-link"></span>
                       </a>

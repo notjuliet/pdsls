@@ -183,9 +183,9 @@ const CollectionView = () => {
     <Show when={records.length || response()}>
       <div class="-mt-2 flex w-full flex-col items-center">
         <StickyOverlay>
-          <div class="flex w-[22rem] items-center gap-2 sm:w-[24rem]">
+          <div class="flex w-[22rem] items-center gap-1 sm:w-[24rem]">
             <Show when={agent() && agent()?.sub === did}>
-              <div class="flex items-center gap-x-2">
+              <div class="flex items-center">
                 <Tooltip
                   text={batchDelete() ? "Cancel" : "Delete"}
                   children={
@@ -199,7 +199,7 @@ const CollectionView = () => {
                         setLastSelected(undefined);
                         setBatchDelete(!batchDelete());
                       }}
-                      class="flex items-center"
+                      class="-ml-1 flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                     >
                       <span
                         class={`iconify text-lg ${batchDelete() ? "lucide--circle-x" : "lucide--trash-2"} `}
@@ -211,7 +211,10 @@ const CollectionView = () => {
                   <Tooltip
                     text="Select all"
                     children={
-                      <button onclick={() => selectAll()} class="flex items-center">
+                      <button
+                        onclick={() => selectAll()}
+                        class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                      >
                         <span class="iconify lucide--copy-check text-lg"></span>
                       </button>
                     }
@@ -224,7 +227,7 @@ const CollectionView = () => {
                           setRecreate(true);
                           setOpenDelete(true);
                         }}
-                        class="flex items-center"
+                        class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                       >
                         <span class="iconify lucide--recycle text-lg text-green-500 dark:text-green-400"></span>
                       </button>
@@ -238,7 +241,7 @@ const CollectionView = () => {
                           setRecreate(false);
                           setOpenDelete(true);
                         }}
-                        class="flex items-center"
+                        class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                       >
                         <span class="iconify lucide--trash-2 text-lg text-red-500 dark:text-red-400"></span>
                       </button>
@@ -267,7 +270,7 @@ const CollectionView = () => {
             <Tooltip text="Jetstream">
               <A
                 href={`/jetstream?collections=${params.collection}&dids=${params.repo}`}
-                class="flex items-center"
+                class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
               >
                 <span class="iconify lucide--radio-tower text-lg"></span>
               </A>

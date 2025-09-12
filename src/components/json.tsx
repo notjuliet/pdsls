@@ -146,11 +146,14 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
             <VideoPlayer did={repo} cid={blob.ref.$link} />
           </Show>
           <span
-            classList={{ "flex items-center justify-between gap-2": true, "flex-col": !hide() }}
+            classList={{ "flex items-center justify-between gap-1": true, "flex-col": !hide() }}
           >
             <Show when={blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4"}>
               <Tooltip text={hide() ? "Show" : "Hide"}>
-                <button onclick={() => setHide(!hide())} class="flex items-center">
+                <button
+                  onclick={() => setHide(!hide())}
+                  class={`${!hide() ? "-mt-1 -ml-0.5" : ""} flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600`}
+                >
                   <span
                     class={`iconify text-base ${hide() ? "lucide--eye-off" : "lucide--eye"}`}
                   ></span>
@@ -158,15 +161,15 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
               </Tooltip>
             </Show>
             <Show when={pds()}>
-              <a
-                href={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${repo}&cid=${blob.ref.$link}`}
-                target="_blank"
-                class="size-fit"
-              >
-                <Tooltip text="Blob PDS link">
+              <Tooltip text="Blob PDS link">
+                <a
+                  href={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${repo}&cid=${blob.ref.$link}`}
+                  target="_blank"
+                  class={`${!hide() ? "-mb-1 -ml-0.5" : ""} flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600`}
+                >
                   <span class="iconify lucide--external-link text-base"></span>
-                </Tooltip>
-              </a>
+                </a>
+              </Tooltip>
             </Show>
           </span>
         </span>
