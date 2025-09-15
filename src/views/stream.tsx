@@ -8,20 +8,13 @@ import { TextInput } from "../components/text-input";
 
 const LIMIT = 25;
 type Parameter = { name: string; param: string | string[] | undefined };
-enum StreamType {
-  JETSTREAM,
-  FIREHOSE,
-}
 
 const StreamView = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [parameters, setParameters] = createSignal<Parameter[]>([]);
-  const streamType =
-    useLocation().pathname === "/firehose" ? StreamType.FIREHOSE : StreamType.JETSTREAM;
-
+  const streamType = useLocation().pathname === "/firehose" ? "firehose" : "jetstream";
   const [records, setRecords] = createSignal<Array<any>>([]);
   const [connected, setConnected] = createSignal(false);
-  const [allEvents, setAllEvents] = createSignal(false);
   const [notice, setNotice] = createSignal("");
   let socket: WebSocket;
   let firehose: Firehose;
@@ -30,7 +23,7 @@ const StreamView = () => {
   const connectSocket = async (formData: FormData) => {
     setNotice("");
     if (connected()) {
-      if (streamType === StreamType.JETSTREAM) socket?.close();
+      if (streamType === "jetstream") socket?.close();
       else firehose?.close();
       setConnected(false);
       return;
@@ -38,7 +31,7 @@ const StreamView = () => {
     setRecords([]);
 
     let url = "";
-    if (streamType === StreamType.JETSTREAM) {
+    if (streamType === "jetstream") {
       url =
         formData.get("instance")?.toString() ?? "wss://jetstream1.us-east.bsky.network/subscribe";
       url = url.concat("?");
@@ -57,12 +50,10 @@ const StreamView = () => {
     });
 
     const cursor = formData.get("cursor")?.toString();
-    if (streamType === StreamType.JETSTREAM) {
+    if (streamType === "jetstream") {
       if (cursor?.length) url = url.concat(`cursor=${cursor}`);
       if (url.endsWith("&")) url = url.slice(0, -1);
     }
-
-    if (searchParams.allEvents === "on") setAllEvents(true);
 
     setSearchParams({
       instance: formData.get("instance")?.toString(),
@@ -81,11 +72,11 @@ const StreamView = () => {
     ]);
 
     setConnected(true);
-    if (streamType === StreamType.JETSTREAM) {
+    if (streamType === "jetstream") {
       socket = new WebSocket(url);
       socket.addEventListener("message", (event) => {
         const rec = JSON.parse(event.data);
-        if (allEvents() || (rec.kind !== "account" && rec.kind !== "identity"))
+        if (searchParams.allEvents === "on" || (rec.kind !== "account" && rec.kind !== "identity"))
           setRecords(records().concat(rec).slice(-LIMIT));
       });
       socket.addEventListener("error", () => {
@@ -177,14 +168,14 @@ const StreamView = () => {
                 name="instance"
                 value={
                   searchParams.instance ??
-                  (streamType === StreamType.JETSTREAM ?
+                  (streamType === "jetstream" ?
                     "wss://jetstream1.us-east.bsky.network/subscribe"
                   : "wss://bsky.network")
                 }
                 class="grow"
               />
             </label>
-            <Show when={streamType === StreamType.JETSTREAM}>
+            <Show when={streamType === "jetstream"}>
               <label class="flex items-center justify-end gap-x-1">
                 <span class="min-w-[5rem]">Collections</span>
                 <textarea
@@ -196,7 +187,7 @@ const StreamView = () => {
                 />
               </label>
             </Show>
-            <Show when={streamType === StreamType.JETSTREAM}>
+            <Show when={streamType === "jetstream"}>
               <label class="flex items-center justify-end gap-x-1">
                 <span class="min-w-[5rem]">DIDs</span>
                 <textarea
@@ -217,14 +208,13 @@ const StreamView = () => {
                 class="grow"
               />
             </label>
-            <Show when={streamType === StreamType.JETSTREAM}>
+            <Show when={streamType === "jetstream"}>
               <div class="flex items-center justify-end gap-x-1">
                 <input
                   type="checkbox"
                   name="allEvents"
                   id="allEvents"
                   checked={searchParams.allEvents === "on" ? true : false}
-                  onChange={(e) => setAllEvents(e.currentTarget.checked)}
                 />
                 <label for="allEvents" class="select-none">
                   Show account and identity events
