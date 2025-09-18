@@ -56,7 +56,7 @@ const NavBar = (props: { params: Params }) => {
       <div class="relative flex items-center justify-between gap-1">
         <div class="flex min-h-[1.25rem] basis-full items-center gap-2">
           <Tooltip text="PDS">
-            <span class="iconify lucide--hard-drive shrink-0 text-lg"></span>
+            <span class="iconify lucide--hard-drive shrink-0 text-base"></span>
           </Tooltip>
           <Show when={pds()}>
             <Show when={props.params.repo}>
@@ -100,7 +100,7 @@ const NavBar = (props: { params: Params }) => {
           <div class="relative mt-1 flex items-center justify-between gap-1">
             <div class="flex basis-full items-center gap-2">
               <Tooltip text="Repository">
-                <span class="iconify lucide--book-user text-lg"></span>
+                <span class="iconify lucide--book-user text-base"></span>
               </Tooltip>
               <div class="flex w-full gap-1">
                 {props.params.collection || location.pathname.includes("/labels") ?
@@ -158,7 +158,7 @@ const NavBar = (props: { params: Params }) => {
           }
         >
           <div class="mt-1 flex items-center gap-2">
-            <span class="iconify lucide--tag text-lg"></span>
+            <span class="iconify lucide--tag text-base"></span>
             <A
               end
               href={`/at://${props.params.repo}/labels`}
@@ -171,7 +171,7 @@ const NavBar = (props: { params: Params }) => {
         <Show when={props.params.collection}>
           <div class="mt-1 flex items-center gap-2">
             <Tooltip text="Collection">
-              <span class="iconify lucide--folder-open text-lg"></span>
+              <span class="iconify lucide--folder-open text-base"></span>
             </Tooltip>
             <Show when={props.params.rkey}>
               <A
@@ -190,7 +190,7 @@ const NavBar = (props: { params: Params }) => {
         <Show when={props.params.rkey}>
           <div class="mt-1 flex items-center gap-2">
             <Tooltip text="Record">
-              <span class="iconify lucide--file-json text-lg"></span>
+              <span class="iconify lucide--file-json text-base"></span>
             </Tooltip>
             <div class="flex gap-1">
               <span>{props.params.rkey}</span>
@@ -227,7 +227,7 @@ const NavBar = (props: { params: Params }) => {
         {(cid) => (
           <div class="mt-1 flex gap-2">
             <Tooltip text="CID">
-              <span class="iconify lucide--box text-lg"></span>
+              <span class="iconify lucide--box text-base"></span>
             </Tooltip>
             <button
               dir="rtl"
