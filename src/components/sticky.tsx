@@ -4,41 +4,40 @@ export const StickyOverlay = (props: { children?: JSX.Element }) => {
   const [filterStuck, setFilterStuck] = createSignal(false);
 
   return (
-    <div
-      ref={(node) => {
-        onMount(() => {
-          let ticking = false;
-          const tick = () => {
-            const topPx = parseFloat(getComputedStyle(node).top);
-            const { top } = node.getBoundingClientRect();
-            setFilterStuck(top <= topPx + 0.5);
-            ticking = false;
-          };
+    <>
+      <div
+        ref={(trigger) => {
+          onMount(() => {
+            const observer = new IntersectionObserver(
+              ([entry]) => setFilterStuck(!entry.isIntersecting),
+              {
+                rootMargin: "-8px 0px 0px 0px",
+                threshold: 0,
+              },
+            );
 
-          const onScroll = () => {
-            if (!ticking) {
-              ticking = true;
-              requestAnimationFrame(tick);
-            }
-          };
+            observer.observe(trigger);
 
-          window.addEventListener("scroll", onScroll, { passive: true });
-
-          tick();
-
-          onCleanup(() => {
-            window.removeEventListener("scroll", onScroll);
+            onCleanup(() => {
+              observer.unobserve(trigger);
+              observer.disconnect();
+            });
           });
-        });
-      }}
-      class="sticky top-2 z-10 flex flex-col items-center justify-center gap-2 rounded-lg p-3 transition-colors"
-      classList={{
-        "bg-neutral-50 dark:bg-dark-300 border-[0.5px] border-neutral-300 dark:border-neutral-700 shadow-md":
-          filterStuck(),
-        "bg-transparent border-transparent shadow-none": !filterStuck(),
-      }}
-    >
-      {props.children}
-    </div>
+        }}
+        class="pointer-events-none h-0"
+        aria-hidden="true"
+      />
+
+      <div
+        class="sticky top-2 z-10 flex flex-col items-center justify-center gap-2 rounded-lg p-3 transition-colors"
+        classList={{
+          "bg-neutral-50 dark:bg-dark-300 border-[0.5px] border-neutral-300 dark:border-neutral-700 shadow-md":
+            filterStuck(),
+          "bg-transparent border-transparent shadow-none": !filterStuck(),
+        }}
+      >
+        {props.children}
+      </div>
+    </>
   );
 };
