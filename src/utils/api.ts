@@ -12,7 +12,6 @@ import {
   DohJsonHandleResolver,
   PlcDidDocumentResolver,
   WellKnownHandleResolver,
-  XrpcHandleResolver,
 } from "@atcute/identity-resolver";
 import { Did, Handle } from "@atcute/lexicons";
 import { isHandle } from "@atcute/lexicons/syntax";
@@ -28,8 +27,12 @@ const didDocumentResolver = new CompositeDidDocumentResolver({
   },
 });
 
-const handleResolver = new XrpcHandleResolver({
-  serviceUrl: "https://public.api.bsky.app",
+const handleResolver = new CompositeHandleResolver({
+  strategy: "dns-first",
+  methods: {
+    dns: new DohJsonHandleResolver({ dohUrl: "https://dns.google/resolve?" }),
+    http: new WellKnownHandleResolver(),
+  },
 });
 
 const didPDSCache: Record<string, string> = {};
@@ -76,14 +79,6 @@ const resolveDidDoc = async (did: Did) => {
 
 const validateHandle = async (handle: Handle, did: Did) => {
   if (!isHandle(handle)) return false;
-
-  const handleResolver = new CompositeHandleResolver({
-    strategy: "dns-first",
-    methods: {
-      dns: new DohJsonHandleResolver({ dohUrl: "https://dns.google/resolve?" }),
-      http: new WellKnownHandleResolver(),
-    },
-  });
 
   let resolvedDid: string;
   try {

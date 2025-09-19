@@ -8,14 +8,13 @@ import {
 } from "@atcute/did-plc";
 import { DidDocument } from "@atcute/identity";
 import { ActorIdentifier, Handle } from "@atcute/lexicons";
-import { resolveHandle } from "@atcute/oauth-browser-client";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from "solid-js";
 import { Backlinks } from "../components/backlinks.jsx";
 import { Button } from "../components/button.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
-import { didDocCache, resolvePDS } from "../utils/api.js";
+import { didDocCache, resolveHandle, resolvePDS } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
 import { BlobView } from "./blob.jsx";

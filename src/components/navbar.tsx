@@ -43,7 +43,7 @@ const NavBar = (props: { params: Params }) => {
         didDocCache[props.params.repo]?.alsoKnownAs
           ?.filter((alias) => alias.startsWith("at://"))[0]
           .split("at://")[1] ?? props.params.repo;
-      if (hdl !== handle()) {
+      if (hdl !== handle() || validHandle() === undefined) {
         setValidHandle(undefined);
         setHandle(hdl);
         setValidHandle(await validateHandle(hdl as Handle, props.params.repo as Did));
