@@ -13,7 +13,6 @@ const LIMIT = 1000;
 
 const PdsView = () => {
   const params = useParams();
-  if (params.pds.startsWith("web%2Bat%3A%2F%2F")) return;
   const [version, setVersion] = createSignal<string>();
   const [serverInfos, setServerInfos] =
     createSignal<InferXRPCBodyOutput<ComAtprotoServerDescribeServer.mainSchema["output"]>>();
