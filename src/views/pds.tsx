@@ -29,7 +29,7 @@ const PdsView = () => {
   };
 
   const fetchRepos = async () => {
-    await getVersion();
+    getVersion();
     const describeRes = await rpc.get("com.atproto.server.describeServer");
     if (!describeRes.ok) console.error(describeRes.data.error);
     else setServerInfos(describeRes.data);
@@ -39,7 +39,6 @@ const PdsView = () => {
     if (!res.ok) throw new Error(res.data.error);
     setCursor(res.data.repos.length < LIMIT ? undefined : res.data.cursor);
     setRepos(repos()?.concat(res.data.repos) ?? res.data.repos);
-    await getVersion();
     return res.data;
   };
 
