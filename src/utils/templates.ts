@@ -47,12 +47,12 @@ export const uriTemplates: TemplateMap = {
   }),
   "sh.tangled.actor.profile": (uri) => ({
     label: "Tangled",
-    link: `https://tangled.sh/${uri.repo}`,
+    link: `https://tangled.org/${uri.repo}`,
     icon: "i-tangled",
   }),
   "sh.tangled.repo": (uri, record) => ({
     label: "Tangled",
-    link: `https://tangled.sh/${uri.repo}/${record.name}`,
+    link: `https://tangled.org/${uri.repo}/${record.name}`,
     icon: "i-tangled",
   }),
 };

@@ -91,7 +91,7 @@ const Home = () => {
       </div>
       <div class="flex gap-2 text-xl">
         <A
-          href="https://tangled.sh/@pdsls.dev/pdsls/"
+          href="https://tangled.org/@pdsls.dev/pdsls/"
           target="_blank"
           class="flex rounded-full bg-neutral-200 p-1.5 transition-colors duration-300 hover:bg-neutral-700 hover:text-neutral-200 dark:bg-neutral-700 dark:hover:bg-neutral-200 dark:hover:text-neutral-700"
         >
