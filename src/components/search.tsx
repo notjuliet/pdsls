@@ -126,7 +126,7 @@ const Search = () => {
             <For each={search()}>
               {(actor) => (
                 <A
-                  class="flex items-center gap-2 rounded-lg p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                  class="flex items-center gap-2 rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                   href={`/at://${actor.did}`}
                   onClick={() => setShowSearch(false)}
                 >
