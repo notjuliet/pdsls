@@ -47,20 +47,23 @@ const Search = () => {
     input = input.trim().replace(/^@/, "");
     if (!input.length) return;
     setShowSearch(false);
-    if (
+    if (input === "me" && localStorage.getItem("lastSignedIn") !== null) {
+      navigate(`/at://${localStorage.getItem("lastSignedIn")}`);
+    } else if (
       !input.startsWith("https://bsky.app/") &&
       (input.startsWith("https://") || input.startsWith("http://"))
     ) {
       navigate(`/${input.replace("https://", "").replace("http://", "").replace("/", "")}`);
-      return;
+    } else {
+      const uri = input
+        .replace("at://", "")
+        .replace("https://bsky.app/profile/", "")
+        .replace("/post/", "/app.bsky.feed.post/");
+      const uriParts = uri.split("/");
+      navigate(
+        `/at://${uriParts[0]}${uriParts.length > 1 ? `/${uriParts.slice(1).join("/")}` : ""}`,
+      );
     }
-
-    const uri = input
-      .replace("at://", "")
-      .replace("https://bsky.app/profile/", "")
-      .replace("/post/", "/app.bsky.feed.post/");
-    const uriParts = uri.split("/");
-    navigate(`/at://${uriParts[0]}${uriParts.length > 1 ? `/${uriParts.slice(1).join("/")}` : ""}`);
   };
 
   return (
