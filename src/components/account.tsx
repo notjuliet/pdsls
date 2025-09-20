@@ -1,7 +1,6 @@
 import { Client, CredentialManager } from "@atcute/client";
 import { Did } from "@atcute/lexicons";
 import { deleteStoredSession, getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
-import { A } from "@solidjs/router";
 import { createSignal, For, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { resolveDidDoc } from "../utils/api.js";
@@ -76,31 +75,24 @@ const AccountManager = () => {
           <div class="mb-3 max-h-[20rem] overflow-y-auto md:max-h-[25rem]">
             <For each={Object.keys(sessions)}>
               {(did) => (
-                <div class="flex w-full items-center justify-between gap-x-2 rounded-lg hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600">
-                  <button
-                    class="flex basis-full items-center justify-between gap-1 truncate p-1"
-                    onclick={() => resumeSession(did as Did)}
-                  >
-                    <span class="truncate">{sessions[did]?.length ? sessions[did] : did}</span>
-                    <Show when={did === agent()?.sub}>
-                      <span class="iconify lucide--check shrink-0"></span>
-                    </Show>
-                  </button>
-                  <div class="flex items-center gap-1">
-                    <A
-                      href={`/at://${did}`}
-                      onClick={() => setOpenManager(false)}
-                      class="flex items-center p-1"
-                    >
-                      <span class="iconify lucide--book-user"></span>
-                    </A>
+                <div class="flex items-center gap-1">
+                  <div class="flex w-full items-center justify-between gap-x-2 rounded-lg hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600">
                     <button
-                      onclick={() => removeSession(did as Did)}
-                      class="flex items-center p-1 hover:text-red-500 hover:dark:text-red-400"
+                      class="flex basis-full items-center justify-between gap-1 truncate p-1"
+                      onclick={() => resumeSession(did as Did)}
                     >
-                      <span class="iconify lucide--user-round-x"></span>
+                      <span class="truncate">{sessions[did]?.length ? sessions[did] : did}</span>
+                      <Show when={did === agent()?.sub}>
+                        <span class="iconify lucide--check shrink-0"></span>
+                      </Show>
                     </button>
                   </div>
+                  <button
+                    onclick={() => removeSession(did as Did)}
+                    class="flex items-center p-1 hover:text-red-500 hover:dark:text-red-400"
+                  >
+                    <span class="iconify lucide--user-round-x"></span>
+                  </button>
                 </div>
               )}
             </For>

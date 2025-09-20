@@ -1,6 +1,8 @@
-import { useLocation, useNavigate } from "@solidjs/router";
-import { createSignal, onCleanup, onMount, Show } from "solid-js";
+import { Client, CredentialManager } from "@atcute/client";
+import { A, useLocation, useNavigate } from "@solidjs/router";
+import { createResource, createSignal, For, onCleanup, onMount, Show, Suspense } from "solid-js";
 import { isTouchDevice } from "../layout";
+import { createDebouncedValue } from "../utils/hooks/debounced";
 
 export const [showSearch, setShowSearch] = createSignal(false);
 
@@ -38,10 +40,27 @@ const SearchButton = () => {
 const Search = () => {
   const navigate = useNavigate();
   let searchInput!: HTMLInputElement;
+  const rpc = new Client({
+    handler: new CredentialManager({ service: "https://public.api.bsky.app" }),
+  });
 
   onMount(() => {
     if (useLocation().pathname !== "/") searchInput.focus();
   });
+
+  const fetchTypeahead = async (input: string) => {
+    if (!input.length) return [];
+    const res = await rpc.get("app.bsky.actor.searchActorsTypeahead", {
+      params: { q: input, limit: 5 },
+    });
+    if (res.ok) {
+      return res.data.actors;
+    }
+    return [];
+  };
+
+  const [input, setInput] = createSignal<string>();
+  const [search] = createResource(createDebouncedValue(input, 300), fetchTypeahead);
 
   const processInput = (input: string) => {
     input = input.trim().replace(/^@/, "");
@@ -54,6 +73,8 @@ const Search = () => {
       (input.startsWith("https://") || input.startsWith("http://"))
     ) {
       navigate(`/${input.replace("https://", "").replace("http://", "").replace("/", "")}`);
+    } else if (search()?.length) {
+      navigate(`/at://${search()![0].did}`);
     } else {
       const uri = input
         .replace("at://", "")
@@ -64,11 +85,12 @@ const Search = () => {
         `/at://${uriParts[0]}${uriParts.length > 1 ? `/${uriParts.slice(1).join("/")}` : ""}`,
       );
     }
+    setShowSearch(false);
   };
 
   return (
     <form
-      class="w-[22rem] sm:w-[24rem]"
+      class="relative w-[22rem] sm:w-[24rem]"
       onsubmit={(e) => {
         e.preventDefault();
         processInput(searchInput.value);
@@ -85,12 +107,37 @@ const Search = () => {
           ref={searchInput}
           id="input"
           class="grow select-none placeholder:text-sm focus:outline-none"
+          value={input() ?? ""}
+          onInput={(e) => setInput(e.currentTarget.value)}
         />
-        <button
-          type="submit"
-          class="iconify lucide--arrow-right text-lg text-neutral-500 dark:text-neutral-400"
-        ></button>
+        <Show when={input()}>
+          <button
+            type="button"
+            class="flex items-center rounded-lg p-0.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
+            onClick={() => setInput(undefined)}
+          >
+            <span class="iconify lucide--x text-lg"></span>
+          </button>
+        </Show>
       </div>
+      <Show when={search()?.length && input()}>
+        <div class="dark:bg-dark-300 absolute z-30 mt-2 flex w-full flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1 dark:border-neutral-700">
+          <Suspense fallback={<div class="p-1">Loading...</div>}>
+            <For each={search()}>
+              {(actor) => (
+                <A
+                  class="flex items-center gap-2 rounded-lg p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                  href={`/at://${actor.did}`}
+                  onClick={() => setShowSearch(false)}
+                >
+                  <img src={actor.avatar} class="size-6 rounded-full" />
+                  <span>{actor.handle}</span>
+                </A>
+              )}
+            </For>
+          </Suspense>
+        </div>
+      </Show>
     </form>
   );
 };
