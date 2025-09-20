@@ -1,6 +1,6 @@
 import { Client, CredentialManager } from "@atcute/client";
 import { A, useLocation, useNavigate } from "@solidjs/router";
-import { createResource, createSignal, For, onCleanup, onMount, Show, Suspense } from "solid-js";
+import { createResource, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { isTouchDevice } from "../layout";
 import { createDebouncedValue } from "../utils/hooks/debounced";
 
@@ -122,20 +122,18 @@ const Search = () => {
       </div>
       <Show when={search()?.length && input()}>
         <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute z-30 mt-2 flex w-full flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
-          <Suspense fallback={<div class="p-1">Loading...</div>}>
-            <For each={search()}>
-              {(actor) => (
-                <A
-                  class="flex items-center gap-2 rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                  href={`/at://${actor.did}`}
-                  onClick={() => setShowSearch(false)}
-                >
-                  <img src={actor.avatar} class="size-6 rounded-full" />
-                  <span>{actor.handle}</span>
-                </A>
-              )}
-            </For>
-          </Suspense>
+          <For each={search()}>
+            {(actor) => (
+              <A
+                class="flex items-center gap-2 rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                href={`/at://${actor.did}`}
+                onClick={() => setShowSearch(false)}
+              >
+                <img src={actor.avatar} class="size-6 rounded-full" />
+                <span>{actor.handle}</span>
+              </A>
+            )}
+          </For>
         </div>
       </Show>
     </form>
