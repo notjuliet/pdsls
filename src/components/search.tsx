@@ -129,7 +129,10 @@ const Search = () => {
                 href={`/at://${actor.did}`}
                 onClick={() => setShowSearch(false)}
               >
-                <img src={actor.avatar} class="size-6 rounded-full" />
+                <img
+                  src={actor.avatar?.replace("img/avatar/", "img/avatar_thumbnail/")}
+                  class="size-6 rounded-full"
+                />
                 <span>{actor.handle}</span>
               </A>
             )}
