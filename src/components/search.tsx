@@ -60,7 +60,7 @@ const Search = () => {
   };
 
   const [input, setInput] = createSignal<string>();
-  const [search] = createResource(createDebouncedValue(input, 300), fetchTypeahead);
+  const [search] = createResource(createDebouncedValue(input, 250), fetchTypeahead);
 
   const processInput = (input: string) => {
     input = input.trim().replace(/^@/, "");
@@ -121,7 +121,7 @@ const Search = () => {
         </Show>
       </div>
       <Show when={search()?.length && input()}>
-        <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute z-30 mt-2 flex w-full flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
+        <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute z-30 mt-1 flex w-full flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
           <For each={search()}>
             {(actor) => (
               <A
