@@ -23,7 +23,7 @@ const Home = () => {
         </div>
         <div class="flex items-center gap-1">
           <div class="iconify lucide--user-round" />
-          <span>Login to manage records in your repo.</span>
+          <span>Login to manage records in your repository.</span>
         </div>
         <div class="flex items-center gap-1">
           <div class="iconify lucide--radio-tower" />
@@ -52,41 +52,17 @@ const Home = () => {
             .
           </span>
         </div>
-      </div>
-      <div class="text-sm">
-        <span class="text-base font-semibold">Examples</span>
-        <div class="flex items-center gap-1">
-          <div class="iconify lucide--hard-drive" />
-          <A href="/pds.kelinci.net" class="text-blue-400 hover:underline active:underline">
-            https://pds.kelinci.net
-          </A>
-        </div>
-        <div class="flex items-center gap-1">
-          <div class="iconify lucide--book-user" />
-          <A
-            href="/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2"
-            class="text-blue-400 hover:underline active:underline"
-          >
-            did:plc:vwzwgnygau7ed7b7wt5ux7y2
-          </A>
-        </div>
-        <div class="flex items-center gap-1">
-          <div class="iconify lucide--file-json shrink-0" />
-          <A
-            href="/at://did:plc:oisofpd7lj26yvgiivf3lxsi/app.bsky.feed.post/3l2zpbbhuvw2h"
-            class="text-blue-400 hover:underline active:underline"
-          >
-            at://hailey.at/app.bsky.feed.post/3l2zpbbhuvw2h
-          </A>
-        </div>
         <div class="flex items-center gap-1">
           <div class="iconify lucide--tag" />
-          <A
-            href="/at://did:plc:wkoofae5uytcm7bjncmev6n6/labels"
-            class="text-blue-400 hover:underline active:underline"
-          >
-            at://pronouns.diy/labels
-          </A>
+          <span>
+            <A
+              href="/at://did:plc:ar7c4by46qjdydhdevvrndac/labels"
+              class="text-blue-400 hover:underline active:underline"
+            >
+              Query labels
+            </A>{" "}
+            from moderation services.
+          </span>
         </div>
       </div>
       <div class="flex gap-2 text-xl">
