@@ -97,7 +97,7 @@ const AccountManager = () => {
                   </A>
                   <button
                     onclick={() => removeSession(did as Did)}
-                    class="flex items-center p-2 hover:text-red-500 hover:dark:text-red-400"
+                    class="flex items-center rounded-lg p-2 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                   >
                     <span class="iconify lucide--user-round-x"></span>
                   </button>
