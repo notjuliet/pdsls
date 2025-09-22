@@ -25,7 +25,7 @@ const SearchButton = () => {
   return (
     <button
       onclick={() => setShowSearch(!showSearch())}
-      class={`flex items-center gap-0.5 rounded-lg ${isTouchDevice ? "p-1 text-xl hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600" : "dark:bg-dark-100 box-border h-7 border-[0.5px] border-neutral-300 bg-neutral-100 p-1.5 text-xs hover:bg-neutral-200 active:bg-neutral-300 dark:border-neutral-700 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"}`}
+      class={`flex items-center gap-0.5 rounded-lg ${isTouchDevice ? "p-1 text-xl hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600" : "dark:bg-dark-100 box-border h-7 border-[0.5px] border-neutral-300 bg-neutral-100 p-1.5 text-xs hover:bg-neutral-200 active:bg-neutral-300 dark:border-neutral-600 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"}`}
     >
       <span class="iconify lucide--search"></span>
       <Show when={!isTouchDevice}>
