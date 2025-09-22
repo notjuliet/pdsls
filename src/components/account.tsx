@@ -1,6 +1,7 @@
 import { Client, CredentialManager } from "@atcute/client";
 import { Did } from "@atcute/lexicons";
 import { deleteStoredSession, getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
+import { A } from "@solidjs/router";
 import { createSignal, For, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { resolveDidDoc } from "../utils/api.js";
@@ -75,7 +76,7 @@ const AccountManager = () => {
           <div class="mb-3 max-h-[20rem] overflow-y-auto md:max-h-[25rem]">
             <For each={Object.keys(sessions)}>
               {(did) => (
-                <div class="flex items-center gap-1">
+                <div class="flex items-center">
                   <div class="flex w-full items-center justify-between gap-x-2 rounded-lg hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600">
                     <button
                       class="flex basis-full items-center justify-between gap-1 truncate p-1"
@@ -87,9 +88,16 @@ const AccountManager = () => {
                       </Show>
                     </button>
                   </div>
+                  <A
+                    href={`/at://${did}`}
+                    onClick={() => setOpenManager(false)}
+                    class="flex items-center rounded-lg p-2 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                  >
+                    <span class="iconify lucide--book-user"></span>
+                  </A>
                   <button
                     onclick={() => removeSession(did as Did)}
-                    class="flex items-center p-1 hover:text-red-500 hover:dark:text-red-400"
+                    class="flex items-center p-2 hover:text-red-500 hover:dark:text-red-400"
                   >
                     <span class="iconify lucide--user-round-x"></span>
                   </button>
