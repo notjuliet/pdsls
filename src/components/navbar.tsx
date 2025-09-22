@@ -101,7 +101,7 @@ const NavBar = (props: { params: Params }) => {
                   <A
                     end
                     href={`/at://${props.params.repo}`}
-                    inactiveClass={`text-blue-400 hover:underline active:underline ${!showHandle() ? "w-full" : ""}`}
+                    inactiveClass="text-blue-400 hover:underline active:underline w-full"
                   >
                     {showHandle() ? handle() : props.params.repo}
                   </A>
