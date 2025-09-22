@@ -1,7 +1,6 @@
-import { Did, Handle } from "@atcute/lexicons";
 import { A, Params, useLocation } from "@solidjs/router";
 import { createEffect, createSignal, Show } from "solid-js";
-import { didDocCache, labelerCache, validateHandle } from "../utils/api";
+import { didDocCache, labelerCache } from "../utils/api";
 import { CopyMenu, DropdownMenu, MenuProvider } from "./dropdown";
 import Tooltip from "./tooltip";
 
@@ -29,7 +28,6 @@ const swapIcons: Record<string, string> = {
 const NavBar = (props: { params: Params }) => {
   const location = useLocation();
   const [handle, setHandle] = createSignal(props.params.repo);
-  const [validHandle, setValidHandle] = createSignal<boolean | undefined>(undefined);
   const [fullCid, setFullCid] = createSignal(false);
   const [showHandle, setShowHandle] = createSignal(localStorage.showHandle === "true");
 
@@ -43,11 +41,7 @@ const NavBar = (props: { params: Params }) => {
         didDocCache[props.params.repo]?.alsoKnownAs
           ?.filter((alias) => alias.startsWith("at://"))[0]
           .split("at://")[1] ?? props.params.repo;
-      if (hdl !== handle() || validHandle() === undefined) {
-        setValidHandle(undefined);
-        setHandle(hdl);
-        setValidHandle(await validateHandle(hdl as Handle, props.params.repo as Did));
-      }
+      if (hdl !== handle()) setHandle(hdl);
     }
   });
 
@@ -112,25 +106,6 @@ const NavBar = (props: { params: Params }) => {
                     {showHandle() ? handle() : props.params.repo}
                   </A>
                 : <span>{showHandle() ? handle() : props.params.repo}</span>}
-                <Show when={showHandle()}>
-                  <Tooltip
-                    text={
-                      validHandle() === true ? "Valid handle"
-                      : validHandle() === undefined ?
-                        "Validating"
-                      : "Invalid handle"
-                    }
-                  >
-                    <span
-                      classList={{
-                        "iconify lucide--circle-check": validHandle() === true,
-                        "iconify lucide--circle-x text-red-500 dark:text-red-400":
-                          validHandle() === false,
-                        "iconify lucide--loader-circle animate-spin": validHandle() === undefined,
-                      }}
-                    ></span>
-                  </Tooltip>
-                </Show>
               </div>
             </div>
             <Tooltip text={showHandle() ? "Show DID" : "Show handle"}>

@@ -7,14 +7,23 @@ import {
   processIndexedEntryLog,
 } from "@atcute/did-plc";
 import { DidDocument } from "@atcute/identity";
-import { ActorIdentifier, Handle } from "@atcute/lexicons";
+import { ActorIdentifier, Did, Handle } from "@atcute/lexicons";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
-import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from "solid-js";
+import {
+  createEffect,
+  createResource,
+  createSignal,
+  ErrorBoundary,
+  For,
+  Show,
+  Suspense,
+} from "solid-js";
+import { createStore } from "solid-js/store";
 import { Backlinks } from "../components/backlinks.jsx";
 import { Button } from "../components/button.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
-import { didDocCache, resolveHandle, resolvePDS } from "../utils/api.js";
+import { didDocCache, resolveHandle, resolvePDS, validateHandle } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
 import { BlobView } from "./blob.jsx";
@@ -164,6 +173,7 @@ const RepoView = () => {
   const [showPlcLogs, setShowPlcLogs] = createSignal(false);
   const [loading, setLoading] = createSignal(false);
   const [notice, setNotice] = createSignal<string>();
+  const [validHandles, setValidHandles] = createStore<Record<string, boolean>>({});
   let rpc: Client;
   let pds: string;
   const did = params.repo;
@@ -264,6 +274,16 @@ const RepoView = () => {
       [authority]: { ...nsids()![authority], hidden: !nsids()![authority].hidden },
     });
   };
+
+  createEffect(async () => {
+    for (const alias of didDoc()?.alsoKnownAs ?? []) {
+      if (alias.startsWith("at://"))
+        setValidHandles(
+          alias,
+          await validateHandle(alias.replace("at://", "") as Handle, did as Did),
+        );
+    }
+  });
 
   return (
     <Show when={repo()}>
@@ -410,7 +430,31 @@ const RepoView = () => {
                     </div>
                     <ul>
                       <For each={didDocument().alsoKnownAs}>
-                        {(alias) => <li class="text-sm">{alias}</li>}
+                        {(alias) => (
+                          <li class="flex items-center gap-1 text-sm">
+                            <span>{alias}</span>
+                            <Show when={alias.startsWith("at://")}>
+                              <Tooltip
+                                text={
+                                  validHandles[alias] === true ? "Valid handle"
+                                  : validHandles[alias] === undefined ?
+                                    "Validating"
+                                  : "Invalid handle"
+                                }
+                              >
+                                <span
+                                  classList={{
+                                    "iconify lucide--circle-check": validHandles[alias] === true,
+                                    "iconify lucide--circle-x text-red-500 dark:text-red-400":
+                                      validHandles[alias] === false,
+                                    "iconify lucide--loader-circle animate-spin":
+                                      validHandles[alias] === undefined,
+                                  }}
+                                ></span>
+                              </Tooltip>
+                            </Show>
+                          </li>
+                        )}
                       </For>
                     </ul>
                   </div>
