@@ -100,10 +100,14 @@ const Search = () => {
         PDS URL, AT URI, or handle
       </label>
       <div class="dark:bg-dark-100 dark:shadow-dark-800 flex items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 shadow-xs focus-within:outline-[1.5px] focus-within:outline-neutral-900 dark:border-neutral-700 dark:focus-within:outline-neutral-200">
+        <span
+          class="iconify lucide--search text-neutral-500 dark:text-neutral-400"
+          onClick={() => searchInput.focus()}
+        ></span>
         <input
           type="text"
           spellcheck={false}
-          placeholder="PDS URL, AT URI, or handle"
+          placeholder="PDS URL, AT URI, DID, or handle"
           ref={searchInput}
           id="input"
           class="grow select-none placeholder:text-sm focus:outline-none"
@@ -113,10 +117,10 @@ const Search = () => {
         <Show when={input()}>
           <button
             type="button"
-            class="flex items-center rounded-lg p-0.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
+            class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
             onClick={() => setInput(undefined)}
           >
-            <span class="iconify lucide--x text-lg"></span>
+            <span class="iconify lucide--x"></span>
           </button>
         </Show>
       </div>
