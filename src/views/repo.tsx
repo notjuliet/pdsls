@@ -491,14 +491,12 @@ const RepoView = () => {
                           <Show when={verif.publicKeyMultibase}>
                             {(key) => (
                               <li class="flex flex-col text-sm">
-                                <span class="flex justify-between gap-1">
-                                  <span>#{verif.id.split("#")[1]}</span>
-                                  <span class="flex items-center gap-0.5">
-                                    <div class="iconify lucide--key-round" />
-                                    <ErrorBoundary fallback={<>unknown</>}>
-                                      {parsePublicMultikey(key()).type}
-                                    </ErrorBoundary>
-                                  </span>
+                                <span>#{verif.id.split("#")[1]}</span>
+                                <span class="flex items-center gap-0.5">
+                                  <div class="iconify lucide--key-round" />
+                                  <ErrorBoundary fallback={<>unknown</>}>
+                                    {parsePublicMultikey(key()).type}
+                                  </ErrorBoundary>
                                 </span>
                                 <span class="truncate">{key()}</span>
                               </li>
