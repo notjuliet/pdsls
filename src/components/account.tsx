@@ -77,17 +77,15 @@ const AccountManager = () => {
             <For each={Object.keys(sessions)}>
               {(did) => (
                 <div class="flex items-center">
-                  <div class="flex w-full items-center justify-between gap-x-2 rounded-lg hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600">
-                    <button
-                      class="flex basis-full items-center justify-between gap-1 truncate p-1"
-                      onclick={() => resumeSession(did as Did)}
-                    >
-                      <span class="truncate">{sessions[did]?.length ? sessions[did] : did}</span>
-                      <Show when={did === agent()?.sub}>
-                        <span class="iconify lucide--check shrink-0"></span>
-                      </Show>
-                    </button>
-                  </div>
+                  <button
+                    class="flex w-full items-center justify-between gap-1 truncate rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                    onclick={() => resumeSession(did as Did)}
+                  >
+                    <span class="truncate">{sessions[did]?.length ? sessions[did] : did}</span>
+                    <Show when={did === agent()?.sub}>
+                      <span class="iconify lucide--check shrink-0"></span>
+                    </Show>
+                  </button>
                   <A
                     href={`/at://${did}`}
                     onClick={() => setOpenManager(false)}
