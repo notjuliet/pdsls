@@ -111,7 +111,7 @@ const AccountManager = () => {
         class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
       >
         {agent() && avatar() ?
-          <img src={avatar()} class="dark:shadow-dark-800 size-5 rounded-full shadow-xs" />
+          <img src={avatar()} class="size-5 rounded-full" />
         : <span class="iconify lucide--circle-user-round text-xl"></span>}
       </button>
     </>
