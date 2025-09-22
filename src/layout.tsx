@@ -24,6 +24,9 @@ const Layout = (props: RouteSectionProps<unknown>) => {
   const navigate = useNavigate();
   let timeout: number;
 
+  if (location.search.includes("hrt=true")) localStorage.setItem("hrt", "true");
+  else if (location.search.includes("hrt=false")) localStorage.setItem("hrt", "false");
+
   createEffect(async () => {
     if (props.params.repo && !props.params.repo.startsWith("did:")) {
       const did = await resolveHandle(props.params.repo as Handle);
@@ -52,7 +55,13 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <Meta name="robots" content="noindex, nofollow" />
         </Show>
       </MetaProvider>
-      <header class="dark:shadow-dark-800 dark:bg-dark-300 mb-4 flex w-full items-center justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-xs dark:border-neutral-700">
+      <header
+        classList={{
+          "dark:shadow-dark-800 dark:bg-dark-300 mb-4 flex w-full items-center justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-xs dark:border-neutral-700": true,
+          "bg-[linear-gradient(to_left,transparent_0%,#fafafa_30%),linear-gradient(to_bottom,#5BCEFA90_0%,#5BCEFA90_20%,#F5A9B890_20%,#F5A9B890_40%,#FFFFFF90_40%,#FFFFFF90_60%,#F5A9B890_60%,#F5A9B890_80%,#5BCEFA90_80%,#5BCEFA90_100%)] dark:bg-[linear-gradient(to_left,transparent_0%,#2d2d2d_30%),linear-gradient(to_bottom,#5BCEFA90_0%,#5BCEFA90_20%,#F5A9B890_20%,#F5A9B890_40%,#FFFFFF90_40%,#FFFFFF90_60%,#F5A9B890_60%,#F5A9B890_80%,#5BCEFA90_80%,#5BCEFA90_100%)]":
+            localStorage.getItem("hrt") === "true",
+        }}
+      >
         <A
           href="/"
           style='font-feature-settings: "cv05"'
