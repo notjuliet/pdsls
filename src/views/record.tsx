@@ -120,7 +120,7 @@ export const RecordView = () => {
   return (
     <Show when={record()} keyed>
       <div class="flex w-full flex-col items-center">
-        <div class="dark:shadow-dark-800 dark:bg-dark-300 mb-3 flex w-[22rem] justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 shadow-xs sm:w-[24rem] dark:border-neutral-700">
+        <div class="dark:shadow-dark-800 dark:bg-dark-300 mb-3 flex w-full justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 shadow-xs dark:border-neutral-700">
           <div class="flex gap-3 text-sm">
             <A
               classList={{
@@ -157,7 +157,7 @@ export const RecordView = () => {
                 </button>
               </Tooltip>
               <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
-                <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute top-70 left-[50%] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-300 dark:border-neutral-700 starting:opacity-0">
+                <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute top-70 left-[50%] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
                   <h2 class="mb-2 font-semibold">Delete this record?</h2>
                   <div class="flex justify-end gap-2">
                     <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
@@ -206,7 +206,7 @@ export const RecordView = () => {
           <Show when={validRecord() === false}>
             <div class="mb-2 break-words text-red-500 dark:text-red-400">{notice()}</div>
           </Show>
-          <div class="w-[22rem] font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-full sm:text-sm">
+          <div class="w-max max-w-screen px-4 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:text-sm md:max-w-[48rem]">
             <JSONValue data={record()?.value as any} repo={record()!.uri.split("/")[2]} />
           </div>
         </Show>

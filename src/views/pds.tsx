@@ -5,6 +5,7 @@ import * as TID from "@atcute/tid";
 import { A, useParams } from "@solidjs/router";
 import { createResource, createSignal, For, Show } from "solid-js";
 import { Button } from "../components/button";
+import { Modal } from "../components/modal";
 import { setPDS } from "../components/navbar";
 import Tooltip from "../components/tooltip";
 import { localDateFromTimestamp } from "../utils/date";
@@ -44,9 +45,67 @@ const PdsView = () => {
   const [response, { refetch }] = createResource(fetchRepos);
   const [repos, setRepos] = createSignal<ComAtprotoSyncListRepos.Repo[]>();
 
+  const RepoCard = (repo: ComAtprotoSyncListRepos.Repo) => {
+    const [openInfo, setOpenInfo] = createSignal(false);
+
+    return (
+      <div class="flex items-center gap-1">
+        <A
+          href={`/at://${repo.did}`}
+          class="grow truncate rounded py-0.5 font-mono text-blue-400 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+        >
+          {repo.did}
+        </A>
+        <Show when={!repo.active}>
+          <Tooltip text={repo.status ?? "Unknown status"}>
+            <span class="iconify lucide--unplug"></span>
+          </Tooltip>
+        </Show>
+        <button
+          onclick={() => setOpenInfo(true)}
+          class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+        >
+          <span class="iconify lucide--info"></span>
+        </button>
+        <Modal open={openInfo()} onClose={() => setOpenInfo(false)}>
+          <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute top-70 left-[50%] w-max max-w-full -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 break-words shadow-md transition-opacity duration-200 sm:max-w-[32rem] dark:border-neutral-700 starting:opacity-0">
+            <div class="mb-1 flex justify-between gap-2">
+              <div class="flex items-center gap-1">
+                <span class="iconify lucide--info"></span>
+                <span class="font-semibold">{repo.did}</span>
+              </div>
+              <button
+                onclick={() => setOpenInfo(false)}
+                class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+              >
+                <span class="iconify lucide--x"></span>
+              </button>
+            </div>
+            <div class="flex flex-col text-sm">
+              <span>
+                Head: <span class="text-xs">{repo.head}</span>
+              </span>
+              <Show when={TID.validate(repo.rev)}>
+                <span>
+                  Rev: {repo.rev} ({localDateFromTimestamp(TID.parse(repo.rev).timestamp / 1000)})
+                </span>
+              </Show>
+              <Show when={repo.active !== undefined}>
+                <span>Active: {repo.active ? "true" : "false"}</span>
+              </Show>
+              <Show when={repo.status}>
+                <span>Status: {repo.status}</span>
+              </Show>
+            </div>
+          </div>
+        </Modal>
+      </div>
+    );
+  };
+
   return (
     <Show when={repos() || response()}>
-      <div class="flex w-[22rem] flex-col sm:w-[24rem]">
+      <div class="flex w-full flex-col">
         <Show when={version()}>
           {(version) => (
             <div class="flex items-baseline gap-x-1">
@@ -76,32 +135,9 @@ const PdsView = () => {
           )}
         </Show>
         <p class="w-full font-semibold">{repos()?.length} Repositories</p>
-        <For each={repos()}>
-          {(repo) => (
-            <A
-              href={`/at://${repo.did}`}
-              classList={{
-                "rounded items-center text-sm gap-1 flex justify-between font-mono relative hover:bg-neutral-200 dark:hover:bg-neutral-700 active:bg-neutral-300 dark:active:bg-neutral-600": true,
-                "text-blue-400": repo.active,
-                "text-neutral-400 dark:text-neutral-500": !repo.active,
-              }}
-            >
-              <Show when={!repo.active}>
-                <div class="absolute -left-4">
-                  <Tooltip text={repo.status ?? "Unknown status"}>
-                    <span class="iconify lucide--unplug"></span>
-                  </Tooltip>
-                </div>
-              </Show>
-              <span class="text-sm">{repo.did}</span>
-              <Show when={TID.validate(repo.rev)}>
-                <span class="text-xs text-neutral-500 dark:text-neutral-400">
-                  {localDateFromTimestamp(TID.parse(repo.rev).timestamp / 1000).split(" ")[0]}
-                </span>
-              </Show>
-            </A>
-          )}
-        </For>
+        <div class="flex flex-col divide-y-[0.5px] divide-neutral-300 dark:divide-neutral-700">
+          <For each={repos()}>{(repo) => <RepoCard {...repo} />}</For>
+        </div>
       </div>
       <Show when={cursor()}>
         <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 py-3">

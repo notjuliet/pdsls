@@ -169,17 +169,18 @@ const RepoView = () => {
   const did = params.repo;
 
   const RepoTab = (props: { tab: Tab; label: string; icon: string }) => (
-    <A
-      classList={{
-        "flex items-center border-b-2 gap-1": true,
-        "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
-          (location.hash !== `#${props.tab}` && !!location.hash) ||
-          (!location.hash && props.tab !== "collections"),
-      }}
-      href={`/at://${params.repo}#${props.tab}`}
-    >
-      <div class={"iconify " + props.icon} />
-      {props.label}
+    <A class="group flex flex-1 justify-center" href={`/at://${params.repo}#${props.tab}`}>
+      <span
+        classList={{
+          "flex gap-1 items-center border-b-2": true,
+          "border-transparent group-hover:border-neutral-400 dark:group-hover:border-neutral-600":
+            (location.hash !== `#${props.tab}` && !!location.hash) ||
+            (!location.hash && props.tab !== "collections"),
+        }}
+      >
+        <span class={"iconify " + props.icon}></span>
+        {props.label}
+      </span>
     </A>
   );
 
@@ -266,7 +267,7 @@ const RepoView = () => {
 
   return (
     <Show when={repo()}>
-      <div class="flex w-[22rem] flex-col gap-2 break-words sm:w-[24rem]">
+      <div class="flex w-full flex-col gap-2 break-words">
         <Show when={error()}>
           <div class="rounded-lg bg-red-100 p-2 text-sm text-red-700 dark:bg-red-200 dark:text-red-600">
             {error()}
@@ -317,6 +318,7 @@ const RepoView = () => {
               </A>
             </Tooltip>
             <TextInput
+              name="filter"
               placeholder="Filter collections"
               onInput={(e) => setFilter(e.currentTarget.value)}
               class="grow"
@@ -454,7 +456,7 @@ const RepoView = () => {
                                     </ErrorBoundary>
                                   </span>
                                 </span>
-                                <span class="truncate text-xs">{key()}</span>
+                                <span class="truncate">{key()}</span>
                               </li>
                             )}
                           </Show>

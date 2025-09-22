@@ -25,7 +25,7 @@ const SearchButton = () => {
   return (
     <button
       onclick={() => setShowSearch(!showSearch())}
-      class={`flex items-center gap-0.5 rounded-lg ${isTouchDevice ? "p-1 text-xl hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600" : "dark:bg-dark-200 bg-neutral-200 p-1.5 text-xs hover:bg-neutral-300/80 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"}`}
+      class={`flex items-center gap-0.5 rounded-lg ${isTouchDevice ? "p-1 text-xl hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600" : "dark:bg-dark-100 box-border h-7 border-[0.5px] border-neutral-300 bg-neutral-100 p-1.5 text-xs hover:bg-neutral-200 active:bg-neutral-300 dark:border-neutral-700 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"}`}
     >
       <span class="iconify lucide--search"></span>
       <Show when={!isTouchDevice}>
@@ -90,7 +90,7 @@ const Search = () => {
 
   return (
     <form
-      class="relative w-[22rem] sm:w-[24rem]"
+      class="relative w-full"
       onsubmit={(e) => {
         e.preventDefault();
         processInput(searchInput.value);
@@ -125,7 +125,7 @@ const Search = () => {
         </Show>
       </div>
       <Show when={search()?.length && input()}>
-        <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute z-30 mt-1 flex w-full flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
+        <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute z-30 mt-1 flex w-full flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
           <For each={search()}>
             {(actor) => (
               <A
@@ -135,7 +135,7 @@ const Search = () => {
               >
                 <img
                   src={actor.avatar?.replace("img/avatar/", "img/avatar_thumbnail/")}
-                  class="size-6 rounded-full"
+                  class="size-8 rounded-full"
                 />
                 <span>{actor.handle}</span>
               </A>

@@ -62,7 +62,7 @@ const LabelView = () => {
   return (
     <div class="flex w-full flex-col items-center">
       <form
-        class="flex w-[22rem] flex-col items-center gap-y-1 sm:w-[24rem]"
+        class="flex w-full flex-col items-center gap-y-1"
         onsubmit={(e) => {
           e.preventDefault();
           initQuery();
@@ -102,8 +102,9 @@ const LabelView = () => {
       <StickyOverlay>
         <TextInput
           placeholder="Filter by label"
+          name="filter"
           onInput={(e) => setFilter(e.currentTarget.value)}
-          class="w-[22rem] sm:w-[24rem]"
+          class="w-full"
         />
         <div class="flex items-center gap-x-2">
           <Show when={labelCount() && labels().length}>
@@ -126,13 +127,13 @@ const LabelView = () => {
         </div>
       </StickyOverlay>
       <Show when={labels().length}>
-        <div class="flex max-w-full min-w-[22rem] flex-col gap-2 divide-y-[0.5px] divide-neutral-400 text-sm wrap-anywhere whitespace-pre-wrap sm:min-w-[24rem] dark:divide-neutral-600">
+        <div class="flex flex-col gap-2 divide-y-[0.5px] divide-neutral-400 text-sm wrap-anywhere whitespace-pre-wrap dark:divide-neutral-600">
           <For each={filterLabels()}>
             {(label) => (
               <div class="flex items-center justify-between gap-2 pb-2">
                 <div class="flex flex-col">
                   <div class="flex items-center gap-x-2">
-                    <div class="min-w-[5rem] font-semibold">URI</div>
+                    <div class="min-w-[4rem] font-semibold">URI</div>
                     <A
                       href={`/at://${label.uri.replace("at://", "")}`}
                       class="text-blue-400 hover:underline active:underline"
@@ -142,22 +143,22 @@ const LabelView = () => {
                   </div>
                   <Show when={label.cid}>
                     <div class="flex items-center gap-x-2">
-                      <div class="min-w-[5rem] font-semibold">CID</div>
+                      <div class="min-w-[4rem] font-semibold">CID</div>
                       {label.cid}
                     </div>
                   </Show>
                   <div class="flex items-center gap-x-2">
-                    <div class="min-w-[5rem] font-semibold">Label</div>
+                    <div class="min-w-[4rem] font-semibold">Label</div>
                     {label.val}
                   </div>
                   <div class="flex items-center gap-x-2">
-                    <div class="min-w-[5rem] font-semibold">Created</div>
+                    <div class="min-w-[4rem] font-semibold">Created</div>
                     {localDateFromTimestamp(new Date(label.cts).getTime())}
                   </div>
                   <Show when={label.exp}>
                     {(exp) => (
                       <div class="flex items-center gap-x-2">
-                        <div class="min-w-[5rem] font-semibold">Expires</div>
+                        <div class="min-w-[4rem] font-semibold">Expires</div>
                         {localDateFromTimestamp(new Date(exp()).getTime())}
                       </div>
                     )}

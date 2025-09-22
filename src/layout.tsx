@@ -45,14 +45,14 @@ const Layout = (props: RouteSectionProps<unknown>) => {
   return (
     <div
       id="main"
-      class="m-4 mb-8 flex flex-col items-center text-neutral-900 dark:text-neutral-200"
+      class="mx-auto mb-8 flex max-w-lg flex-col items-center p-4 text-neutral-900 dark:text-neutral-200"
     >
       <MetaProvider>
         <Show when={location.pathname !== "/"}>
           <Meta name="robots" content="noindex, nofollow" />
         </Show>
       </MetaProvider>
-      <header class="mb-4 flex w-[22rem] items-center justify-between sm:w-[24rem]">
+      <header class="dark:shadow-dark-800 dark:bg-dark-300 mb-4 flex w-full items-center justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-xs dark:border-neutral-700">
         <A
           href="/"
           style='font-feature-settings: "cv05"'
@@ -73,7 +73,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
             <DropdownMenu
               icon="lucide--menu text-xl"
               buttonClass="rounded-lg p-1"
-              menuClass="top-8 p-3 text-sm"
+              menuClass="top-10 p-3"
             >
               <NavMenu href="/jetstream" label="Jetstream" icon="lucide--radio-tower" />
               <NavMenu href="/firehose" label="Firehose" icon="lucide--waves" />
@@ -83,7 +83,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           </MenuProvider>
         </div>
       </header>
-      <div class="flex max-w-full min-w-[22rem] flex-col items-center gap-4 text-pretty sm:min-w-[24rem] md:max-w-[48rem]">
+      <div class="flex w-full flex-col items-center gap-4 text-pretty">
         <Show when={showSearch() || location.pathname === "/"}>
           <Search />
         </Show>

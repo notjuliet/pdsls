@@ -140,7 +140,7 @@ const StreamView = () => {
   onCleanup(() => socket?.close());
 
   return (
-    <div class="flex flex-col items-center">
+    <div class="flex w-full flex-col items-center">
       <div class="flex gap-2 text-sm">
         <A
           class="flex items-center gap-1 border-b-2 p-1"
@@ -160,7 +160,7 @@ const StreamView = () => {
         </A>
       </div>
       <StickyOverlay>
-        <form ref={formRef} class="flex w-[22rem] flex-col gap-1 text-sm sm:w-[24rem]">
+        <form ref={formRef} class="flex w-full flex-col gap-1 text-sm">
           <Show when={!connected()}>
             <label class="flex items-center justify-end gap-x-1">
               <span class="min-w-[5rem]">Instance</span>
@@ -246,7 +246,7 @@ const StreamView = () => {
       <Show when={notice().length}>
         <div class="text-red-500 dark:text-red-400">{notice()}</div>
       </Show>
-      <div class="flex w-full flex-col gap-2 divide-y-[0.5px] divide-neutral-500 px-4 font-mono text-sm wrap-anywhere whitespace-pre-wrap md:w-[48rem]">
+      <div class="flex w-full flex-col gap-2 divide-y-[0.5px] divide-neutral-500 font-mono text-sm wrap-anywhere whitespace-pre-wrap md:w-[48rem]">
         <For each={records().toReversed()}>
           {(rec) => (
             <div class="pb-2">

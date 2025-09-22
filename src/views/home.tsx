@@ -2,7 +2,7 @@ import { A } from "@solidjs/router";
 
 const Home = () => {
   return (
-    <div class="flex w-[22rem] flex-col gap-4 break-words sm:w-[24rem]">
+    <div class="flex w-full flex-col gap-4 break-words">
       <div>
         <div>
           <span class="text-lg font-semibold">AT Protocol Explorer</span>
@@ -54,15 +54,7 @@ const Home = () => {
         </div>
         <div class="flex items-center gap-1">
           <div class="iconify lucide--tag" />
-          <span>
-            <A
-              href="/at://did:plc:ar7c4by46qjdydhdevvrndac/labels"
-              class="text-blue-400 hover:underline active:underline"
-            >
-              Query labels
-            </A>{" "}
-            from moderation services.
-          </span>
+          <span>Query labels from moderation services.</span>
         </div>
       </div>
       <div class="flex gap-2 text-xl">
