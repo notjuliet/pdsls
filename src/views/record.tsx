@@ -206,7 +206,7 @@ export const RecordView = () => {
           <Show when={validRecord() === false}>
             <div class="mb-2 break-words text-red-500 dark:text-red-400">{notice()}</div>
           </Show>
-          <div class="w-max max-w-screen px-4 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:text-sm md:max-w-[48rem]">
+          <div class="w-max max-w-screen min-w-full px-4 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:px-2 sm:text-sm md:max-w-[48rem]">
             <JSONValue data={record()?.value as any} repo={record()!.uri.split("/")[2]} />
           </div>
         </Show>
