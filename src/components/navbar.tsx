@@ -96,17 +96,15 @@ const NavBar = (props: { params: Params }) => {
               <Tooltip text="Repository">
                 <span class="iconify lucide--book-user text-base"></span>
               </Tooltip>
-              <div class="flex w-full gap-1">
-                {props.params.collection || location.pathname.includes("/labels") ?
-                  <A
-                    end
-                    href={`/at://${props.params.repo}`}
-                    inactiveClass="text-blue-400 hover:underline active:underline w-full"
-                  >
-                    {showHandle() ? handle() : props.params.repo}
-                  </A>
-                : <span>{showHandle() ? handle() : props.params.repo}</span>}
-              </div>
+              {props.params.collection || location.pathname.includes("/labels") ?
+                <A
+                  end
+                  href={`/at://${props.params.repo}`}
+                  inactiveClass="text-blue-400 hover:underline active:underline w-full"
+                >
+                  {showHandle() ? handle() : props.params.repo}
+                </A>
+              : <span>{showHandle() ? handle() : props.params.repo}</span>}
             </div>
             <Tooltip text={showHandle() ? "Show DID" : "Show handle"}>
               <button
