@@ -85,13 +85,13 @@ const RepoView = () => {
       console.error(res.data.error);
       switch (res.data.error) {
         case "RepoDeactivated":
-          setError("This repository has been deactivated");
+          setError("Deactivated");
           break;
         case "RepoTakendown":
-          setError("This repository has been taken down");
+          setError("Takendown");
           break;
         default:
-          setError("This repository is unreachable");
+          setError("Unreachable");
       }
       navigate(`/at://${params.repo}#identity`);
     }
@@ -145,11 +145,6 @@ const RepoView = () => {
   return (
     <Show when={repo()}>
       <div class="flex w-full flex-col gap-2 break-words">
-        <Show when={error()}>
-          <div class="rounded-lg bg-red-100 p-2 text-sm text-red-700 dark:bg-red-200 dark:text-red-600">
-            {error()}
-          </div>
-        </Show>
         <div
           class={`dark:shadow-dark-800 dark:bg-dark-300 flex justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700`}
         >
@@ -166,26 +161,34 @@ const RepoView = () => {
             </Show>
             <RepoTab tab="backlinks" label="Backlinks" />
           </div>
-          <MenuProvider>
-            <DropdownMenu
-              icon="lucide--ellipsis-vertical"
-              buttonClass="rounded-sm p-1"
-              menuClass="top-8 p-2 text-sm"
-            >
-              <NavMenu
-                href={`/jetstream?dids=${params.repo}`}
-                label="Jetstream"
-                icon="lucide--radio-tower"
-              />
-              <Show when={error()?.length === 0 || error() === undefined}>
-                <ActionMenu
-                  label="Export Repo"
-                  icon={downloading() ? "lucide--loader-circle animate-spin" : "lucide--download"}
-                  onClick={() => downloadRepo()}
+          <div class="flex gap-1">
+            <Show when={error()}>
+              <div class="flex items-center gap-1 text-red-500 dark:text-red-400">
+                <span class="iconify lucide--alert-triangle"></span>
+                <span>{error()}</span>
+              </div>
+            </Show>
+            <MenuProvider>
+              <DropdownMenu
+                icon="lucide--ellipsis-vertical"
+                buttonClass="rounded-sm p-1"
+                menuClass="top-8 p-2 text-sm"
+              >
+                <NavMenu
+                  href={`/jetstream?dids=${params.repo}`}
+                  label="Jetstream"
+                  icon="lucide--radio-tower"
                 />
-              </Show>
-            </DropdownMenu>
-          </MenuProvider>
+                <Show when={error()?.length === 0 || error() === undefined}>
+                  <ActionMenu
+                    label="Export Repo"
+                    icon={downloading() ? "lucide--loader-circle animate-spin" : "lucide--download"}
+                    onClick={() => downloadRepo()}
+                  />
+                </Show>
+              </DropdownMenu>
+            </MenuProvider>
+          </div>
         </div>
         <div class="flex w-full flex-col gap-2 px-2">
           <Show when={location.hash === "#logs"}>
