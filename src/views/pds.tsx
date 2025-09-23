@@ -105,7 +105,7 @@ const PdsView = () => {
 
   return (
     <Show when={repos() || response()}>
-      <div class="flex w-full flex-col">
+      <div class="flex w-full flex-col px-2">
         <Show when={version()}>
           {(version) => (
             <div class="flex items-baseline gap-x-1">

@@ -187,211 +187,213 @@ const RepoView = () => {
             </DropdownMenu>
           </MenuProvider>
         </div>
-        <Show when={location.hash === "#logs"}>
-          <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
-            <Suspense
-              fallback={
-                <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
-              }
-            >
-              <PlcLogView did={did} />
-            </Suspense>
-          </ErrorBoundary>
-        </Show>
-        <Show when={location.hash === "#backlinks"}>
-          <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
-            <Suspense
-              fallback={
-                <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
-              }
-            >
-              <Backlinks target={did} />
-            </Suspense>
-          </ErrorBoundary>
-        </Show>
-        <Show when={location.hash === "#blobs"}>
-          <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
-            <Suspense
-              fallback={
-                <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
-              }
-            >
-              <BlobView pds={pds!} repo={did} />
-            </Suspense>
-          </ErrorBoundary>
-        </Show>
-        <Show when={nsids() && (!location.hash || location.hash === "#collections")}>
-          <TextInput
-            name="filter"
-            placeholder="Filter collections"
-            onInput={(e) => setFilter(e.currentTarget.value)}
-            class="grow"
-          />
-          <div class="flex flex-col font-mono">
-            <div class="grid grid-cols-[min-content_1fr] items-center gap-x-2 overflow-hidden text-sm">
-              <For
-                each={Object.keys(nsids() ?? {}).filter((authority) =>
-                  filter() ?
-                    authority.startsWith(filter()!) || filter()?.startsWith(authority)
-                  : true,
-                )}
+        <div class="flex w-full flex-col gap-2 px-2">
+          <Show when={location.hash === "#logs"}>
+            <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
+              <Suspense
+                fallback={
+                  <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
+                }
               >
-                {(authority) => (
-                  <>
-                    <button onclick={() => toggleCollection(authority)} class="flex items-center">
-                      <span
-                        classList={{
-                          "iconify lucide--chevron-down text-lg transition-transform": true,
-                          "-rotate-90": nsids()?.[authority].hidden,
-                        }}
-                      ></span>
-                    </button>
-                    <button
-                      class="bg-transparent text-left wrap-anywhere"
-                      onclick={() => toggleCollection(authority)}
-                    >
-                      {authority}
-                    </button>
-                    <Show when={!nsids()?.[authority].hidden}>
-                      <div></div>
-                      <div class="flex flex-col">
-                        <For
-                          each={nsids()?.[authority].nsids.filter((nsid) =>
-                            filter() ?
-                              nsid.startsWith(filter()!.split(".").slice(2).join("."))
-                            : true,
-                          )}
-                        >
-                          {(nsid) => (
-                            <A
-                              href={`/at://${did}/${authority}.${nsid}`}
-                              class="text-blue-400 hover:underline active:underline"
-                            >
-                              {authority}.{nsid}
-                            </A>
-                          )}
-                        </For>
-                      </div>
-                    </Show>
-                  </>
-                )}
-              </For>
+                <PlcLogView did={did} />
+              </Suspense>
+            </ErrorBoundary>
+          </Show>
+          <Show when={location.hash === "#backlinks"}>
+            <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
+              <Suspense
+                fallback={
+                  <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
+                }
+              >
+                <Backlinks target={did} />
+              </Suspense>
+            </ErrorBoundary>
+          </Show>
+          <Show when={location.hash === "#blobs"}>
+            <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
+              <Suspense
+                fallback={
+                  <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
+                }
+              >
+                <BlobView pds={pds!} repo={did} />
+              </Suspense>
+            </ErrorBoundary>
+          </Show>
+          <Show when={nsids() && (!location.hash || location.hash === "#collections")}>
+            <TextInput
+              name="filter"
+              placeholder="Filter collections"
+              onInput={(e) => setFilter(e.currentTarget.value)}
+              class="grow"
+            />
+            <div class="flex flex-col font-mono">
+              <div class="grid grid-cols-[min-content_1fr] items-center gap-x-2 overflow-hidden text-sm">
+                <For
+                  each={Object.keys(nsids() ?? {}).filter((authority) =>
+                    filter() ?
+                      authority.startsWith(filter()!) || filter()?.startsWith(authority)
+                    : true,
+                  )}
+                >
+                  {(authority) => (
+                    <>
+                      <button onclick={() => toggleCollection(authority)} class="flex items-center">
+                        <span
+                          classList={{
+                            "iconify lucide--chevron-down text-lg transition-transform": true,
+                            "-rotate-90": nsids()?.[authority].hidden,
+                          }}
+                        ></span>
+                      </button>
+                      <button
+                        class="bg-transparent text-left wrap-anywhere"
+                        onclick={() => toggleCollection(authority)}
+                      >
+                        {authority}
+                      </button>
+                      <Show when={!nsids()?.[authority].hidden}>
+                        <div></div>
+                        <div class="flex flex-col">
+                          <For
+                            each={nsids()?.[authority].nsids.filter((nsid) =>
+                              filter() ?
+                                nsid.startsWith(filter()!.split(".").slice(2).join("."))
+                              : true,
+                            )}
+                          >
+                            {(nsid) => (
+                              <A
+                                href={`/at://${did}/${authority}.${nsid}`}
+                                class="text-blue-400 hover:underline active:underline"
+                              >
+                                {authority}.{nsid}
+                              </A>
+                            )}
+                          </For>
+                        </div>
+                      </Show>
+                    </>
+                  )}
+                </For>
+              </div>
             </div>
-          </div>
-        </Show>
-        <Show when={location.hash === "#identity"}>
-          <Show when={didDoc()}>
-            {(didDocument) => (
-              <div class="flex flex-col gap-y-1 wrap-anywhere">
-                <div class="flex items-baseline justify-between gap-2">
+          </Show>
+          <Show when={location.hash === "#identity"}>
+            <Show when={didDoc()}>
+              {(didDocument) => (
+                <div class="flex flex-col gap-y-1 wrap-anywhere">
+                  <div class="flex items-baseline justify-between gap-2">
+                    <div>
+                      <div class="flex items-center gap-1">
+                        <div class="iconify lucide--id-card" />
+                        <p class="font-semibold">ID</p>
+                      </div>
+                      <div class="text-sm">{didDocument().id}</div>
+                    </div>
+                    <Tooltip text="DID document">
+                      <a
+                        href={
+                          did.startsWith("did:plc") ?
+                            `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
+                          : `https://${did.split("did:web:")[1]}/.well-known/did.json`
+                        }
+                        target="_blank"
+                        class="-mr-1 flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                      >
+                        <span class="iconify lucide--external-link"></span>
+                      </a>
+                    </Tooltip>
+                  </div>
                   <div>
                     <div class="flex items-center gap-1">
-                      <div class="iconify lucide--id-card" />
-                      <p class="font-semibold">ID</p>
+                      <div class="iconify lucide--at-sign" />
+                      <p class="font-semibold">Aliases</p>
                     </div>
-                    <div class="text-sm">{didDocument().id}</div>
+                    <ul>
+                      <For each={didDocument().alsoKnownAs}>
+                        {(alias) => (
+                          <li class="flex items-center gap-1 text-sm">
+                            <span>{alias}</span>
+                            <Show when={alias.startsWith("at://")}>
+                              <Tooltip
+                                text={
+                                  validHandles[alias] === true ? "Valid handle"
+                                  : validHandles[alias] === undefined ?
+                                    "Validating"
+                                  : "Invalid handle"
+                                }
+                              >
+                                <span
+                                  classList={{
+                                    "iconify lucide--circle-check": validHandles[alias] === true,
+                                    "iconify lucide--circle-x text-red-500 dark:text-red-400":
+                                      validHandles[alias] === false,
+                                    "iconify lucide--loader-circle animate-spin":
+                                      validHandles[alias] === undefined,
+                                  }}
+                                ></span>
+                              </Tooltip>
+                            </Show>
+                          </li>
+                        )}
+                      </For>
+                    </ul>
                   </div>
-                  <Tooltip text="DID document">
-                    <a
-                      href={
-                        did.startsWith("did:plc") ?
-                          `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
-                        : `https://${did.split("did:web:")[1]}/.well-known/did.json`
-                      }
-                      target="_blank"
-                      class="-mr-1 flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                    >
-                      <span class="iconify lucide--external-link"></span>
-                    </a>
-                  </Tooltip>
-                </div>
-                <div>
-                  <div class="flex items-center gap-1">
-                    <div class="iconify lucide--at-sign" />
-                    <p class="font-semibold">Aliases</p>
-                  </div>
-                  <ul>
-                    <For each={didDocument().alsoKnownAs}>
-                      {(alias) => (
-                        <li class="flex items-center gap-1 text-sm">
-                          <span>{alias}</span>
-                          <Show when={alias.startsWith("at://")}>
-                            <Tooltip
-                              text={
-                                validHandles[alias] === true ? "Valid handle"
-                                : validHandles[alias] === undefined ?
-                                  "Validating"
-                                : "Invalid handle"
-                              }
+                  <div>
+                    <div class="flex items-center gap-1">
+                      <div class="iconify lucide--hard-drive" />
+                      <p class="font-semibold">Services</p>
+                    </div>
+                    <ul>
+                      <For each={didDocument().service}>
+                        {(service) => (
+                          <li class="flex flex-col text-sm">
+                            <span>#{service.id.split("#")[1]}</span>
+                            <a
+                              class="w-fit text-blue-400 hover:underline active:underline"
+                              href={service.serviceEndpoint.toString()}
+                              target="_blank"
                             >
-                              <span
-                                classList={{
-                                  "iconify lucide--circle-check": validHandles[alias] === true,
-                                  "iconify lucide--circle-x text-red-500 dark:text-red-400":
-                                    validHandles[alias] === false,
-                                  "iconify lucide--loader-circle animate-spin":
-                                    validHandles[alias] === undefined,
-                                }}
-                              ></span>
-                            </Tooltip>
+                              {service.serviceEndpoint.toString()}
+                            </a>
+                          </li>
+                        )}
+                      </For>
+                    </ul>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1">
+                      <div class="iconify lucide--shield-check" />
+                      <p class="font-semibold">Verification methods</p>
+                    </div>
+                    <ul>
+                      <For each={didDocument().verificationMethod}>
+                        {(verif) => (
+                          <Show when={verif.publicKeyMultibase}>
+                            {(key) => (
+                              <li class="flex flex-col text-sm">
+                                <span>#{verif.id.split("#")[1]}</span>
+                                <span class="flex items-center gap-0.5">
+                                  <div class="iconify lucide--key-round" />
+                                  <ErrorBoundary fallback={<>unknown</>}>
+                                    {parsePublicMultikey(key()).type}
+                                  </ErrorBoundary>
+                                </span>
+                                <span class="truncate">{key()}</span>
+                              </li>
+                            )}
                           </Show>
-                        </li>
-                      )}
-                    </For>
-                  </ul>
-                </div>
-                <div>
-                  <div class="flex items-center gap-1">
-                    <div class="iconify lucide--hard-drive" />
-                    <p class="font-semibold">Services</p>
+                        )}
+                      </For>
+                    </ul>
                   </div>
-                  <ul>
-                    <For each={didDocument().service}>
-                      {(service) => (
-                        <li class="flex flex-col text-sm">
-                          <span>#{service.id.split("#")[1]}</span>
-                          <a
-                            class="w-fit text-blue-400 hover:underline active:underline"
-                            href={service.serviceEndpoint.toString()}
-                            target="_blank"
-                          >
-                            {service.serviceEndpoint.toString()}
-                          </a>
-                        </li>
-                      )}
-                    </For>
-                  </ul>
                 </div>
-                <div>
-                  <div class="flex items-center gap-1">
-                    <div class="iconify lucide--shield-check" />
-                    <p class="font-semibold">Verification methods</p>
-                  </div>
-                  <ul>
-                    <For each={didDocument().verificationMethod}>
-                      {(verif) => (
-                        <Show when={verif.publicKeyMultibase}>
-                          {(key) => (
-                            <li class="flex flex-col text-sm">
-                              <span>#{verif.id.split("#")[1]}</span>
-                              <span class="flex items-center gap-0.5">
-                                <div class="iconify lucide--key-round" />
-                                <ErrorBoundary fallback={<>unknown</>}>
-                                  {parsePublicMultikey(key()).type}
-                                </ErrorBoundary>
-                              </span>
-                              <span class="truncate">{key()}</span>
-                            </li>
-                          )}
-                        </Show>
-                      )}
-                    </For>
-                  </ul>
-                </div>
-              </div>
-            )}
+              )}
+            </Show>
           </Show>
-        </Show>
+        </div>
       </div>
     </Show>
   );

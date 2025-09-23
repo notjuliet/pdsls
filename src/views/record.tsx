@@ -217,7 +217,9 @@ export const RecordView = () => {
                 <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
               }
             >
-              <Backlinks target={`at://${did}/${params.collection}/${params.rkey}`} />
+              <div class="w-full px-2">
+                <Backlinks target={`at://${did}/${params.collection}/${params.rkey}`} />
+              </div>
             </Suspense>
           </ErrorBoundary>
         </Show>
