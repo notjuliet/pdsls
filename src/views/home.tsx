@@ -27,16 +27,7 @@ const Home = () => {
         </div>
         <div class="flex items-center gap-1">
           <div class="iconify lucide--radio-tower" />
-          <div>
-            <A href="/jetstream" class="text-blue-400 hover:underline active:underline">
-              Jetstream
-            </A>{" "}
-            and{" "}
-            <A href="/firehose" class="text-blue-400 hover:underline active:underline">
-              firehose
-            </A>{" "}
-            streaming.
-          </div>
+          <span>Jetstream and firehose streaming.</span>
         </div>
         <div class="flex items-center gap-1">
           <div class="iconify lucide--send-to-back" />
