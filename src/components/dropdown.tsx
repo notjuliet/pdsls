@@ -59,6 +59,24 @@ export const NavMenu = (props: { href: string; label: string; icon: string; newT
   );
 };
 
+export const ActionMenu = (props: {
+  label: string;
+  icon: string;
+  onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
+}) => {
+  return (
+    <button
+      onClick={props.onClick}
+      class="flex items-center gap-1.5 rounded-lg p-1 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+    >
+      <Show when={props.icon}>
+        <span class={"iconify shrink-0 " + props.icon}></span>
+      </Show>
+      <span class="whitespace-nowrap">{props.label}</span>
+    </button>
+  );
+};
+
 export const DropdownMenu = (props: {
   icon: string;
   buttonClass?: string;

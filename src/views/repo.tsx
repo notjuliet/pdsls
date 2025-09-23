@@ -1,11 +1,5 @@
 import { Client, CredentialManager } from "@atcute/client";
 import { parsePublicMultikey } from "@atcute/crypto";
-import {
-  CompatibleOperationOrTombstone,
-  defs,
-  IndexedEntry,
-  processIndexedEntryLog,
-} from "@atcute/did-plc";
 import { DidDocument } from "@atcute/identity";
 import { ActorIdentifier, Did, Handle } from "@atcute/lexicons";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
@@ -20,145 +14,14 @@ import {
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Backlinks } from "../components/backlinks.jsx";
-import { Button } from "../components/button.jsx";
+import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import { didDocCache, resolveHandle, resolvePDS, validateHandle } from "../utils/api.js";
-import { localDateFromTimestamp } from "../utils/date.js";
-import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
 import { BlobView } from "./blob.jsx";
+import { PlcLogView } from "./logs.jsx";
 
-type Tab = "collections" | "backlinks" | "identity" | "blobs";
-type PlcEvent = "handle" | "rotation_key" | "service" | "verification_method";
-
-const PlcLogView = (props: {
-  did: string;
-  plcOps: [IndexedEntry<CompatibleOperationOrTombstone>, DiffEntry[]][];
-}) => {
-  const [activePlcEvent, setActivePlcEvent] = createSignal<PlcEvent | undefined>();
-
-  const FilterButton = (props: { icon: string; event: PlcEvent }) => (
-    <button
-      classList={{
-        "flex items-center rounded-full p-1.5": true,
-        "bg-neutral-700 dark:bg-neutral-200": activePlcEvent() === props.event,
-      }}
-      onclick={() => setActivePlcEvent(activePlcEvent() === props.event ? undefined : props.event)}
-    >
-      <span
-        class={`${props.icon} ${activePlcEvent() === props.event ? "text-neutral-200 dark:text-neutral-900" : ""}`}
-      ></span>
-    </button>
-  );
-
-  const DiffItem = (props: { diff: DiffEntry }) => {
-    const diff = props.diff;
-    let title = "Unknown log entry";
-    let icon = "lucide--circle-help";
-    let value = "";
-
-    if (diff.type === "identity_created") {
-      icon = "lucide--bell";
-      title = `Identity created`;
-    } else if (diff.type === "identity_tombstoned") {
-      icon = "lucide--skull";
-      title = `Identity tombstoned`;
-    } else if (diff.type === "handle_added" || diff.type === "handle_removed") {
-      icon = "lucide--at-sign";
-      title = diff.type === "handle_added" ? "Alias added" : "Alias removed";
-      value = diff.handle;
-    } else if (diff.type === "handle_changed") {
-      icon = "lucide--at-sign";
-      title = "Alias updated";
-      value = `${diff.prev_handle} → ${diff.next_handle}`;
-    } else if (diff.type === "rotation_key_added" || diff.type === "rotation_key_removed") {
-      icon = "lucide--key-round";
-      title = diff.type === "rotation_key_added" ? "Rotation key added" : "Rotation key removed";
-      value = diff.rotation_key;
-    } else if (diff.type === "service_added" || diff.type === "service_removed") {
-      icon = "lucide--hard-drive";
-      title = `Service ${diff.service_id} ${diff.type === "service_added" ? "added" : "removed"}`;
-      value = `${diff.service_endpoint}`;
-    } else if (diff.type === "service_changed") {
-      icon = "lucide--hard-drive";
-      title = `Service ${diff.service_id} updated`;
-      value = `${diff.prev_service_endpoint} → ${diff.next_service_endpoint}`;
-    } else if (
-      diff.type === "verification_method_added" ||
-      diff.type === "verification_method_removed"
-    ) {
-      icon = "lucide--shield-check";
-      title = `Verification method ${diff.method_id} ${diff.type === "verification_method_added" ? "added" : "removed"}`;
-      value = `${diff.method_key}`;
-    } else if (diff.type === "verification_method_changed") {
-      icon = "lucide--shield-check";
-      title = `Verification method ${diff.method_id} updated`;
-      value = `${diff.prev_method_key} → ${diff.next_method_key}`;
-    }
-
-    return (
-      <div class="grid grid-cols-[min-content_1fr] items-center gap-x-1">
-        <div class={icon + ` iconify shrink-0`} />
-        <p
-          classList={{
-            "font-semibold": true,
-            "text-neutral-400 line-through dark:text-neutral-600": diff.orig.nullified,
-          }}
-        >
-          {title}
-        </p>
-        <div></div>
-        {value}
-      </div>
-    );
-  };
-
-  return (
-    <>
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-1">
-          <div class="iconify lucide--filter" />
-          <div class="dark:shadow-dark-800 dark:bg-dark-300 flex w-fit items-center rounded-full border-[0.5px] border-neutral-300 bg-neutral-50 shadow-xs dark:border-neutral-700">
-            <FilterButton icon="iconify lucide--at-sign" event="handle" />
-            <FilterButton icon="iconify lucide--key-round" event="rotation_key" />
-            <FilterButton icon="iconify lucide--hard-drive" event="service" />
-            <FilterButton icon="iconify lucide--shield-check" event="verification_method" />
-          </div>
-        </div>
-        <Tooltip text="Audit log">
-          <a
-            href={`${localStorage.plcDirectory ?? "https://plc.directory"}/${props.did}/log/audit`}
-            target="_blank"
-            class="-mr-1 flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-          >
-            <span class="iconify lucide--external-link"></span>
-          </a>
-        </Tooltip>
-      </div>
-      <div class="flex flex-col gap-1 text-sm">
-        <For each={props.plcOps}>
-          {([entry, diffs]) => (
-            <Show
-              when={!activePlcEvent() || diffs.find((d) => d.type.startsWith(activePlcEvent()!))}
-            >
-              <div class="flex flex-col">
-                <span class="text-neutral-500 dark:text-neutral-400">
-                  {localDateFromTimestamp(new Date(entry.createdAt).getTime())}
-                </span>
-                {diffs.map((diff) => (
-                  <Show when={!activePlcEvent() || diff.type.startsWith(activePlcEvent()!)}>
-                    <DiffItem diff={diff} />
-                  </Show>
-                ))}
-              </div>
-            </Show>
-          )}
-        </For>
-      </div>
-    </>
-  );
-};
-
+type Tab = "collections" | "backlinks" | "identity" | "blobs" | "logs";
 const RepoView = () => {
   const params = useParams();
   const location = useLocation();
@@ -168,27 +31,21 @@ const RepoView = () => {
   const [didDoc, setDidDoc] = createSignal<DidDocument>();
   const [nsids, setNsids] = createSignal<Record<string, { hidden: boolean; nsids: string[] }>>();
   const [filter, setFilter] = createSignal<string>();
-  const [plcOps, setPlcOps] =
-    createSignal<[IndexedEntry<CompatibleOperationOrTombstone>, DiffEntry[]][]>();
-  const [showPlcLogs, setShowPlcLogs] = createSignal(false);
-  const [loading, setLoading] = createSignal(false);
-  const [notice, setNotice] = createSignal<string>();
   const [validHandles, setValidHandles] = createStore<Record<string, boolean>>({});
   let rpc: Client;
   let pds: string;
   const did = params.repo;
 
-  const RepoTab = (props: { tab: Tab; label: string; icon: string }) => (
-    <A class="group flex flex-1 justify-center" href={`/at://${params.repo}#${props.tab}`}>
+  const RepoTab = (props: { tab: Tab; label: string }) => (
+    <A class="group flex justify-center" href={`/at://${params.repo}#${props.tab}`}>
       <span
         classList={{
-          "flex gap-1 items-center border-b-2": true,
+          "flex flex-1 border-b-2": true,
           "border-transparent group-hover:border-neutral-400 dark:group-hover:border-neutral-600":
             (location.hash !== `#${props.tab}` && !!location.hash) ||
             (!location.hash && props.tab !== "collections"),
         }}
       >
-        <span class={"iconify " + props.icon}></span>
         {props.label}
       </span>
     </A>
@@ -294,17 +151,53 @@ const RepoView = () => {
           </div>
         </Show>
         <div
-          class={`dark:shadow-dark-800 dark:bg-dark-300 flex ${error() ? "justify-around" : "justify-between"} rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700`}
+          class={`dark:shadow-dark-800 dark:bg-dark-300 flex justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700`}
         >
-          <Show when={!error()}>
-            <RepoTab tab="collections" label="Collections" icon="lucide--folder-open" />
-          </Show>
-          <RepoTab tab="identity" label="Identity" icon="lucide--id-card" />
-          <Show when={!error()}>
-            <RepoTab tab="blobs" label="Blobs" icon="lucide--file-digit" />
-          </Show>
-          <RepoTab tab="backlinks" label="Backlinks" icon="lucide--send-to-back" />
+          <div class="flex gap-2 sm:gap-4">
+            <Show when={!error()}>
+              <RepoTab tab="collections" label="Collections" />
+            </Show>
+            <RepoTab tab="identity" label="Identity" />
+            <Show when={did.startsWith("did:plc")}>
+              <RepoTab tab="logs" label="Logs" />
+            </Show>
+            <Show when={!error()}>
+              <RepoTab tab="blobs" label="Blobs" />
+            </Show>
+            <RepoTab tab="backlinks" label="Backlinks" />
+          </div>
+          <MenuProvider>
+            <DropdownMenu
+              icon="lucide--ellipsis-vertical"
+              buttonClass="rounded-sm p-1"
+              menuClass="top-8 p-2 text-sm"
+            >
+              <NavMenu
+                href={`/jetstream?dids=${params.repo}`}
+                label="Jetstream"
+                icon="lucide--radio-tower"
+              />
+              <Show when={error()?.length === 0 || error() === undefined}>
+                <ActionMenu
+                  label="Export Repo"
+                  icon={downloading() ? "lucide--loader-circle animate-spin" : "lucide--download"}
+                  onClick={() => downloadRepo()}
+                />
+              </Show>
+            </DropdownMenu>
+          </MenuProvider>
         </div>
+        <Show when={location.hash === "#logs"}>
+          <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
+            <Suspense
+              fallback={
+                <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
+              }
+            >
+              <PlcLogView did={did} />
+            </Suspense>
+          </ErrorBoundary>
+        </Show>
         <Show when={location.hash === "#backlinks"}>
           <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
             <Suspense
@@ -328,22 +221,12 @@ const RepoView = () => {
           </ErrorBoundary>
         </Show>
         <Show when={nsids() && (!location.hash || location.hash === "#collections")}>
-          <div class="flex items-center gap-1">
-            <Tooltip text="Jetstream">
-              <A
-                href={`/jetstream?dids=${params.repo}`}
-                class="-ml-1 flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-              >
-                <span class="iconify lucide--radio-tower text-lg"></span>
-              </A>
-            </Tooltip>
-            <TextInput
-              name="filter"
-              placeholder="Filter collections"
-              onInput={(e) => setFilter(e.currentTarget.value)}
-              class="grow"
-            />
-          </div>
+          <TextInput
+            name="filter"
+            placeholder="Filter collections"
+            onInput={(e) => setFilter(e.currentTarget.value)}
+            class="grow"
+          />
           <div class="flex flex-col font-mono">
             <div class="grid grid-cols-[min-content_1fr] items-center gap-x-2 overflow-hidden text-sm">
               <For
@@ -399,176 +282,112 @@ const RepoView = () => {
         <Show when={location.hash === "#identity"}>
           <Show when={didDoc()}>
             {(didDocument) => (
-              <div class="flex flex-col gap-y-2 wrap-anywhere">
-                <div class="flex flex-col gap-y-1">
-                  <div class="flex items-baseline justify-between gap-2">
-                    <div>
-                      <div class="flex items-center gap-1">
-                        <div class="iconify lucide--id-card" />
-                        <p class="font-semibold">ID</p>
-                      </div>
-                      <div class="text-sm">{didDocument().id}</div>
-                    </div>
-                    <Tooltip text="DID document">
-                      <a
-                        href={
-                          did.startsWith("did:plc") ?
-                            `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
-                          : `https://${did.split("did:web:")[1]}/.well-known/did.json`
-                        }
-                        target="_blank"
-                        class="-mr-1 flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                      >
-                        <span class="iconify lucide--external-link"></span>
-                      </a>
-                    </Tooltip>
-                  </div>
+              <div class="flex flex-col gap-y-1 wrap-anywhere">
+                <div class="flex items-baseline justify-between gap-2">
                   <div>
                     <div class="flex items-center gap-1">
-                      <div class="iconify lucide--at-sign" />
-                      <p class="font-semibold">Aliases</p>
+                      <div class="iconify lucide--id-card" />
+                      <p class="font-semibold">ID</p>
                     </div>
-                    <ul>
-                      <For each={didDocument().alsoKnownAs}>
-                        {(alias) => (
-                          <li class="flex items-center gap-1 text-sm">
-                            <span>{alias}</span>
-                            <Show when={alias.startsWith("at://")}>
-                              <Tooltip
-                                text={
-                                  validHandles[alias] === true ? "Valid handle"
-                                  : validHandles[alias] === undefined ?
-                                    "Validating"
-                                  : "Invalid handle"
-                                }
-                              >
-                                <span
-                                  classList={{
-                                    "iconify lucide--circle-check": validHandles[alias] === true,
-                                    "iconify lucide--circle-x text-red-500 dark:text-red-400":
-                                      validHandles[alias] === false,
-                                    "iconify lucide--loader-circle animate-spin":
-                                      validHandles[alias] === undefined,
-                                  }}
-                                ></span>
-                              </Tooltip>
-                            </Show>
-                          </li>
-                        )}
-                      </For>
-                    </ul>
+                    <div class="text-sm">{didDocument().id}</div>
                   </div>
-                  <div>
-                    <div class="flex items-center gap-1">
-                      <div class="iconify lucide--hard-drive" />
-                      <p class="font-semibold">Services</p>
-                    </div>
-                    <ul>
-                      <For each={didDocument().service}>
-                        {(service) => (
-                          <li class="flex flex-col text-sm">
-                            <span>#{service.id.split("#")[1]}</span>
-                            <a
-                              class="w-fit text-blue-400 hover:underline active:underline"
-                              href={service.serviceEndpoint.toString()}
-                              target="_blank"
-                            >
-                              {service.serviceEndpoint.toString()}
-                            </a>
-                          </li>
-                        )}
-                      </For>
-                    </ul>
-                  </div>
-                  <div>
-                    <div class="flex items-center gap-1">
-                      <div class="iconify lucide--shield-check" />
-                      <p class="font-semibold">Verification methods</p>
-                    </div>
-                    <ul>
-                      <For each={didDocument().verificationMethod}>
-                        {(verif) => (
-                          <Show when={verif.publicKeyMultibase}>
-                            {(key) => (
-                              <li class="flex flex-col text-sm">
-                                <span>#{verif.id.split("#")[1]}</span>
-                                <span class="flex items-center gap-0.5">
-                                  <div class="iconify lucide--key-round" />
-                                  <ErrorBoundary fallback={<>unknown</>}>
-                                    {parsePublicMultikey(key()).type}
-                                  </ErrorBoundary>
-                                </span>
-                                <span class="truncate">{key()}</span>
-                              </li>
-                            )}
-                          </Show>
-                        )}
-                      </For>
-                    </ul>
-                  </div>
-                </div>
-                <div class="flex justify-between">
-                  <Show when={did.startsWith("did:plc")}>
-                    <div class="flex items-center gap-1">
-                      <Button
-                        onClick={async () => {
-                          if (!plcOps()) {
-                            setLoading(true);
-                            const response = await fetch(
-                              `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}/log/audit`,
-                            );
-                            const json = await response.json();
-                            try {
-                              const logs = defs.indexedEntryLog.parse(json);
-                              try {
-                                await processIndexedEntryLog(did as any, logs);
-                              } catch (e) {
-                                console.error(e);
-                              }
-                              const opHistory = createOperationHistory(logs).reverse();
-                              setPlcOps(Array.from(groupBy(opHistory, (item) => item.orig)));
-                              setLoading(false);
-                            } catch (e: any) {
-                              setNotice(e);
-                              console.error(e);
-                              setLoading(false);
-                            }
-                          }
-
-                          setShowPlcLogs(!showPlcLogs());
-                        }}
-                      >
-                        <span class="iconify lucide--logs text-sm"></span>
-                        {showPlcLogs() ? "Hide" : "Show"} PLC Logs
-                      </Button>
-                      <Show when={loading()}>
-                        <div class="iconify lucide--loader-circle animate-spin text-xl" />
-                      </Show>
-                    </div>
-                  </Show>
-                  <Show when={error()?.length === 0 || error() === undefined}>
-                    <div
-                      classList={{
-                        "flex items-center gap-1": true,
-                        "flex-row-reverse": did.startsWith("did:web"),
-                      }}
+                  <Tooltip text="DID document">
+                    <a
+                      href={
+                        did.startsWith("did:plc") ?
+                          `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
+                        : `https://${did.split("did:web:")[1]}/.well-known/did.json`
+                      }
+                      target="_blank"
+                      class="-mr-1 flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                     >
-                      <Show when={downloading()}>
-                        <div class="iconify lucide--loader-circle animate-spin text-xl" />
-                      </Show>
-                      <Button onClick={() => downloadRepo()}>
-                        <span class="iconify lucide--download text-sm"></span>
-                        Export Repo
-                      </Button>
-                    </div>
-                  </Show>
+                      <span class="iconify lucide--external-link"></span>
+                    </a>
+                  </Tooltip>
                 </div>
-                <Show when={showPlcLogs()}>
-                  <Show when={notice()}>
-                    <div>{notice()}</div>
-                  </Show>
-                  <PlcLogView plcOps={plcOps() ?? []} did={did} />
-                </Show>
+                <div>
+                  <div class="flex items-center gap-1">
+                    <div class="iconify lucide--at-sign" />
+                    <p class="font-semibold">Aliases</p>
+                  </div>
+                  <ul>
+                    <For each={didDocument().alsoKnownAs}>
+                      {(alias) => (
+                        <li class="flex items-center gap-1 text-sm">
+                          <span>{alias}</span>
+                          <Show when={alias.startsWith("at://")}>
+                            <Tooltip
+                              text={
+                                validHandles[alias] === true ? "Valid handle"
+                                : validHandles[alias] === undefined ?
+                                  "Validating"
+                                : "Invalid handle"
+                              }
+                            >
+                              <span
+                                classList={{
+                                  "iconify lucide--circle-check": validHandles[alias] === true,
+                                  "iconify lucide--circle-x text-red-500 dark:text-red-400":
+                                    validHandles[alias] === false,
+                                  "iconify lucide--loader-circle animate-spin":
+                                    validHandles[alias] === undefined,
+                                }}
+                              ></span>
+                            </Tooltip>
+                          </Show>
+                        </li>
+                      )}
+                    </For>
+                  </ul>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1">
+                    <div class="iconify lucide--hard-drive" />
+                    <p class="font-semibold">Services</p>
+                  </div>
+                  <ul>
+                    <For each={didDocument().service}>
+                      {(service) => (
+                        <li class="flex flex-col text-sm">
+                          <span>#{service.id.split("#")[1]}</span>
+                          <a
+                            class="w-fit text-blue-400 hover:underline active:underline"
+                            href={service.serviceEndpoint.toString()}
+                            target="_blank"
+                          >
+                            {service.serviceEndpoint.toString()}
+                          </a>
+                        </li>
+                      )}
+                    </For>
+                  </ul>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1">
+                    <div class="iconify lucide--shield-check" />
+                    <p class="font-semibold">Verification methods</p>
+                  </div>
+                  <ul>
+                    <For each={didDocument().verificationMethod}>
+                      {(verif) => (
+                        <Show when={verif.publicKeyMultibase}>
+                          {(key) => (
+                            <li class="flex flex-col text-sm">
+                              <span>#{verif.id.split("#")[1]}</span>
+                              <span class="flex items-center gap-0.5">
+                                <div class="iconify lucide--key-round" />
+                                <ErrorBoundary fallback={<>unknown</>}>
+                                  {parsePublicMultikey(key()).type}
+                                </ErrorBoundary>
+                              </span>
+                              <span class="truncate">{key()}</span>
+                            </li>
+                          )}
+                        </Show>
+                      )}
+                    </For>
+                  </ul>
+                </div>
               </div>
             )}
           </Show>
