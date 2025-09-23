@@ -62,7 +62,7 @@ const LabelView = () => {
   return (
     <div class="flex w-full flex-col items-center">
       <form
-        class="flex w-full flex-col items-center gap-y-1"
+        class="flex w-full flex-col items-center gap-y-1 px-2"
         onsubmit={(e) => {
           e.preventDefault();
           initQuery();
