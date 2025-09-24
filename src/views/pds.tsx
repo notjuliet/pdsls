@@ -49,7 +49,7 @@ const PdsView = () => {
     const [openInfo, setOpenInfo] = createSignal(false);
 
     return (
-      <div class="flex items-center gap-1">
+      <div class="flex items-center">
         <A
           href={`/at://${repo.did}`}
           class="grow truncate rounded py-0.5 font-mono text-blue-400 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
