@@ -10,7 +10,7 @@ import { CopyMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dro
 import { JSONValue } from "../components/json.jsx";
 import { agent } from "../components/login.jsx";
 import { Modal } from "../components/modal.jsx";
-import { pds, setCID, setValidRecord, setValidSchema, validRecord } from "../components/navbar.jsx";
+import { pds, setCID } from "../components/navbar.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import { setNotif } from "../layout.jsx";
 import { didDocCache, resolvePDS } from "../utils/api.js";
@@ -27,6 +27,8 @@ export const RecordView = () => {
   const [externalLink, setExternalLink] = createSignal<
     { label: string; link: string; icon?: string } | undefined
   >();
+  const [validRecord, setValidRecord] = createSignal<boolean | undefined>(undefined);
+  const [validSchema, setValidSchema] = createSignal<boolean | undefined>(undefined);
   const did = params.repo;
   let rpc: Client;
 
@@ -146,6 +148,32 @@ export const RecordView = () => {
             </A>
           </div>
           <div class="flex gap-1">
+            <div class="mr-1 flex gap-3">
+              <Tooltip
+                text={
+                  validRecord() === undefined ? "Validating"
+                  : validRecord() === false ?
+                    "Invalid record"
+                  : "Valid record"
+                }
+              >
+                <span
+                  classList={{
+                    "iconify lucide--lock-keyhole": validRecord() === true,
+                    "iconify lucide--lock-keyhole-open text-red-500 dark:text-red-400":
+                      validRecord() === false,
+                    "iconify lucide--loader-circle animate-spin": validRecord() === undefined,
+                  }}
+                ></span>
+              </Tooltip>
+              <Show when={validSchema() !== undefined}>
+                <Tooltip text={validSchema() ? "Valid schema" : "Invalid schema"}>
+                  <span
+                    class={`iconify ${validSchema() ? "lucide--file-check" : "lucide--file-x text-red-500 dark:text-red-400"}`}
+                  ></span>
+                </Tooltip>
+              </Show>
+            </div>
             <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
               <RecordEditor create={false} record={record()?.value} refetch={refetch} />
               <Tooltip text="Delete">

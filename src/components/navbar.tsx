@@ -7,8 +7,6 @@ import Tooltip from "./tooltip";
 export const [pds, setPDS] = createSignal<string>();
 export const [cid, setCID] = createSignal<string>();
 export const [isLabeler, setIsLabeler] = createSignal(false);
-export const [validRecord, setValidRecord] = createSignal<boolean | undefined>(undefined);
-export const [validSchema, setValidSchema] = createSignal<boolean | undefined>(undefined);
 
 const swapIcons: Record<string, string> = {
   "did:plc:vwzwgnygau7ed7b7wt5ux7y2": "lucide--microchip",
@@ -165,34 +163,7 @@ const NavBar = (props: { params: Params }) => {
             <Tooltip text="Record">
               <span class="iconify lucide--file-json text-base"></span>
             </Tooltip>
-            <div class="flex gap-1">
-              <span>{props.params.rkey}</span>
-              <Show when={validRecord()}>
-                <Tooltip text="Valid record">
-                  <span class="iconify lucide--lock-keyhole"></span>
-                </Tooltip>
-              </Show>
-              <Show when={validRecord() === false}>
-                <Tooltip text="Invalid record">
-                  <span class="iconify lucide--lock-keyhole-open text-red-500 dark:text-red-400"></span>
-                </Tooltip>
-              </Show>
-              <Show when={validRecord() === undefined}>
-                <Tooltip text="Validating">
-                  <span class="iconify lucide--loader-circle animate-spin"></span>
-                </Tooltip>
-              </Show>
-              <Show when={validSchema()}>
-                <Tooltip text="Valid schema">
-                  <span class="iconify lucide--file-check"></span>
-                </Tooltip>
-              </Show>
-              <Show when={validSchema() === false}>
-                <Tooltip text="Invalid schema">
-                  <span class="iconify lucide--file-x text-red-500 dark:text-red-400"></span>
-                </Tooltip>
-              </Show>
-            </div>
+            <span>{props.params.rkey}</span>
           </div>
         </Show>
       </div>
