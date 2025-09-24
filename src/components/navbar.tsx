@@ -8,21 +8,6 @@ export const [pds, setPDS] = createSignal<string>();
 export const [cid, setCID] = createSignal<string>();
 export const [isLabeler, setIsLabeler] = createSignal(false);
 
-const swapIcons: Record<string, string> = {
-  "did:plc:vwzwgnygau7ed7b7wt5ux7y2": "lucide--microchip",
-  "did:plc:oisofpd7lj26yvgiivf3lxsi": "lucide--bone",
-  "did:plc:uu5axsmbm2or2dngy4gwchec": "lucide--train-track",
-  "did:plc:7x6rtuenkuvxq3zsvffp2ide": "lucide--rabbit",
-  "did:plc:ia76kvnndjutgedggx2ibrem": "lucide--rabbit",
-  "did:plc:hvakvedv6byxhufjl23mfmsd": "lucide--rat",
-  "did:plc:ezhjhbzqt32bqprrn6qjlkri": "lucide--film",
-  "did:plc:6v6jqsy7swpzuu53rmzaybjy": "lucide--fish",
-  "did:plc:hx53snho72xoj7zqt5uice4u": "lucide--rose",
-  "did:plc:wzsilnxf24ehtmmc3gssy5bu": "lucide--music-2",
-  "did:plc:bnqkww7bjxaacajzvu5gswdf": "lucide--gem",
-  "did:plc:hdhoaan3xa3jiuq4fg4mefid": "lucide--sparkles",
-};
-
 const NavBar = (props: { params: Params }) => {
   const location = useLocation();
   const [handle, setHandle] = createSignal(props.params.repo);
@@ -113,10 +98,7 @@ const NavBar = (props: { params: Params }) => {
                 }}
               >
                 <span
-                  class={
-                    `iconify shrink-0 text-base transition-transform duration-400 ${showHandle() ? "rotate-y-180" : ""} ` +
-                    (swapIcons[props.params.repo] ?? "lucide--arrow-left-right")
-                  }
+                  class={`iconify shrink-0 text-base transition-transform duration-400 ${showHandle() ? "rotate-y-180" : ""} lucide--arrow-left-right`}
                 ></span>
               </button>
             </Tooltip>

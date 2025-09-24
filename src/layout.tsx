@@ -19,6 +19,14 @@ export const [notif, setNotif] = createSignal<{
   text?: string;
 }>({ show: false });
 
+const headers: Record<string, string> = {
+  "did:plc:ia76kvnndjutgedggx2ibrem": "bunny.jpg",
+  "did:plc:oisofpd7lj26yvgiivf3lxsi": "puppy.jpg",
+  "did:plc:vwzwgnygau7ed7b7wt5ux7y2": "water.webp",
+  "did:plc:uu5axsmbm2or2dngy4gwchec": "city.webp",
+  "did:plc:hx53snho72xoj7zqt5uice4u": "bridge.jpg",
+};
+
 const Layout = (props: RouteSectionProps<unknown>) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -56,10 +64,12 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         </Show>
       </MetaProvider>
       <header
-        classList={{
-          "dark:shadow-dark-800 dark:bg-dark-300 mb-4 flex w-full items-center justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-xs dark:border-neutral-700": true,
-          "bg-[linear-gradient(to_left,transparent_0%,#fafafa_80%),linear-gradient(to_bottom,#5BCEFA90_0%,#5BCEFA90_20%,#F5A9B890_20%,#F5A9B890_40%,#FFFFFF90_40%,#FFFFFF90_60%,#F5A9B890_60%,#F5A9B890_80%,#5BCEFA90_80%,#5BCEFA90_100%)] dark:bg-[linear-gradient(to_left,transparent_0%,#2d2d2d_80%),linear-gradient(to_bottom,#5BCEFA90_0%,#5BCEFA90_20%,#F5A9B890_20%,#F5A9B890_40%,#FFFFFF90_40%,#FFFFFF90_60%,#F5A9B890_60%,#F5A9B890_80%,#5BCEFA90_80%,#5BCEFA90_100%)]":
-            localStorage.getItem("hrt") === "true",
+        class={`dark:shadow-dark-800 dark:bg-dark-300 mb-4 flex w-full items-center justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 bg-cover bg-center bg-no-repeat p-2 shadow-xs [--header-bg:#fafafa] dark:border-neutral-700 dark:[--header-bg:#2d2d2d] ${localStorage.getItem("hrt") === "true" ? "bg-[linear-gradient(to_left,transparent_0%,var(--header-bg)_80%),linear-gradient(to_bottom,#5BCEFA90_0%,#5BCEFA90_20%,#F5A9B890_20%,#F5A9B890_40%,#FFFFFF90_40%,#FFFFFF90_60%,#F5A9B890_60%,#F5A9B890_80%,#5BCEFA90_80%,#5BCEFA90_100%)]" : ""}`}
+        style={{
+          "background-image":
+            props.params.repo in headers ?
+              `linear-gradient(to left, transparent 0%, var(--header-bg) 80%), url(/headers/${headers[props.params.repo]})`
+            : undefined,
         }}
       >
         <A
