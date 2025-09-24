@@ -70,7 +70,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <span class="iconify tabler--binary-tree-filled text-[#76c4e5]"></span>
           <span>PDSls</span>
         </A>
-        <div class="relative -mr-1 flex items-center gap-1">
+        <div class="dark:bg-dark-300/50 relative -mr-1 flex items-center gap-1 rounded-lg bg-neutral-50/50">
           <Show when={location.pathname !== "/"}>
             <SearchButton />
           </Show>
