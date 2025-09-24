@@ -40,7 +40,7 @@ const RepoView = () => {
     <A class="group flex justify-center" href={`/at://${params.repo}#${props.tab}`}>
       <span
         classList={{
-          "flex flex-1 border-b-2": true,
+          "flex flex-1 items-center border-b-2": true,
           "border-transparent group-hover:border-neutral-400 dark:group-hover:border-neutral-600":
             (location.hash !== `#${props.tab}` && !!location.hash) ||
             (!location.hash && props.tab !== "collections"),
@@ -146,9 +146,9 @@ const RepoView = () => {
     <Show when={repo()}>
       <div class="flex w-full flex-col gap-2 break-words">
         <div
-          class={`dark:shadow-dark-800 dark:bg-dark-300 flex justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700`}
+          class={`dark:shadow-dark-800 dark:bg-dark-300 flex justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 shadow-xs dark:border-neutral-700`}
         >
-          <div class="flex gap-2 sm:gap-4">
+          <div class="flex gap-2 text-sm sm:gap-4">
             <Show when={!error()}>
               <RepoTab tab="collections" label="Collections" />
             </Show>
