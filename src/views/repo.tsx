@@ -3,15 +3,7 @@ import { parsePublicMultikey } from "@atcute/crypto";
 import { DidDocument } from "@atcute/identity";
 import { ActorIdentifier, Did, Handle } from "@atcute/lexicons";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
-import {
-  createEffect,
-  createResource,
-  createSignal,
-  ErrorBoundary,
-  For,
-  Show,
-  Suspense,
-} from "solid-js";
+import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Backlinks } from "../components/backlinks.jsx";
 import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
@@ -21,8 +13,7 @@ import { didDocCache, resolveHandle, resolvePDS, validateHandle } from "../utils
 import { BlobView } from "./blob.jsx";
 import { PlcLogView } from "./logs.jsx";
 
-type Tab = "collections" | "backlinks" | "identity" | "blobs" | "logs";
-const RepoView = () => {
+export const RepoView = () => {
   const params = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,7 +27,10 @@ const RepoView = () => {
   let pds: string;
   const did = params.repo;
 
-  const RepoTab = (props: { tab: Tab; label: string }) => (
+  const RepoTab = (props: {
+    tab: "collections" | "backlinks" | "identity" | "blobs" | "logs";
+    label: string;
+  }) => (
     <A class="group flex justify-center" href={`/at://${params.repo}#${props.tab}`}>
       <span
         classList={{
@@ -63,6 +57,7 @@ const RepoView = () => {
       }
     }
     setDidDoc(didDocCache[did] as DidDocument);
+    validateHandles();
 
     rpc = new Client({ handler: new CredentialManager({ service: pds }) });
     const res = await rpc.get("com.atproto.repo.describeRepo", {
@@ -101,6 +96,16 @@ const RepoView = () => {
 
   const [repo] = createResource(fetchRepo);
 
+  const validateHandles = async () => {
+    for (const alias of didDoc()?.alsoKnownAs ?? []) {
+      if (alias.startsWith("at://"))
+        setValidHandles(
+          alias,
+          await validateHandle(alias.replace("at://", "") as Handle, did as Did),
+        );
+    }
+  };
+
   const downloadRepo = async () => {
     try {
       setDownloading(true);
@@ -132,23 +137,13 @@ const RepoView = () => {
     });
   };
 
-  createEffect(async () => {
-    for (const alias of didDoc()?.alsoKnownAs ?? []) {
-      if (alias.startsWith("at://"))
-        setValidHandles(
-          alias,
-          await validateHandle(alias.replace("at://", "") as Handle, did as Did),
-        );
-    }
-  });
-
   return (
     <Show when={repo()}>
       <div class="flex w-full flex-col gap-2 break-words">
         <div
-          class={`dark:shadow-dark-800 dark:bg-dark-300 flex justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 shadow-xs dark:border-neutral-700`}
+          class={`dark:shadow-dark-800 dark:bg-dark-300 flex justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700`}
         >
-          <div class="flex gap-2 text-sm sm:gap-4">
+          <div class="flex gap-2 sm:gap-4">
             <Show when={!error()}>
               <RepoTab tab="collections" label="Collections" />
             </Show>
@@ -401,5 +396,3 @@ const RepoView = () => {
     </Show>
   );
 };
-
-export { RepoView };

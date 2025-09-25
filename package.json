@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@atcute/atproto": "^3.1.4",
-    "@atcute/bluesky": "^3.2.2",
+    "@atcute/bluesky": "^3.2.3",
     "@atcute/car": "^3.1.1",
     "@atcute/cbor": "^2.2.5",
     "@atcute/cid": "^2.2.3",
