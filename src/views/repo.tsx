@@ -190,7 +190,7 @@ export const RepoView = () => {
             <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
               <Suspense
                 fallback={
-                  <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
+                  <div class="iconify lucide--loader-circle mt-2 animate-spin self-center text-xl" />
                 }
               >
                 <PlcLogView did={did} />
@@ -201,7 +201,7 @@ export const RepoView = () => {
             <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
               <Suspense
                 fallback={
-                  <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
+                  <div class="iconify lucide--loader-circle mt-2 animate-spin self-center text-xl" />
                 }
               >
                 <Backlinks target={did} />
@@ -212,7 +212,7 @@ export const RepoView = () => {
             <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
               <Suspense
                 fallback={
-                  <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
+                  <div class="iconify lucide--loader-circle mt-2 animate-spin self-center text-xl" />
                 }
               >
                 <BlobView pds={pds!} repo={did} />
