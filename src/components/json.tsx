@@ -1,5 +1,5 @@
-import { A } from "@solidjs/router";
-import { createEffect, createSignal, For, Show } from "solid-js";
+import { A, useParams } from "@solidjs/router";
+import { createEffect, createSignal, ErrorBoundary, For, Show } from "solid-js";
 import { hideMedia } from "../views/settings";
 import { pds } from "./navbar";
 import Tooltip from "./tooltip";
@@ -77,9 +77,14 @@ const JSONNull = () => {
 };
 
 const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: string }) => {
-  const [hide, setHide] = createSignal(localStorage.hideMedia === "true");
+  const params = useParams();
+  const [hide, setHide] = createSignal(
+    localStorage.hideMedia === "true" || params.rkey === undefined,
+  );
 
-  createEffect(() => setHide(hideMedia()));
+  createEffect(() => {
+    if (hideMedia()) setHide(hideMedia());
+  });
 
   const Obj = ({ key, value }: { key: string; value: JSONType }) => {
     const [show, setShow] = createSignal(true);
@@ -132,21 +137,21 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
       <>
         <span class="flex gap-x-1">
           <Show when={blob.mimeType.startsWith("image/") && !hide()}>
-            <a
-              href={`https://cdn.bsky.app/img/feed_thumbnail/plain/${repo}/${blob.ref.$link}@jpeg`}
-              target="_blank"
-            >
-              <img
-                class="max-h-[16rem] w-full max-w-[16rem]"
-                src={`https://cdn.bsky.app/img/feed_thumbnail/plain/${repo}/${blob.ref.$link}@jpeg`}
-              />
-            </a>
+            <img
+              class="max-h-[16rem] w-fit max-w-[16rem]"
+              src={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${repo}&cid=${blob.ref.$link}`}
+            />
           </Show>
           <Show when={blob.mimeType === "video/mp4" && !hide()}>
-            <VideoPlayer did={repo} cid={blob.ref.$link} />
+            <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
+              <VideoPlayer did={repo} cid={blob.ref.$link} />
+            </ErrorBoundary>
           </Show>
           <span
-            classList={{ "flex items-center justify-between gap-1": true, "flex-col": !hide() }}
+            classList={{
+              "flex items-center justify-between gap-1": true,
+              "flex-col": !hide(),
+            }}
           >
             <Show when={blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4"}>
               <Tooltip text={hide() ? "Show" : "Hide"}>
@@ -161,7 +166,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
               </Tooltip>
             </Show>
             <Show when={pds()}>
-              <Tooltip text="Blob PDS link">
+              <Tooltip text="Blob on PDS">
                 <a
                   href={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${repo}&cid=${blob.ref.$link}`}
                   target="_blank"
