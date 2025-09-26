@@ -135,19 +135,19 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
   if (blob.$type === "blob") {
     return (
       <>
-        <span class="flex gap-x-1">
-          <Show when={blob.mimeType.startsWith("image/") && !hide()}>
-            <img
-              class="max-h-[16rem] w-fit max-w-[16rem]"
-              src={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${repo}&cid=${blob.ref.$link}`}
-            />
-          </Show>
-          <Show when={blob.mimeType === "video/mp4" && !hide()}>
-            <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
-              <VideoPlayer did={repo} cid={blob.ref.$link} />
-            </ErrorBoundary>
-          </Show>
-          <Show when={params.rkey}>
+        <Show when={pds() && params.rkey}>
+          <span class="flex gap-x-1">
+            <Show when={blob.mimeType.startsWith("image/") && !hide()}>
+              <img
+                class="max-h-[16rem] w-fit max-w-[16rem]"
+                src={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${repo}&cid=${blob.ref.$link}`}
+              />
+            </Show>
+            <Show when={blob.mimeType === "video/mp4" && !hide()}>
+              <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
+                <VideoPlayer did={repo} cid={blob.ref.$link} />
+              </ErrorBoundary>
+            </Show>
             <span
               classList={{
                 "flex items-center justify-between gap-1": true,
@@ -166,20 +166,18 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
                   </button>
                 </Tooltip>
               </Show>
-              <Show when={pds()}>
-                <Tooltip text="Blob on PDS">
-                  <a
-                    href={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${repo}&cid=${blob.ref.$link}`}
-                    target="_blank"
-                    class={`${!hide() ? "-mb-1 -ml-0.5" : ""} flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600`}
-                  >
-                    <span class="iconify lucide--external-link text-base"></span>
-                  </a>
-                </Tooltip>
-              </Show>
+              <Tooltip text="Blob on PDS">
+                <a
+                  href={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${repo}&cid=${blob.ref.$link}`}
+                  target="_blank"
+                  class={`${!hide() ? "-mb-1 -ml-0.5" : ""} flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600`}
+                >
+                  <span class="iconify lucide--external-link text-base"></span>
+                </a>
+              </Tooltip>
             </span>
-          </Show>
-        </span>
+          </span>
+        </Show>
         {rawObj}
       </>
     );
