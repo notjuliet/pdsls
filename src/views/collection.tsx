@@ -277,6 +277,7 @@ const CollectionView = () => {
                 </A>
               </Tooltip>
               <TextInput
+                name="Filter"
                 placeholder="Filter by substring"
                 onInput={(e) => setFilter(e.currentTarget.value)}
                 class="grow"
