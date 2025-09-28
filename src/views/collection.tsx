@@ -18,6 +18,7 @@ import { localDateFromTimestamp } from "../utils/date.js";
 
 interface AtprotoRecord {
   rkey: string;
+  cid: string;
   record: InferXRPCBodyOutput<ComAtprotoRepoGetRecord.mainSchema["output"]>;
   timestamp: number | undefined;
   toDelete: boolean;
@@ -45,11 +46,12 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
       onmouseover={() => setHover(true)}
       onmouseleave={() => setHover(false)}
     >
-      <span class="text-sm text-blue-400 sm:text-base">{props.record.rkey}</span>
+      <span class="shrink-0 text-sm text-blue-400 sm:text-base">{props.record.rkey}</span>
+      <span class="ml-1 truncate text-xs text-neutral-500 dark:text-neutral-400" dir="rtl">
+        {props.record.cid}
+      </span>
       <Show when={props.record.timestamp && props.record.timestamp <= Date.now()}>
-        <span class="ml-1 text-xs text-neutral-500 dark:text-neutral-400">
-          {localDateFromTimestamp(props.record.timestamp!)}
-        </span>
+        <span class="ml-1 shrink-0 text-xs">{localDateFromTimestamp(props.record.timestamp!)}</span>
       </Show>
       <Show when={hover()}>
         <span
@@ -99,6 +101,7 @@ const CollectionView = () => {
       const rkey = record.uri.split("/").pop()!;
       tmpRecords.push({
         rkey: rkey,
+        cid: record.cid,
         record: record,
         timestamp: TID.validate(rkey) ? TID.parse(rkey).timestamp / 1000 : undefined,
         toDelete: false,
@@ -319,7 +322,7 @@ const CollectionView = () => {
             </Show>
           </div>
         </StickyOverlay>
-        <div class="flex max-w-full flex-col font-mono">
+        <div class="flex max-w-full flex-col px-2 font-mono">
           <For
             each={records.filter((rec) =>
               filter() ? JSON.stringify(rec.record.value).includes(filter()!) : true,
