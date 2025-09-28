@@ -24,7 +24,7 @@ const headers: Record<string, string> = {
   "did:plc:oisofpd7lj26yvgiivf3lxsi": "puppy.jpg",
   "did:plc:vwzwgnygau7ed7b7wt5ux7y2": "water.webp",
   "did:plc:uu5axsmbm2or2dngy4gwchec": "city.webp",
-  "did:plc:hx53snho72xoj7zqt5uice4u": "bridge.jpg",
+  "did:plc:aokggmp5jzj4nc5jifhiplqc": "bridge.jpg",
 };
 
 const Layout = (props: RouteSectionProps<unknown>) => {
