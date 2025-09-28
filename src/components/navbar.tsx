@@ -37,11 +37,7 @@ const NavBar = (props: { params: Params }) => {
           </Tooltip>
           <Show when={pds()}>
             <Show when={props.params.repo}>
-              <A
-                end
-                href={pds()!}
-                inactiveClass="text-blue-400 w-full hover:underline active:underline"
-              >
+              <A end href={pds()!} inactiveClass="w-full hover:underline active:underline">
                 {pds()}
               </A>
             </Show>
@@ -83,7 +79,7 @@ const NavBar = (props: { params: Params }) => {
                 <A
                   end
                   href={`/at://${props.params.repo}`}
-                  inactiveClass="text-blue-400 hover:underline active:underline w-full"
+                  inactiveClass="hover:underline active:underline w-full"
                 >
                   {showHandle() ? handle() : props.params.repo}
                 </A>
@@ -115,7 +111,7 @@ const NavBar = (props: { params: Params }) => {
             <A
               end
               href={`/at://${props.params.repo}/labels`}
-              inactiveClass="text-blue-400 grow hover:underline active:underline"
+              inactiveClass="grow hover:underline active:underline"
             >
               labels
             </A>
@@ -130,7 +126,7 @@ const NavBar = (props: { params: Params }) => {
               <A
                 end
                 href={`/at://${props.params.repo}/${props.params.collection}`}
-                inactiveClass="text-blue-400 w-full hover:underline active:underline"
+                inactiveClass="w-full hover:underline active:underline"
               >
                 {props.params.collection}
               </A>
