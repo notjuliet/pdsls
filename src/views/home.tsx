@@ -9,11 +9,7 @@ export const Home = () => {
           <div class="iconify lucide--search" />
           <span>
             Browse the public data on{" "}
-            <a
-              class="text-blue-400 hover:underline active:underline"
-              href="https://atproto.com"
-              target="_blank"
-            >
+            <a class="underline" href="https://atproto.com" target="_blank">
               atproto
             </a>
             .
@@ -31,11 +27,7 @@ export const Home = () => {
           <div class="iconify lucide--send-to-back" />
           <span>
             Backlinks support with{" "}
-            <a
-              href="https://constellation.microcosm.blue"
-              class="text-blue-400 hover:underline active:underline"
-              target="_blank"
-            >
+            <a href="https://constellation.microcosm.blue" class="underline" target="_blank">
               constellation
             </a>
             .
