@@ -47,12 +47,7 @@ const JSONString = ({ data }: { data: string }) => {
               ["http:", "https:", "web+at:"].includes(new URL(part).protocol) &&
               part.split("\n").length === 1
             ) ?
-              <a
-                class="text-blue-400 hover:underline active:underline"
-                href={part}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a class="underline" href={part} target="_blank" rel="noopener noreferrer">
                 {part}
               </a>
             : part}
