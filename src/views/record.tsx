@@ -132,7 +132,6 @@ export const RecordView = () => {
               }}
               href={`/at://${did}/${params.collection}/${params.rkey}#record`}
             >
-              <div class="iconify lucide--file-json" />
               Record
             </A>
             <A
@@ -143,7 +142,6 @@ export const RecordView = () => {
               }}
               href={`/at://${did}/${params.collection}/${params.rkey}#backlinks`}
             >
-              <div class="iconify lucide--send-to-back" />
               Backlinks
             </A>
           </div>
