@@ -130,13 +130,6 @@ export const RepoView = () => {
     setDownloading(false);
   };
 
-  const toggleCollection = (authority: string) => {
-    setNsids({
-      ...nsids(),
-      [authority]: { ...nsids()![authority], hidden: !nsids()![authority].hidden },
-    });
-  };
-
   return (
     <Show when={repo()}>
       <div class="flex w-full flex-col gap-2 break-words">
@@ -226,56 +219,34 @@ export const RepoView = () => {
               onInput={(e) => setFilter(e.currentTarget.value)}
               class="grow"
             />
-            <div class="flex flex-col font-mono">
-              <div class="grid grid-cols-[min-content_1fr] items-center gap-x-2 overflow-hidden text-sm">
-                <For
-                  each={Object.keys(nsids() ?? {}).filter((authority) =>
-                    filter() ?
-                      authority.startsWith(filter()!) || filter()?.startsWith(authority)
-                    : true,
-                  )}
-                >
-                  {(authority) => (
-                    <>
-                      <button onclick={() => toggleCollection(authority)} class="flex items-center">
-                        <span
-                          classList={{
-                            "iconify lucide--chevron-down text-lg transition-transform": true,
-                            "-rotate-90": nsids()?.[authority].hidden,
-                          }}
-                        ></span>
-                      </button>
-                      <button
-                        class="bg-transparent text-left wrap-anywhere"
-                        onclick={() => toggleCollection(authority)}
-                      >
-                        {authority}
-                      </button>
-                      <Show when={!nsids()?.[authority].hidden}>
-                        <div></div>
-                        <div class="flex flex-col">
-                          <For
-                            each={nsids()?.[authority].nsids.filter((nsid) =>
-                              filter() ?
-                                nsid.startsWith(filter()!.split(".").slice(2).join("."))
-                              : true,
-                            )}
-                          >
-                            {(nsid) => (
-                              <A
-                                href={`/at://${did}/${authority}.${nsid}`}
-                                class="text-blue-400 hover:underline active:underline"
-                              >
-                                {authority}.{nsid}
-                              </A>
-                            )}
-                          </For>
-                        </div>
-                      </Show>
-                    </>
-                  )}
-                </For>
-              </div>
+            <div class="flex flex-col overflow-hidden font-mono text-sm">
+              <For
+                each={Object.keys(nsids() ?? {}).filter((authority) =>
+                  filter() ?
+                    authority.startsWith(filter()!) || filter()?.startsWith(authority)
+                  : true,
+                )}
+              >
+                {(authority) => (
+                  <div class="flex flex-col rounded-lg p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700">
+                    <For
+                      each={nsids()?.[authority].nsids.filter((nsid) =>
+                        filter() ? nsid.startsWith(filter()!.split(".").slice(2).join(".")) : true,
+                      )}
+                    >
+                      {(nsid) => (
+                        <A
+                          href={`/at://${did}/${authority}.${nsid}`}
+                          class="hover:underline active:underline"
+                        >
+                          <span>{authority}</span>
+                          <span class="text-neutral-500 dark:text-neutral-400">.{nsid}</span>
+                        </A>
+                      )}
+                    </For>
+                  </div>
+                )}
+              </For>
             </div>
           </Show>
           <Show when={location.hash === "#identity"}>
