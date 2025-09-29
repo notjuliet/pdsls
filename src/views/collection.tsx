@@ -41,18 +41,22 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
 
   return (
     <span
-      class="relative flex items-baseline rounded px-0.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      class="relative flex w-full items-baseline rounded px-0.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
       ref={rkeyRef}
       onmouseover={() => setHover(true)}
       onmouseleave={() => setHover(false)}
     >
-      <span class="shrink-0 text-sm text-blue-400 sm:text-base">{props.record.rkey}</span>
-      <span class="ml-1 truncate text-xs text-neutral-500 dark:text-neutral-400" dir="rtl">
-        {props.record.cid}
+      <span class="flex items-baseline truncate">
+        <span class="shrink-0 text-sm text-blue-400 sm:text-base">{props.record.rkey}</span>
+        <span class="ml-1 truncate text-xs text-neutral-500 dark:text-neutral-400" dir="rtl">
+          {props.record.cid}
+        </span>
+        <Show when={props.record.timestamp && props.record.timestamp <= Date.now()}>
+          <span class="ml-1 shrink-0 text-xs">
+            {localDateFromTimestamp(props.record.timestamp!)}
+          </span>
+        </Show>
       </span>
-      <Show when={props.record.timestamp && props.record.timestamp <= Date.now()}>
-        <span class="ml-1 shrink-0 text-xs">{localDateFromTimestamp(props.record.timestamp!)}</span>
-      </Show>
       <Show when={hover()}>
         <span
           ref={previewRef}
