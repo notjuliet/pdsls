@@ -228,7 +228,7 @@ export const RepoView = () => {
                 )}
               >
                 {(authority) => (
-                  <div class="flex flex-col rounded-lg p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700">
+                  <div class="dark:hover:bg-dark-200 flex flex-col rounded-lg p-1 hover:bg-neutral-200">
                     <For
                       each={nsids()?.[authority].nsids.filter((nsid) =>
                         filter() ? nsid.startsWith(filter()!.split(".").slice(2).join(".")) : true,
