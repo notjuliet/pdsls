@@ -26,6 +26,7 @@ const headers: Record<string, string> = {
   "did:plc:uu5axsmbm2or2dngy4gwchec": "city.webp",
   "did:plc:aokggmp5jzj4nc5jifhiplqc": "bridge.jpg",
   "did:plc:bnqkww7bjxaacajzvu5gswdf": "forest.jpg",
+  "did:plc:p2cp5gopk7mgjegy6wadk3ep": "aurora.jpg",
 };
 
 const Layout = (props: RouteSectionProps<unknown>) => {
@@ -69,7 +70,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         style={{
           "background-image":
             props.params.repo in headers ?
-              `linear-gradient(to left, transparent 0%, var(--header-bg) 80%), url(/headers/${headers[props.params.repo]})`
+              `linear-gradient(to left, transparent 0%, var(--header-bg) 85%), url(/headers/${headers[props.params.repo]})`
             : undefined,
         }}
       >
