@@ -37,6 +37,7 @@ export const RecordView = () => {
     setCID(undefined);
     setValidRecord(undefined);
     setValidSchema(undefined);
+    setLexiconUri(undefined);
     const pds = await resolvePDS(did);
     rpc = new Client({ handler: new CredentialManager({ service: pds }) });
     const res = await rpc.get("com.atproto.repo.getRecord", {
@@ -100,10 +101,7 @@ export const RecordView = () => {
     try {
       const res = await resolveLexiconAuthority(nsid);
       setLexiconUri(`at://${res}/com.atproto.lexicon.schema/${nsid}`);
-      console.log(res);
-    } catch (e) {
-      console.error(e);
-    }
+    } catch {}
   };
 
   const [record, { refetch }] = createResource(fetchRecord);
