@@ -11,12 +11,7 @@ export const [isLabeler, setIsLabeler] = createSignal(false);
 const NavBar = (props: { params: Params }) => {
   const location = useLocation();
   const [handle, setHandle] = createSignal(props.params.repo);
-  const [fullCid, setFullCid] = createSignal(false);
   const [showHandle, setShowHandle] = createSignal(localStorage.showHandle === "true");
-
-  createEffect(() => {
-    if (cid() !== undefined) setFullCid(false);
-  });
 
   createEffect(async () => {
     if (pds() !== undefined && props.params.repo) {
@@ -149,22 +144,6 @@ const NavBar = (props: { params: Params }) => {
           </div>
         </Show>
       </div>
-      <Show when={props.params.rkey && cid()}>
-        {(cid) => (
-          <div class="mt-1 flex gap-2">
-            <Tooltip text="CID">
-              <span class="iconify lucide--box text-base"></span>
-            </Tooltip>
-            <button
-              dir="rtl"
-              classList={{ "bg-transparent text-left": true, truncate: !fullCid() }}
-              onclick={() => setFullCid(!fullCid())}
-            >
-              {cid()}
-            </button>
-          </div>
-        )}
-      </Show>
     </nav>
   );
 };

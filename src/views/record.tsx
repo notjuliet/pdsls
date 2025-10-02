@@ -1,6 +1,6 @@
 import { Client, CredentialManager } from "@atcute/client";
 import { lexiconDoc } from "@atcute/lexicon-doc";
-import { ActorIdentifier, is, ResourceUri } from "@atcute/lexicons";
+import { ActorIdentifier, is, Nsid, ResourceUri } from "@atcute/lexicons";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, Show, Suspense } from "solid-js";
 import { Backlinks } from "../components/backlinks.jsx";
@@ -13,7 +13,7 @@ import { Modal } from "../components/modal.jsx";
 import { pds, setCID } from "../components/navbar.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import { setNotif } from "../layout.jsx";
-import { didDocCache, resolvePDS } from "../utils/api.js";
+import { didDocCache, resolveLexiconAuthority, resolvePDS } from "../utils/api.js";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 import { lexicons } from "../utils/types/lexicons.js";
 import { verifyRecord } from "../utils/verify.js";
@@ -27,6 +27,7 @@ export const RecordView = () => {
   const [externalLink, setExternalLink] = createSignal<
     { label: string; link: string; icon?: string } | undefined
   >();
+  const [lexiconUri, setLexiconUri] = createSignal<string>();
   const [validRecord, setValidRecord] = createSignal<boolean | undefined>(undefined);
   const [validSchema, setValidSchema] = createSignal<boolean | undefined>(undefined);
   const did = params.repo;
@@ -52,6 +53,7 @@ export const RecordView = () => {
     }
     setCID(res.data.cid);
     setExternalLink(checkUri(res.data.uri, res.data.value));
+    resolveLexicon(params.collection as Nsid);
     verify(res.data);
 
     return res.data;
@@ -94,6 +96,16 @@ export const RecordView = () => {
     }
   };
 
+  const resolveLexicon = async (nsid: Nsid) => {
+    try {
+      const res = await resolveLexiconAuthority(nsid);
+      setLexiconUri(`at://${res}/com.atproto.lexicon.schema/${nsid}`);
+      console.log(res);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const [record, { refetch }] = createResource(fetchRecord);
 
   const deleteRecord = async () => {
@@ -119,59 +131,30 @@ export const RecordView = () => {
     return template(parsedUri, record);
   };
 
+  const RecordTab = (props: { tab: "record" | "backlinks" | "info"; label: string }) => (
+    <A
+      classList={{
+        "flex items-center gap-1 border-b-2": true,
+        "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
+          (!!location.hash && location.hash !== `#${props.tab}`) ||
+          (!location.hash && props.tab !== "record"),
+      }}
+      href={`/at://${did}/${params.collection}/${params.rkey}#${props.tab}`}
+    >
+      {props.label}
+    </A>
+  );
+
   return (
     <Show when={record()} keyed>
       <div class="flex w-full flex-col items-center">
         <div class="dark:shadow-dark-800 dark:bg-dark-300 mb-3 flex w-full justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700">
           <div class="flex gap-3">
-            <A
-              classList={{
-                "flex items-center gap-1 border-b-2": true,
-                "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
-                  !!location.hash && location.hash !== "#record",
-              }}
-              href={`/at://${did}/${params.collection}/${params.rkey}#record`}
-            >
-              Record
-            </A>
-            <A
-              classList={{
-                "flex items-center gap-1 border-b-2": true,
-                "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
-                  location.hash !== "#backlinks",
-              }}
-              href={`/at://${did}/${params.collection}/${params.rkey}#backlinks`}
-            >
-              Backlinks
-            </A>
+            <RecordTab tab="record" label="Record" />
+            <RecordTab tab="backlinks" label="Backlinks" />
+            <RecordTab tab="info" label="Info" />
           </div>
           <div class="flex gap-1">
-            <div class="mr-1 flex gap-3">
-              <Tooltip
-                text={
-                  validRecord() === undefined ? "Validating"
-                  : validRecord() === false ?
-                    "Invalid record"
-                  : "Valid record"
-                }
-              >
-                <span
-                  classList={{
-                    "iconify lucide--lock-keyhole": validRecord() === true,
-                    "iconify lucide--lock-keyhole-open text-red-500 dark:text-red-400":
-                      validRecord() === false,
-                    "iconify lucide--loader-circle animate-spin": validRecord() === undefined,
-                  }}
-                ></span>
-              </Tooltip>
-              <Show when={validSchema() !== undefined}>
-                <Tooltip text={validSchema() ? "Valid schema" : "Invalid schema"}>
-                  <span
-                    class={`iconify ${validSchema() ? "lucide--file-check" : "lucide--file-x text-red-500 dark:text-red-400"}`}
-                  ></span>
-                </Tooltip>
-              </Show>
-            </div>
             <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
               <RecordEditor create={false} record={record()?.value} refetch={refetch} />
               <Tooltip text="Delete">
@@ -229,9 +212,6 @@ export const RecordView = () => {
           </div>
         </div>
         <Show when={!location.hash || location.hash === "#record"}>
-          <Show when={validRecord() === false}>
-            <div class="mb-2 break-words text-red-500 dark:text-red-400">{notice()}</div>
-          </Show>
           <div class="w-max max-w-screen min-w-full px-4 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:px-2 sm:text-sm md:max-w-[48rem]">
             <JSONValue data={record()?.value as any} repo={record()!.uri.split("/")[2]} />
           </div>
@@ -248,6 +228,70 @@ export const RecordView = () => {
               </div>
             </Suspense>
           </ErrorBoundary>
+        </Show>
+        <Show when={location.hash === "#info"}>
+          <div class="flex w-full flex-col gap-2 px-2 text-sm">
+            <div>
+              <div class="flex items-center gap-1">
+                <span class="iconify lucide--at-sign"></span>
+                <p class="font-semibold">AT URI</p>
+              </div>
+              <div class="truncate text-xs">{record()?.uri}</div>
+            </div>
+            <Show when={record()?.cid}>
+              <div>
+                <div class="flex items-center gap-1">
+                  <span class="iconify lucide--box"></span>
+                  <p class="font-semibold">CID</p>
+                </div>
+                <div class="truncate text-left text-xs" dir="rtl">
+                  {record()?.cid}
+                </div>
+              </div>
+            </Show>
+            <div>
+              <div class="flex items-center gap-1">
+                <span class="iconify lucide--lock-keyhole"></span>
+                <p class="font-semibold">Record verification</p>
+                <span
+                  classList={{
+                    "iconify lucide--check text-green-500 dark:text-green-400":
+                      validRecord() === true,
+                    "iconify lucide--x text-red-500 dark:text-red-400": validRecord() === false,
+                    "iconify lucide--loader-circle animate-spin": validRecord() === undefined,
+                  }}
+                ></span>
+              </div>
+              <Show when={validRecord() === false}>
+                <div class="break-words">{notice()}</div>
+              </Show>
+            </div>
+            <Show when={validSchema() !== undefined}>
+              <div class="flex items-center gap-1">
+                <span class="iconify lucide--file-check"></span>
+                <p class="font-semibold">Schema validation</p>
+                <span
+                  class={`iconify ${validSchema() ? "lucide--check text-green-500 dark:text-green-400" : "lucide--x text-red-500 dark:text-red-400"}`}
+                ></span>
+              </div>
+            </Show>
+            <Show when={lexiconUri()}>
+              <div>
+                <div class="flex items-center gap-1">
+                  <span class="iconify lucide--scroll-text"></span>
+                  <p class="font-semibold">Lexicon document</p>
+                </div>
+                <div class="truncate text-xs">
+                  <A
+                    href={`/${lexiconUri()}`}
+                    class="text-blue-400 hover:underline active:underline"
+                  >
+                    {lexiconUri()}
+                  </A>
+                </div>
+              </div>
+            </Show>
+          </div>
         </Show>
       </div>
     </Show>

@@ -11,14 +11,14 @@
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.68",
     "@iconify/tailwind4": "^1.0.6",
-    "@tailwindcss/vite": "^4.1.13",
+    "@tailwindcss/vite": "^4.1.14",
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.6.14",
-    "tailwindcss": "^4.1.13",
-    "typescript": "^5.9.2",
-    "vite": "^7.1.7",
-    "vite-plugin-solid": "^2.11.8"
+    "tailwindcss": "^4.1.14",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.8",
+    "vite-plugin-solid": "^2.11.9"
   },
   "dependencies": {
     "@atcute/atproto": "^3.1.4",
@@ -33,16 +33,17 @@
     "@atcute/identity-resolver": "^1.1.3",
     "@atcute/leaflet": "^1.0.8",
     "@atcute/lexicon-doc": "^1.1.1",
+    "@atcute/lexicon-resolver": "^0.1.0",
     "@atcute/lexicons": "^1.1.1",
     "@atcute/oauth-browser-client": "^1.0.26",
     "@atcute/tangled": "^1.0.6",
     "@atcute/tid": "^1.0.2",
     "@atcute/uint8array": "^1.0.4",
-    "@codemirror/commands": "^6.8.1",
+    "@codemirror/commands": "^6.9.0",
     "@codemirror/lang-json": "^6.0.2",
-    "@codemirror/lint": "^6.8.5",
+    "@codemirror/lint": "^6.9.0",
     "@codemirror/state": "^6.5.2",
-    "@codemirror/view": "^6.38.3",
+    "@codemirror/view": "^6.38.4",
     "@fsegurai/codemirror-theme-basic-dark": "^6.2.2",
     "@fsegurai/codemirror-theme-basic-light": "^6.2.2",
     "@mary/exif-rm": "jsr:^0.2.2",
@@ -52,5 +53,5 @@
     "codemirror": "^6.0.2",
     "solid-js": "^1.9.9"
   },
-  "packageManager": "pnpm@10.12.2+sha512.a32540185b964ee30bb4e979e405adc6af59226b438ee4cc19f9e8773667a66d302f5bfee60a39d3cac69e35e4b96e708a71dd002b7e9359c4112a1722ac323f"
+  "packageManager": "pnpm@10.17.1+sha512.17c560fca4867ae9473a3899ad84a88334914f379be46d455cbf92e5cf4b39d34985d452d2583baf19967fa76cb5c17bc9e245529d0b98745721aa7200ecaf7a"
 }

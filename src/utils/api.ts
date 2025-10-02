@@ -13,8 +13,9 @@ import {
   PlcDidDocumentResolver,
   WellKnownHandleResolver,
 } from "@atcute/identity-resolver";
+import { DohJsonLexiconAuthorityResolver } from "@atcute/lexicon-resolver";
 import { Did, Handle } from "@atcute/lexicons";
-import { isHandle } from "@atcute/lexicons/syntax";
+import { isHandle, Nsid } from "@atcute/lexicons/syntax";
 import { createStore } from "solid-js/store";
 import { setPDS } from "../components/navbar";
 
@@ -33,6 +34,10 @@ const handleResolver = new CompositeHandleResolver({
     dns: new DohJsonHandleResolver({ dohUrl: "https://dns.google/resolve?" }),
     http: new WellKnownHandleResolver(),
   },
+});
+
+const authorityResolver = new DohJsonLexiconAuthorityResolver({
+  dohUrl: "https://mozilla.cloudflare-dns.com/dns-query",
 });
 
 const didPDSCache: Record<string, string> = {};
@@ -99,6 +104,10 @@ const resolvePDS = async (did: string) => {
   return pds;
 };
 
+const resolveLexiconAuthority = async (nsid: Nsid) => {
+  return await authorityResolver.resolve(nsid);
+};
+
 interface LinkData {
   links: {
     [key: string]: {
@@ -162,6 +171,7 @@ export {
   labelerCache,
   resolveDidDoc,
   resolveHandle,
+  resolveLexiconAuthority,
   resolvePDS,
   validateHandle,
   type LinkData,
