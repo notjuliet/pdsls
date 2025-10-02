@@ -216,7 +216,7 @@ export const RepoView = () => {
             <TextInput
               name="filter"
               placeholder="Filter collections"
-              onInput={(e) => setFilter(e.currentTarget.value)}
+              onInput={(e) => setFilter(e.currentTarget.value.toLowerCase())}
               class="grow"
             />
             <div class="flex flex-col overflow-hidden font-mono text-sm">
