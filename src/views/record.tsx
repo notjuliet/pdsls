@@ -129,18 +129,27 @@ export const RecordView = () => {
     return template(parsedUri, record);
   };
 
-  const RecordTab = (props: { tab: "record" | "backlinks" | "info"; label: string }) => (
-    <A
-      classList={{
-        "flex items-center gap-1 border-b-2": true,
-        "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
-          (!!location.hash && location.hash !== `#${props.tab}`) ||
-          (!location.hash && props.tab !== "record"),
-      }}
-      href={`/at://${did}/${params.collection}/${params.rkey}#${props.tab}`}
-    >
-      {props.label}
-    </A>
+  const RecordTab = (props: {
+    tab: "record" | "backlinks" | "info";
+    label: string;
+    error?: boolean;
+  }) => (
+    <div class="flex items-center gap-0.5">
+      <A
+        classList={{
+          "flex items-center gap-1 border-b-2": true,
+          "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
+            (!!location.hash && location.hash !== `#${props.tab}`) ||
+            (!location.hash && props.tab !== "record"),
+        }}
+        href={`/at://${did}/${params.collection}/${params.rkey}#${props.tab}`}
+      >
+        {props.label}
+      </A>
+      <Show when={props.error && (validRecord() === false || validSchema() === false)}>
+        <span class="iconify lucide--x text-red-500 dark:text-red-400"></span>
+      </Show>
+    </div>
   );
 
   return (
@@ -150,7 +159,7 @@ export const RecordView = () => {
           <div class="flex gap-3">
             <RecordTab tab="record" label="Record" />
             <RecordTab tab="backlinks" label="Backlinks" />
-            <RecordTab tab="info" label="Info" />
+            <RecordTab tab="info" label="Info" error />
           </div>
           <div class="flex gap-1">
             <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
