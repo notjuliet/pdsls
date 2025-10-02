@@ -70,7 +70,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         style={{
           "background-image":
             props.params.repo in headers ?
-              `linear-gradient(to left, transparent 0%, var(--header-bg) 85%), url(/headers/${headers[props.params.repo]})`
+              `linear-gradient(to left, transparent 10%, var(--header-bg) 85%), url(/headers/${headers[props.params.repo]})`
             : undefined,
         }}
       >
@@ -82,7 +82,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <span class="iconify tabler--binary-tree-filled text-[#76c4e5]"></span>
           <span>PDSls</span>
         </A>
-        <div class="dark:bg-dark-300/50 relative -mr-1 flex items-center gap-1 rounded-lg bg-neutral-50/50">
+        <div class="dark:bg-dark-300/60 relative -mr-1 flex items-center gap-1 rounded-lg bg-neutral-50/60">
           <Show when={location.pathname !== "/"}>
             <SearchButton />
           </Show>
