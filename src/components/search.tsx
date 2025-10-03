@@ -85,7 +85,7 @@ const Search = () => {
         navigate(`/${uri}`);
       }
     } else {
-      navigate(`/at://${input}`);
+      navigate(`/at://${input.replace("at://", "")}`);
     }
     setShowSearch(false);
   };
