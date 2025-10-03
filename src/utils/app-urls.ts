@@ -1,17 +1,15 @@
 export type AppUrl = `${string}.${string}` | `localhost:${number}`;
-type AppUrlObject = Record<AppUrl, App>;
-type AppHandleLinkObject = Record<App, (url: string[]) => string>;
 
 export enum App {
-  Bluesky = 0,
-  Tangled = 1,
-  Whitewind = 2,
-  Frontpage = 3,
-  Pinksea = 4,
-  Linkat = 5,
+  Bluesky,
+  Tangled,
+  Whitewind,
+  Frontpage,
+  Pinksea,
+  Linkat,
 }
 
-export const appList: AppUrlObject = {
+export const appList: Record<AppUrl, App> = {
   "localhost:19006": App.Bluesky,
   "blacksky.community": App.Bluesky,
   "bsky.app": App.Bluesky,
@@ -28,7 +26,7 @@ export const appList: AppUrlObject = {
   "linkat.blue": App.Linkat,
 };
 
-export const appHandleLink: AppHandleLinkObject = {
+export const appHandleLink: Record<App, (url: string[]) => string> = {
   [App.Bluesky]: (path) => {
     const baseType = path[0];
     const user = path[1];

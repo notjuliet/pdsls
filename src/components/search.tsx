@@ -2,7 +2,7 @@ import { Client, CredentialManager } from "@atcute/client";
 import { A, useLocation, useNavigate } from "@solidjs/router";
 import { createResource, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { isTouchDevice } from "../layout";
-import { appHandleLink, appList } from "../utils/app-urls";
+import { appHandleLink, appList, AppUrl } from "../utils/app-urls";
 import { createDebouncedValue } from "../utils/hooks/debounced";
 
 export const [showSearch, setShowSearch] = createSignal(false);
@@ -78,7 +78,7 @@ const Search = () => {
       if (!(host in appList)) {
         navigate(`/${input.replace("https://", "").replace("http://", "").replace("/", "")}`);
       } else {
-        const app = appList[host as keyof typeof appList];
+        const app = appList[host as AppUrl];
         const path = input.slice(hostLength + 1).split("/");
 
         const uri = appHandleLink[app](path);
