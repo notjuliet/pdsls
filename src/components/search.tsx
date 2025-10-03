@@ -2,6 +2,7 @@ import { Client, CredentialManager } from "@atcute/client";
 import { A, useLocation, useNavigate } from "@solidjs/router";
 import { createResource, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { isTouchDevice } from "../layout";
+import { appHandleLink, appList } from "../utils/app-urls";
 import { createDebouncedValue } from "../utils/hooks/debounced";
 
 export const [showSearch, setShowSearch] = createSignal(false);
@@ -68,22 +69,23 @@ const Search = () => {
     setShowSearch(false);
     if (input === "me" && localStorage.getItem("lastSignedIn") !== null) {
       navigate(`/at://${localStorage.getItem("lastSignedIn")}`);
-    } else if (
-      !input.startsWith("https://bsky.app/") &&
-      (input.startsWith("https://") || input.startsWith("http://"))
-    ) {
-      navigate(`/${input.replace("https://", "").replace("http://", "").replace("/", "")}`);
     } else if (search()?.length) {
       navigate(`/at://${search()![0].did}`);
+    } else if (input.startsWith("https://") || input.startsWith("http://")) {
+      const hostLength = input.indexOf("/", 8);
+      const host = input.slice(0, hostLength).replace("https://", "").replace("http://", "");
+
+      if (!(host in appList)) {
+        navigate(`/${input.replace("https://", "").replace("http://", "").replace("/", "")}`);
+      } else {
+        const app = appList[host as keyof typeof appList];
+        const path = input.slice(hostLength + 1).split("/");
+
+        const uri = appHandleLink[app](path);
+        navigate(`/${uri}`);
+      }
     } else {
-      const uri = input
-        .replace("at://", "")
-        .replace("https://bsky.app/profile/", "")
-        .replace("/post/", "/app.bsky.feed.post/");
-      const uriParts = uri.split("/");
-      navigate(
-        `/at://${uriParts[0]}${uriParts.length > 1 ? `/${uriParts.slice(1).join("/")}` : ""}`,
-      );
+      navigate(`/at://${input}`);
     }
     setShowSearch(false);
   };
