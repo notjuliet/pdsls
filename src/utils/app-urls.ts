@@ -9,6 +9,15 @@ export enum App {
   Linkat,
 }
 
+export const appName = {
+  [App.Bluesky]: "Bluesky",
+  [App.Tangled]: "Tangled",
+  [App.Whitewind]: "Whitewind",
+  [App.Frontpage]: "Frontpage",
+  [App.Pinksea]: "Pinksea",
+  [App.Linkat]: "Linkat",
+};
+
 export const appList: Record<AppUrl, App> = {
   "localhost:19006": App.Bluesky,
   "blacksky.community": App.Bluesky,

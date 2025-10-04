@@ -2,8 +2,9 @@ import { Client, CredentialManager } from "@atcute/client";
 import { A, useLocation, useNavigate } from "@solidjs/router";
 import { createResource, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { isTouchDevice } from "../layout";
-import { appHandleLink, appList, AppUrl } from "../utils/app-urls";
+import { appHandleLink, appList, appName, AppUrl } from "../utils/app-urls";
 import { createDebouncedValue } from "../utils/hooks/debounced";
+import { Modal } from "./modal";
 
 export const [showSearch, setShowSearch] = createSignal(false);
 
@@ -113,7 +114,7 @@ const Search = () => {
           value={input() ?? ""}
           onInput={(e) => setInput(e.currentTarget.value)}
         />
-        <Show when={input()}>
+        <Show when={input()} fallback={ListUrlsTooltip()}>
           <button
             type="button"
             class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
@@ -143,6 +144,54 @@ const Search = () => {
         </div>
       </Show>
     </form>
+  );
+};
+
+const ListUrlsTooltip = () => {
+  const [openList, setOpenList] = createSignal(false);
+
+  let urls: Record<string, AppUrl[]> = {};
+  for (const [appUrl, appView] of Object.entries(appList)) {
+    if (!urls[appView]) urls[appView] = [appUrl as AppUrl];
+    else urls[appView].push(appUrl as AppUrl);
+  }
+
+  return (
+    <>
+      <Modal open={openList()} onClose={() => setOpenList(false)}>
+        <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute top-16 left-[50%] w-[26rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
+          <div class="mb-2 flex items-center gap-1 font-semibold">
+            <span class="iconify lucide--link"></span>
+            <span>Supported URLs</span>
+          </div>
+          <div class="mb-2 text-sm text-neutral-500 dark:text-neutral-400">
+            Links that will be parsed automatically, as long as all the data necessary is on the
+            URL.
+          </div>
+          <div class="flex flex-col gap-2 text-sm">
+            <For each={Object.entries(appName)}>
+              {([appView, name]) => {
+                return (
+                  <div>
+                    <p class="font-semibold">{name}</p>
+                    <div class="grid grid-cols-2 gap-x-4 text-neutral-600 dark:text-neutral-400">
+                      <For each={urls[appView]}>{(url) => <span>{url}</span>}</For>
+                    </div>
+                  </div>
+                );
+              }}
+            </For>
+          </div>
+        </div>
+      </Modal>
+      <button
+        type="button"
+        class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
+        onClick={() => setOpenList(true)}
+      >
+        <span class="iconify lucide--help-circle"></span>
+      </button>
+    </>
   );
 };
 
