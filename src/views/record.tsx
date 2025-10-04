@@ -198,6 +198,13 @@ export const RecordView = () => {
                   label="Copy record"
                   icon="lucide--copy"
                 />
+                <Show when={lexiconUri()}>
+                  <NavMenu
+                    href={`/${lexiconUri()}`}
+                    icon="lucide--scroll-text"
+                    label="Lexicon schema"
+                  />
+                </Show>
                 <Show when={externalLink()}>
                   {(externalLink) => (
                     <NavMenu
@@ -280,22 +287,6 @@ export const RecordView = () => {
                 <span
                   class={`iconify ${validSchema() ? "lucide--check text-green-500 dark:text-green-400" : "lucide--x text-red-500 dark:text-red-400"}`}
                 ></span>
-              </div>
-            </Show>
-            <Show when={lexiconUri()}>
-              <div>
-                <div class="flex items-center gap-1">
-                  <span class="iconify lucide--scroll-text"></span>
-                  <p class="font-semibold">Lexicon document</p>
-                </div>
-                <div class="truncate text-xs">
-                  <A
-                    href={`/${lexiconUri()}`}
-                    class="text-blue-400 hover:underline active:underline"
-                  >
-                    {lexiconUri()}
-                  </A>
-                </div>
               </div>
             </Show>
           </div>
