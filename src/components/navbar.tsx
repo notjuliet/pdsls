@@ -5,7 +5,6 @@ import { CopyMenu, DropdownMenu, MenuProvider } from "./dropdown";
 import Tooltip from "./tooltip";
 
 export const [pds, setPDS] = createSignal<string>();
-export const [cid, setCID] = createSignal<string>();
 export const [isLabeler, setIsLabeler] = createSignal(false);
 
 const NavBar = (props: { params: Params }) => {
@@ -60,9 +59,6 @@ const NavBar = (props: { params: Params }) => {
                 copyContent={`at://${props.params.repo}${props.params.collection ? `/${props.params.collection}` : ""}${props.params.rkey ? `/${props.params.rkey}` : ""}`}
                 label="Copy AT URI"
               />
-            </Show>
-            <Show when={props.params.rkey && cid()}>
-              <CopyMenu copyContent={cid()!} label="Copy CID" />
             </Show>
           </DropdownMenu>
         </MenuProvider>

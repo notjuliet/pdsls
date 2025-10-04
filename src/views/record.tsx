@@ -10,7 +10,7 @@ import { CopyMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dro
 import { JSONValue } from "../components/json.jsx";
 import { agent } from "../components/login.jsx";
 import { Modal } from "../components/modal.jsx";
-import { pds, setCID } from "../components/navbar.jsx";
+import { pds } from "../components/navbar.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import { setNotif } from "../layout.jsx";
 import { didDocCache, resolveLexiconAuthority, resolvePDS } from "../utils/api.js";
@@ -34,7 +34,6 @@ export const RecordView = () => {
   let rpc: Client;
 
   const fetchRecord = async () => {
-    setCID(undefined);
     setValidRecord(undefined);
     setValidSchema(undefined);
     setLexiconUri(undefined);
@@ -52,7 +51,6 @@ export const RecordView = () => {
       setNotice(res.data.error);
       throw new Error(res.data.error);
     }
-    setCID(res.data.cid);
     setExternalLink(checkUri(res.data.uri, res.data.value));
     resolveLexicon(params.collection as Nsid);
     verify(res.data);
@@ -198,6 +196,9 @@ export const RecordView = () => {
                   label="Copy record"
                   icon="lucide--copy"
                 />
+                <Show when={record()?.cid}>
+                  {(cid) => <CopyMenu copyContent={cid()} label="Copy CID" icon="lucide--copy" />}
+                </Show>
                 <Show when={lexiconUri()}>
                   <NavMenu
                     href={`/${lexiconUri()}`}
