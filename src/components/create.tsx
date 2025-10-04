@@ -172,8 +172,11 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
               ></span>
               <span>{props.create ? "Creating" : "Editing"} record</span>
             </div>
-            <button onclick={() => setOpenDialog(false)} class="flex items-center">
-              <span class="iconify lucide--x text-lg hover:text-neutral-500 dark:hover:text-neutral-400"></span>
+            <button
+              onclick={() => setOpenDialog(false)}
+              class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+            >
+              <span class="iconify lucide--x"></span>
             </button>
           </div>
           <form ref={formRef} class="flex flex-col gap-y-2">
