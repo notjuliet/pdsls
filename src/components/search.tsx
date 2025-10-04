@@ -175,7 +175,17 @@ const ListUrlsTooltip = () => {
                   <div>
                     <p class="font-semibold">{name}</p>
                     <div class="grid grid-cols-2 gap-x-4 text-neutral-600 dark:text-neutral-400">
-                      <For each={urls[appView]}>{(url) => <span>{url}</span>}</For>
+                      <For each={urls[appView]}>
+                        {(url) => (
+                          <a
+                            href={`${url.startsWith("localhost:") ? "http://" : "https://"}${url}`}
+                            target="_blank"
+                            class="hover:underline active:underline"
+                          >
+                            {url}
+                          </a>
+                        )}
+                      </For>
                     </div>
                   </div>
                 );
