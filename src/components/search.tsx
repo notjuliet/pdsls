@@ -85,7 +85,6 @@ const Search = () => {
     } else {
       navigate(`/at://${input.replace("at://", "")}`);
     }
-    setShowSearch(false);
   };
 
   return (
