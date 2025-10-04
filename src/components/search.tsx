@@ -164,7 +164,7 @@ const ListUrlsTooltip = () => {
             <span class="iconify lucide--link"></span>
             <span>Supported URLs</span>
           </div>
-          <div class="mb-2 text-sm text-neutral-500 dark:text-neutral-400">
+          <div class="mb-2 text-sm text-neutral-600 dark:text-neutral-400">
             Links that will be parsed automatically, as long as all the data necessary is on the
             URL.
           </div>
