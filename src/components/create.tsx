@@ -189,7 +189,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                   <TextInput
                     id="collection"
                     name="collection"
-                    placeholder="Optional (default: record type)"
+                    placeholder="Optional (default: $type)"
                     class="w-[15rem]"
                   />
                 </div>
