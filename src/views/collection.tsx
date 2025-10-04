@@ -41,7 +41,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
 
   return (
     <span
-      class="relative flex w-full items-baseline truncate rounded px-0.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      class="relative flex w-full min-w-0 items-baseline rounded px-0.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
       ref={rkeyRef}
       onmouseover={() => setHover(true)}
       onmouseleave={() => setHover(false)}
