@@ -2,7 +2,7 @@ import { ComAtprotoServerDescribeServer, ComAtprotoSyncListRepos } from "@atcute
 import { Client, CredentialManager } from "@atcute/client";
 import { InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
-import { A, useParams } from "@solidjs/router";
+import { A, useLocation, useParams } from "@solidjs/router";
 import { createResource, createSignal, For, Show } from "solid-js";
 import { Button } from "../components/button";
 import { Modal } from "../components/modal";
@@ -14,6 +14,7 @@ const LIMIT = 1000;
 
 const PdsView = () => {
   const params = useParams();
+  const location = useLocation();
   const [version, setVersion] = createSignal<string>();
   const [serverInfos, setServerInfos] =
     createSignal<InferXRPCBodyOutput<ComAtprotoServerDescribeServer.mainSchema["output"]>>();
@@ -103,50 +104,88 @@ const PdsView = () => {
     );
   };
 
+  const Tab = (props: { tab: "repos" | "info"; label: string }) => (
+    <div class="flex items-center gap-0.5">
+      <A
+        classList={{
+          "flex items-center gap-1 border-b-2": true,
+          "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
+            (!!location.hash && location.hash !== `#${props.tab}`) ||
+            (!location.hash && props.tab !== "repos"),
+        }}
+        href={`/${params.pds}#${props.tab}`}
+      >
+        {props.label}
+      </A>
+    </div>
+  );
+
   return (
     <Show when={repos() || response()}>
-      <div class="flex w-full flex-col px-2">
-        <Show when={version()}>
-          {(version) => (
-            <div class="flex items-baseline gap-x-1">
-              <span class="font-semibold">Version</span>
-              <span class="truncate text-sm">{version()}</span>
+      <div class="flex w-full flex-col">
+        <div class="dark:shadow-dark-800 dark:bg-dark-300 mb-2 flex w-full justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700">
+          <div class="flex gap-3">
+            <Tab tab="repos" label="Repositories" />
+            <Tab tab="info" label="Info" />
+          </div>
+          <Tooltip text="Firehose">
+            <A
+              href={`/firehose?instance=wss://${params.pds}`}
+              class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+            >
+              <span class="iconify lucide--radio-tower"></span>
+            </A>
+          </Tooltip>
+        </div>
+        <div class="flex flex-col gap-1 px-2">
+          <Show when={!location.hash || location.hash === "#repos"}>
+            <div class="flex flex-col divide-y-[0.5px] divide-neutral-300 dark:divide-neutral-700">
+              <For each={repos()}>{(repo) => <RepoCard {...repo} />}</For>
             </div>
-          )}
-        </Show>
-        <Show when={serverInfos()}>
-          {(server) => (
-            <>
-              <Show when={server().inviteCodeRequired}>
-                <span class="font-semibold">Invite Code Required</span>
-              </Show>
-              <Show when={server().phoneVerificationRequired}>
-                <span class="font-semibold">Phone Verification Required</span>
-              </Show>
-              <Show when={server().availableUserDomains.length}>
-                <div class="flex flex-col">
-                  <span class="font-semibold">Available User Domains</span>
-                  <For each={server().availableUserDomains}>
-                    {(domain) => <span class="text-sm wrap-anywhere">{domain}</span>}
-                  </For>
+          </Show>
+          <Show when={location.hash === "#info"}>
+            <Show when={version()}>
+              {(version) => (
+                <div class="flex items-baseline gap-x-1">
+                  <span class="font-semibold">Version</span>
+                  <span class="truncate text-sm">{version()}</span>
                 </div>
-              </Show>
-            </>
-          )}
-        </Show>
-        <p class="w-full font-semibold">{repos()?.length} Repositories</p>
-        <div class="flex flex-col divide-y-[0.5px] divide-neutral-300 dark:divide-neutral-700">
-          <For each={repos()}>{(repo) => <RepoCard {...repo} />}</For>
+              )}
+            </Show>
+            <Show when={serverInfos()}>
+              {(server) => (
+                <>
+                  <Show when={server().inviteCodeRequired}>
+                    <span class="font-semibold">Invite Code Required</span>
+                  </Show>
+                  <Show when={server().phoneVerificationRequired}>
+                    <span class="font-semibold">Phone Verification Required</span>
+                  </Show>
+                  <Show when={server().availableUserDomains.length}>
+                    <div class="flex flex-col">
+                      <span class="font-semibold">Available User Domains</span>
+                      <For each={server().availableUserDomains}>
+                        {(domain) => <span class="text-sm wrap-anywhere">{domain}</span>}
+                      </For>
+                    </div>
+                  </Show>
+                </>
+              )}
+            </Show>
+          </Show>
         </div>
       </div>
-      <Show when={cursor()}>
-        <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 py-3">
-          <Show when={!response.loading}>
-            <Button onClick={() => refetch()}>Load More</Button>
-          </Show>
-          <Show when={response.loading}>
-            <span class="iconify lucide--loader-circle animate-spin py-3.5 text-xl"></span>
-          </Show>
+      <Show when={!location.hash || location.hash === "#repos"}>
+        <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 py-2">
+          <div class="flex flex-col items-center gap-1 pb-2">
+            <p>{repos()?.length} loaded</p>
+            <Show when={!response.loading && cursor()}>
+              <Button onClick={() => refetch()}>Load More</Button>
+            </Show>
+            <Show when={response.loading}>
+              <span class="iconify lucide--loader-circle animate-spin py-3.5 text-xl"></span>
+            </Show>
+          </div>
         </div>
       </Show>
     </Show>
