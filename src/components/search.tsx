@@ -67,9 +67,7 @@ const Search = () => {
     input = input.trim().replace(/^@/, "");
     if (!input.length) return;
     setShowSearch(false);
-    if (input === "me" && localStorage.getItem("lastSignedIn") !== null) {
-      navigate(`/at://${localStorage.getItem("lastSignedIn")}`);
-    } else if (search()?.length) {
+    if (search()?.length) {
       navigate(`/at://${search()![0].did}`);
     } else if (input.startsWith("https://") || input.startsWith("http://")) {
       const hostLength = input.indexOf("/", 8);
