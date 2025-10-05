@@ -7,7 +7,7 @@ import Tooltip from "./tooltip";
 export const [pds, setPDS] = createSignal<string>();
 export const [isLabeler, setIsLabeler] = createSignal(false);
 
-const NavBar = (props: { params: Params }) => {
+export const NavBar = (props: { params: Params }) => {
   const location = useLocation();
   const [handle, setHandle] = createSignal(props.params.repo);
   const [showHandle, setShowHandle] = createSignal(localStorage.showHandle === "true");
@@ -54,13 +54,11 @@ const NavBar = (props: { params: Params }) => {
               <Show when={pds()}>
                 <CopyMenu copyContent={pds()!} label="Copy PDS" />
               </Show>
-              <Show when={props.params.repo}>
-                <CopyMenu copyContent={props.params.repo} label="Copy DID" />
-                <CopyMenu
-                  copyContent={`at://${props.params.repo}${props.params.collection ? `/${props.params.collection}` : ""}${props.params.rkey ? `/${props.params.rkey}` : ""}`}
-                  label="Copy AT URI"
-                />
-              </Show>
+              <CopyMenu copyContent={props.params.repo} label="Copy DID" />
+              <CopyMenu
+                copyContent={`at://${props.params.repo}${props.params.collection ? `/${props.params.collection}` : ""}${props.params.rkey ? `/${props.params.rkey}` : ""}`}
+                label="Copy AT URI"
+              />
             </DropdownMenu>
           </MenuProvider>
         </Show>
@@ -145,5 +143,3 @@ const NavBar = (props: { params: Params }) => {
     </nav>
   );
 };
-
-export { NavBar };
