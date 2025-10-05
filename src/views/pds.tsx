@@ -29,11 +29,15 @@ const PdsView = () => {
     setVersion((res.data as any).version);
   };
 
+  const describeServer = async () => {
+    const res = await rpc.get("com.atproto.server.describeServer");
+    if (!res.ok) console.error(res.data.error);
+    else setServerInfos(res.data);
+  };
+
   const fetchRepos = async () => {
     getVersion();
-    const describeRes = await rpc.get("com.atproto.server.describeServer");
-    if (!describeRes.ok) console.error(describeRes.data.error);
-    else setServerInfos(describeRes.data);
+    describeServer();
     const res = await rpc.get("com.atproto.sync.listRepos", {
       params: { limit: LIMIT, cursor: cursor() },
     });
