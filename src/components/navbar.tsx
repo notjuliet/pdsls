@@ -44,24 +44,26 @@ const NavBar = (props: { params: Params }) => {
             </Show>
           </Show>
         </div>
-        <MenuProvider>
-          <DropdownMenu
-            icon="lucide--copy text-base"
-            buttonClass="rounded p-0.5"
-            menuClass="top-6 p-2 text-xs"
-          >
-            <Show when={pds()}>
-              <CopyMenu copyContent={pds()!} label="Copy PDS" />
-            </Show>
-            <Show when={props.params.repo}>
-              <CopyMenu copyContent={props.params.repo} label="Copy DID" />
-              <CopyMenu
-                copyContent={`at://${props.params.repo}${props.params.collection ? `/${props.params.collection}` : ""}${props.params.rkey ? `/${props.params.rkey}` : ""}`}
-                label="Copy AT URI"
-              />
-            </Show>
-          </DropdownMenu>
-        </MenuProvider>
+        <Show when={props.params.repo}>
+          <MenuProvider>
+            <DropdownMenu
+              icon="lucide--copy text-base"
+              buttonClass="rounded p-0.5"
+              menuClass="top-6 p-2 text-xs"
+            >
+              <Show when={pds()}>
+                <CopyMenu copyContent={pds()!} label="Copy PDS" />
+              </Show>
+              <Show when={props.params.repo}>
+                <CopyMenu copyContent={props.params.repo} label="Copy DID" />
+                <CopyMenu
+                  copyContent={`at://${props.params.repo}${props.params.collection ? `/${props.params.collection}` : ""}${props.params.rkey ? `/${props.params.rkey}` : ""}`}
+                  label="Copy AT URI"
+                />
+              </Show>
+            </DropdownMenu>
+          </MenuProvider>
+        </Show>
       </div>
       <div class="flex flex-col flex-wrap">
         <Show when={props.params.repo}>
