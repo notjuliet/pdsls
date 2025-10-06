@@ -1,7 +1,7 @@
 import { Client } from "@atcute/client";
 import { remove } from "@mary/exif-rm";
 import { useNavigate, useParams } from "@solidjs/router";
-import { createSignal, Show } from "solid-js";
+import { createSignal, onCleanup, Show } from "solid-js";
 import { Editor, editorView } from "../components/editor.jsx";
 import { agent } from "../components/login.jsx";
 import { setNotif } from "../layout.jsx";
@@ -15,7 +15,8 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   const params = useParams();
   const [openDialog, setOpenDialog] = createSignal(false);
   const [notice, setNotice] = createSignal("");
-  const [uploading, setUploading] = createSignal(false);
+  const [openUpload, setOpenUpload] = createSignal(false);
+  let blobInput!: HTMLInputElement;
   let formRef!: HTMLFormElement;
 
   const placeholder = () => {
@@ -125,40 +126,102 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     }
   };
 
-  const uploadBlob = async () => {
-    setNotice("");
-    let blob: Blob;
+  const FileUpload = (props: { file: File }) => {
+    const [uploading, setUploading] = createSignal(false);
+    const [error, setError] = createSignal("");
 
-    const file = (document.getElementById("blob") as HTMLInputElement)?.files?.[0];
-    if (!file) return;
+    onCleanup(() => (blobInput.value = ""));
 
-    const mimetype = (document.getElementById("mimetype") as HTMLInputElement)?.value;
-    (document.getElementById("mimetype") as HTMLInputElement).value = "";
-    if (mimetype) blob = new Blob([file], { type: mimetype });
-    else blob = file;
+    const formatFileSize = (bytes: number) => {
+      if (bytes === 0) return "0 Bytes";
+      const k = 1024;
+      const sizes = ["Bytes", "KB", "MB", "GB"];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+    };
 
-    if ((document.getElementById("exif-rm") as HTMLInputElement).checked) {
-      const exifRemoved = remove(new Uint8Array(await blob.arrayBuffer()));
-      if (exifRemoved !== null) blob = new Blob([exifRemoved], { type: blob.type });
-    }
+    const uploadBlob = async () => {
+      let blob: Blob;
 
-    const rpc = new Client({ handler: agent()! });
-    setUploading(true);
-    const res = await rpc.post("com.atproto.repo.uploadBlob", {
-      input: blob,
-    });
-    setUploading(false);
-    (document.getElementById("blob") as HTMLInputElement).value = "";
-    if (!res.ok) {
-      setNotice(res.data.error);
-      return;
-    }
-    editorView.dispatch({
-      changes: {
-        from: editorView.state.selection.main.head,
-        insert: JSON.stringify(res.data.blob, null, 2),
-      },
-    });
+      const mimetype = (document.getElementById("mimetype") as HTMLInputElement)?.value;
+      (document.getElementById("mimetype") as HTMLInputElement).value = "";
+      if (mimetype) blob = new Blob([props.file], { type: mimetype });
+      else blob = props.file;
+
+      if ((document.getElementById("exif-rm") as HTMLInputElement).checked) {
+        const exifRemoved = remove(new Uint8Array(await blob.arrayBuffer()));
+        if (exifRemoved !== null) blob = new Blob([exifRemoved], { type: blob.type });
+      }
+
+      const rpc = new Client({ handler: agent()! });
+      setUploading(true);
+      const res = await rpc.post("com.atproto.repo.uploadBlob", {
+        input: blob,
+      });
+      setUploading(false);
+      if (!res.ok) {
+        setError(res.data.error);
+        return;
+      }
+      editorView.dispatch({
+        changes: {
+          from: editorView.state.selection.main.head,
+          insert: JSON.stringify(res.data.blob, null, 2),
+        },
+      });
+      setOpenUpload(false);
+    };
+
+    return (
+      <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute top-70 left-[50%] max-w-[20rem] min-w-[16rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
+        <h2 class="mb-2 font-semibold">Upload blob</h2>
+        <div class="flex flex-col gap-2">
+          <div class="flex flex-col gap-1">
+            <p class="flex gap-1">
+              <span class="truncate">{props.file.name}</span>
+              <span class="shrink-0 text-neutral-600 dark:text-neutral-400">
+                ({formatFileSize(props.file.size)})
+              </span>
+            </p>
+          </div>
+          <div class="flex items-center gap-x-2">
+            <label for="mimetype" class="shrink-0 select-none">
+              MIME type
+            </label>
+            <TextInput id="mimetype" placeholder={props.file.type} />
+          </div>
+          <div class="flex items-center gap-1">
+            <input id="exif-rm" type="checkbox" checked />
+            <label for="exif-rm" class="select-none">
+              Remove EXIF data
+            </label>
+          </div>
+          <p class="text-xs text-neutral-600 dark:text-neutral-400">
+            Metadata will be pasted after the cursor
+          </p>
+          <Show when={error()}>
+            <span class="text-red-500 dark:text-red-400">Error: {error()}</span>
+          </Show>
+          <div class="flex justify-between gap-2">
+            <Button onClick={() => setOpenUpload(false)}>Cancel</Button>
+            <Show when={uploading()}>
+              <div class="flex items-center gap-1">
+                <span class="iconify lucide--loader-circle animate-spin"></span>
+                <span>Uploading</span>
+              </div>
+            </Show>
+            <Show when={!uploading()}>
+              <Button
+                onClick={uploadBlob}
+                class="dark:shadow-dark-800 flex items-center gap-1 rounded-lg bg-blue-500 px-2 py-1.5 text-xs text-white shadow-xs select-none hover:bg-blue-600 active:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 dark:active:bg-blue-400"
+              >
+                Upload
+              </Button>
+            </Show>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -205,49 +268,43 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                   />
                 </div>
               </Show>
-              <div class="flex items-center gap-x-2">
-                <label for="validate" class="min-w-20 select-none">
-                  Validate
-                </label>
-                <select
-                  name="validate"
-                  id="validate"
-                  class="dark:bg-dark-100 dark:shadow-dark-800 rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 shadow-xs focus:outline-[1px] focus:outline-neutral-900 dark:border-neutral-700 dark:focus:outline-neutral-200"
-                >
-                  <option value="unset">Unset</option>
-                  <option value="true">True</option>
-                  <option value="false">False</option>
-                </select>
-              </div>
-              <div class="flex items-center gap-2">
-                <Show when={!uploading()}>
-                  <div class="dark:hover:bg-dark-200 dark:shadow-dark-800 dark:active:bg-dark-100 flex rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 text-xs font-semibold shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800">
-                    <input type="file" id="blob" class="sr-only" onChange={() => uploadBlob()} />
-                    <label class="flex items-center gap-1 px-2 py-1.5 select-none" for="blob">
-                      <span class="iconify lucide--upload text-sm"></span>
-                      Upload
-                    </label>
-                  </div>
-                  <p class="text-xs">Metadata will be pasted after the cursor</p>
-                </Show>
-                <Show when={uploading()}>
-                  <span class="iconify lucide--loader-circle animate-spin text-xl"></span>
-                  <p>Uploading...</p>
-                </Show>
-              </div>
-              <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div class="flex justify-between">
                 <div class="flex items-center gap-x-2">
-                  <label for="mimetype" class="min-w-20 select-none">
-                    MIME type
+                  <label for="validate" class="min-w-20 select-none">
+                    Validate
                   </label>
-                  <TextInput id="mimetype" placeholder="Optional" class="w-[15rem]" />
+                  <select
+                    name="validate"
+                    id="validate"
+                    class="dark:bg-dark-100 dark:shadow-dark-800 rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 shadow-xs focus:outline-[1px] focus:outline-neutral-900 dark:border-neutral-700 dark:focus:outline-neutral-200"
+                  >
+                    <option value="unset">Unset</option>
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                  </select>
                 </div>
-                <div class="flex items-center gap-1">
-                  <input id="exif-rm" type="checkbox" checked />
-                  <label for="exif-rm" class="select-none">
-                    Remove EXIF data
+                <div class="dark:hover:bg-dark-200 dark:shadow-dark-800 dark:active:bg-dark-100 flex rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 text-xs shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800">
+                  <input
+                    type="file"
+                    id="blob"
+                    class="sr-only"
+                    ref={blobInput}
+                    onChange={(e) => {
+                      if (e.target.files !== null) setOpenUpload(true);
+                    }}
+                  />
+                  <label class="flex items-center gap-1 px-2 py-1.5 select-none" for="blob">
+                    <span class="iconify lucide--upload text-sm"></span>
+                    Upload
                   </label>
                 </div>
+                <Modal
+                  open={openUpload()}
+                  onClose={() => setOpenUpload(false)}
+                  closeOnClick={false}
+                >
+                  <FileUpload file={blobInput.files![0]} />
+                </Modal>
               </div>
             </div>
             <Editor
