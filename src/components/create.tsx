@@ -268,44 +268,38 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                   />
                 </div>
               </Show>
-              <div class="flex justify-between">
-                <div class="flex items-center gap-x-2">
-                  <label for="validate" class="min-w-20 select-none">
-                    Validate
-                  </label>
-                  <select
-                    name="validate"
-                    id="validate"
-                    class="dark:bg-dark-100 dark:shadow-dark-800 rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 shadow-xs focus:outline-[1px] focus:outline-neutral-900 dark:border-neutral-700 dark:focus:outline-neutral-200"
-                  >
-                    <option value="unset">Unset</option>
-                    <option value="true">True</option>
-                    <option value="false">False</option>
-                  </select>
-                </div>
-                <div class="dark:hover:bg-dark-200 dark:shadow-dark-800 dark:active:bg-dark-100 flex rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 text-xs shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800">
-                  <input
-                    type="file"
-                    id="blob"
-                    class="sr-only"
-                    ref={blobInput}
-                    onChange={(e) => {
-                      if (e.target.files !== null) setOpenUpload(true);
-                    }}
-                  />
-                  <label class="flex items-center gap-1 px-2 py-1.5 select-none" for="blob">
-                    <span class="iconify lucide--upload"></span>
-                    Upload
-                  </label>
-                </div>
-                <Modal
-                  open={openUpload()}
-                  onClose={() => setOpenUpload(false)}
-                  closeOnClick={false}
+              <div class="flex items-center gap-x-2">
+                <label for="validate" class="min-w-20 select-none">
+                  Validate
+                </label>
+                <select
+                  name="validate"
+                  id="validate"
+                  class="dark:bg-dark-100 dark:shadow-dark-800 rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 shadow-xs focus:outline-[1px] focus:outline-neutral-900 dark:border-neutral-700 dark:focus:outline-neutral-200"
                 >
-                  <FileUpload file={blobInput.files![0]} />
-                </Modal>
+                  <option value="unset">Unset</option>
+                  <option value="true">True</option>
+                  <option value="false">False</option>
+                </select>
               </div>
+              <div class="dark:hover:bg-dark-200 dark:shadow-dark-800 dark:active:bg-dark-100 flex w-fit rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 text-xs shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800">
+                <input
+                  type="file"
+                  id="blob"
+                  class="sr-only"
+                  ref={blobInput}
+                  onChange={(e) => {
+                    if (e.target.files !== null) setOpenUpload(true);
+                  }}
+                />
+                <label class="flex items-center gap-1 px-2 py-1.5 select-none" for="blob">
+                  <span class="iconify lucide--upload"></span>
+                  Upload
+                </label>
+              </div>
+              <Modal open={openUpload()} onClose={() => setOpenUpload(false)} closeOnClick={false}>
+                <FileUpload file={blobInput.files![0]} />
+              </Modal>
             </div>
             <Editor
               content={JSON.stringify(props.create ? placeholder() : props.record, null, 2)}
