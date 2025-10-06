@@ -37,6 +37,7 @@ export const PlcLogView = (props: { did: string }) => {
       classList={{
         "flex items-center rounded-full p-1.5": true,
         "bg-neutral-700 dark:bg-neutral-200": activePlcEvent() === props.event,
+        "hover:bg-neutral-200 dark:hover:bg-neutral-700": activePlcEvent() !== props.event,
       }}
       onclick={() => setActivePlcEvent(activePlcEvent() === props.event ? undefined : props.event)}
     >
