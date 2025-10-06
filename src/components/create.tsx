@@ -175,7 +175,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     return (
       <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute top-70 left-[50%] w-[20rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
         <h2 class="mb-2 font-semibold">Upload blob</h2>
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 text-sm">
           <div class="flex flex-col gap-1">
             <p class="flex gap-1">
               <span class="truncate">{props.file.name}</span>
