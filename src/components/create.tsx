@@ -294,7 +294,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                     }}
                   />
                   <label class="flex items-center gap-1 px-2 py-1.5 select-none" for="blob">
-                    <span class="iconify lucide--upload text-sm"></span>
+                    <span class="iconify lucide--upload"></span>
                     Upload
                   </label>
                 </div>
