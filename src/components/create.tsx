@@ -243,7 +243,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
             </button>
           </div>
           <form ref={formRef} class="flex flex-col gap-y-2">
-            <div class="flex w-fit flex-col gap-y-1 text-xs sm:text-sm">
+            <div class="flex w-fit flex-col gap-y-1 text-sm">
               <Show when={props.create}>
                 <div class="flex items-center gap-x-2">
                   <label for="collection" class="min-w-20 select-none">
@@ -282,50 +282,56 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                   <option value="false">False</option>
                 </select>
               </div>
-              <div class="dark:hover:bg-dark-200 dark:shadow-dark-800 dark:active:bg-dark-100 flex w-fit rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 text-xs shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800">
-                <input
-                  type="file"
-                  id="blob"
-                  class="sr-only"
-                  ref={blobInput}
-                  onChange={(e) => {
-                    if (e.target.files !== null) setOpenUpload(true);
-                  }}
-                />
-                <label class="flex items-center gap-1 px-2 py-1.5 select-none" for="blob">
-                  <span class="iconify lucide--upload"></span>
-                  Upload
-                </label>
-              </div>
-              <Modal open={openUpload()} onClose={() => setOpenUpload(false)} closeOnClick={false}>
-                <FileUpload file={blobInput.files![0]} />
-              </Modal>
             </div>
             <Editor
               content={JSON.stringify(props.create ? placeholder() : props.record, null, 2)}
             />
             <div class="flex flex-col gap-2">
               <Show when={notice()}>
-                <div class="text-red-500 dark:text-red-400">{notice()}</div>
+                <div class="text-sm text-red-500 dark:text-red-400">{notice()}</div>
               </Show>
-              <div class="flex items-center justify-end gap-2">
-                <Show when={!props.create}>
-                  <div class="flex items-center gap-1">
-                    <input id="recreate" name="recreate" type="checkbox" />
-                    <label for="recreate" class="text-sm select-none">
-                      Recreate record
-                    </label>
-                  </div>
-                </Show>
-                <Button
-                  onClick={() =>
-                    props.create ?
-                      createRecord(new FormData(formRef))
-                    : editRecord(new FormData(formRef))
-                  }
+              <div class="flex justify-between gap-2">
+                <div class="dark:hover:bg-dark-200 dark:shadow-dark-800 dark:active:bg-dark-100 flex w-fit rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 text-xs shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800">
+                  <input
+                    type="file"
+                    id="blob"
+                    class="sr-only"
+                    ref={blobInput}
+                    onChange={(e) => {
+                      if (e.target.files !== null) setOpenUpload(true);
+                    }}
+                  />
+                  <label class="flex items-center gap-1 px-2 py-1.5 select-none" for="blob">
+                    <span class="iconify lucide--upload"></span>
+                    Upload
+                  </label>
+                </div>
+                <Modal
+                  open={openUpload()}
+                  onClose={() => setOpenUpload(false)}
+                  closeOnClick={false}
                 >
-                  {props.create ? "Create" : "Edit"}
-                </Button>
+                  <FileUpload file={blobInput.files![0]} />
+                </Modal>
+                <div class="flex items-center justify-end gap-2">
+                  <Show when={!props.create}>
+                    <div class="flex items-center gap-1">
+                      <input id="recreate" name="recreate" type="checkbox" />
+                      <label for="recreate" class="text-sm select-none">
+                        Recreate record
+                      </label>
+                    </div>
+                  </Show>
+                  <Button
+                    onClick={() =>
+                      props.create ?
+                        createRecord(new FormData(formRef))
+                      : editRecord(new FormData(formRef))
+                    }
+                  >
+                    {props.create ? "Create" : "Edit"}
+                  </Button>
+                </div>
               </div>
             </div>
           </form>
