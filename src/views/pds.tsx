@@ -215,7 +215,7 @@ const PdsView = () => {
                   <Show when={server().contact?.email}>
                     <div class="flex flex-col">
                       <span class="font-semibold">Contact</span>
-                      <a href={server().contact?.email} class="text-sm hover:underline">
+                      <a href={`mailto:${server().contact?.email}`} class="text-sm hover:underline">
                         {server().contact?.email}
                       </a>
                     </div>
