@@ -170,6 +170,10 @@ const PdsView = () => {
             <Show when={serverInfos()}>
               {(server) => (
                 <>
+                  <div class="flex items-baseline gap-x-1">
+                    <span class="font-semibold">DID</span>
+                    <span class="truncate text-sm">{server().did}</span>
+                  </div>
                   <Show when={server().inviteCodeRequired}>
                     <span class="font-semibold">Invite Code Required</span>
                   </Show>
@@ -182,6 +186,38 @@ const PdsView = () => {
                       <For each={server().availableUserDomains}>
                         {(domain) => <span class="text-sm wrap-anywhere">{domain}</span>}
                       </For>
+                    </div>
+                  </Show>
+                  <Show when={server().links?.privacyPolicy}>
+                    <div class="flex flex-col">
+                      <span class="font-semibold">Privacy Policy</span>
+                      <a
+                        href={server().links?.privacyPolicy}
+                        class="text-sm hover:underline"
+                        target="_blank"
+                      >
+                        {server().links?.privacyPolicy}
+                      </a>
+                    </div>
+                  </Show>
+                  <Show when={server().links?.termsOfService}>
+                    <div class="flex flex-col">
+                      <span class="font-semibold">Terms of Service</span>
+                      <a
+                        href={server().links?.termsOfService}
+                        class="text-sm hover:underline"
+                        target="_blank"
+                      >
+                        {server().links?.termsOfService}
+                      </a>
+                    </div>
+                  </Show>
+                  <Show when={server().contact?.email}>
+                    <div class="flex flex-col">
+                      <span class="font-semibold">Contact</span>
+                      <a href={server().contact?.email} class="text-sm hover:underline">
+                        {server().contact?.email}
+                      </a>
                     </div>
                   </Show>
                 </>
