@@ -68,12 +68,10 @@ const LabelView = () => {
           initQuery();
         }}
       >
-        <div class="w-full">
-          <label for="patterns" class="ml-0.5 text-sm">
-            URI Patterns (comma-separated)
-          </label>
-        </div>
-        <div class="flex w-full items-center gap-x-1">
+        <label for="patterns" class="ml-2 w-full text-sm">
+          URI Patterns (comma-separated)
+        </label>
+        <div class="flex w-full items-center gap-x-1 px-1">
           <textarea
             id="patterns"
             name="patterns"
