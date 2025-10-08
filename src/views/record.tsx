@@ -5,7 +5,7 @@ import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, Show, Suspense } from "solid-js";
 import { Backlinks } from "../components/backlinks.jsx";
 import { Button } from "../components/button.jsx";
-import { RecordEditor } from "../components/create.jsx";
+import { RecordEditor, setPlaceholder } from "../components/create.jsx";
 import { CopyMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
 import { JSONValue } from "../components/json.jsx";
 import { agent } from "../components/login.jsx";
@@ -51,12 +51,15 @@ export const RecordView = () => {
       setNotice(res.data.error);
       throw new Error(res.data.error);
     }
+    setPlaceholder(res.data.value);
     setExternalLink(checkUri(res.data.uri, res.data.value));
     resolveLexicon(params.collection as Nsid);
     verify(res.data);
 
     return res.data;
   };
+
+  const [record, { refetch }] = createResource(fetchRecord);
 
   const verify = async (record: {
     uri: ResourceUri;
@@ -101,8 +104,6 @@ export const RecordView = () => {
       setLexiconUri(`at://${res}/com.atproto.lexicon.schema/${nsid}`);
     } catch {}
   };
-
-  const [record, { refetch }] = createResource(fetchRecord);
 
   const deleteRecord = async () => {
     rpc = new Client({ handler: agent()! });

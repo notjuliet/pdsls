@@ -10,6 +10,8 @@ import { Modal } from "./modal.jsx";
 import { TextInput } from "./text-input.jsx";
 import Tooltip from "./tooltip.jsx";
 
+export const [placeholder, setPlaceholder] = createSignal<any>();
+
 export const RecordEditor = (props: { create: boolean; record?: any; refetch?: any }) => {
   const navigate = useNavigate();
   const params = useParams();
@@ -19,7 +21,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   let blobInput!: HTMLInputElement;
   let formRef!: HTMLFormElement;
 
-  const placeholder = () => {
+  const defaultPlaceholder = () => {
     return {
       $type: "app.bsky.feed.post",
       text: "This post was sent from PDSls",
@@ -284,7 +286,13 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
               </div>
             </div>
             <Editor
-              content={JSON.stringify(props.create ? placeholder() : props.record, null, 2)}
+              content={JSON.stringify(
+                !props.create ? props.record
+                : params.rkey ? placeholder()
+                : defaultPlaceholder(),
+                null,
+                2,
+              )}
             />
             <div class="flex flex-col gap-2">
               <Show when={notice()}>
