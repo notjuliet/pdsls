@@ -178,7 +178,7 @@ export const RepoView = () => {
             </MenuProvider>
           </div>
         </div>
-        <div class="flex w-full flex-col gap-2 px-2">
+        <div class="flex w-full flex-col gap-1 px-2">
           <Show when={location.hash === "#logs"}>
             <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
               <Suspense
