@@ -219,7 +219,7 @@ export const RepoView = () => {
               onInput={(e) => setFilter(e.currentTarget.value.toLowerCase())}
               class="grow"
             />
-            <div class="flex flex-col overflow-hidden font-mono text-sm">
+            <div class="flex flex-col overflow-hidden text-sm">
               <For
                 each={Object.keys(nsids() ?? {}).filter((authority) =>
                   filter() ?
