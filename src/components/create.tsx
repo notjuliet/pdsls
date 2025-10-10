@@ -71,7 +71,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     navigate(`/${res.data.uri}`);
   };
 
-  const editRecord = async (formData: FormData) => {
+  const editRecord = async (formData: FormData, recreate?: boolean) => {
     const record = editorView.state.doc.toString();
     const validate =
       formData.get("validate")?.toString() === "true" ? true
@@ -81,7 +81,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     const rpc = new Client({ handler: agent()! });
     try {
       const editedRecord = JSON.parse(record);
-      if (formData.get("recreate")) {
+      if (recreate) {
         const res = await rpc.post("com.atproto.repo.applyWrites", {
           input: {
             repo: agent()!.sub,
@@ -320,12 +320,9 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                 </Modal>
                 <div class="flex items-center justify-end gap-2">
                   <Show when={!props.create}>
-                    <div class="flex items-center gap-1">
-                      <input id="recreate" name="recreate" type="checkbox" />
-                      <label for="recreate" class="text-sm select-none">
-                        Recreate record
-                      </label>
-                    </div>
+                    <Button onClick={() => editRecord(new FormData(formRef), true)}>
+                      Recreate
+                    </Button>
                   </Show>
                   <Button
                     onClick={() =>
