@@ -12,7 +12,6 @@ import {
   type Session,
 } from "@atcute/oauth-browser-client";
 import { createSignal, Show } from "solid-js";
-import { TextInput } from "./text-input";
 
 configureOAuth({
   metadata: {
@@ -29,6 +28,7 @@ const Login = () => {
 
   const login = async (handle: string) => {
     try {
+      setNotice("");
       if (!handle) return;
       let resolved;
       if (!isHandle(handle)) {
@@ -58,24 +58,32 @@ const Login = () => {
   return (
     <form class="flex flex-col gap-y-2 px-1" onsubmit={(e) => e.preventDefault()}>
       <div class="flex items-center gap-1">
-        <label for="handle" class="mr-1 flex items-center">
-          <span class="iconify lucide--user-round-plus text-lg"></span>
+        <label for="handle" class="hidden">
+          Add account
         </label>
-        <TextInput
-          id="handle"
-          placeholder="user.bsky.social"
-          onInput={(e) => setLoginInput(e.currentTarget.value)}
-          class="grow"
-        />
+        <div class="dark:bg-dark-100 dark:shadow-dark-800 flex grow items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 shadow-xs focus-within:outline-[1px] focus-within:outline-neutral-600 dark:border-neutral-700 dark:focus-within:outline-neutral-400">
+          <label
+            for="handle"
+            class="iconify lucide--user-round-plus text-neutral-500 dark:text-neutral-400"
+          ></label>
+          <input
+            type="text"
+            spellcheck={false}
+            placeholder="user.bsky.social"
+            id="handle"
+            class="grow py-1 select-none placeholder:text-sm focus:outline-none"
+            onInput={(e) => setLoginInput(e.currentTarget.value)}
+          />
+        </div>
         <button
           onclick={() => login(loginInput())}
-          class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+          class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
         >
-          <span class="iconify lucide--log-in text-lg"></span>
+          <span class="iconify lucide--log-in"></span>
         </button>
       </div>
       <Show when={notice()}>
-        <div>{notice()}</div>
+        <div class="text-sm">{notice()}</div>
       </Show>
     </form>
   );

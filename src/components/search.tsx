@@ -99,18 +99,18 @@ const Search = () => {
       <label for="input" class="hidden">
         PDS URL, AT URI, or handle
       </label>
-      <div class="dark:bg-dark-100 dark:shadow-dark-800 flex items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 shadow-xs focus-within:outline-[1px] focus-within:outline-neutral-600 dark:border-neutral-700 dark:focus-within:outline-neutral-400">
-        <span
+      <div class="dark:bg-dark-100 dark:shadow-dark-800 flex items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 shadow-xs focus-within:outline-[1px] focus-within:outline-neutral-600 dark:border-neutral-700 dark:focus-within:outline-neutral-400">
+        <label
+          for="input"
           class="iconify lucide--search text-neutral-500 dark:text-neutral-400"
-          onClick={() => searchInput.focus()}
-        ></span>
+        ></label>
         <input
           type="text"
           spellcheck={false}
           placeholder="PDS URL, AT URI, DID, or handle"
           ref={searchInput}
           id="input"
-          class="grow select-none placeholder:text-sm focus:outline-none"
+          class="grow py-1 select-none placeholder:text-sm focus:outline-none"
           value={input() ?? ""}
           onInput={(e) => setInput(e.currentTarget.value)}
         />
