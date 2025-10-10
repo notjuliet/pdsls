@@ -99,7 +99,7 @@ const Search = () => {
       <label for="input" class="hidden">
         PDS URL, AT URI, or handle
       </label>
-      <div class="dark:bg-dark-100 dark:shadow-dark-800 flex items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 shadow-xs focus-within:outline-[1px] focus-within:outline-neutral-900 dark:border-neutral-700 dark:focus-within:outline-neutral-200">
+      <div class="dark:bg-dark-100 dark:shadow-dark-800 flex items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 shadow-xs focus-within:outline-[1px] focus-within:outline-neutral-600 dark:border-neutral-700 dark:focus-within:outline-neutral-400">
         <span
           class="iconify lucide--search text-neutral-500 dark:text-neutral-400"
           onClick={() => searchInput.focus()}
