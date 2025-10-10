@@ -84,7 +84,7 @@ const AccountManager = () => {
                     <span class="flex items-center gap-2">
                       <img
                         src={avatars[did as Did].replace("img/avatar/", "img/avatar_thumbnail/")}
-                        class="size-5 rounded-full"
+                        class="size-6 rounded-full"
                       />
                       <span class="truncate">{sessions[did]?.length ? sessions[did] : did}</span>
                     </span>
