@@ -134,7 +134,7 @@ export const RepoView = () => {
     <Show when={repo()}>
       <div class="flex w-full flex-col gap-2 break-words">
         <div
-          class={`dark:shadow-dark-800 dark:bg-dark-300 flex justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700`}
+          class={`dark:shadow-dark-700 dark:bg-dark-300 flex justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700`}
         >
           <div class="flex gap-2 sm:gap-4">
             <Show when={!error()}>

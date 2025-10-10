@@ -74,7 +74,7 @@ const PdsView = () => {
           <span class="iconify lucide--info"></span>
         </button>
         <Modal open={openInfo()} onClose={() => setOpenInfo(false)}>
-          <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute top-70 left-[50%] w-max max-w-full -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 break-words shadow-md transition-opacity duration-200 sm:max-w-[32rem] dark:border-neutral-700 starting:opacity-0">
+          <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] w-max max-w-full -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 break-words shadow-md transition-opacity duration-200 sm:max-w-[32rem] dark:border-neutral-700 starting:opacity-0">
             <div class="mb-1 flex justify-between gap-2">
               <div class="flex items-center gap-1">
                 <span class="iconify lucide--info"></span>
@@ -128,7 +128,7 @@ const PdsView = () => {
   return (
     <Show when={repos() || response()}>
       <div class="flex w-full flex-col">
-        <div class="dark:shadow-dark-800 dark:bg-dark-300 mb-2 flex w-full justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700">
+        <div class="dark:shadow-dark-700 dark:bg-dark-300 mb-2 flex w-full justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700">
           <div class="flex gap-3">
             <Tab tab="repos" label="Repositories" />
             <Tab tab="info" label="Info" />

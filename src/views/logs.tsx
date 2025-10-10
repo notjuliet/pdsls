@@ -114,7 +114,7 @@ export const PlcLogView = (props: { did: string }) => {
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-1">
           <div class="iconify lucide--filter" />
-          <div class="dark:shadow-dark-800 dark:bg-dark-300 flex w-fit items-center rounded-full border-[0.5px] border-neutral-300 bg-neutral-50 shadow-xs dark:border-neutral-700">
+          <div class="dark:shadow-dark-700 dark:bg-dark-300 flex w-fit items-center rounded-full border-[0.5px] border-neutral-300 bg-neutral-50 shadow-xs dark:border-neutral-700">
             <FilterButton icon="iconify lucide--at-sign" event="handle" />
             <FilterButton icon="iconify lucide--key-round" event="rotation_key" />
             <FilterButton icon="iconify lucide--hard-drive" event="service" />

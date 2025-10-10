@@ -99,7 +99,7 @@ const Search = () => {
       <label for="input" class="hidden">
         PDS URL, AT URI, or handle
       </label>
-      <div class="dark:bg-dark-100 dark:shadow-dark-800 flex items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 shadow-xs focus-within:outline-[1px] focus-within:outline-neutral-600 dark:border-neutral-600 dark:focus-within:outline-neutral-400">
+      <div class="dark:bg-dark-100 dark:shadow-dark-700 flex items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 shadow-xs focus-within:outline-[1px] focus-within:outline-neutral-600 dark:border-neutral-600 dark:focus-within:outline-neutral-400">
         <label
           for="input"
           class="iconify lucide--search text-neutral-500 dark:text-neutral-400"
@@ -125,7 +125,7 @@ const Search = () => {
         </Show>
       </div>
       <Show when={search()?.length && input()}>
-        <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute z-30 mt-1 flex w-full flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
+        <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute z-30 mt-1 flex w-full flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
           <For each={search()}>
             {(actor) => (
               <A
@@ -159,7 +159,7 @@ const ListUrlsTooltip = () => {
   return (
     <>
       <Modal open={openList()} onClose={() => setOpenList(false)}>
-        <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute top-16 left-[50%] w-[22rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-[26rem] dark:border-neutral-700 starting:opacity-0">
+        <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-16 left-[50%] w-[22rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-[26rem] dark:border-neutral-700 starting:opacity-0">
           <div class="mb-2 flex items-center gap-1 font-semibold">
             <span class="iconify lucide--link"></span>
             <span>Supported URLs</span>

@@ -175,7 +175,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     };
 
     return (
-      <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute top-70 left-[50%] w-[20rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
+      <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] w-[20rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
         <h2 class="mb-2 font-semibold">Upload blob</h2>
         <div class="flex flex-col gap-2 text-sm">
           <div class="flex flex-col gap-1">
@@ -215,7 +215,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
             <Show when={!uploading()}>
               <Button
                 onClick={uploadBlob}
-                class="dark:shadow-dark-800 flex items-center gap-1 rounded-lg bg-blue-500 px-2 py-1.5 text-xs text-white shadow-xs select-none hover:bg-blue-600 active:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 dark:active:bg-blue-400"
+                class="dark:shadow-dark-700 flex items-center gap-1 rounded-lg bg-blue-500 px-2 py-1.5 text-xs text-white shadow-xs select-none hover:bg-blue-600 active:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 dark:active:bg-blue-400"
               >
                 Upload
               </Button>
@@ -229,7 +229,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   return (
     <>
       <Modal open={openDialog()} onClose={() => setOpenDialog(false)} closeOnClick={false}>
-        <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute top-16 left-[50%] w-screen -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-xl lg:w-[48rem] dark:border-neutral-700 starting:opacity-0">
+        <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-16 left-[50%] w-screen -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-xl lg:w-[48rem] dark:border-neutral-700 starting:opacity-0">
           <div class="mb-2 flex w-full justify-between">
             <div class="font-semibold">
               <span>{props.create ? "Creating" : "Editing"} record</span>
@@ -274,7 +274,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                 <select
                   name="validate"
                   id="validate"
-                  class="dark:bg-dark-100 dark:shadow-dark-800 rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 shadow-xs focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
+                  class="dark:bg-dark-100 dark:shadow-dark-700 rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 shadow-xs focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
                 >
                   <option value="unset">Unset</option>
                   <option value="true">True</option>
@@ -296,7 +296,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                 <div class="text-sm text-red-500 dark:text-red-400">{notice()}</div>
               </Show>
               <div class="flex justify-between gap-2">
-                <div class="dark:hover:bg-dark-200 dark:shadow-dark-800 dark:active:bg-dark-100 flex w-fit rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 text-xs shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800">
+                <div class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 flex w-fit rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 text-xs shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800">
                   <input
                     type="file"
                     id="blob"

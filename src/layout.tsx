@@ -66,7 +66,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         </Show>
       </MetaProvider>
       <header
-        class={`dark:shadow-dark-800 dark:bg-dark-300 mb-4 flex w-full items-center justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 bg-size-[95%] bg-right bg-no-repeat p-2 shadow-xs [--header-bg:#fafafa] dark:border-neutral-700 dark:[--header-bg:#2d2d2d] ${localStorage.getItem("hrt") === "true" ? "bg-[linear-gradient(to_left,transparent_10%,var(--header-bg)_85%),linear-gradient(to_bottom,#5BCEFA90_0%,#5BCEFA90_20%,#F5A9B890_20%,#F5A9B890_40%,#FFFFFF90_40%,#FFFFFF90_60%,#F5A9B890_60%,#F5A9B890_80%,#5BCEFA90_80%,#5BCEFA90_100%)]" : ""}`}
+        class={`dark:shadow-dark-700 dark:bg-dark-300 mb-4 flex w-full items-center justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 bg-size-[95%] bg-right bg-no-repeat p-2 shadow-xs [--header-bg:#fafafa] dark:border-neutral-700 dark:[--header-bg:#2d2d2d] ${localStorage.getItem("hrt") === "true" ? "bg-[linear-gradient(to_left,transparent_10%,var(--header-bg)_85%),linear-gradient(to_bottom,#5BCEFA90_0%,#5BCEFA90_20%,#F5A9B890_20%,#F5A9B890_40%,#FFFFFF90_40%,#FFFFFF90_60%,#F5A9B890_60%,#F5A9B890_80%,#5BCEFA90_80%,#5BCEFA90_100%)]" : ""}`}
         style={{
           "background-image":
             props.params.repo in headers ?
@@ -127,7 +127,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
       </div>
       <Show when={notif().show}>
         <button
-          class="dark:shadow-dark-800 dark:bg-dark-100 fixed bottom-10 z-50 flex items-center rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-md dark:border-neutral-700"
+          class="dark:shadow-dark-700 dark:bg-dark-100 fixed bottom-10 z-50 flex items-center rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-md dark:border-neutral-700"
           onClick={() => setNotif({ show: false })}
         >
           <span class={`iconify ${notif().icon} mr-1`}></span>

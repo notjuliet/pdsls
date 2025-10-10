@@ -111,7 +111,7 @@ export const DropdownMenu = (props: {
         <div
           ref={setMenu}
           class={
-            "dark:bg-dark-300 dark:shadow-dark-800 absolute right-0 z-40 flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 shadow-md dark:border-neutral-700 " +
+            "dark:bg-dark-300 dark:shadow-dark-700 absolute right-0 z-40 flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 shadow-md dark:border-neutral-700 " +
             props.menuClass
           }
         >
