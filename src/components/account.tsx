@@ -11,7 +11,7 @@ import { Modal } from "./modal.jsx";
 const AccountManager = () => {
   const [openManager, setOpenManager] = createSignal(false);
   const [sessions, setSessions] = createStore<Record<string, string | undefined>>();
-  const [avatar, setAvatar] = createSignal<string>();
+  const [avatars, setAvatars] = createStore<Record<Did, string>>();
 
   onMount(async () => {
     await retrieveSession();
@@ -29,16 +29,16 @@ const AccountManager = () => {
           }
         });
       });
+      sessionDids.forEach(async (did) => {
+        const avatar = await getAvatar(did);
+        if (avatar) setAvatars(did, avatar);
+      });
     }
-
-    const repo = localStorage.getItem("lastSignedIn");
-    if (repo) setAvatar(await getAvatar(repo as Did));
   });
 
   const resumeSession = async (did: Did) => {
     localStorage.setItem("lastSignedIn", did);
     retrieveSession();
-    setAvatar(await getAvatar(did));
   };
 
   const removeSession = async (did: Did) => {
@@ -81,7 +81,13 @@ const AccountManager = () => {
                     class="flex w-full items-center justify-between gap-1 truncate rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                     onclick={() => resumeSession(did as Did)}
                   >
-                    <span class="truncate">{sessions[did]?.length ? sessions[did] : did}</span>
+                    <span class="flex items-center gap-2">
+                      <img
+                        src={avatars[did as Did].replace("img/avatar/", "img/avatar_thumbnail/")}
+                        class="size-5 rounded-full"
+                      />
+                      <span class="truncate">{sessions[did]?.length ? sessions[did] : did}</span>
+                    </span>
                     <Show when={did === agent()?.sub}>
                       <span class="iconify lucide--check shrink-0"></span>
                     </Show>
@@ -110,8 +116,11 @@ const AccountManager = () => {
         onclick={() => setOpenManager(true)}
         class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
       >
-        {agent() && avatar() ?
-          <img src={avatar()} class="size-5 rounded-full" />
+        {agent() && avatars[agent()!.sub] ?
+          <img
+            src={avatars[agent()!.sub].replace("img/avatar/", "img/avatar_thumbnail/")}
+            class="size-5 rounded-full"
+          />
         : <span class="iconify lucide--circle-user-round text-xl"></span>}
       </button>
     </>
