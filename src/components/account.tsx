@@ -81,7 +81,7 @@ const AccountManager = () => {
                     class="flex w-full items-center justify-between gap-1 truncate rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                     onclick={() => resumeSession(did as Did)}
                   >
-                    <span class="flex items-center gap-2">
+                    <span class="flex items-center gap-2 truncate">
                       <Show when={avatars[did as Did]}>
                         <img
                           src={avatars[did as Did].replace("img/avatar/", "img/avatar_thumbnail/")}
