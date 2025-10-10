@@ -99,13 +99,13 @@ const AccountManager = () => {
                     onClick={() => setOpenManager(false)}
                     class="flex items-center rounded-lg p-2 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                   >
-                    <span class="iconify lucide--book-user"></span>
+                    <span class="iconify lucide--chevron-right"></span>
                   </A>
                   <button
                     onclick={() => removeSession(did as Did)}
                     class="flex items-center rounded-lg p-2 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                   >
-                    <span class="iconify lucide--user-round-x"></span>
+                    <span class="iconify lucide--x"></span>
                   </button>
                 </div>
               )}
