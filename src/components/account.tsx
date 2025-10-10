@@ -89,7 +89,7 @@ const AccountManager = () => {
                       <span class="truncate">{sessions[did]?.length ? sessions[did] : did}</span>
                     </span>
                     <Show when={did === agent()?.sub}>
-                      <span class="iconify lucide--check shrink-0"></span>
+                      <span class="iconify lucide--check shrink-0 text-green-500 dark:text-green-400"></span>
                     </Show>
                   </button>
                   <A
