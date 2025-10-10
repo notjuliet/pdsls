@@ -82,10 +82,12 @@ const AccountManager = () => {
                     onclick={() => resumeSession(did as Did)}
                   >
                     <span class="flex items-center gap-2">
-                      <img
-                        src={avatars[did as Did].replace("img/avatar/", "img/avatar_thumbnail/")}
-                        class="size-6 rounded-full"
-                      />
+                      <Show when={avatars[did as Did]}>
+                        <img
+                          src={avatars[did as Did].replace("img/avatar/", "img/avatar_thumbnail/")}
+                          class="size-6 rounded-full"
+                        />
+                      </Show>
                       <span class="truncate">{sessions[did]?.length ? sessions[did] : did}</span>
                     </span>
                     <Show when={did === agent()?.sub}>
