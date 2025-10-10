@@ -69,7 +69,7 @@ const AccountManager = () => {
     <>
       <Modal open={openManager()} onClose={() => setOpenManager(false)}>
         <div class="dark:bg-dark-300 dark:shadow-dark-800 absolute top-16 left-[50%] w-[22rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
-          <div class="mb-2 flex items-center gap-1 font-semibold">
+          <div class="mb-2 flex items-center gap-1 px-1 font-semibold">
             <span class="iconify lucide--user-round"></span>
             <span>Manage accounts</span>
           </div>
