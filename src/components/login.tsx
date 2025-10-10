@@ -11,7 +11,7 @@ import {
   resolveFromService,
   type Session,
 } from "@atcute/oauth-browser-client";
-import { createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import { TextInput } from "./text-input";
 
 configureOAuth({
@@ -74,7 +74,9 @@ const Login = () => {
           <span class="iconify lucide--log-in text-lg"></span>
         </button>
       </div>
-      <div>{notice()}</div>
+      <Show when={notice()}>
+        <div>{notice()}</div>
+      </Show>
     </form>
   );
 };
