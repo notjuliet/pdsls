@@ -1,6 +1,12 @@
 import * as TID from "@atcute/tid";
 import { createResource, createSignal, For, onMount, Show } from "solid-js";
-import { getAllBacklinks, getDidBacklinks, getRecordBacklinks } from "../utils/api.js";
+import {
+  getAllBacklinks,
+  getDidBacklinks,
+  getRecordBacklinks,
+  LinksWithDids,
+  LinksWithRecords,
+} from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { Button } from "./button.jsx";
 
@@ -128,7 +134,7 @@ const BacklinkItems = ({
   dids: boolean;
   cursor?: string;
 }) => {
-  const [links, setLinks] = createSignal<any>();
+  const [links, setLinks] = createSignal<LinksWithDids | LinksWithRecords>();
   const [more, setMore] = createSignal<boolean>(false);
 
   onMount(async () => {
@@ -147,7 +153,7 @@ const BacklinkItems = ({
   return (
     <Show when={links()} fallback={<p>Loading&hellip;</p>}>
       <Show when={dids}>
-        <For each={links().linking_dids}>
+        <For each={(links() as LinksWithDids).linking_dids}>
           {(did) => (
             <a
               href={`/at://${did}`}
@@ -159,7 +165,7 @@ const BacklinkItems = ({
         </For>
       </Show>
       <Show when={!dids}>
-        <For each={links().linking_records}>
+        <For each={(links() as LinksWithRecords).linking_records}>
           {({ did, collection, rkey }) => (
             <p class="relative flex w-full items-center gap-1 font-mono">
               <a
@@ -177,14 +183,14 @@ const BacklinkItems = ({
           )}
         </For>
       </Show>
-      <Show when={links().cursor}>
+      <Show when={links()?.cursor}>
         <Show when={more()} fallback={<Button onClick={() => setMore(true)}>Load More</Button>}>
           <BacklinkItems
             target={target}
             collection={collection}
             path={path}
             dids={dids}
-            cursor={links().cursor}
+            cursor={links()!.cursor}
           />
         </Show>
       </Show>

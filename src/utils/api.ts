@@ -119,6 +119,18 @@ interface LinkData {
   };
 }
 
+type LinksWithRecords = {
+  cursor: string;
+  total: number;
+  linking_records: Array<{ did: string; collection: string; rkey: string }>;
+};
+
+type LinksWithDids = {
+  cursor: string;
+  total: number;
+  linking_dids: Array<string>;
+};
+
 const getConstellation = async (
   endpoint: string,
   target: string,
@@ -152,7 +164,8 @@ const getRecordBacklinks = (
   path: string,
   cursor?: string,
   limit?: number,
-) => getConstellation("/links", target, collection, path, cursor, limit || 100);
+): Promise<LinksWithRecords> =>
+  getConstellation("/links", target, collection, path, cursor, limit || 100);
 
 const getDidBacklinks = (
   target: string,
@@ -160,7 +173,8 @@ const getDidBacklinks = (
   path: string,
   cursor?: string,
   limit?: number,
-) => getConstellation("/links/distinct-dids", target, collection, path, cursor, limit || 100);
+): Promise<LinksWithDids> =>
+  getConstellation("/links/distinct-dids", target, collection, path, cursor, limit || 100);
 
 export {
   didDocCache,
@@ -175,4 +189,6 @@ export {
   resolvePDS,
   validateHandle,
   type LinkData,
+  type LinksWithDids,
+  type LinksWithRecords,
 };
