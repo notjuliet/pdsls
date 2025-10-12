@@ -11,13 +11,12 @@ import { localDateFromTimestamp } from "../utils/date.js";
 import { Button } from "./button.jsx";
 
 type Backlink = {
-  collection: string;
   path: string;
   counts: { distinct_dids: number; records: number };
 };
 
 const linksBySource = (links: Record<string, any>) => {
-  let out: Backlink[] = [];
+  let out: Record<string, Backlink[]> = {};
   Object.keys(links)
     .toSorted()
     .forEach((collection) => {
@@ -26,7 +25,8 @@ const linksBySource = (links: Record<string, any>) => {
         .toSorted()
         .forEach((path) => {
           if (paths[path].records === 0) return;
-          out.push({ collection, path, counts: paths[path] });
+          if (out[collection]) out[collection].push({ path, counts: paths[path] });
+          else out[collection] = [{ path, counts: paths[path] }];
         });
     });
   return out;
@@ -48,12 +48,12 @@ const Backlinks = (props: { target: string }) => {
 
   return (
     <div class="flex w-full flex-col gap-1 text-sm wrap-anywhere">
-      <Show when={response()?.length === 0}>
-        <p>No backlinks found.</p>
-      </Show>
-      <For each={response()}>
-        {({ collection, path, counts }) => (
-          <div>
+      <Show
+        when={response() && Object.keys(response()!).length}
+        fallback={<p>No backlinks found.</p>}
+      >
+        <For each={Object.keys(response()!)}>
+          {(collection) => (
             <div>
               <div class="flex items-center gap-1">
                 <span
@@ -62,70 +62,79 @@ const Backlinks = (props: { target: string }) => {
                 ></span>
                 {collection}
               </div>
-              <div class="flex items-center gap-1">
-                <span
-                  title="Record path where the link is found"
-                  class="iconify lucide--route shrink-0"
-                ></span>
-                {path.slice(1)}
-              </div>
+              <For each={response()![collection]}>
+                {({ path, counts }) => (
+                  <div class="ml-4.5">
+                    <div class="flex items-center gap-1">
+                      <span
+                        title="Record path where the link is found"
+                        class="iconify lucide--route shrink-0"
+                      ></span>
+                      {path.slice(1)}
+                    </div>
+                    <div class="ml-4.5">
+                      <p>
+                        <button
+                          class="text-blue-400 hover:underline active:underline"
+                          title="Show linking records"
+                          onclick={() =>
+                            (
+                              show()?.collection === collection &&
+                              show()?.path === path &&
+                              !show()?.showDids
+                            ) ?
+                              setShow(null)
+                            : setShow({ collection, path, showDids: false })
+                          }
+                        >
+                          {counts.records} record{counts.records < 2 ? "" : "s"}
+                        </button>
+                        {" from "}
+                        <button
+                          class="text-blue-400 hover:underline active:underline"
+                          title="Show linking DIDs"
+                          onclick={() =>
+                            (
+                              show()?.collection === collection &&
+                              show()?.path === path &&
+                              show()?.showDids
+                            ) ?
+                              setShow(null)
+                            : setShow({ collection, path, showDids: true })
+                          }
+                        >
+                          {counts.distinct_dids} DID
+                          {counts.distinct_dids < 2 ? "" : "s"}
+                        </button>
+                      </p>
+                      <Show when={show()?.collection === collection && show()?.path === path}>
+                        <Show when={show()?.showDids}>
+                          <p class="w-full font-semibold">Distinct identities</p>
+                          <BacklinkItems
+                            target={props.target}
+                            collection={collection}
+                            path={path}
+                            dids={true}
+                          />
+                        </Show>
+                        <Show when={!show()?.showDids}>
+                          <p class="w-full font-semibold">Records</p>
+                          <BacklinkItems
+                            target={props.target}
+                            collection={collection}
+                            path={path}
+                            dids={false}
+                          />
+                        </Show>
+                      </Show>
+                    </div>
+                  </div>
+                )}
+              </For>
             </div>
-            <div class="ml-4.5">
-              <p>
-                <button
-                  class="text-blue-400 hover:underline active:underline"
-                  title="Show linking records"
-                  onclick={() =>
-                    (
-                      show()?.collection === collection &&
-                      show()?.path === path &&
-                      !show()?.showDids
-                    ) ?
-                      setShow(null)
-                    : setShow({ collection, path, showDids: false })
-                  }
-                >
-                  {counts.records} record{counts.records < 2 ? "" : "s"}
-                </button>
-                {" from "}
-                <button
-                  class="text-blue-400 hover:underline active:underline"
-                  title="Show linking DIDs"
-                  onclick={() =>
-                    show()?.collection === collection && show()?.path === path && show()?.showDids ?
-                      setShow(null)
-                    : setShow({ collection, path, showDids: true })
-                  }
-                >
-                  {counts.distinct_dids} DID
-                  {counts.distinct_dids < 2 ? "" : "s"}
-                </button>
-              </p>
-              <Show when={show()?.collection === collection && show()?.path === path}>
-                <Show when={show()?.showDids}>
-                  {/* putting this in the `dids` prop directly failed to re-render. idk how to solidjs. */}
-                  <p class="w-full font-semibold">Distinct identities</p>
-                  <BacklinkItems
-                    target={props.target}
-                    collection={collection}
-                    path={path}
-                    dids={true}
-                  />
-                </Show>
-                <Show when={!show()?.showDids}>
-                  <p class="w-full font-semibold">Records</p>
-                  <BacklinkItems
-                    target={props.target}
-                    collection={collection}
-                    path={path}
-                    dids={false}
-                  />
-                </Show>
-              </Show>
-            </div>
-          </div>
-        )}
-      </For>
+          )}
+        </For>
+      </Show>
     </div>
   );
 };
