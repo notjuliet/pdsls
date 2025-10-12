@@ -43,7 +43,12 @@ export const CopyMenu = (props: { copyContent: string; label: string; icon?: str
   );
 };
 
-export const NavMenu = (props: { href: string; label: string; icon: string; newTab?: boolean }) => {
+export const NavMenu = (props: {
+  href: string;
+  label: string;
+  icon?: string;
+  newTab?: boolean;
+}) => {
   const ctx = useContext(MenuContext);
 
   return (
@@ -53,7 +58,9 @@ export const NavMenu = (props: { href: string; label: string; icon: string; newT
       class="flex items-center gap-1.5 rounded-lg p-1 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
       target={props.newTab ? "_blank" : undefined}
     >
-      <span class={"iconify shrink-0 " + props.icon}></span>
+      <Show when={props.icon}>
+        <span class={"iconify shrink-0 " + props.icon}></span>
+      </Show>
       <span class="whitespace-nowrap">{props.label}</span>
     </A>
   );

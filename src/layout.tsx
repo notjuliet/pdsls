@@ -96,9 +96,9 @@ const Layout = (props: RouteSectionProps<unknown>) => {
               buttonClass="rounded-lg p-1"
               menuClass="top-10 p-3"
             >
-              <NavMenu href="/jetstream" label="Jetstream" icon="lucide--radio-tower" />
-              <NavMenu href="/firehose" label="Firehose" icon="lucide--waves" />
-              <NavMenu href="/settings" label="Settings" icon="lucide--settings" />
+              <NavMenu href="/jetstream" label="Jetstream" />
+              <NavMenu href="/firehose" label="Firehose" />
+              <NavMenu href="/settings" label="Settings" />
               <ThemeSelection />
             </DropdownMenu>
           </MenuProvider>
