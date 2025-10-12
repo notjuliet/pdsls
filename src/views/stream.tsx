@@ -38,7 +38,7 @@ const StreamView = () => {
     } else {
       url = formData.get("instance")?.toString() ?? "wss://bsky.network";
       url = url.replace("/xrpc/com.atproto.sync.subscribeRepos", "");
-      if (!url.startsWith("wss://") && !url.startsWith("ws://")) url = "wss://" + url;
+      if (!(url.startsWith("wss://") || url.startsWith("ws://"))) url = "wss://" + url;
     }
 
     const collections = formData.get("collections")?.toString().split(",");
