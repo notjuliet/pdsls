@@ -22,6 +22,7 @@ export const RepoView = () => {
   const [didDoc, setDidDoc] = createSignal<DidDocument>();
   const [nsids, setNsids] = createSignal<Record<string, { hidden: boolean; nsids: string[] }>>();
   const [filter, setFilter] = createSignal<string>();
+  const [showFilter, setShowFilter] = createSignal(false);
   const [validHandles, setValidHandles] = createStore<Record<string, boolean>>({});
   let rpc: Client;
   let pds: string;
@@ -136,7 +137,7 @@ export const RepoView = () => {
         <div
           class={`dark:shadow-dark-700 dark:bg-dark-300 flex justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700`}
         >
-          <div class="flex gap-2 sm:gap-4">
+          <div class="flex gap-2 text-xs sm:gap-4 sm:text-sm">
             <Show when={!error()}>
               <RepoTab tab="collections" label="Collections" />
             </Show>
@@ -155,6 +156,16 @@ export const RepoView = () => {
                 <span class="iconify lucide--alert-triangle"></span>
                 <span>{error()}</span>
               </div>
+            </Show>
+            <Show when={!error() && (!location.hash || location.hash === "#collections")}>
+              <Tooltip text="Filter collections">
+                <button
+                  class="flex items-center rounded-sm p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                  onClick={() => setShowFilter(!showFilter())}
+                >
+                  <span class="iconify lucide--filter"></span>
+                </button>
+              </Tooltip>
             </Show>
             <MenuProvider>
               <DropdownMenu
@@ -213,12 +224,14 @@ export const RepoView = () => {
             </ErrorBoundary>
           </Show>
           <Show when={nsids() && (!location.hash || location.hash === "#collections")}>
-            <TextInput
-              name="filter"
-              placeholder="Filter collections"
-              onInput={(e) => setFilter(e.currentTarget.value.toLowerCase())}
-              class="grow"
-            />
+            <Show when={showFilter()}>
+              <TextInput
+                name="filter"
+                placeholder="Filter collections"
+                onInput={(e) => setFilter(e.currentTarget.value.toLowerCase())}
+                class="grow"
+              />
+            </Show>
             <div class="flex flex-col overflow-hidden text-sm">
               <For
                 each={Object.keys(nsids() ?? {}).filter((authority) =>
