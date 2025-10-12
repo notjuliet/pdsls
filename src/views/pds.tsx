@@ -195,6 +195,7 @@ const PdsView = () => {
                         href={server().links?.privacyPolicy}
                         class="text-sm hover:underline"
                         target="_blank"
+                        rel="noopener noreferrer"
                       >
                         {server().links?.privacyPolicy}
                       </a>
@@ -207,6 +208,7 @@ const PdsView = () => {
                         href={server().links?.termsOfService}
                         class="text-sm hover:underline"
                         target="_blank"
+                        rel="noopener noreferrer"
                       >
                         {server().links?.termsOfService}
                       </a>

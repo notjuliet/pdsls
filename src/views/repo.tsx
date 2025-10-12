@@ -337,6 +337,7 @@ export const RepoView = () => {
                               class="w-fit underline"
                               href={service.serviceEndpoint.toString()}
                               target="_blank"
+                              rel="noopener noreferrer"
                             >
                               {service.serviceEndpoint.toString()}
                             </a>
