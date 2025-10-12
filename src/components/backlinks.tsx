@@ -10,9 +10,14 @@ import {
 import { localDateFromTimestamp } from "../utils/date.js";
 import { Button } from "./button.jsx";
 
-// the actual backlink api will probably become closer to this
+type Backlink = {
+  collection: string;
+  path: string;
+  counts: { distinct_dids: number; records: number };
+};
+
 const linksBySource = (links: Record<string, any>) => {
-  let out: any[] = [];
+  let out: Backlink[] = [];
   Object.keys(links)
     .toSorted()
     .forEach((collection) => {
@@ -50,12 +55,18 @@ const Backlinks = (props: { target: string }) => {
         {({ collection, path, counts }) => (
           <div>
             <div>
-              <div title="Collection containing linking records" class="flex items-center gap-1">
-                <span class="iconify lucide--book-text shrink-0"></span>
+              <div class="flex items-center gap-1">
+                <span
+                  title="Collection containing linking records"
+                  class="iconify lucide--book-text shrink-0"
+                ></span>
                 {collection}
               </div>
-              <div title="Record path where the link is found" class="flex items-center gap-1">
-                <span class="iconify lucide--route shrink-0"></span>
+              <div class="flex items-center gap-1">
+                <span
+                  title="Record path where the link is found"
+                  class="iconify lucide--route shrink-0"
+                ></span>
                 {path.slice(1)}
               </div>
             </div>
