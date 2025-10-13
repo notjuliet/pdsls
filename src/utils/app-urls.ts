@@ -47,7 +47,7 @@ export const appHandleLink: Record<App, (url: string[]) => string> = {
 
         if (type === "post") {
           return `at://${user}/app.bsky.feed.post/${rkey}`;
-        } else if (type === "list") {
+        } else if (type === "lists") {
           return `at://${user}/app.bsky.graph.list/${rkey}`;
         } else if (type === "feed") {
           return `at://${user}/app.bsky.feed.generator/${rkey}`;
