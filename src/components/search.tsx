@@ -47,7 +47,7 @@ const Search = () => {
   });
 
   onMount(() => {
-    searchInput.focus();
+    if (!isTouchDevice) searchInput.focus();
   });
 
   const fetchTypeahead = async (input: string) => {
