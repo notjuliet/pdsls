@@ -1,5 +1,5 @@
 import { Client, CredentialManager } from "@atcute/client";
-import { A, useNavigate } from "@solidjs/router";
+import { A, useLocation, useNavigate } from "@solidjs/router";
 import { createResource, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { isTouchDevice } from "../layout";
 import { appHandleLink, appList, appName, AppUrl } from "../utils/app-urls";
@@ -47,7 +47,7 @@ const Search = () => {
   });
 
   onMount(() => {
-    if (!isTouchDevice) searchInput.focus();
+    if (!isTouchDevice || useLocation().pathname !== "/") searchInput.focus();
   });
 
   const fetchTypeahead = async (input: string) => {
