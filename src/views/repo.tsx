@@ -3,7 +3,15 @@ import { parsePublicMultikey } from "@atcute/crypto";
 import { DidDocument } from "@atcute/identity";
 import { ActorIdentifier, Did, Handle } from "@atcute/lexicons";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
-import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from "solid-js";
+import {
+  createResource,
+  createSignal,
+  ErrorBoundary,
+  For,
+  onMount,
+  Show,
+  Suspense,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 import { Backlinks } from "../components/backlinks.jsx";
 import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
@@ -230,6 +238,9 @@ export const RepoView = () => {
                 placeholder="Filter collections"
                 onInput={(e) => setFilter(e.currentTarget.value.toLowerCase())}
                 class="grow"
+                ref={(node) => {
+                  onMount(() => node.focus());
+                }}
               />
             </Show>
             <div class="flex flex-col overflow-hidden text-sm">

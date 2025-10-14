@@ -1,5 +1,5 @@
 export interface TextInputProps {
-  ref?: HTMLInputElement;
+  ref?: HTMLInputElement | ((el: HTMLInputElement) => void);
   class?: string;
   id?: string;
   type?: "text" | "email" | "password" | "search" | "tel" | "url";
