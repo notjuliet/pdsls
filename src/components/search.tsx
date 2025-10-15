@@ -113,7 +113,7 @@ const Search = () => {
         <input
           type="text"
           spellcheck={false}
-          placeholder="PDS URL, AT URI, NSID, DID, or handle"
+          placeholder="PDS, AT URI, NSID, DID, or handle"
           ref={searchInput}
           id="input"
           class="grow py-1 select-none placeholder:text-sm focus:outline-none"
