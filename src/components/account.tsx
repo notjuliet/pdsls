@@ -30,8 +30,14 @@ const AccountManager = () => {
         });
       });
       sessionDids.forEach(async (did) => {
-        const avatar = await getAvatar(did);
-        if (avatar) setAvatars(did, avatar);
+        try {
+          await getSession(did, { allowStale: true });
+          const avatar = await getAvatar(did);
+          if (avatar) setAvatars(did, avatar);
+        } catch {
+          deleteStoredSession(did);
+          setSessions(did, undefined);
+        }
       });
     }
   });
