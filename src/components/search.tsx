@@ -97,7 +97,7 @@ const Search = () => {
       }}
     >
       <label for="input" class="hidden">
-        PDS URL, AT URI, or handle
+        PDS URL, AT URI, NSID, DID, or handle
       </label>
       <div class="dark:bg-dark-100 dark:shadow-dark-700 flex items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 shadow-xs focus-within:outline-[1px] focus-within:outline-neutral-600 dark:border-neutral-600 dark:focus-within:outline-neutral-400">
         <label
@@ -107,7 +107,7 @@ const Search = () => {
         <input
           type="text"
           spellcheck={false}
-          placeholder="PDS URL, AT URI, DID, or handle"
+          placeholder="PDS URL, AT URI, NSID, DID, or handle"
           ref={searchInput}
           id="input"
           class="grow py-1 select-none placeholder:text-sm focus:outline-none"

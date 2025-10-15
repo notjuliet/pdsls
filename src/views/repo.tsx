@@ -1,7 +1,7 @@
 import { Client, CredentialManager } from "@atcute/client";
 import { parsePublicMultikey } from "@atcute/crypto";
 import { DidDocument } from "@atcute/identity";
-import { ActorIdentifier, Did, Handle } from "@atcute/lexicons";
+import { ActorIdentifier, Did, Handle, Nsid } from "@atcute/lexicons";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import {
   createResource,
@@ -17,7 +17,13 @@ import { Backlinks } from "../components/backlinks.jsx";
 import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
-import { didDocCache, resolveHandle, resolvePDS, validateHandle } from "../utils/api.js";
+import {
+  didDocCache,
+  resolveHandle,
+  resolveLexiconAuthority,
+  resolvePDS,
+  validateHandle,
+} from "../utils/api.js";
 import { BlobView } from "./blob.jsx";
 import { PlcLogView } from "./logs.jsx";
 
@@ -62,7 +68,13 @@ export const RepoView = () => {
         const did = await resolveHandle(params.repo as Handle);
         navigate(location.pathname.replace(params.repo, did));
       } catch {
-        navigate(`/${did}`);
+        try {
+          const nsid = params.repo as Nsid;
+          const res = await resolveLexiconAuthority(nsid);
+          navigate(`/at://${res}/com.atproto.lexicon.schema/${nsid}`);
+        } catch {
+          navigate(`/${did}`);
+        }
       }
     }
     setDidDoc(didDocCache[did] as DidDocument);
