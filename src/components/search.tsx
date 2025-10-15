@@ -1,7 +1,9 @@
 import { Client, CredentialManager } from "@atcute/client";
+import { Nsid } from "@atcute/lexicons";
 import { A, useLocation, useNavigate } from "@solidjs/router";
 import { createResource, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { isTouchDevice } from "../layout";
+import { resolveLexiconAuthority } from "../utils/api";
 import { appHandleLink, appList, appName, AppUrl } from "../utils/app-urls";
 import { createDebouncedValue } from "../utils/hooks/debounced";
 import { Modal } from "./modal";
@@ -64,7 +66,7 @@ const Search = () => {
   const [input, setInput] = createSignal<string>();
   const [search] = createResource(createDebouncedValue(input, 250), fetchTypeahead);
 
-  const processInput = (input: string) => {
+  const processInput = async (input: string) => {
     input = input.trim().replace(/^@/, "");
     if (!input.length) return;
     setShowSearch(false);
@@ -83,6 +85,10 @@ const Search = () => {
         const uri = appHandleLink[app](path);
         navigate(`/${uri}`);
       }
+    } else if (input.startsWith("lex:")) {
+      const nsid = input.replace("lex:", "") as Nsid;
+      const res = await resolveLexiconAuthority(nsid);
+      navigate(`/at://${res}/com.atproto.lexicon.schema/${nsid}`);
     } else {
       navigate(`/at://${input.replace("at://", "")}`);
     }
