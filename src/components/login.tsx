@@ -1,9 +1,9 @@
+import { Client } from "@atcute/client";
 import { Did } from "@atcute/lexicons";
 import { isHandle } from "@atcute/lexicons/syntax";
 import {
   configureOAuth,
   createAuthorizationUrl,
-  deleteStoredSession,
   finalizeAuthorization,
   getSession,
   OAuthUserAgent,
@@ -21,6 +21,13 @@ configureOAuth({
 });
 
 export const [agent, setAgent] = createSignal<OAuthUserAgent | undefined>();
+
+type Account = {
+  signedIn: boolean;
+  handle?: string;
+};
+
+export type Sessions = Record<string, Account>;
 
 const Login = () => {
   const [notice, setNotice] = createSignal("");
@@ -100,23 +107,34 @@ const retrieveSession = async () => {
       const did = session.info.sub;
 
       localStorage.setItem("lastSignedIn", did);
+
+      const sessions = localStorage.getItem("sessions");
+      const newSessions: Sessions = sessions ? JSON.parse(sessions) : { [did]: {} };
+      newSessions[did] = { signedIn: true };
+      localStorage.setItem("sessions", JSON.stringify(newSessions));
       return session;
     } else {
       const lastSignedIn = localStorage.getItem("lastSignedIn");
 
       if (lastSignedIn) {
         try {
-          return await getSession(lastSignedIn as Did);
+          const session = await getSession(lastSignedIn as Did);
+          const rpc = new Client({ handler: new OAuthUserAgent(session) });
+          const res = await rpc.get("com.atproto.server.getSession");
+          if (!res.ok) throw res.data.error;
+          return session;
         } catch (err) {
-          deleteStoredSession(lastSignedIn as Did);
-          localStorage.removeItem("lastSignedIn");
+          const sessions = localStorage.getItem("sessions");
+          const newSessions: Sessions = sessions ? JSON.parse(sessions) : {};
+          newSessions[lastSignedIn].signedIn = false;
+          localStorage.setItem("sessions", JSON.stringify(newSessions));
           throw err;
         }
       }
     }
   };
 
-  const session = await init().catch(() => {});
+  const session = await init();
 
   if (session) setAgent(new OAuthUserAgent(session));
 };

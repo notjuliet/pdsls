@@ -1,50 +1,67 @@
 import { Client, CredentialManager } from "@atcute/client";
 import { Did } from "@atcute/lexicons";
-import { deleteStoredSession, getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
+import {
+  createAuthorizationUrl,
+  deleteStoredSession,
+  getSession,
+  OAuthUserAgent,
+  resolveFromIdentity,
+} from "@atcute/oauth-browser-client";
 import { A } from "@solidjs/router";
 import { createSignal, For, onMount, Show } from "solid-js";
-import { createStore } from "solid-js/store";
+import { createStore, produce } from "solid-js/store";
 import { resolveDidDoc } from "../utils/api.js";
-import { agent, Login, retrieveSession, setAgent } from "./login.jsx";
+import { agent, Login, retrieveSession, Sessions, setAgent } from "./login.jsx";
 import { Modal } from "./modal.jsx";
 
 const AccountManager = () => {
   const [openManager, setOpenManager] = createSignal(false);
-  const [sessions, setSessions] = createStore<Record<string, string | undefined>>();
+  const [sessions, setSessions] = createStore<Sessions>();
   const [avatars, setAvatars] = createStore<Record<Did, string>>();
 
   onMount(async () => {
-    await retrieveSession();
+    try {
+      await retrieveSession();
+    } catch {}
 
-    const storedSessions = localStorage.getItem("atcute-oauth:sessions");
-    if (storedSessions) {
-      const sessionDids = Object.keys(JSON.parse(storedSessions)) as Did[];
-      sessionDids.forEach((did) => setSessions(did, ""));
+    const localSessions = localStorage.getItem("sessions");
+    if (localSessions) {
+      const storedSessions: Sessions = JSON.parse(localSessions);
+      const sessionDids = Object.keys(storedSessions) as Did[];
       sessionDids.forEach(async (did) => {
         const doc = await resolveDidDoc(did);
         doc.alsoKnownAs?.forEach((alias) => {
           if (alias.startsWith("at://")) {
-            setSessions(did, alias.replace("at://", ""));
+            setSessions(did, {
+              signedIn: storedSessions[did].signedIn,
+              handle: alias.replace("at://", ""),
+            });
             return;
           }
         });
       });
       sessionDids.forEach(async (did) => {
-        try {
-          await getSession(did, { allowStale: true });
-          const avatar = await getAvatar(did);
-          if (avatar) setAvatars(did, avatar);
-        } catch {
-          deleteStoredSession(did);
-          setSessions(did, undefined);
-        }
+        const avatar = await getAvatar(did);
+        if (avatar) setAvatars(did, avatar);
       });
     }
   });
 
   const resumeSession = async (did: Did) => {
-    localStorage.setItem("lastSignedIn", did);
-    retrieveSession();
+    try {
+      localStorage.setItem("lastSignedIn", did);
+      await retrieveSession();
+    } catch {
+      const resolved = await resolveFromIdentity(did);
+      const authUrl = await createAuthorizationUrl({
+        scope: import.meta.env.VITE_OAUTH_SCOPE,
+        ...resolved,
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 250));
+
+      location.assign(authUrl);
+    }
   };
 
   const removeSession = async (did: Did) => {
@@ -56,7 +73,12 @@ const AccountManager = () => {
     } catch {
       deleteStoredSession(did);
     }
-    setSessions(did, undefined);
+    setSessions(
+      produce((accs) => {
+        delete accs[did];
+      }),
+    );
+    localStorage.setItem("sessions", JSON.stringify(sessions));
     if (currentSession === did) setAgent(undefined);
   };
 
@@ -93,10 +115,15 @@ const AccountManager = () => {
                           class="size-6 rounded-full"
                         />
                       </Show>
-                      <span class="truncate">{sessions[did]?.length ? sessions[did] : did}</span>
+                      <span class="truncate">
+                        {sessions[did]?.handle ? sessions[did].handle : did}
+                      </span>
                     </span>
-                    <Show when={did === agent()?.sub}>
+                    <Show when={did === agent()?.sub && sessions[did].signedIn}>
                       <span class="iconify lucide--check shrink-0 text-green-500 dark:text-green-400"></span>
+                    </Show>
+                    <Show when={!sessions[did].signedIn}>
+                      <span class="iconify lucide--circle-alert shrink-0 text-red-500 dark:text-red-400"></span>
                     </Show>
                   </button>
                   <A
