@@ -134,7 +134,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
           <span class="flex gap-x-1">
             <Show when={blob.mimeType.startsWith("image/") && !hide()}>
               <img
-                class="max-h-[16rem] max-w-[16rem]"
+                class="size-fit max-h-[16rem] max-w-[16rem]"
                 src={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${repo}&cid=${blob.ref.$link}`}
               />
             </Show>
