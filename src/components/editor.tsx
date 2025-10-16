@@ -57,7 +57,8 @@ const Editor = (props: { content: string }) => {
   return (
     <div
       ref={editorDiv}
-      class="dark:shadow-dark-700 border-[0.5px] border-neutral-300 shadow-xs dark:border-neutral-700"
+      id="editor"
+      class="dark:shadow-dark-700 cursor-auto border-[0.5px] border-neutral-300 shadow-xs dark:border-neutral-700"
     ></div>
   );
 };

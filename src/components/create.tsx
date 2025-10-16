@@ -1,7 +1,7 @@
 import { Client } from "@atcute/client";
 import { remove } from "@mary/exif-rm";
 import { useNavigate, useParams } from "@solidjs/router";
-import { createSignal, onCleanup, Show } from "solid-js";
+import { createSignal, onCleanup, onMount, Show } from "solid-js";
 import { Editor, editorView } from "../components/editor.jsx";
 import { agent } from "../components/login.jsx";
 import { setNotif } from "../layout.jsx";
@@ -128,6 +128,80 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     }
   };
 
+  const dragDiv = (box: HTMLDivElement) => {
+    let currentBox: HTMLDivElement | null = null;
+    let isDragging = false;
+    let offsetX: number;
+    let offsetY: number;
+
+    const handleMouseDown = (e: MouseEvent) => {
+      if (!(e.target instanceof HTMLElement)) return;
+
+      const closestDraggable = e.target.closest("[data-draggable]") as HTMLElement;
+      if (closestDraggable && closestDraggable !== box) return;
+
+      if (
+        ["INPUT", "SELECT", "BUTTON", "LABEL"].includes(e.target.tagName) ||
+        e.target.closest("#editor")
+      )
+        return;
+
+      e.preventDefault();
+      isDragging = true;
+      box.classList.add("cursor-grabbing");
+      currentBox = box;
+
+      const rect = box.getBoundingClientRect();
+
+      box.style.left = rect.left + "px";
+      box.style.top = rect.top + "px";
+
+      box.classList.remove("-translate-x-1/2");
+
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDragging && box === currentBox) {
+        let newLeft = e.clientX - offsetX;
+        let newTop = e.clientY - offsetY;
+
+        const boxWidth = box.offsetWidth;
+        const boxHeight = box.offsetHeight;
+
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        newLeft = Math.max(0, Math.min(newLeft, viewportWidth - boxWidth));
+        newTop = Math.max(0, Math.min(newTop, viewportHeight - boxHeight));
+
+        box.style.left = newLeft + "px";
+        box.style.top = newTop + "px";
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (isDragging && box === currentBox) {
+        isDragging = false;
+        box.classList.remove("cursor-grabbing");
+        currentBox = null;
+      }
+    };
+
+    onMount(() => {
+      box.addEventListener("mousedown", handleMouseDown);
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    });
+
+    onCleanup(() => {
+      box.removeEventListener("mousedown", handleMouseDown);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    });
+  };
+
   const FileUpload = (props: { file: File }) => {
     const [uploading, setUploading] = createSignal(false);
     const [error, setError] = createSignal("");
@@ -175,7 +249,11 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     };
 
     return (
-      <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] w-[20rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
+      <div
+        data-draggable
+        class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] w-[20rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0"
+        ref={dragDiv}
+      >
         <h2 class="mb-2 font-semibold">Upload blob</h2>
         <div class="flex flex-col gap-2 text-sm">
           <div class="flex flex-col gap-1">
@@ -229,10 +307,14 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   return (
     <>
       <Modal open={openDialog()} onClose={() => setOpenDialog(false)} closeOnClick={false}>
-        <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-16 left-[50%] w-screen -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-xl lg:w-[48rem] dark:border-neutral-700 starting:opacity-0">
+        <div
+          data-draggable
+          class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-16 left-[50%] w-screen -translate-x-1/2 cursor-grab rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-xl lg:w-[48rem] dark:border-neutral-700 starting:opacity-0"
+          ref={dragDiv}
+        >
           <div class="mb-2 flex w-full justify-between">
             <div class="font-semibold">
-              <span>{props.create ? "Creating" : "Editing"} record</span>
+              <span class="select-none">{props.create ? "Creating" : "Editing"} record</span>
             </div>
             <button
               onclick={() => setOpenDialog(false)}
@@ -274,7 +356,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                 <select
                   name="validate"
                   id="validate"
-                  class="dark:bg-dark-100 dark:shadow-dark-700 rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 shadow-xs focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
+                  class="dark:bg-dark-100 dark:shadow-dark-700 rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 shadow-xs select-none focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
                 >
                   <option value="unset">Unset</option>
                   <option value="true">True</option>
@@ -296,7 +378,10 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                 <div class="text-sm text-red-500 dark:text-red-400">{notice()}</div>
               </Show>
               <div class="flex justify-between gap-2">
-                <div class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 flex w-fit rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 text-xs shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800">
+                <button
+                  type="button"
+                  class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 flex w-fit rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 text-xs shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+                >
                   <input
                     type="file"
                     id="blob"
@@ -310,7 +395,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                     <span class="iconify lucide--upload"></span>
                     Upload
                   </label>
-                </div>
+                </button>
                 <Modal
                   open={openUpload()}
                   onClose={() => setOpenUpload(false)}
