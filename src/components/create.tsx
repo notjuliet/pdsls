@@ -128,7 +128,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     }
   };
 
-  const dragDiv = (box: HTMLDivElement) => {
+  const dragBox = (box: HTMLDivElement) => {
     let currentBox: HTMLDivElement | null = null;
     let isDragging = false;
     let offsetX: number;
@@ -142,7 +142,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
 
       if (
         ["INPUT", "SELECT", "BUTTON", "LABEL"].includes(e.target.tagName) ||
-        e.target.closest("#editor")
+        e.target.closest("#editor, #close")
       )
         return;
 
@@ -252,7 +252,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
       <div
         data-draggable
         class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] w-[20rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0"
-        ref={dragDiv}
+        ref={dragBox}
       >
         <h2 class="mb-2 font-semibold">Upload blob</h2>
         <div class="flex flex-col gap-2 text-sm">
@@ -310,13 +310,14 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
         <div
           data-draggable
           class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-16 left-[50%] w-screen -translate-x-1/2 cursor-grab rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-xl lg:w-[48rem] dark:border-neutral-700 starting:opacity-0"
-          ref={dragDiv}
+          ref={dragBox}
         >
           <div class="mb-2 flex w-full justify-between">
             <div class="font-semibold">
               <span class="select-none">{props.create ? "Creating" : "Editing"} record</span>
             </div>
             <button
+              id="close"
               onclick={() => setOpenDialog(false)}
               class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
             >
