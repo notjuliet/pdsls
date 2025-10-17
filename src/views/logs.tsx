@@ -5,7 +5,6 @@ import {
   processIndexedEntryLog,
 } from "@atcute/did-plc";
 import { createResource, createSignal, For, Show } from "solid-js";
-import Tooltip from "../components/tooltip.jsx";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
 
@@ -111,25 +110,14 @@ export const PlcLogView = (props: { did: string }) => {
 
   return (
     <div class="flex w-full flex-col gap-2 wrap-anywhere">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-1">
-          <div class="iconify lucide--filter" />
-          <div class="dark:shadow-dark-700 dark:bg-dark-300 flex w-fit items-center rounded-full border-[0.5px] border-neutral-300 bg-neutral-50 shadow-xs dark:border-neutral-700">
-            <FilterButton icon="iconify lucide--at-sign" event="handle" />
-            <FilterButton icon="iconify lucide--key-round" event="rotation_key" />
-            <FilterButton icon="iconify lucide--hard-drive" event="service" />
-            <FilterButton icon="iconify lucide--shield-check" event="verification_method" />
-          </div>
+      <div class="flex items-center gap-1">
+        <div class="iconify lucide--filter" />
+        <div class="dark:shadow-dark-700 dark:bg-dark-300 flex w-fit items-center rounded-full border-[0.5px] border-neutral-300 bg-neutral-50 shadow-xs dark:border-neutral-700">
+          <FilterButton icon="iconify lucide--at-sign" event="handle" />
+          <FilterButton icon="iconify lucide--key-round" event="rotation_key" />
+          <FilterButton icon="iconify lucide--hard-drive" event="service" />
+          <FilterButton icon="iconify lucide--shield-check" event="verification_method" />
         </div>
-        <Tooltip text="Audit log">
-          <a
-            href={`${localStorage.plcDirectory ?? "https://plc.directory"}/${props.did}/log/audit`}
-            target="_blank"
-            class="-mr-1 flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-          >
-            <span class="iconify lucide--external-link"></span>
-          </a>
-        </Tooltip>
       </div>
       <div class="flex flex-col gap-1 text-sm">
         <For each={plcOps()}>

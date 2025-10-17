@@ -198,6 +198,24 @@ export const RepoView = () => {
                   label="Jetstream"
                   icon="lucide--radio-tower"
                 />
+                <NavMenu
+                  href={
+                    did.startsWith("did:plc") ?
+                      `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
+                    : `https://${did.split("did:web:")[1]}/.well-known/did.json`
+                  }
+                  newTab
+                  label="DID Document"
+                  icon="lucide--external-link"
+                />
+                <Show when={did.startsWith("did:plc")}>
+                  <NavMenu
+                    href={`${localStorage.plcDirectory ?? "https://plc.directory"}/${did}/log/audit`}
+                    newTab
+                    label="Audit Log"
+                    icon="lucide--external-link"
+                  />
+                </Show>
                 <Show when={error()?.length === 0 || error() === undefined}>
                   <ActionMenu
                     label="Export Repo"
@@ -289,27 +307,12 @@ export const RepoView = () => {
             <Show when={didDoc()}>
               {(didDocument) => (
                 <div class="flex flex-col gap-y-1 wrap-anywhere">
-                  <div class="flex items-baseline justify-between gap-2">
-                    <div>
-                      <div class="flex items-center gap-1">
-                        <div class="iconify lucide--id-card" />
-                        <p class="font-semibold">ID</p>
-                      </div>
-                      <div class="text-sm">{didDocument().id}</div>
+                  <div>
+                    <div class="flex items-center gap-1">
+                      <div class="iconify lucide--id-card" />
+                      <p class="font-semibold">ID</p>
                     </div>
-                    <Tooltip text="DID document">
-                      <a
-                        href={
-                          did.startsWith("did:plc") ?
-                            `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
-                          : `https://${did.split("did:web:")[1]}/.well-known/did.json`
-                        }
-                        target="_blank"
-                        class="-mr-1 flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                      >
-                        <span class="iconify lucide--external-link"></span>
-                      </a>
-                    </Tooltip>
+                    <div class="text-sm">{didDocument().id}</div>
                   </div>
                   <div>
                     <div class="flex items-center gap-1">
