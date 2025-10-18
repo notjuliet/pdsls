@@ -5,7 +5,6 @@ import { CopyMenu, DropdownMenu, MenuProvider } from "./dropdown";
 import Tooltip from "./tooltip";
 
 export const [pds, setPDS] = createSignal<string>();
-export const [isLabeler, setIsLabeler] = createSignal(false);
 
 export const NavBar = (props: { params: Params }) => {
   const location = useLocation();
