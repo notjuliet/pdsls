@@ -5,10 +5,10 @@ import * as TID from "@atcute/tid";
 import { A, useLocation, useParams } from "@solidjs/router";
 import { createResource, createSignal, For, Show } from "solid-js";
 import { Button } from "../components/button";
+import { CopyMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown";
 import { Modal } from "../components/modal";
 import { setPDS } from "../components/navbar";
 import Tooltip from "../components/tooltip";
-import { addToClipboard } from "../utils/copy";
 import { localDateFromTimestamp } from "../utils/date";
 
 const LIMIT = 1000;
@@ -133,24 +133,20 @@ const PdsView = () => {
             <Tab tab="repos" label="Repositories" />
             <Tab tab="info" label="Info" />
           </div>
-          <div class="flex gap-1">
-            <Tooltip text="Copy PDS">
-              <button
-                onClick={() => addToClipboard(params.pds)}
-                class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-              >
-                <span class="iconify lucide--copy"></span>
-              </button>
-            </Tooltip>
-            <Tooltip text="Firehose">
-              <A
+          <MenuProvider>
+            <DropdownMenu
+              icon="lucide--ellipsis-vertical"
+              buttonClass="rounded-sm p-1"
+              menuClass="top-8 p-2 text-sm"
+            >
+              <CopyMenu copyContent={params.pds} label="Copy PDS" icon="lucide--copy" />
+              <NavMenu
                 href={`/firehose?instance=wss://${params.pds}`}
-                class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-              >
-                <span class="iconify lucide--radio-tower"></span>
-              </A>
-            </Tooltip>
-          </div>
+                label="Firehose"
+                icon="lucide--radio-tower"
+              />
+            </DropdownMenu>
+          </MenuProvider>
         </div>
         <div class="flex flex-col gap-1 px-2">
           <Show when={!location.hash || location.hash === "#repos"}>

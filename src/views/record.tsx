@@ -188,7 +188,7 @@ export const RecordView = () => {
             </Show>
             <MenuProvider>
               <DropdownMenu
-                icon="lucide--ellipsis-vertical "
+                icon="lucide--ellipsis-vertical"
                 buttonClass="rounded-sm p-1"
                 menuClass="top-8 p-2 text-sm"
               >
