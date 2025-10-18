@@ -363,14 +363,14 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                 <TextInput
                   id="collection"
                   name="collection"
-                  placeholder="Optional (default: $type)"
+                  placeholder="Collection (default: $type)"
                   class="w-[10rem] placeholder:text-xs lg:w-[13rem]"
                 />
                 <span>/</span>
                 <TextInput
                   id="rkey"
                   name="rkey"
-                  placeholder="Optional (default: TID)"
+                  placeholder="Record key (default: TID)"
                   class="w-[10rem] placeholder:text-xs lg:w-[13rem]"
                 />
               </div>
