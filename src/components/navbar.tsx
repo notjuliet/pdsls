@@ -11,7 +11,7 @@ export const NavBar = (props: { params: Params }) => {
   const [handle, setHandle] = createSignal(props.params.repo);
   const [showHandle, setShowHandle] = createSignal(localStorage.showHandle === "true");
 
-  createEffect(async () => {
+  createEffect(() => {
     if (pds() !== undefined && props.params.repo) {
       const hdl =
         didDocCache[props.params.repo]?.alsoKnownAs
@@ -29,7 +29,7 @@ export const NavBar = (props: { params: Params }) => {
             <span class="iconify lucide--hard-drive shrink-0 text-base"></span>
           </Tooltip>
           <Show when={pds()}>
-            <Show when={props.params.repo}>
+            <Show when={props.params.repo} fallback={<span>{pds()}</span>}>
               <A
                 end
                 href={pds()!}
@@ -37,9 +37,6 @@ export const NavBar = (props: { params: Params }) => {
               >
                 {pds()}
               </A>
-            </Show>
-            <Show when={!props.params.repo}>
-              <span>{pds()}</span>
             </Show>
           </Show>
         </div>
@@ -116,7 +113,7 @@ export const NavBar = (props: { params: Params }) => {
             <Tooltip text="Collection">
               <span class="iconify lucide--folder-open text-base"></span>
             </Tooltip>
-            <Show when={props.params.rkey}>
+            <Show when={props.params.rkey} fallback={<span>{props.params.collection}</span>}>
               <A
                 end
                 href={`/at://${props.params.repo}/${props.params.collection}`}
@@ -124,9 +121,6 @@ export const NavBar = (props: { params: Params }) => {
               >
                 {props.params.collection}
               </A>
-            </Show>
-            <Show when={!props.params.rkey}>
-              <span>{props.params.collection}</span>
             </Show>
           </div>
         </Show>
