@@ -14,7 +14,7 @@ import { resolveDidDoc } from "../utils/api.js";
 import { agent, Login, retrieveSession, Sessions, setAgent } from "./login.jsx";
 import { Modal } from "./modal.jsx";
 
-const AccountManager = () => {
+export const AccountManager = () => {
   const [openManager, setOpenManager] = createSignal(false);
   const [sessions, setSessions] = createStore<Sessions>();
   const [avatars, setAvatars] = createStore<Record<Did, string>>();
@@ -144,6 +144,17 @@ const AccountManager = () => {
             </For>
           </div>
           <Login />
+          <div class="mt-2 flex items-start gap-2 rounded-lg border border-yellow-600 bg-yellow-50 p-3 text-sm dark:border-yellow-800 dark:bg-yellow-950/20">
+            <span class="iconify lucide--triangle-alert mt-0.5 flex-shrink-0 text-yellow-600 dark:text-yellow-500" />
+            <div class="flex flex-col gap-1">
+              <span class="font-semibold text-yellow-800 dark:text-yellow-400">Warning</span>
+              <span class="text-yellow-800/90 dark:text-yellow-400/90">
+                Logging in lets you create, edit, and delete records in your repository. Use at your
+                own risk. The developer (who is the cutest thing in the world) cannot be held
+                accountable for any issues.
+              </span>
+            </div>
+          </div>
         </div>
       </Modal>
       <button
@@ -160,5 +171,3 @@ const AccountManager = () => {
     </>
   );
 };
-
-export { AccountManager };
