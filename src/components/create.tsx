@@ -3,7 +3,7 @@ import { Did } from "@atcute/lexicons";
 import { getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { remove } from "@mary/exif-rm";
 import { useNavigate, useParams } from "@solidjs/router";
-import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
+import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { Editor, editorView } from "../components/editor.jsx";
 import { agent } from "../components/login.jsx";
 import { setNotif } from "../layout.jsx";
@@ -57,6 +57,10 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
       : "Unset"
     );
   };
+
+  createEffect(() => {
+    if (openDialog()) setValidate(undefined);
+  });
 
   const createRecord = async (formData: FormData) => {
     const repo = formData.get("repo")?.toString();
