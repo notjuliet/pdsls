@@ -339,58 +339,38 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
             </button>
           </div>
           <form ref={formRef} class="flex flex-col gap-y-2">
-            <div class="flex w-fit flex-col gap-y-1 text-sm">
-              <div class="flex flex-wrap items-center gap-1">
-                <Show when={props.create}>
-                  <span>at://</span>
-                  <select
-                    class="dark:bg-dark-100 dark:shadow-dark-700 max-w-[10rem] truncate rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 shadow-xs select-none focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
-                    name="repo"
-                    id="repo"
-                  >
-                    <For each={Object.keys(sessions)}>
-                      {(session) => (
-                        <option value={session} selected={session === agent()?.sub}>
-                          {sessions[session].handle ?? session}
-                        </option>
-                      )}
-                    </For>
-                  </select>
-                  <span>/</span>
-                  <TextInput
-                    id="collection"
-                    name="collection"
-                    placeholder="Optional (default: $type)"
-                    class="w-[10rem] placeholder:text-xs lg:w-[13rem]"
-                  />
-                  <span>/</span>
-                  <TextInput
-                    id="rkey"
-                    name="rkey"
-                    placeholder="Optional (default: TID)"
-                    class="w-[10rem] placeholder:text-xs lg:w-[13rem]"
-                  />
-                </Show>
-              </div>
-              <div class="flex items-center gap-1">
-                <button
-                  type="button"
-                  class="flex items-center gap-1 rounded-sm p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                  onClick={() =>
-                    setValidate(
-                      validate() === true ? false
-                      : validate() === false ? undefined
-                      : true,
-                    )
-                  }
+            <Show when={props.create}>
+              <div class="flex flex-wrap items-center gap-1 text-sm">
+                <span>at://</span>
+                <select
+                  class="dark:bg-dark-100 dark:shadow-dark-700 max-w-[10rem] truncate rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 shadow-xs select-none focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
+                  name="repo"
+                  id="repo"
                 >
-                  <Tooltip text={getValidateLabel()}>
-                    <span class={`iconify text-base ${getValidateIcon()}`}></span>
-                  </Tooltip>
-                  <span>Validate</span>
-                </button>
+                  <For each={Object.keys(sessions)}>
+                    {(session) => (
+                      <option value={session} selected={session === agent()?.sub}>
+                        {sessions[session].handle ?? session}
+                      </option>
+                    )}
+                  </For>
+                </select>
+                <span>/</span>
+                <TextInput
+                  id="collection"
+                  name="collection"
+                  placeholder="Optional (default: $type)"
+                  class="w-[10rem] placeholder:text-xs lg:w-[13rem]"
+                />
+                <span>/</span>
+                <TextInput
+                  id="rkey"
+                  name="rkey"
+                  placeholder="Optional (default: TID)"
+                  class="w-[10rem] placeholder:text-xs lg:w-[13rem]"
+                />
               </div>
-            </div>
+            </Show>
             <Editor
               content={JSON.stringify(
                 !props.create ? props.record
@@ -431,6 +411,22 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                   <FileUpload file={blobInput.files![0]} />
                 </Modal>
                 <div class="flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    class="flex items-center gap-1 rounded-sm p-1 text-sm hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                    onClick={() =>
+                      setValidate(
+                        validate() === true ? false
+                        : validate() === false ? undefined
+                        : true,
+                      )
+                    }
+                  >
+                    <Tooltip text={getValidateLabel()}>
+                      <span class={`iconify ${getValidateIcon()}`}></span>
+                    </Tooltip>
+                    <span>Validate</span>
+                  </button>
                   <Show when={!props.create}>
                     <Button onClick={() => editRecord(true)}>Recreate</Button>
                   </Show>
