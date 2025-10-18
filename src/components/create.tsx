@@ -1,10 +1,13 @@
 import { Client } from "@atcute/client";
+import { Did } from "@atcute/lexicons";
+import { getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { remove } from "@mary/exif-rm";
 import { useNavigate, useParams } from "@solidjs/router";
-import { createSignal, onCleanup, onMount, Show } from "solid-js";
+import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { Editor, editorView } from "../components/editor.jsx";
 import { agent } from "../components/login.jsx";
 import { setNotif } from "../layout.jsx";
+import { sessions } from "./account.jsx";
 import { Button } from "./button.jsx";
 import { Modal } from "./modal.jsx";
 import { TextInput } from "./text-input.jsx";
@@ -18,6 +21,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   const [openDialog, setOpenDialog] = createSignal(false);
   const [notice, setNotice] = createSignal("");
   const [openUpload, setOpenUpload] = createSignal(false);
+  const [validate, setValidate] = createSignal<boolean | undefined>(undefined);
   let blobInput!: HTMLInputElement;
   let formRef!: HTMLFormElement;
 
@@ -38,11 +42,28 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     };
   };
 
+  const getValidateIcon = () => {
+    return (
+      validate() === true ? "lucide--circle-check"
+      : validate() === false ? "lucide--circle-x"
+      : "lucide--circle"
+    );
+  };
+
+  const getValidateLabel = () => {
+    return (
+      validate() === true ? "True"
+      : validate() === false ? "False"
+      : "Unset"
+    );
+  };
+
   const createRecord = async (formData: FormData) => {
-    const rpc = new Client({ handler: agent()! });
+    const repo = formData.get("repo")?.toString();
+    if (!repo) return;
+    const rpc = new Client({ handler: new OAuthUserAgent(await getSession(repo as Did)) });
     const collection = formData.get("collection");
     const rkey = formData.get("rkey");
-    const validate = formData.get("validate")?.toString();
     let record: any;
     try {
       record = JSON.parse(editorView.state.doc.toString());
@@ -52,14 +73,11 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     }
     const res = await rpc.post("com.atproto.repo.createRecord", {
       input: {
-        repo: agent()!.sub,
+        repo: repo as Did,
         collection: collection ? collection.toString() : record.$type,
         rkey: rkey?.toString().length ? rkey?.toString() : undefined,
         record: record,
-        validate:
-          validate === "true" ? true
-          : validate === "false" ? false
-          : undefined,
+        validate: validate(),
       },
     });
     if (!res.ok) {
@@ -71,12 +89,8 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     navigate(`/${res.data.uri}`);
   };
 
-  const editRecord = async (formData: FormData, recreate?: boolean) => {
+  const editRecord = async (recreate?: boolean) => {
     const record = editorView.state.doc.toString();
-    const validate =
-      formData.get("validate")?.toString() === "true" ? true
-      : formData.get("validate")?.toString() === "false" ? false
-      : undefined;
     if (!record) return;
     const rpc = new Client({ handler: agent()! });
     try {
@@ -85,7 +99,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
         const res = await rpc.post("com.atproto.repo.applyWrites", {
           input: {
             repo: agent()!.sub,
-            validate: validate,
+            validate: validate(),
             writes: [
               {
                 collection: params.collection as `${string}.${string}.${string}`,
@@ -112,7 +126,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
             collection: params.collection as `${string}.${string}.${string}`,
             rkey: params.rkey,
             record: editedRecord,
-            validate: validate,
+            validate: validate(),
           },
         });
         if (!res.ok) {
@@ -326,43 +340,55 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
           </div>
           <form ref={formRef} class="flex flex-col gap-y-2">
             <div class="flex w-fit flex-col gap-y-1 text-sm">
-              <Show when={props.create}>
-                <div class="flex items-center gap-x-2">
-                  <label for="collection" class="min-w-20 select-none">
-                    Collection
-                  </label>
+              <div class="flex flex-wrap items-center gap-1">
+                <Show when={props.create}>
+                  <span>at://</span>
+                  <select
+                    class="dark:bg-dark-100 dark:shadow-dark-700 max-w-[10rem] truncate rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 shadow-xs select-none focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
+                    name="repo"
+                    id="repo"
+                  >
+                    <For each={Object.keys(sessions)}>
+                      {(session) => (
+                        <option value={session} selected={session === agent()?.sub}>
+                          {sessions[session].handle ?? session}
+                        </option>
+                      )}
+                    </For>
+                  </select>
+                  <span>/</span>
                   <TextInput
                     id="collection"
                     name="collection"
                     placeholder="Optional (default: $type)"
-                    class="w-[15rem]"
+                    class="w-[10rem] placeholder:text-xs lg:w-[13rem]"
                   />
-                </div>
-                <div class="flex items-center gap-x-2">
-                  <label for="rkey" class="min-w-20 select-none">
-                    Record key
-                  </label>
+                  <span>/</span>
                   <TextInput
                     id="rkey"
                     name="rkey"
                     placeholder="Optional (default: TID)"
-                    class="w-[15rem]"
+                    class="w-[10rem] placeholder:text-xs lg:w-[13rem]"
                   />
-                </div>
-              </Show>
-              <div class="flex items-center gap-x-2">
-                <label for="validate" class="min-w-20 select-none">
-                  Validate
-                </label>
-                <select
-                  name="validate"
-                  id="validate"
-                  class="dark:bg-dark-100 dark:shadow-dark-700 rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 shadow-xs select-none focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
+                </Show>
+              </div>
+              <div class="flex items-center gap-1">
+                <button
+                  type="button"
+                  class="flex items-center gap-1 rounded-sm p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                  onClick={() =>
+                    setValidate(
+                      validate() === true ? false
+                      : validate() === false ? undefined
+                      : true,
+                    )
+                  }
                 >
-                  <option value="unset">Unset</option>
-                  <option value="true">True</option>
-                  <option value="false">False</option>
-                </select>
+                  <Tooltip text={getValidateLabel()}>
+                    <span class={`iconify text-base ${getValidateIcon()}`}></span>
+                  </Tooltip>
+                  <span>Validate</span>
+                </button>
               </div>
             </div>
             <Editor
@@ -406,15 +432,11 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                 </Modal>
                 <div class="flex items-center justify-end gap-2">
                   <Show when={!props.create}>
-                    <Button onClick={() => editRecord(new FormData(formRef), true)}>
-                      Recreate
-                    </Button>
+                    <Button onClick={() => editRecord(true)}>Recreate</Button>
                   </Show>
                   <Button
                     onClick={() =>
-                      props.create ?
-                        createRecord(new FormData(formRef))
-                      : editRecord(new FormData(formRef))
+                      props.create ? createRecord(new FormData(formRef)) : editRecord()
                     }
                   >
                     {props.create ? "Create" : "Edit"}

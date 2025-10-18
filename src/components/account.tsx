@@ -14,9 +14,10 @@ import { resolveDidDoc } from "../utils/api.js";
 import { agent, Login, retrieveSession, Sessions, setAgent } from "./login.jsx";
 import { Modal } from "./modal.jsx";
 
+export const [sessions, setSessions] = createStore<Sessions>();
+
 export const AccountManager = () => {
   const [openManager, setOpenManager] = createSignal(false);
-  const [sessions, setSessions] = createStore<Sessions>();
   const [avatars, setAvatars] = createStore<Record<Did, string>>();
 
   onMount(async () => {
