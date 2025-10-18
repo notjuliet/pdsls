@@ -144,7 +144,7 @@ export const AccountManager = () => {
             </For>
           </div>
           <Login />
-          <div class="mt-2 flex items-start gap-2 rounded-lg border border-yellow-600 bg-yellow-50 p-3 text-sm dark:border-yellow-800 dark:bg-yellow-950/20">
+          <div class="mx-1 mt-2 flex items-start gap-2 rounded-lg border border-yellow-600 bg-yellow-50 p-3 text-sm dark:border-yellow-800 dark:bg-yellow-950/20">
             <span class="iconify lucide--triangle-alert mt-0.5 flex-shrink-0 text-yellow-600 dark:text-yellow-500" />
             <div class="flex flex-col gap-1">
               <span class="font-semibold text-yellow-800 dark:text-yellow-400">Warning</span>
