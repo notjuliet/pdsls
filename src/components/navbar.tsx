@@ -22,11 +22,11 @@ export const NavBar = (props: { params: Params }) => {
   });
 
   return (
-    <nav class="flex w-full flex-col px-2 text-sm wrap-anywhere">
+    <nav class="flex w-full flex-col px-2 wrap-anywhere">
       <div class="relative flex items-center justify-between gap-1">
-        <div class="flex min-h-[1.25rem] basis-full items-center gap-2">
+        <div class="flex min-h-[1.5rem] basis-full items-center gap-2">
           <Tooltip text="PDS">
-            <span class="iconify lucide--hard-drive shrink-0 text-base"></span>
+            <span class="iconify lucide--hard-drive shrink-0"></span>
           </Tooltip>
           <Show when={pds()}>
             <Show when={props.params.repo} fallback={<span>{pds()}</span>}>
@@ -43,8 +43,8 @@ export const NavBar = (props: { params: Params }) => {
         <Show when={props.params.repo}>
           <MenuProvider>
             <DropdownMenu
-              icon="lucide--copy text-base"
-              buttonClass="rounded p-0.5"
+              icon="lucide--copy"
+              buttonClass="rounded p-1"
               menuClass="top-6 p-2 text-xs"
             >
               <Show when={pds()}>
@@ -61,10 +61,10 @@ export const NavBar = (props: { params: Params }) => {
       </div>
       <div class="flex flex-col flex-wrap">
         <Show when={props.params.repo}>
-          <div class="relative mt-1 flex items-center justify-between gap-1">
+          <div class="relative flex items-center justify-between gap-1">
             <div class="flex basis-full items-center gap-2">
               <Tooltip text="Repository">
-                <span class="iconify lucide--book-user text-base"></span>
+                <span class="iconify lucide--book-user"></span>
               </Tooltip>
               {props.params.collection || location.pathname.includes("/labels") ?
                 <A
@@ -78,14 +78,14 @@ export const NavBar = (props: { params: Params }) => {
             </div>
             <Tooltip text={showHandle() ? "Show DID" : "Show handle"}>
               <button
-                class="flex items-center rounded p-0.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                class="flex items-center rounded p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                 onclick={() => {
                   localStorage.showHandle = !showHandle();
                   setShowHandle(!showHandle());
                 }}
               >
                 <span
-                  class={`iconify shrink-0 text-base transition-transform duration-400 ${showHandle() ? "rotate-y-180" : ""} lucide--arrow-left-right`}
+                  class={`iconify shrink-0 transition-transform duration-400 ${showHandle() ? "rotate-y-180" : ""} lucide--arrow-left-right`}
                 ></span>
               </button>
             </Tooltip>
@@ -97,8 +97,8 @@ export const NavBar = (props: { params: Params }) => {
             (props.params.repo in labelerCache || location.pathname.endsWith("/labels"))
           }
         >
-          <div class="mt-1 flex items-center gap-2">
-            <span class="iconify lucide--tag text-base"></span>
+          <div class="flex items-center gap-2">
+            <span class="iconify lucide--tag"></span>
             <A
               end
               href={`/at://${props.params.repo}/labels`}
@@ -109,9 +109,9 @@ export const NavBar = (props: { params: Params }) => {
           </div>
         </Show>
         <Show when={props.params.collection}>
-          <div class="mt-1 flex items-center gap-2">
+          <div class="flex items-center gap-2">
             <Tooltip text="Collection">
-              <span class="iconify lucide--folder-open text-base"></span>
+              <span class="iconify lucide--folder-open"></span>
             </Tooltip>
             <Show when={props.params.rkey} fallback={<span>{props.params.collection}</span>}>
               <A
@@ -125,9 +125,9 @@ export const NavBar = (props: { params: Params }) => {
           </div>
         </Show>
         <Show when={props.params.rkey}>
-          <div class="mt-1 flex items-center gap-2">
+          <div class="flex items-center gap-2">
             <Tooltip text="Record">
-              <span class="iconify lucide--file-json text-base"></span>
+              <span class="iconify lucide--file-json"></span>
             </Tooltip>
             <span>{props.params.rkey}</span>
           </div>
