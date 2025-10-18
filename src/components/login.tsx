@@ -64,27 +64,25 @@ const Login = () => {
 
   return (
     <form class="flex flex-col gap-y-2 px-1" onsubmit={(e) => e.preventDefault()}>
-      <div class="flex items-center gap-1">
-        <label for="handle" class="hidden">
-          Add account
-        </label>
-        <div class="dark:bg-dark-100 dark:shadow-dark-700 flex grow items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 shadow-xs focus-within:outline-[1px] focus-within:outline-neutral-600 dark:border-neutral-600 dark:focus-within:outline-neutral-400">
-          <label
-            for="handle"
-            class="iconify lucide--user-round-plus text-neutral-500 dark:text-neutral-400"
-          ></label>
-          <input
-            type="text"
-            spellcheck={false}
-            placeholder="user.bsky.social"
-            id="handle"
-            class="grow py-1 select-none placeholder:text-sm focus:outline-none"
-            onInput={(e) => setLoginInput(e.currentTarget.value)}
-          />
-        </div>
+      <label for="handle" class="hidden">
+        Add account
+      </label>
+      <div class="dark:bg-dark-100 dark:shadow-dark-700 flex grow items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 shadow-xs focus-within:outline-[1px] focus-within:outline-neutral-600 dark:border-neutral-600 dark:focus-within:outline-neutral-400">
+        <label
+          for="handle"
+          class="iconify lucide--user-round-plus text-neutral-500 dark:text-neutral-400"
+        ></label>
+        <input
+          type="text"
+          spellcheck={false}
+          placeholder="user.bsky.social"
+          id="handle"
+          class="grow py-1 select-none placeholder:text-sm focus:outline-none"
+          onInput={(e) => setLoginInput(e.currentTarget.value)}
+        />
         <button
           onclick={() => login(loginInput())}
-          class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+          class="flex items-center rounded-lg p-1 hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
         >
           <span class="iconify lucide--log-in"></span>
         </button>
