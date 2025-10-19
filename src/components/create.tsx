@@ -330,7 +330,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
           class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-16 left-[50%] w-screen -translate-x-1/2 cursor-grab rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-xl lg:w-[48rem] dark:border-neutral-700 starting:opacity-0"
           ref={dragBox}
         >
-          <div class="mb-2 flex w-full justify-between">
+          <div class="mb-2 flex w-full justify-between text-base">
             <div class="font-semibold">
               <span class="select-none">{props.create ? "Creating" : "Editing"} record</span>
             </div>
