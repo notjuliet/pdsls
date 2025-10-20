@@ -60,7 +60,10 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   };
 
   createEffect(() => {
-    if (openDialog()) setValidate(undefined);
+    if (openDialog()) {
+      setValidate(undefined);
+      setNonBlocking(false);
+    }
   });
 
   const createRecord = async (formData: FormData) => {
