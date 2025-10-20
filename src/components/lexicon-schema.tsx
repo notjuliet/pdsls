@@ -172,7 +172,12 @@ const ConstraintsList = (props: { property: LexiconProperty }) => (
   </div>
 );
 
-const PropertyRow = (props: { name: string; property: LexiconProperty; required?: boolean }) => {
+const PropertyRow = (props: {
+  name: string;
+  property: LexiconProperty;
+  required?: boolean;
+  hideNameType?: boolean;
+}) => {
   const hasConstraints = (property: LexiconProperty) =>
     property.minLength !== undefined ||
     property.maxLength !== undefined ||
@@ -189,24 +194,26 @@ const PropertyRow = (props: { name: string; property: LexiconProperty; required?
 
   return (
     <div class="flex flex-col gap-2 py-3">
-      <div class="flex flex-wrap items-center gap-2">
-        <span class="font-mono text-sm font-semibold">{props.name}</span>
-        <Show when={!props.property.refs}>
-          <TypeBadge
-            type={props.property.type}
-            format={props.property.format}
-            refType={props.property.ref}
-          />
-        </Show>
-        <Show when={props.property.refs}>
-          <span class="inline-block rounded bg-blue-100 px-1.5 py-0.5 font-mono text-xs text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-            union
-          </span>
-        </Show>
-        <Show when={props.required}>
-          <span class="text-xs font-semibold text-red-500 dark:text-red-400">required</span>
-        </Show>
-      </div>
+      <Show when={!props.hideNameType}>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="font-mono text-sm font-semibold">{props.name}</span>
+          <Show when={!props.property.refs}>
+            <TypeBadge
+              type={props.property.type}
+              format={props.property.format}
+              refType={props.property.ref}
+            />
+          </Show>
+          <Show when={props.property.refs}>
+            <span class="inline-block rounded bg-blue-100 px-1.5 py-0.5 font-mono text-xs text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+              union
+            </span>
+          </Show>
+          <Show when={props.required}>
+            <span class="text-xs font-semibold text-red-500 dark:text-red-400">required</span>
+          </Show>
+        </div>
+      </Show>
       <Show when={props.property.refs}>
         <UnionBadges refs={props.property.refs!} />
       </Show>
@@ -261,7 +268,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
       case "token":
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
       default:
-        return "bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300";
+        return "bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300";
     }
   };
 
@@ -462,7 +469,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
         }
       >
         <div class="divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/30">
-          <PropertyRow name={props.name} property={props.def} />
+          <PropertyRow name={props.name} property={props.def} hideNameType />
         </div>
       </Show>
     </div>
