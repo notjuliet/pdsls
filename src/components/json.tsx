@@ -1,5 +1,8 @@
-import { A, useParams } from "@solidjs/router";
+import { isDid, isNsid, Nsid } from "@atcute/lexicons/syntax";
+import { A, useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createSignal, ErrorBoundary, For, Show } from "solid-js";
+import { resolveLexiconAuthority } from "../utils/api";
+import { ATURI_RE } from "../utils/types/at-uri";
 import { hideMedia } from "../views/settings";
 import { pds } from "./navbar";
 import Tooltip from "./tooltip";
@@ -11,12 +14,9 @@ interface AtBlob {
   mimeType: string;
 }
 
-const ATURI_RE =
-  /^at:\/\/([a-zA-Z0-9._:%-]+)(?:\/([a-zA-Z0-9-.]+)(?:\/([a-zA-Z0-9._~:@!$&%')(*+,;=-]+))?)?(?:#(\/[a-zA-Z0-9._~:@!$&%')(*+,;=\-[\]/\\]*))?$/;
-
-const DID_RE = /^did:[a-z]+:[a-zA-Z0-9._:%-]*[a-zA-Z0-9._-]$/;
-
 const JSONString = ({ data }: { data: string }) => {
+  const navigate = useNavigate();
+
   const isURL =
     URL.canParse ??
     ((url, base) => {
@@ -28,6 +28,18 @@ const JSONString = ({ data }: { data: string }) => {
       }
     });
 
+  const handleClick = async (lex: string) => {
+    try {
+      const [nsid, anchor] = lex.split("#");
+      const authority = await resolveLexiconAuthority(nsid as Nsid);
+
+      const hash = anchor ? `#schema:${anchor}` : "#schema";
+      navigate(`/at://${authority}/com.atproto.lexicon.schema/${nsid}${hash}`);
+    } catch (err) {
+      console.error("Failed to resolve lexicon authority:", err);
+    }
+  };
+
   return (
     <span>
       "
@@ -38,10 +50,18 @@ const JSONString = ({ data }: { data: string }) => {
               <A class="text-blue-400 hover:underline active:underline" href={`/${part}`}>
                 {part}
               </A>
-            : DID_RE.test(part) ?
+            : isDid(part) ?
               <A class="text-blue-400 hover:underline active:underline" href={`/at://${part}`}>
                 {part}
               </A>
+            : isNsid(part.split("#")[0]) ?
+              <button
+                type="button"
+                onClick={() => handleClick(part)}
+                class="cursor-pointer text-blue-400 hover:underline active:underline"
+              >
+                {part}
+              </button>
             : (
               isURL(part) &&
               ["http:", "https:", "web+at:"].includes(new URL(part).protocol) &&
