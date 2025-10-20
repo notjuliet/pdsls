@@ -22,6 +22,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   const [notice, setNotice] = createSignal("");
   const [openUpload, setOpenUpload] = createSignal(false);
   const [validate, setValidate] = createSignal<boolean | undefined>(undefined);
+  const [nonBlocking, setNonBlocking] = createSignal(false);
   let blobInput!: HTMLInputElement;
   let formRef!: HTMLFormElement;
 
@@ -324,15 +325,36 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
 
   return (
     <>
-      <Modal open={openDialog()} onClose={() => setOpenDialog(false)} closeOnClick={false}>
+      <Modal
+        open={openDialog()}
+        onClose={() => setOpenDialog(false)}
+        closeOnClick={false}
+        nonBlocking={nonBlocking()}
+      >
         <div
           data-draggable
-          class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-16 left-[50%] w-screen -translate-x-1/2 cursor-grab rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-xl lg:w-[48rem] dark:border-neutral-700 starting:opacity-0"
+          classList={{
+            "dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto absolute top-16 left-[50%] w-screen -translate-x-1/2 cursor-grab rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-xl lg:w-[48rem] dark:border-neutral-700 starting:opacity-0": true,
+            "opacity-60 hover:opacity-100": nonBlocking(),
+          }}
           ref={dragBox}
         >
           <div class="mb-2 flex w-full justify-between text-base">
-            <div class="font-semibold">
-              <span class="select-none">{props.create ? "Creating" : "Editing"} record</span>
+            <div class="flex items-center gap-2">
+              <span class="font-semibold select-none">
+                {props.create ? "Creating" : "Editing"} record
+              </span>
+              <Tooltip text={nonBlocking() ? "Lock" : "Unlock"}>
+                <button
+                  type="button"
+                  onclick={() => setNonBlocking(!nonBlocking())}
+                  class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                >
+                  <span
+                    class={`iconify ${nonBlocking() ? "lucide--lock-open" : "lucide--lock"}`}
+                  ></span>
+                </button>
+              </Tooltip>
             </div>
             <button
               id="close"

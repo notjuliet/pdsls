@@ -15,7 +15,7 @@ const SearchButton = () => {
   onCleanup(() => window.removeEventListener("keydown", keyEvent));
 
   const keyEvent = (ev: KeyboardEvent) => {
-    if (document.querySelector("dialog")) return;
+    if (document.querySelector("[data-modal]")) return;
 
     if ((ev.ctrlKey || ev.metaKey) && ev.key == "k") {
       ev.preventDefault();
