@@ -22,9 +22,9 @@ export const NavBar = (props: { params: Params }) => {
   });
 
   return (
-    <nav class="flex w-full flex-col px-2 wrap-anywhere">
+    <nav class="flex w-full flex-col px-2 text-sm wrap-anywhere sm:text-base">
       <div class="relative flex items-center justify-between gap-1">
-        <div class="flex min-h-[1.5rem] basis-full items-center gap-2">
+        <div class="flex min-h-[1.25rem] basis-full items-center gap-2 sm:min-h-[1.5rem]">
           <Tooltip text="PDS">
             <span class="iconify lucide--hard-drive shrink-0"></span>
           </Tooltip>
@@ -44,7 +44,7 @@ export const NavBar = (props: { params: Params }) => {
           <MenuProvider>
             <DropdownMenu
               icon="lucide--copy"
-              buttonClass="rounded p-1"
+              buttonClass="rounded p-0.5 sm:p-1 text-base"
               menuClass="top-6 p-2 text-xs"
             >
               <Show when={pds()}>
@@ -78,7 +78,7 @@ export const NavBar = (props: { params: Params }) => {
             </div>
             <Tooltip text={showHandle() ? "Show DID" : "Show handle"}>
               <button
-                class="flex items-center rounded p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                class="flex items-center rounded p-0.5 text-base hover:bg-neutral-200 active:bg-neutral-300 sm:p-1 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                 onclick={() => {
                   localStorage.showHandle = !showHandle();
                   setShowHandle(!showHandle());
