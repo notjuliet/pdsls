@@ -151,7 +151,6 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   };
 
   const dragBox = (box: HTMLDivElement) => {
-    let currentBox: HTMLDivElement | null = null;
     let isDragging = false;
     let offsetX: number;
     let offsetY: number;
@@ -171,7 +170,6 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
       e.preventDefault();
       isDragging = true;
       box.classList.add("cursor-grabbing");
-      currentBox = box;
 
       const rect = box.getBoundingClientRect();
 
@@ -185,7 +183,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging && box === currentBox) {
+      if (isDragging) {
         let newLeft = e.clientX - offsetX;
         let newTop = e.clientY - offsetY;
 
@@ -204,10 +202,9 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     };
 
     const handleMouseUp = () => {
-      if (isDragging && box === currentBox) {
+      if (isDragging) {
         isDragging = false;
         box.classList.remove("cursor-grabbing");
-        currentBox = null;
       }
     };
 
