@@ -8,6 +8,7 @@ import { Button } from "../components/button.jsx";
 import { RecordEditor, setPlaceholder } from "../components/create.jsx";
 import { CopyMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
 import { JSONValue } from "../components/json.jsx";
+import { LexiconSchemaView } from "../components/lexicon-schema.jsx";
 import { agent } from "../components/login.jsx";
 import { Modal } from "../components/modal.jsx";
 import { pds } from "../components/navbar.jsx";
@@ -129,27 +130,35 @@ export const RecordView = () => {
   };
 
   const RecordTab = (props: {
-    tab: "record" | "backlinks" | "info";
+    tab: "record" | "backlinks" | "info" | "schema";
     label: string;
     error?: boolean;
-  }) => (
-    <div class="flex items-center gap-0.5">
-      <A
-        classList={{
-          "flex items-center gap-1 border-b-2": true,
-          "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
-            (!!location.hash && location.hash !== `#${props.tab}`) ||
-            (!location.hash && props.tab !== "record"),
-        }}
-        href={`/at://${did}/${params.collection}/${params.rkey}#${props.tab}`}
-      >
-        {props.label}
-      </A>
-      <Show when={props.error && (validRecord() === false || validSchema() === false)}>
-        <span class="iconify lucide--x text-red-500 dark:text-red-400"></span>
-      </Show>
-    </div>
-  );
+  }) => {
+    const isActive = () => {
+      if (!location.hash && props.tab === "record") return true;
+      if (location.hash === `#${props.tab}`) return true;
+      if (props.tab === "schema" && location.hash.startsWith("#schema:")) return true;
+      return false;
+    };
+
+    return (
+      <div class="flex items-center gap-0.5">
+        <A
+          classList={{
+            "flex items-center gap-1 border-b-2": true,
+            "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
+              !isActive(),
+          }}
+          href={`/at://${did}/${params.collection}/${params.rkey}#${props.tab}`}
+        >
+          {props.label}
+        </A>
+        <Show when={props.error && (validRecord() === false || validSchema() === false)}>
+          <span class="iconify lucide--x text-red-500 dark:text-red-400"></span>
+        </Show>
+      </div>
+    );
+  };
 
   return (
     <Show when={record()} keyed>
@@ -157,6 +166,9 @@ export const RecordView = () => {
         <div class="dark:shadow-dark-700 dark:bg-dark-300 mb-3 flex w-full justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700">
           <div class="flex gap-3">
             <RecordTab tab="record" label="Record" />
+            <Show when={params.collection === "com.atproto.lexicon.schema"}>
+              <RecordTab tab="schema" label="Schema" />
+            </Show>
             <RecordTab tab="backlinks" label="Backlinks" />
             <RecordTab tab="info" label="Info" error />
           </div>
@@ -224,6 +236,16 @@ export const RecordView = () => {
           <div class="w-max max-w-screen min-w-full px-4 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:px-2 sm:text-sm md:max-w-[48rem]">
             <JSONValue data={record()?.value as any} repo={record()!.uri.split("/")[2]} />
           </div>
+        </Show>
+        <Show
+          when={
+            (location.hash === "#schema" || location.hash.startsWith("#schema:")) &&
+            params.collection === "com.atproto.lexicon.schema"
+          }
+        >
+          <ErrorBoundary fallback={(err) => <div>Error: {err.message}</div>}>
+            <LexiconSchemaView schema={record()?.value as any} />
+          </ErrorBoundary>
         </Show>
         <Show when={location.hash === "#backlinks"}>
           <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
