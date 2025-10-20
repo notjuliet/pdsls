@@ -272,6 +272,21 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
     }
   };
 
+  const hasDefContent = () =>
+    props.def.refs ||
+    props.def.minLength !== undefined ||
+    props.def.maxLength !== undefined ||
+    props.def.maxGraphemes !== undefined ||
+    props.def.minimum !== undefined ||
+    props.def.maximum !== undefined ||
+    props.def.maxSize !== undefined ||
+    props.def.accept ||
+    props.def.enum ||
+    props.def.const ||
+    props.def.default !== undefined ||
+    props.def.closed ||
+    props.def.items;
+
   const handleHeaderClick = (e: MouseEvent) => {
     e.preventDefault();
     window.history.replaceState(null, "", `#schema:${props.name}`);
@@ -475,7 +490,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
             props.def.output ||
             props.def.errors ||
             props.def.record
-          )
+          ) && hasDefContent()
         }
       >
         <div class="divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/30">
