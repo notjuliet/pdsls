@@ -108,13 +108,13 @@ const TypeBadge = (props: { type: string; format?: string; refType?: string }) =
   return (
     <>
       <Show when={props.refType}>
-        <a
-          href={props.refType}
+        <button
+          type="button"
           onClick={handleClick}
-          class="inline-block rounded bg-blue-100 px-1.5 py-0.5 font-mono text-xs text-blue-800 hover:bg-blue-200 hover:underline active:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 dark:active:bg-blue-900/50"
+          class="inline-block cursor-pointer rounded bg-blue-100 px-1.5 py-0.5 font-mono text-xs text-blue-800 hover:bg-blue-200 hover:underline active:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 dark:active:bg-blue-900/50"
         >
           {displayType}
-        </a>
+        </button>
       </Show>
       <Show when={!props.refType}>
         <span class="inline-block rounded bg-blue-100 px-1.5 py-0.5 font-mono text-xs text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
@@ -299,13 +299,13 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
   return (
     <div class="flex flex-col gap-3" id={`def-${props.name}`}>
       <div class="flex items-center gap-2">
-        <a
-          href={`#schema:${props.name}`}
+        <button
+          type="button"
           onClick={handleHeaderClick}
-          class="text-lg font-semibold hover:underline"
+          class="cursor-pointer text-lg font-semibold hover:underline"
         >
           {props.name === "main" ? "Main Definition" : props.name}
-        </a>
+        </button>
         <span class={`rounded px-2 py-0.5 text-xs font-semibold uppercase ${defTypeColor()}`}>
           {props.def.type}
         </span>
