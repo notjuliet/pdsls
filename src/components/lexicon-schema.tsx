@@ -83,8 +83,7 @@ const TypeBadge = (props: { type: string; format?: string; refType?: string }) =
   const isLocalRef = () => props.refType?.startsWith("#");
   const isExternalRef = () => props.refType && !props.refType.startsWith("#");
 
-  const handleClick = async (e: MouseEvent) => {
-    e.preventDefault();
+  const handleClick = async () => {
     if (isLocalRef()) {
       const defName = props.refType!.slice(1);
       window.history.replaceState(null, "", `#schema:${defName}`);
@@ -287,8 +286,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
     props.def.closed ||
     props.def.items;
 
-  const handleHeaderClick = (e: MouseEvent) => {
-    e.preventDefault();
+  const handleHeaderClick = () => {
     window.history.replaceState(null, "", `#schema:${props.name}`);
     const element = document.getElementById(`def-${props.name}`);
     if (element) {
@@ -334,7 +332,9 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
       </Show>
 
       {/* Properties (for record/object types) */}
-      <Show when={props.def.properties || props.def.record?.properties}>
+      <Show
+        when={Object.keys(props.def.properties || props.def.record?.properties || {}).length > 0}
+      >
         <div class="flex flex-col gap-2">
           <h4 class="text-sm font-semibold text-neutral-600 uppercase dark:text-neutral-400">
             Properties
@@ -354,7 +354,12 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
       </Show>
 
       {/* Parameters (for query/procedure) */}
-      <Show when={props.def.parameters?.properties}>
+      <Show
+        when={
+          props.def.parameters?.properties &&
+          Object.keys(props.def.parameters.properties).length > 0
+        }
+      >
         <div class="flex flex-col gap-2">
           <h4 class="text-sm font-semibold text-neutral-600 uppercase dark:text-neutral-400">
             Parameters
@@ -398,7 +403,12 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
                 <UnionBadges refs={props.def.input!.schema!.refs!} />
               </div>
             </Show>
-            <Show when={props.def.input!.schema?.properties}>
+            <Show
+              when={
+                props.def.input!.schema?.properties &&
+                Object.keys(props.def.input!.schema.properties).length > 0
+              }
+            >
               <div class="divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/30">
                 <For each={Object.entries(props.def.input!.schema!.properties!)}>
                   {([name, property]) => (
@@ -440,7 +450,12 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
                 <UnionBadges refs={props.def.output!.schema!.refs!} />
               </div>
             </Show>
-            <Show when={props.def.output!.schema?.properties}>
+            <Show
+              when={
+                props.def.output!.schema?.properties &&
+                Object.keys(props.def.output!.schema.properties).length > 0
+              }
+            >
               <div class="divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/30">
                 <For each={Object.entries(props.def.output!.schema!.properties!)}>
                   {([name, property]) => (
