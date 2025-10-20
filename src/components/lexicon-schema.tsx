@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "@solidjs/router";
 import { createEffect, For, Show } from "solid-js";
 import { resolveLexiconAuthority } from "../utils/api.js";
 
+// TODO: tidy types
+
 interface LexiconSchema {
   lexicon: number;
   id: string;
@@ -26,6 +28,7 @@ interface LexiconDef {
   nullable?: string[];
   maxLength?: number;
   minLength?: number;
+  maxGraphemes?: number;
   items?: LexiconProperty;
   refs?: string[];
   closed?: boolean;
@@ -34,6 +37,8 @@ interface LexiconDef {
   default?: any;
   minimum?: number;
   maximum?: number;
+  accept?: string[];
+  maxSize?: number;
 }
 
 interface LexiconObject {
@@ -440,6 +445,24 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
               )}
             </For>
           </div>
+        </div>
+      </Show>
+
+      {/* Other Definitions */}
+      <Show
+        when={
+          !(
+            props.def.properties ||
+            props.def.parameters ||
+            props.def.input ||
+            props.def.output ||
+            props.def.errors ||
+            props.def.record
+          )
+        }
+      >
+        <div class="divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/30">
+          <PropertyRow name={props.name} property={props.def} />
         </div>
       </Show>
     </div>
