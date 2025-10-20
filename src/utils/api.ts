@@ -13,16 +13,16 @@ import {
   PlcDidDocumentResolver,
   WellKnownHandleResolver,
 } from "@atcute/identity-resolver";
-import { DohJsonLexiconAuthorityResolver } from "@atcute/lexicon-resolver";
+import { DohJsonLexiconAuthorityResolver, LexiconSchemaResolver } from "@atcute/lexicon-resolver";
 import { Did, Handle } from "@atcute/lexicons";
-import { isHandle, Nsid } from "@atcute/lexicons/syntax";
+import { AtprotoDid, isHandle, Nsid } from "@atcute/lexicons/syntax";
 import { createStore } from "solid-js/store";
 import { setPDS } from "../components/navbar";
 
 const didDocumentResolver = new CompositeDidDocumentResolver({
   methods: {
     plc: new PlcDidDocumentResolver({
-      apiUrl: localStorage.plcDirectory ?? "https://plc.directory",
+      apiUrl: localStorage.getItem("plcDirectory") ?? "https://plc.directory",
     }),
     web: new AtprotoWebDidDocumentResolver(),
   },
@@ -38,6 +38,10 @@ const handleResolver = new CompositeHandleResolver({
 
 const authorityResolver = new DohJsonLexiconAuthorityResolver({
   dohUrl: "https://mozilla.cloudflare-dns.com/dns-query",
+});
+
+const schemaResolver = new LexiconSchemaResolver({
+  didDocumentResolver: didDocumentResolver,
 });
 
 const didPDSCache: Record<string, string> = {};
@@ -106,6 +110,10 @@ const resolvePDS = async (did: string) => {
 
 const resolveLexiconAuthority = async (nsid: Nsid) => {
   return await authorityResolver.resolve(nsid);
+};
+
+const resolveLexiconSchema = async (authority: AtprotoDid, nsid: Nsid) => {
+  return await schemaResolver.resolve(authority, nsid);
 };
 
 interface LinkData {
@@ -186,6 +194,7 @@ export {
   resolveDidDoc,
   resolveHandle,
   resolveLexiconAuthority,
+  resolveLexiconSchema,
   resolvePDS,
   validateHandle,
   type LinkData,

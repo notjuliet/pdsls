@@ -1,5 +1,6 @@
 import { Client, CredentialManager } from "@atcute/client";
 import { lexiconDoc } from "@atcute/lexicon-doc";
+import { ResolvedSchema } from "@atcute/lexicon-resolver";
 import { ActorIdentifier, is, Nsid, ResourceUri } from "@atcute/lexicons";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, Show, Suspense } from "solid-js";
@@ -14,7 +15,12 @@ import { Modal } from "../components/modal.jsx";
 import { pds } from "../components/navbar.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import { setNotif } from "../layout.jsx";
-import { didDocCache, resolveLexiconAuthority, resolvePDS } from "../utils/api.js";
+import {
+  didDocCache,
+  resolveLexiconAuthority,
+  resolveLexiconSchema,
+  resolvePDS,
+} from "../utils/api.js";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 import { lexicons } from "../utils/types/lexicons.js";
 import { verifyRecord } from "../utils/verify.js";
@@ -31,6 +37,8 @@ export const RecordView = () => {
   const [lexiconUri, setLexiconUri] = createSignal<string>();
   const [validRecord, setValidRecord] = createSignal<boolean | undefined>(undefined);
   const [validSchema, setValidSchema] = createSignal<boolean | undefined>(undefined);
+  const [schema, setSchema] = createSignal<ResolvedSchema>();
+  const [lexiconNotFound, setLexiconNotFound] = createSignal<boolean>();
   const did = params.repo;
   let rpc: Client;
 
@@ -72,6 +80,7 @@ export const RecordView = () => {
         if (is(lexicons[params.collection], record.value)) setValidSchema(true);
         else setValidSchema(false);
       } else if (params.collection === "com.atproto.lexicon.schema") {
+        setLexiconNotFound(false);
         try {
           lexiconDoc.parse(record.value, { mode: "passthrough" });
           setValidSchema(true);
@@ -101,9 +110,16 @@ export const RecordView = () => {
 
   const resolveLexicon = async (nsid: Nsid) => {
     try {
-      const res = await resolveLexiconAuthority(nsid);
-      setLexiconUri(`at://${res}/com.atproto.lexicon.schema/${nsid}`);
-    } catch {}
+      const authority = await resolveLexiconAuthority(nsid);
+      setLexiconUri(`at://${authority}/com.atproto.lexicon.schema/${nsid}`);
+      if (params.collection !== "com.atproto.lexicon.schema") {
+        const schema = await resolveLexiconSchema(authority, nsid);
+        setSchema(schema);
+        setLexiconNotFound(false);
+      }
+    } catch {
+      setLexiconNotFound(true);
+    }
   };
 
   const deleteRecord = async () => {
@@ -166,9 +182,7 @@ export const RecordView = () => {
         <div class="dark:shadow-dark-700 dark:bg-dark-300 mb-3 flex w-full justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700">
           <div class="flex gap-3">
             <RecordTab tab="record" label="Record" />
-            <Show when={params.collection === "com.atproto.lexicon.schema"}>
-              <RecordTab tab="schema" label="Schema" />
-            </Show>
+            <RecordTab tab="schema" label="Schema" />
             <RecordTab tab="backlinks" label="Backlinks" />
             <RecordTab tab="info" label="Info" error />
           </div>
@@ -237,15 +251,18 @@ export const RecordView = () => {
             <JSONValue data={record()?.value as any} repo={record()!.uri.split("/")[2]} />
           </div>
         </Show>
-        <Show
-          when={
-            (location.hash === "#schema" || location.hash.startsWith("#schema:")) &&
-            params.collection === "com.atproto.lexicon.schema"
-          }
-        >
-          <ErrorBoundary fallback={(err) => <div>Error: {err.message}</div>}>
-            <LexiconSchemaView schema={record()?.value as any} />
-          </ErrorBoundary>
+        <Show when={location.hash === "#schema" || location.hash.startsWith("#schema:")}>
+          <Show when={lexiconNotFound() === true}>
+            <span class="w-full px-2 text-sm">Lexicon schema could not be resolved.</span>
+          </Show>
+          <Show when={lexiconNotFound() === undefined}>
+            <span class="w-full px-2 text-sm">Resolving lexicon schema...</span>
+          </Show>
+          <Show when={schema() || params.collection === "com.atproto.lexicon.schema"}>
+            <ErrorBoundary fallback={(err) => <div>Error: {err.message}</div>}>
+              <LexiconSchemaView schema={schema()?.rawSchema ?? (record()?.value as any)} />
+            </ErrorBoundary>
+          </Show>
         </Show>
         <Show when={location.hash === "#backlinks"}>
           <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
