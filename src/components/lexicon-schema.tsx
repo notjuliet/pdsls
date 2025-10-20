@@ -296,7 +296,17 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
         </span>
       </div>
 
-      <Show when={props.def.description}>
+      <Show
+        when={
+          props.def.description &&
+          (props.def.properties ||
+            props.def.parameters ||
+            props.def.input ||
+            props.def.output ||
+            props.def.errors ||
+            props.def.record)
+        }
+      >
         <p class="text-sm text-neutral-700 dark:text-neutral-300">{props.def.description}</p>
       </Show>
 
