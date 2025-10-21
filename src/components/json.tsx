@@ -14,7 +14,7 @@ interface AtBlob {
   mimeType: string;
 }
 
-const JSONString = ({ data }: { data: string }) => {
+const JSONString = ({ data, isType }: { data: string; isType?: boolean }) => {
   const navigate = useNavigate();
 
   const isURL =
@@ -54,7 +54,7 @@ const JSONString = ({ data }: { data: string }) => {
               <A class="text-blue-400 hover:underline active:underline" href={`/at://${part}`}>
                 {part}
               </A>
-            : isNsid(part.split("#")[0]) ?
+            : isNsid(part.split("#")[0]) && isType ?
               <button
                 type="button"
                 onClick={() => handleClick(part)}
@@ -135,7 +135,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
             "invisible h-0": !show(),
           }}
         >
-          <JSONValue data={value} repo={repo} />
+          <JSONValue data={value} repo={repo} isType={key === "$type" ? true : undefined} />
         </span>
       </span>
     );
@@ -220,13 +220,14 @@ const JSONArray = ({ data, repo }: { data: JSONType[]; repo: string }) => {
   );
 };
 
-export const JSONValue = ({ data, repo }: { data: JSONType; repo: string }) => {
-  if (typeof data === "string") return <JSONString data={data} />;
+export const JSONValue = (props: { data: JSONType; repo: string; isType?: boolean }) => {
+  const data = props.data;
+  if (typeof data === "string") return <JSONString data={data} isType={props.isType} />;
   if (typeof data === "number") return <JSONNumber data={data} />;
   if (typeof data === "boolean") return <JSONBoolean data={data} />;
   if (data === null) return <JSONNull />;
-  if (Array.isArray(data)) return <JSONArray data={data} repo={repo} />;
-  return <JSONObject data={data} repo={repo} />;
+  if (Array.isArray(data)) return <JSONArray data={data} repo={props.repo} />;
+  return <JSONObject data={data} repo={props.repo} />;
 };
 
 export type JSONType = string | number | boolean | null | { [x: string]: JSONType } | JSONType[];
