@@ -25,7 +25,7 @@ export const NavBar = (props: { params: Params }) => {
     <nav class="flex w-full flex-col text-sm wrap-anywhere sm:text-base">
       {/* PDS Level */}
       <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-        <div class="flex min-h-5 basis-full items-center gap-1.5 sm:min-h-6">
+        <div class="flex min-h-6 basis-full items-center gap-1.5 sm:min-h-7">
           <Tooltip text="PDS">
             <span class="iconify lucide--hard-drive shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
           </Tooltip>
