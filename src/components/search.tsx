@@ -73,8 +73,7 @@ const Search = () => {
     const index = selectedIndex() >= 0 ? selectedIndex() : 0;
     setShowSearch(false);
     setInput(undefined);
-    setSelectedIndex(-1);
-    if (search()?.length) {
+    if (search()?.length && selectedIndex() !== -1) {
       navigate(`/at://${search()![index].did}`);
     } else if (input.startsWith("https://") || input.startsWith("http://")) {
       const hostLength = input.indexOf("/", 8);
@@ -96,6 +95,7 @@ const Search = () => {
     } else {
       navigate(`/at://${input.replace("at://", "")}`);
     }
+    setSelectedIndex(-1);
   };
 
   return (
