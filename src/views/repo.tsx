@@ -1,5 +1,5 @@
 import { Client, CredentialManager } from "@atcute/client";
-import { parsePublicMultikey } from "@atcute/crypto";
+import { parseDidKey, parsePublicMultikey } from "@atcute/crypto";
 import { DidDocument } from "@atcute/identity";
 import { ActorIdentifier, Did, Handle, Nsid } from "@atcute/lexicons";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
@@ -38,6 +38,7 @@ export const RepoView = () => {
   const [filter, setFilter] = createSignal<string>();
   const [showFilter, setShowFilter] = createSignal(false);
   const [validHandles, setValidHandles] = createStore<Record<string, boolean>>({});
+  const [rotationKeys, setRotationKeys] = createSignal<Array<string>>([]);
   let rpc: Client;
   let pds: string;
   const did = params.repo;
@@ -60,6 +61,14 @@ export const RepoView = () => {
     </A>
   );
 
+  const getRotationKeys = async () => {
+    const res = await fetch(
+      `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}/log/last`,
+    );
+    const json = await res.json();
+    setRotationKeys(json.rotationKeys ?? []);
+  };
+
   const fetchRepo = async () => {
     try {
       pds = await resolvePDS(did);
@@ -78,6 +87,8 @@ export const RepoView = () => {
       }
     }
     setDidDoc(didDocCache[did] as DidDocument);
+    getRotationKeys();
+
     validateHandles();
 
     rpc = new Client({ handler: new CredentialManager({ service: pds }) });
@@ -381,7 +392,7 @@ export const RepoView = () => {
                   <div>
                     <div class="flex items-center gap-1">
                       <div class="iconify lucide--shield-check" />
-                      <p class="font-semibold">Verification methods</p>
+                      <p class="font-semibold">Verification Methods</p>
                     </div>
                     <ul>
                       <For each={didDocument().verificationMethod}>
@@ -389,17 +400,33 @@ export const RepoView = () => {
                           <Show when={verif.publicKeyMultibase}>
                             {(key) => (
                               <li class="flex flex-col text-sm">
-                                <span>#{verif.id.split("#")[1]}</span>
-                                <span class="flex items-center gap-0.5">
-                                  <div class="iconify lucide--key-round" />
+                                <span>
+                                  <span>#{verif.id.split("#")[1]}</span>
                                   <ErrorBoundary fallback={<>unknown</>}>
-                                    {parsePublicMultikey(key()).type}
+                                    {" "}
+                                    ({parsePublicMultikey(key()).type})
                                   </ErrorBoundary>
                                 </span>
                                 <span class="truncate">{key()}</span>
                               </li>
                             )}
                           </Show>
+                        )}
+                      </For>
+                    </ul>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1">
+                      <div class="iconify lucide--key-round" />
+                      <p class="font-semibold">Rotation Keys</p>
+                    </div>
+                    <ul>
+                      <For each={rotationKeys()}>
+                        {(key) => (
+                          <li class="text-xs">
+                            <span>{key.replace("did:key:", "")}</span>
+                            <span> ({parseDidKey(key).type})</span>
+                          </li>
                         )}
                       </For>
                     </ul>
