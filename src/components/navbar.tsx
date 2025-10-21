@@ -45,7 +45,7 @@ export const NavBar = (props: { params: Params }) => {
           <MenuProvider>
             <DropdownMenu
               icon="lucide--copy"
-              buttonClass="rounded p-1 text-base transition-all duration-200 hover:bg-neutral-200/70 active:bg-neutral-300/70 dark:hover:bg-neutral-700/70 dark:active:bg-neutral-600/70"
+              buttonClass="rounded p-0.5 sm:p-1 text-base transition-all duration-200 hover:bg-neutral-200/70 active:bg-neutral-300/70 dark:hover:bg-neutral-700/70 dark:active:bg-neutral-600/70"
               menuClass="top-7 p-2 text-xs"
             >
               <Show when={pds()}>
@@ -81,7 +81,7 @@ export const NavBar = (props: { params: Params }) => {
             </div>
             <Tooltip text={showHandle() ? "Show DID" : "Show handle"}>
               <button
-                class="flex items-center rounded p-1 text-base transition-all duration-200 hover:bg-neutral-200/70 active:bg-neutral-300/70 dark:hover:bg-neutral-700/70 dark:active:bg-neutral-600/70"
+                class="flex items-center rounded p-0.5 text-base transition-all duration-200 hover:bg-neutral-200/70 active:bg-neutral-300/70 sm:p-1 dark:hover:bg-neutral-700/70 dark:active:bg-neutral-600/70"
                 onclick={() => {
                   localStorage.showHandle = !showHandle();
                   setShowHandle(!showHandle());
