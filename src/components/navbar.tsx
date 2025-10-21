@@ -24,17 +24,20 @@ export const NavBar = (props: { params: Params }) => {
   return (
     <nav class="flex w-full flex-col text-sm wrap-anywhere sm:text-base">
       {/* PDS Level */}
-      <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 py-0.5 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
+      <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
         <div class="flex min-h-5 basis-full items-center gap-1.5 sm:min-h-6">
           <Tooltip text="PDS">
             <span class="iconify lucide--hard-drive shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
           </Tooltip>
           <Show when={pds()}>
-            <Show when={props.params.repo} fallback={<span class="font-medium">{pds()}</span>}>
+            <Show
+              when={props.params.repo}
+              fallback={<span class="py-0.5 font-medium">{pds()}</span>}
+            >
               <A
                 end
                 href={pds()!}
-                inactiveClass="text-blue-400 w-full font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
+                inactiveClass="text-blue-400 py-0.5 w-full font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
               >
                 {pds()}
               </A>
@@ -64,7 +67,7 @@ export const NavBar = (props: { params: Params }) => {
       <div class="flex flex-col">
         <Show when={props.params.repo}>
           {/* Repository Level */}
-          <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 py-0.5 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
+          <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
             <div class="flex basis-full items-center gap-1.5">
               <Tooltip text="Repository">
                 <span class="iconify lucide--book-user text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
@@ -73,11 +76,14 @@ export const NavBar = (props: { params: Params }) => {
                 <A
                   end
                   href={`/at://${props.params.repo}`}
-                  inactiveClass="text-blue-400 w-full font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
+                  inactiveClass="text-blue-400 w-full py-0.5 font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
                 >
                   {showHandle() ? handle() : props.params.repo}
                 </A>
-              : <span class="font-medium">{showHandle() ? handle() : props.params.repo}</span>}
+              : <span class="py-0.5 font-medium">
+                  {showHandle() ? handle() : props.params.repo}
+                </span>
+              }
             </div>
             <Tooltip text={showHandle() ? "Show DID" : "Show handle"}>
               <button
@@ -102,11 +108,12 @@ export const NavBar = (props: { params: Params }) => {
             (props.params.repo in labelerCache || location.pathname.endsWith("/labels"))
           }
         >
-          <div class="group flex items-center gap-1.5 rounded-md border-[0.5px] border-transparent bg-transparent px-2 py-0.5 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
+          <div class="group flex items-center gap-1.5 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
             <span class="iconify lucide--tag text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
             <A
               end
               href={`/at://${props.params.repo}/labels`}
+              class="py-0.5"
               inactiveClass="text-blue-400 grow font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
             >
               labels
@@ -116,18 +123,18 @@ export const NavBar = (props: { params: Params }) => {
 
         {/* Collection Level */}
         <Show when={props.params.collection}>
-          <div class="group flex items-center gap-1.5 rounded-md border-[0.5px] border-transparent bg-transparent px-2 py-0.5 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
+          <div class="group flex items-center gap-1.5 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
             <Tooltip text="Collection">
               <span class="iconify lucide--folder-open text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
             </Tooltip>
             <Show
               when={props.params.rkey}
-              fallback={<span class="font-medium">{props.params.collection}</span>}
+              fallback={<span class="py-0.5 font-medium">{props.params.collection}</span>}
             >
               <A
                 end
                 href={`/at://${props.params.repo}/${props.params.collection}`}
-                inactiveClass="text-blue-400 grow font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
+                inactiveClass="text-blue-400 grow py-0.5 font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
               >
                 {props.params.collection}
               </A>
