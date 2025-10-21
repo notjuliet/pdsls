@@ -64,14 +64,18 @@ const Search = () => {
   };
 
   const [input, setInput] = createSignal<string>();
+  const [selectedIndex, setSelectedIndex] = createSignal(-1);
   const [search] = createResource(createDebouncedValue(input, 250), fetchTypeahead);
 
   const processInput = async (input: string) => {
     input = input.trim().replace(/^@/, "");
     if (!input.length) return;
+    const index = selectedIndex() >= 0 ? selectedIndex() : 0;
     setShowSearch(false);
+    setInput(undefined);
+    setSelectedIndex(-1);
     if (search()?.length) {
-      navigate(`/at://${search()![0].did}`);
+      navigate(`/at://${search()![index].did}`);
     } else if (input.startsWith("https://") || input.startsWith("http://")) {
       const hostLength = input.indexOf("/", 8);
       const host = input.slice(0, hostLength).replace("https://", "").replace("http://", "");
@@ -118,7 +122,24 @@ const Search = () => {
           id="input"
           class="grow py-1 select-none placeholder:text-sm focus:outline-none"
           value={input() ?? ""}
-          onInput={(e) => setInput(e.currentTarget.value)}
+          onInput={(e) => {
+            setInput(e.currentTarget.value);
+            setSelectedIndex(-1);
+          }}
+          onKeyDown={(e) => {
+            const results = search();
+            if (!results?.length) return;
+
+            if (e.key === "ArrowDown") {
+              e.preventDefault();
+              setSelectedIndex((prev) => (prev === -1 ? 0 : (prev + 1) % results.length));
+            } else if (e.key === "ArrowUp") {
+              e.preventDefault();
+              setSelectedIndex((prev) =>
+                prev === -1 ? results.length - 1 : (prev - 1 + results.length) % results.length,
+              );
+            }
+          }}
         />
         <Show when={input()} fallback={ListUrlsTooltip()}>
           <button
@@ -133,9 +154,13 @@ const Search = () => {
       <Show when={search()?.length && input()}>
         <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute z-30 mt-1 flex w-full flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
           <For each={search()}>
-            {(actor) => (
+            {(actor, index) => (
               <A
-                class="flex items-center gap-2 rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                class={`flex items-center gap-2 rounded-lg p-1 transition-colors duration-150 ${
+                  index() === selectedIndex() ?
+                    "bg-neutral-200 dark:bg-neutral-700"
+                  : "hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                }`}
                 href={`/at://${actor.did}`}
                 onClick={() => setShowSearch(false)}
               >
