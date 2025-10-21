@@ -24,7 +24,7 @@ export const NavBar = (props: { params: Params }) => {
   return (
     <nav class="flex w-full flex-col px-2 text-sm wrap-anywhere sm:text-base">
       <div class="relative flex items-center justify-between gap-1">
-        <div class="flex min-h-[1.25rem] basis-full items-center gap-2 sm:min-h-[1.5rem]">
+        <div class="flex min-h-5 basis-full items-center gap-2 sm:min-h-6">
           <Tooltip text="PDS">
             <span class="iconify lucide--hard-drive shrink-0"></span>
           </Tooltip>

@@ -2,6 +2,8 @@ import { Client, CredentialManager } from "@atcute/client";
 import { lexiconDoc } from "@atcute/lexicon-doc";
 import { ResolvedSchema } from "@atcute/lexicon-resolver";
 import { ActorIdentifier, is, Nsid, ResourceUri } from "@atcute/lexicons";
+import { AtprotoDid, Did } from "@atcute/lexicons/syntax";
+import { verifyRecord } from "@atcute/repo";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, Show, Suspense } from "solid-js";
 import { Backlinks } from "../components/backlinks.jsx";
@@ -15,15 +17,9 @@ import { Modal } from "../components/modal.jsx";
 import { pds } from "../components/navbar.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import { setNotif } from "../layout.jsx";
-import {
-  didDocCache,
-  resolveLexiconAuthority,
-  resolveLexiconSchema,
-  resolvePDS,
-} from "../utils/api.js";
+import { resolveLexiconAuthority, resolveLexiconSchema, resolvePDS } from "../utils/api.js";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 import { lexicons } from "../utils/types/lexicons.js";
-import { verifyRecord } from "../utils/verify.js";
 
 export const RecordView = () => {
   const location = useLocation();
@@ -89,21 +85,28 @@ export const RecordView = () => {
           setValidSchema(false);
         }
       }
-      const { errors } = await verifyRecord({
-        rpc: rpc,
-        uri: record.uri,
-        cid: record.cid!,
-        record: record.value,
-        didDoc: didDocCache[record.uri.split("/")[2]],
+
+      const { ok, data } = await rpc.get("com.atproto.sync.getRecord", {
+        params: {
+          did: did as Did,
+          collection: params.collection as Nsid,
+          rkey: params.rkey,
+        },
+        as: "bytes",
+      });
+      if (!ok) throw data.error;
+
+      await verifyRecord({
+        did: did as AtprotoDid,
+        collection: params.collection,
+        rkey: params.rkey,
+        carBytes: data,
       });
 
-      if (errors.length > 0) {
-        console.warn(errors);
-        setNotice(`Invalid record: ${errors.map((e) => e.message).join("\n")}`);
-      }
-      setValidRecord(errors.length === 0);
-    } catch (err) {
+      setValidRecord(true);
+    } catch (err: any) {
       console.error(err);
+      setNotice(err.message);
       setValidRecord(false);
     }
   };
@@ -247,7 +250,7 @@ export const RecordView = () => {
           </div>
         </div>
         <Show when={!location.hash || location.hash === "#record"}>
-          <div class="w-max max-w-screen min-w-full px-4 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:px-2 sm:text-sm md:max-w-[48rem]">
+          <div class="w-max max-w-screen min-w-full px-4 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:px-2 sm:text-sm md:max-w-3xl">
             <JSONValue data={record()?.value as any} repo={record()!.uri.split("/")[2]} />
           </div>
         </Show>
@@ -265,7 +268,9 @@ export const RecordView = () => {
           </Show>
         </Show>
         <Show when={location.hash === "#backlinks"}>
-          <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
+          <ErrorBoundary
+            fallback={(err) => <div class="wrap-break-word">Error: {err.message}</div>}
+          >
             <Suspense
               fallback={
                 <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
@@ -311,7 +316,7 @@ export const RecordView = () => {
                 ></span>
               </div>
               <Show when={validRecord() === false}>
-                <div class="break-words">{notice()}</div>
+                <div class="wrap-break-word">{notice()}</div>
               </Show>
             </div>
             <Show when={validSchema() !== undefined}>

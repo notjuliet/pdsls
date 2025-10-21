@@ -60,7 +60,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
       <Show when={hover()}>
         <span
           ref={previewRef}
-          class={`dark:bg-dark-300 dark:shadow-dark-700 pointer-events-none absolute left-[50%] z-25 block max-h-[20rem] w-max max-w-sm -translate-x-1/2 overflow-hidden rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-xs whitespace-pre-wrap shadow-md sm:max-h-[28rem] lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
+          class={`dark:bg-dark-300 dark:shadow-dark-700 pointer-events-none absolute left-[50%] z-25 block max-h-80 w-max max-w-sm -translate-x-1/2 overflow-hidden rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-xs whitespace-pre-wrap shadow-md sm:max-h-112 lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
         >
           <JSONValue
             data={props.record.record.value as JSONType}
@@ -312,13 +312,13 @@ const CollectionView = () => {
                   </Show>
                   <span>{records.length} records</span>
                 </div>
-                <div class="flex w-[5rem] items-center justify-end">
+                <div class="flex w-20 items-center justify-end">
                   <Show when={cursor()}>
                     <Show when={!response.loading}>
                       <Button onClick={() => refetch()}>Load More</Button>
                     </Show>
                     <Show when={response.loading}>
-                      <div class="iconify lucide--loader-circle w-[5rem] animate-spin text-xl" />
+                      <div class="iconify lucide--loader-circle w-20 animate-spin text-xl" />
                     </Show>
                   </Show>
                 </div>

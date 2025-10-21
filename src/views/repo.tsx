@@ -153,7 +153,7 @@ export const RepoView = () => {
 
   return (
     <Show when={repo()}>
-      <div class="flex w-full flex-col gap-2 break-words">
+      <div class="flex w-full flex-col gap-2 wrap-break-word">
         <div
           class={`dark:shadow-dark-700 dark:bg-dark-300 flex justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm shadow-xs dark:border-neutral-700`}
         >
@@ -229,7 +229,9 @@ export const RepoView = () => {
         </div>
         <div class="flex w-full flex-col gap-1 px-2">
           <Show when={location.hash === "#logs"}>
-            <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
+            <ErrorBoundary
+              fallback={(err) => <div class="wrap-break-word">Error: {err.message}</div>}
+            >
               <Suspense
                 fallback={
                   <div class="iconify lucide--loader-circle mt-2 animate-spin self-center text-xl" />
@@ -240,7 +242,9 @@ export const RepoView = () => {
             </ErrorBoundary>
           </Show>
           <Show when={location.hash === "#backlinks"}>
-            <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
+            <ErrorBoundary
+              fallback={(err) => <div class="wrap-break-word">Error: {err.message}</div>}
+            >
               <Suspense
                 fallback={
                   <div class="iconify lucide--loader-circle mt-2 animate-spin self-center text-xl" />
@@ -251,7 +255,9 @@ export const RepoView = () => {
             </ErrorBoundary>
           </Show>
           <Show when={location.hash === "#blobs"}>
-            <ErrorBoundary fallback={(err) => <div class="break-words">Error: {err.message}</div>}>
+            <ErrorBoundary
+              fallback={(err) => <div class="wrap-break-word">Error: {err.message}</div>}
+            >
               <Suspense
                 fallback={
                   <div class="iconify lucide--loader-circle mt-2 animate-spin self-center text-xl" />

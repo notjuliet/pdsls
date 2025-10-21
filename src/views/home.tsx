@@ -1,6 +1,6 @@
 export const Home = () => {
   return (
-    <div class="flex w-full flex-col gap-4 break-words">
+    <div class="flex w-full flex-col gap-4 wrap-break-word">
       <div>
         <div>
           <span class="text-lg font-semibold">AT Protocol Explorer</span>
@@ -58,7 +58,7 @@ export const Home = () => {
         Made by{" "}
         <a
           href="https://juli.ee"
-          class="font-pecita relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 after:bg-current after:transition-[width] after:duration-300 after:ease-out hover:after:w-full"
+          class="font-pecita relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:transition-[width] after:duration-300 after:ease-out hover:after:w-full"
         >
           Juliet
         </a>{" "}

@@ -19,7 +19,7 @@ const VideoPlayer = ({ did, cid }: VideoPlayerProps) => {
   });
 
   return (
-    <video ref={video} class="max-h-[20rem] max-w-[20rem]" controls playsinline>
+    <video ref={video} class="max-h-80 max-w-[20rem]" controls playsinline>
       <source type="video/mp4" />
     </video>
   );

@@ -113,7 +113,7 @@ const LabelView = () => {
             </div>
           </Show>
           <Show when={cursor()}>
-            <div class="flex h-[2rem] w-[5.5rem] items-center justify-center text-nowrap">
+            <div class="flex h-8 w-22 items-center justify-center text-nowrap">
               <Show when={!response.loading}>
                 <Button onClick={() => refetch()}>Load More</Button>
               </Show>
@@ -131,7 +131,7 @@ const LabelView = () => {
               <div class="flex items-center justify-between gap-2 pb-2">
                 <div class="flex flex-col">
                   <div class="flex items-center gap-x-2">
-                    <div class="min-w-[4rem] font-semibold">URI</div>
+                    <div class="min-w-16 font-semibold">URI</div>
                     <A
                       href={`/at://${label.uri.replace("at://", "")}`}
                       class="text-blue-400 hover:underline active:underline"
@@ -141,22 +141,22 @@ const LabelView = () => {
                   </div>
                   <Show when={label.cid}>
                     <div class="flex items-center gap-x-2">
-                      <div class="min-w-[4rem] font-semibold">CID</div>
+                      <div class="min-w-16 font-semibold">CID</div>
                       {label.cid}
                     </div>
                   </Show>
                   <div class="flex items-center gap-x-2">
-                    <div class="min-w-[4rem] font-semibold">Label</div>
+                    <div class="min-w-16 font-semibold">Label</div>
                     {label.val}
                   </div>
                   <div class="flex items-center gap-x-2">
-                    <div class="min-w-[4rem] font-semibold">Created</div>
+                    <div class="min-w-16 font-semibold">Created</div>
                     {localDateFromTimestamp(new Date(label.cts).getTime())}
                   </div>
                   <Show when={label.exp}>
                     {(exp) => (
                       <div class="flex items-center gap-x-2">
-                        <div class="min-w-[4rem] font-semibold">Expires</div>
+                        <div class="min-w-16 font-semibold">Expires</div>
                         {localDateFromTimestamp(new Date(exp()).getTime())}
                       </div>
                     )}

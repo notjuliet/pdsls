@@ -163,7 +163,7 @@ const StreamView = () => {
         <form ref={formRef} class="flex w-full flex-col gap-1 text-sm">
           <Show when={!connected()}>
             <label class="flex items-center justify-end gap-x-1">
-              <span class="min-w-[5rem]">Instance</span>
+              <span class="min-w-20">Instance</span>
               <TextInput
                 name="instance"
                 value={
@@ -177,7 +177,7 @@ const StreamView = () => {
             </label>
             <Show when={streamType === "jetstream"}>
               <label class="flex items-center justify-end gap-x-1">
-                <span class="min-w-[5rem]">Collections</span>
+                <span class="min-w-20">Collections</span>
                 <textarea
                   name="collections"
                   spellcheck={false}
@@ -189,7 +189,7 @@ const StreamView = () => {
             </Show>
             <Show when={streamType === "jetstream"}>
               <label class="flex items-center justify-end gap-x-1">
-                <span class="min-w-[5rem]">DIDs</span>
+                <span class="min-w-20">DIDs</span>
                 <textarea
                   name="dids"
                   spellcheck={false}
@@ -200,7 +200,7 @@ const StreamView = () => {
               </label>
             </Show>
             <label class="flex items-center justify-end gap-x-1">
-              <span class="min-w-[5rem]">Cursor</span>
+              <span class="min-w-20">Cursor</span>
               <TextInput
                 name="cursor"
                 placeholder="Leave empty for live-tail"
@@ -228,7 +228,7 @@ const StreamView = () => {
                 {(param) => (
                   <Show when={param.param}>
                     <div class="flex">
-                      <div class="min-w-[6rem] font-semibold">{param.name}</div>
+                      <div class="min-w-24 font-semibold">{param.name}</div>
                       {param.param}
                     </div>
                   </Show>
@@ -246,7 +246,7 @@ const StreamView = () => {
       <Show when={notice().length}>
         <div class="text-red-500 dark:text-red-400">{notice()}</div>
       </Show>
-      <div class="flex w-full flex-col gap-2 divide-y-[0.5px] divide-neutral-500 font-mono text-sm wrap-anywhere whitespace-pre-wrap md:w-[48rem]">
+      <div class="flex w-full flex-col gap-2 divide-y-[0.5px] divide-neutral-500 font-mono text-sm wrap-anywhere whitespace-pre-wrap md:w-3xl">
         <For each={records().toReversed()}>
           {(rec) => (
             <div class="pb-2">

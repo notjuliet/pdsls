@@ -334,7 +334,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
         <div
           data-draggable
           classList={{
-            "dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto absolute top-16 left-[50%] w-screen -translate-x-1/2 cursor-grab rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-xl lg:w-[48rem] dark:border-neutral-700 starting:opacity-0": true,
+            "dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto absolute top-16 left-[50%] w-screen -translate-x-1/2 cursor-grab rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-xl lg:w-3xl dark:border-neutral-700 starting:opacity-0": true,
             "opacity-60 hover:opacity-100": nonBlocking(),
           }}
           ref={dragBox}
@@ -369,7 +369,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
               <div class="flex flex-wrap items-center gap-1 text-sm">
                 <span>at://</span>
                 <select
-                  class="dark:bg-dark-100 dark:shadow-dark-700 max-w-[10rem] truncate rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 shadow-xs select-none focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
+                  class="dark:bg-dark-100 dark:shadow-dark-700 max-w-40 truncate rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 shadow-xs select-none focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
                   name="repo"
                   id="repo"
                 >
@@ -386,14 +386,14 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                   id="collection"
                   name="collection"
                   placeholder="Collection (default: $type)"
-                  class="w-[10rem] placeholder:text-xs lg:w-[13rem]"
+                  class="w-40 placeholder:text-xs lg:w-52"
                 />
                 <span>/</span>
                 <TextInput
                   id="rkey"
                   name="rkey"
                   placeholder="Record key (default: TID)"
-                  class="w-[10rem] placeholder:text-xs lg:w-[13rem]"
+                  class="w-40 placeholder:text-xs lg:w-52"
                 />
               </div>
             </Show>
