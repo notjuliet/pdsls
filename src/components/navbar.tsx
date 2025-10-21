@@ -34,7 +34,7 @@ export const NavBar = (props: { params: Params }) => {
               <A
                 end
                 href={pds()!}
-                inactiveClass="text-blue-500 w-full font-medium hover:text-blue-600 transition-colors duration-150 dark:text-blue-400 dark:hover:text-blue-300"
+                inactiveClass="text-blue-400 w-full font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
               >
                 {pds()}
               </A>
@@ -73,7 +73,7 @@ export const NavBar = (props: { params: Params }) => {
                 <A
                   end
                   href={`/at://${props.params.repo}`}
-                  inactiveClass="text-blue-500 w-full font-medium hover:text-blue-600 transition-colors duration-150 dark:text-blue-400 dark:hover:text-blue-300"
+                  inactiveClass="text-blue-400 w-full font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
                 >
                   {showHandle() ? handle() : props.params.repo}
                 </A>
@@ -107,7 +107,7 @@ export const NavBar = (props: { params: Params }) => {
             <A
               end
               href={`/at://${props.params.repo}/labels`}
-              inactiveClass="text-blue-500 grow font-medium hover:text-blue-600 transition-colors duration-150 dark:text-blue-400 dark:hover:text-blue-300"
+              inactiveClass="text-blue-400 grow font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
             >
               labels
             </A>
@@ -127,7 +127,7 @@ export const NavBar = (props: { params: Params }) => {
               <A
                 end
                 href={`/at://${props.params.repo}/${props.params.collection}`}
-                inactiveClass="text-blue-500 w-full font-medium hover:text-blue-600 transition-colors duration-150 dark:text-blue-400 dark:hover:text-blue-300"
+                inactiveClass="text-blue-400 grow font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
               >
                 {props.params.collection}
               </A>
