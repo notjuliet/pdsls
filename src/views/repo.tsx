@@ -14,7 +14,13 @@ import {
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Backlinks } from "../components/backlinks.jsx";
-import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
+import {
+  ActionMenu,
+  CopyMenu,
+  DropdownMenu,
+  MenuProvider,
+  NavMenu,
+} from "../components/dropdown.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import {
@@ -209,6 +215,7 @@ export const RepoView = () => {
                   label="Jetstream"
                   icon="lucide--radio-tower"
                 />
+                <CopyMenu content={params.repo} label="Copy DID" icon="lucide--copy" />
                 <NavMenu
                   href={
                     did.startsWith("did:plc") ?

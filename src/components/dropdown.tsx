@@ -24,13 +24,13 @@ export const MenuProvider = (props: { children?: JSX.Element }) => {
   return <MenuContext.Provider value={value}>{props.children}</MenuContext.Provider>;
 };
 
-export const CopyMenu = (props: { copyContent: string; label: string; icon?: string }) => {
+export const CopyMenu = (props: { content: string; label: string; icon?: string }) => {
   const ctx = useContext(MenuContext);
 
   return (
     <button
       onClick={() => {
-        addToClipboard(props.copyContent);
+        addToClipboard(props.content);
         ctx?.setShowMenu(false);
       }}
       class="flex items-center gap-1.5 rounded-lg p-1 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"

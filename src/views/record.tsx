@@ -222,12 +222,17 @@ export const RecordView = () => {
                 menuClass="top-8 p-2 text-sm"
               >
                 <CopyMenu
-                  copyContent={JSON.stringify(record()?.value, null, 2)}
+                  content={JSON.stringify(record()?.value, null, 2)}
                   label="Copy record"
                   icon="lucide--copy"
                 />
+                <CopyMenu
+                  content={`at://${params.repo}/${params.collection}/${params.rkey}`}
+                  label="Copy AT URI"
+                  icon="lucide--copy"
+                />
                 <Show when={record()?.cid}>
-                  {(cid) => <CopyMenu copyContent={cid()} label="Copy CID" icon="lucide--copy" />}
+                  {(cid) => <CopyMenu content={cid()} label="Copy CID" icon="lucide--copy" />}
                 </Show>
                 <Show when={externalLink()}>
                   {(externalLink) => (

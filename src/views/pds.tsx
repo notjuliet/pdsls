@@ -139,7 +139,7 @@ const PdsView = () => {
               buttonClass="rounded-sm p-1"
               menuClass="top-8 p-2 text-sm"
             >
-              <CopyMenu copyContent={params.pds} label="Copy PDS" icon="lucide--copy" />
+              <CopyMenu content={params.pds} label="Copy PDS" icon="lucide--copy" />
               <NavMenu
                 href={`/firehose?instance=wss://${params.pds}`}
                 label="Firehose"
