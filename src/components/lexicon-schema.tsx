@@ -524,12 +524,8 @@ export const LexiconSchemaView = (props: { schema: LexiconSchema }) => {
     const hash = location.hash;
     if (hash.startsWith("#schema:")) {
       const defName = hash.slice(8);
-      setTimeout(() => {
-        const element = document.getElementById(`def-${defName}`);
-        if (element) {
-          element.scrollIntoView({ behavior: "instant", block: "start" });
-        }
-      }, 100);
+      const element = document.getElementById(`def-${defName}`);
+      if (element) element.scrollIntoView({ behavior: "instant", block: "start" });
     }
   });
 
