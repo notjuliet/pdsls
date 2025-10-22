@@ -15,7 +15,7 @@ const CopyButton = (props: { content: string }) => {
         e.stopPropagation();
         addToClipboard(props.content);
       }}
-      class={`hidden items-center rounded p-0.5 text-base text-neutral-500 transition-all duration-200 group-hover:flex hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:p-1 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70`}
+      class={`-mr-2 hidden items-center rounded px-2 py-1.5 text-neutral-500 transition-all duration-200 group-hover:flex hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70`}
       aria-label="Copy to clipboard"
     >
       <span class="iconify lucide--link"></span>
@@ -39,10 +39,10 @@ export const NavBar = (props: { params: Params }) => {
   });
 
   return (
-    <nav class="flex w-full flex-col text-sm wrap-anywhere sm:text-base">
+    <nav class="flex w-full flex-col wrap-anywhere">
       {/* PDS Level */}
       <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-        <div class="flex min-h-6 basis-full items-center gap-1.5 sm:min-h-7">
+        <div class="flex min-h-7 basis-full items-center gap-2">
           <Tooltip text="PDS">
             <span class="iconify lucide--hard-drive shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
           </Tooltip>
@@ -70,11 +70,11 @@ export const NavBar = (props: { params: Params }) => {
         <Show when={props.params.repo}>
           {/* Repository Level */}
           <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-            <div class="-ml-1 flex basis-full items-center gap-0.5">
+            <div class="-ml-2 flex basis-full items-center">
               <Tooltip text={showHandle() ? "Show DID" : "Show handle"}>
                 <button
                   type="button"
-                  class="relative flex items-center rounded p-1 text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-700 active:bg-neutral-300/70 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-200 dark:active:bg-neutral-600/70"
+                  class="relative flex items-center rounded px-2 py-1.5 text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-700 active:bg-neutral-300/70 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-200 dark:active:bg-neutral-600/70"
                   onclick={() => {
                     localStorage.showHandle = !showHandle();
                     setShowHandle(!showHandle());
@@ -111,8 +111,8 @@ export const NavBar = (props: { params: Params }) => {
             (props.params.repo in labelerCache || location.pathname.endsWith("/labels"))
           }
         >
-          <div class="group flex items-center justify-between gap-1.5 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-            <div class="flex basis-full items-center gap-1.5">
+          <div class="group flex items-center justify-between gap-2 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
+            <div class="flex basis-full items-center gap-2">
               <span class="iconify lucide--tag text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
               <A
                 end
@@ -129,8 +129,8 @@ export const NavBar = (props: { params: Params }) => {
 
         {/* Collection Level */}
         <Show when={props.params.collection}>
-          <div class="group flex items-center justify-between gap-1.5 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-            <div class="flex basis-full items-center gap-1.5">
+          <div class="group flex items-center justify-between gap-2 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
+            <div class="flex basis-full items-center gap-2">
               <Tooltip text="Collection">
                 <span class="iconify lucide--folder-open text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
               </Tooltip>
@@ -153,12 +153,12 @@ export const NavBar = (props: { params: Params }) => {
 
         {/* Record Level */}
         <Show when={props.params.rkey}>
-          <div class="group flex items-center justify-between gap-1.5 rounded-md border-[0.5px] border-transparent bg-transparent px-2 py-0.5 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-            <div class="flex basis-full items-center gap-1.5">
+          <div class="group flex items-center justify-between gap-2 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
+            <div class="flex basis-full items-center gap-2">
               <Tooltip text="Record">
                 <span class="iconify lucide--file-json text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
               </Tooltip>
-              <span class="font-medium">{props.params.rkey}</span>
+              <span class="py-0.5 font-medium">{props.params.rkey}</span>
             </div>
             <CopyButton
               content={`at://${props.params.repo}/${props.params.collection}/${props.params.rkey}`}
