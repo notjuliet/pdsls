@@ -1,25 +1,30 @@
 import { A, Params, useLocation } from "@solidjs/router";
 import { createEffect, createSignal, Show } from "solid-js";
+import { isTouchDevice } from "../layout";
 import { didDocCache, labelerCache } from "../utils/api";
 import { addToClipboard } from "../utils/copy";
 import Tooltip from "./tooltip";
 
 export const [pds, setPDS] = createSignal<string>();
 
-const CopyButton = (props: { content: string }) => {
+const CopyButton = (props: { content: string; label: string }) => {
   return (
-    <button
-      type="button"
-      onclick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        addToClipboard(props.content);
-      }}
-      class={`-mr-2 hidden items-center rounded px-2 py-1.5 text-neutral-500 transition-all duration-200 group-hover:flex hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70`}
-      aria-label="Copy to clipboard"
-    >
-      <span class="iconify lucide--link"></span>
-    </button>
+    <Show when={!isTouchDevice}>
+      <Tooltip text={props.label}>
+        <button
+          type="button"
+          onclick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            addToClipboard(props.content);
+          }}
+          class={`-mr-2 hidden items-center rounded px-2 py-1.5 text-neutral-500 transition-all duration-200 group-hover:flex hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70`}
+          aria-label="Copy to clipboard"
+        >
+          <span class="iconify lucide--link"></span>
+        </button>
+      </Tooltip>
+    </Show>
   );
 };
 
@@ -39,10 +44,10 @@ export const NavBar = (props: { params: Params }) => {
   });
 
   return (
-    <nav class="flex w-full flex-col wrap-anywhere">
+    <nav class="flex w-full flex-col text-sm wrap-anywhere sm:text-base">
       {/* PDS Level */}
       <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-        <div class="flex min-h-7 basis-full items-center gap-2">
+        <div class="flex min-h-6 basis-full items-center gap-2 sm:min-h-7">
           <Tooltip text="PDS">
             <span class="iconify lucide--hard-drive shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
           </Tooltip>
@@ -62,7 +67,7 @@ export const NavBar = (props: { params: Params }) => {
           </Show>
         </div>
         <Show when={pds()}>
-          <CopyButton content={pds()!} />
+          <CopyButton content={pds()!} label="Copy PDS" />
         </Show>
       </div>
 
@@ -70,22 +75,9 @@ export const NavBar = (props: { params: Params }) => {
         <Show when={props.params.repo}>
           {/* Repository Level */}
           <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-            <div class="-ml-2 flex basis-full items-center">
-              <Tooltip text={showHandle() ? "Show DID" : "Show handle"}>
-                <button
-                  type="button"
-                  class="relative flex items-center rounded px-2 py-1.5 text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-700 active:bg-neutral-300/70 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-200 dark:active:bg-neutral-600/70"
-                  onclick={() => {
-                    localStorage.showHandle = !showHandle();
-                    setShowHandle(!showHandle());
-                  }}
-                  aria-label="Switch DID/Handle"
-                >
-                  <span class="iconify lucide--book-user shrink-0 transition-opacity duration-200 group-hover:opacity-0"></span>
-                  <span
-                    class={`iconify absolute shrink-0 opacity-0 transition-all duration-200 group-hover:opacity-100 ${showHandle() ? "rotate-y-180" : ""} lucide--arrow-left-right`}
-                  ></span>
-                </button>
+            <div class="flex basis-full items-center gap-2">
+              <Tooltip text="Repository">
+                <span class="iconify lucide--book-user shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
               </Tooltip>
               {props.params.collection || location.pathname.includes("/labels") ?
                 <A
@@ -100,7 +92,24 @@ export const NavBar = (props: { params: Params }) => {
                 </span>
               }
             </div>
-            <CopyButton content={props.params.repo} />
+            <div class="flex">
+              <Tooltip text={showHandle() ? "Show DID" : "Show handle"}>
+                <button
+                  type="button"
+                  class={`items-center rounded px-2 py-1 text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-700 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-200 dark:active:bg-neutral-600/70 ${isTouchDevice ? "flex" : "hidden group-hover:flex"}`}
+                  onclick={() => {
+                    localStorage.showHandle = !showHandle();
+                    setShowHandle(!showHandle());
+                  }}
+                  aria-label="Switch DID/Handle"
+                >
+                  <span
+                    class={`iconify shrink-0 duration-200 ${showHandle() ? "rotate-y-180" : ""} lucide--arrow-left-right`}
+                  ></span>
+                </button>
+              </Tooltip>
+              <CopyButton content={props.params.repo} label="Copy DID" />
+            </div>
           </div>
         </Show>
 
@@ -111,19 +120,16 @@ export const NavBar = (props: { params: Params }) => {
             (props.params.repo in labelerCache || location.pathname.endsWith("/labels"))
           }
         >
-          <div class="group flex items-center justify-between gap-2 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-            <div class="flex basis-full items-center gap-2">
-              <span class="iconify lucide--tag text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
-              <A
-                end
-                href={`/at://${props.params.repo}/labels`}
-                class="py-0.5"
-                inactiveClass="text-blue-400 grow font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
-              >
-                labels
-              </A>
-            </div>
-            <CopyButton content={`at://${props.params.repo}/labels`} />
+          <div class="group flex items-center gap-2 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
+            <span class="iconify lucide--tag text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
+            <A
+              end
+              href={`/at://${props.params.repo}/labels`}
+              class="py-0.5"
+              inactiveClass="text-blue-400 grow font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
+            >
+              labels
+            </A>
           </div>
         </Show>
 
@@ -147,7 +153,10 @@ export const NavBar = (props: { params: Params }) => {
                 </A>
               </Show>
             </div>
-            <CopyButton content={`at://${props.params.repo}/${props.params.collection}`} />
+            <CopyButton
+              content={`at://${props.params.repo}/${props.params.collection}`}
+              label="Copy AT URI"
+            />
           </div>
         </Show>
 
@@ -162,6 +171,7 @@ export const NavBar = (props: { params: Params }) => {
             </div>
             <CopyButton
               content={`at://${props.params.repo}/${props.params.collection}/${props.params.rkey}`}
+              label="Copy AT URI"
             />
           </div>
         </Show>
