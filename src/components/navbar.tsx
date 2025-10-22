@@ -70,9 +70,22 @@ export const NavBar = (props: { params: Params }) => {
         <Show when={props.params.repo}>
           {/* Repository Level */}
           <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-            <div class="flex basis-full items-center gap-1.5">
-              <Tooltip text="Repository">
-                <span class="iconify lucide--book-user text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
+            <div class="-ml-0.5 flex basis-full items-center gap-1 sm:-ml-1 sm:gap-0.5">
+              <Tooltip text={showHandle() ? "Show DID" : "Show handle"}>
+                <button
+                  type="button"
+                  class="relative flex items-center rounded p-0.5 text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-700 active:bg-neutral-300/70 sm:p-1 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-200 dark:active:bg-neutral-600/70"
+                  onclick={() => {
+                    localStorage.showHandle = !showHandle();
+                    setShowHandle(!showHandle());
+                  }}
+                  aria-label="Switch DID/Handle"
+                >
+                  <span class="iconify lucide--book-user shrink-0 transition-opacity duration-200 group-hover:opacity-0"></span>
+                  <span
+                    class={`iconify absolute shrink-0 opacity-0 transition-all duration-200 group-hover:opacity-100 ${showHandle() ? "rotate-y-180" : ""} lucide--arrow-left-right`}
+                  ></span>
+                </button>
               </Tooltip>
               {props.params.collection || location.pathname.includes("/labels") ?
                 <A
@@ -87,22 +100,7 @@ export const NavBar = (props: { params: Params }) => {
                 </span>
               }
             </div>
-            <div class="flex items-center gap-0.5">
-              <CopyButton content={`at://${props.params.repo}`} />
-              <Tooltip text={showHandle() ? "Show DID" : "Show handle"}>
-                <button
-                  class="flex items-center rounded p-0.5 text-base transition-all duration-200 hover:bg-neutral-200/70 active:bg-neutral-300/70 sm:p-1 dark:hover:bg-neutral-700/70 dark:active:bg-neutral-600/70"
-                  onclick={() => {
-                    localStorage.showHandle = !showHandle();
-                    setShowHandle(!showHandle());
-                  }}
-                >
-                  <span
-                    class={`iconify shrink-0 transition-transform duration-300 ease-in-out ${showHandle() ? "rotate-y-180" : ""} lucide--arrow-left-right`}
-                  ></span>
-                </button>
-              </Tooltip>
-            </div>
+            <CopyButton content={props.params.repo} />
           </div>
         </Show>
 
