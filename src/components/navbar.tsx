@@ -96,7 +96,7 @@ export const NavBar = (props: { params: Params }) => {
               <Tooltip text={showHandle() ? "Show DID" : "Show handle"}>
                 <button
                   type="button"
-                  class={`items-center rounded px-2 py-1 text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-700 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-200 dark:active:bg-neutral-600/70 ${isTouchDevice ? "flex" : "hidden group-hover:flex"}`}
+                  class={`items-center rounded px-1.25 py-1.25 text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-700 active:bg-neutral-300/70 sm:px-2 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-200 dark:active:bg-neutral-600/70 ${isTouchDevice ? "flex" : "hidden group-hover:flex"}`}
                   onclick={() => {
                     localStorage.showHandle = !showHandle();
                     setShowHandle(!showHandle());
