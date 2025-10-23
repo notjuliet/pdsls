@@ -3,8 +3,6 @@ import { useLocation, useNavigate } from "@solidjs/router";
 import { createEffect, For, Show } from "solid-js";
 import { resolveLexiconAuthority } from "../utils/api.js";
 
-// TODO: tidy types
-
 interface LexiconSchema {
   lexicon: number;
   id: string;
@@ -29,6 +27,7 @@ interface LexiconDef {
   maxLength?: number;
   minLength?: number;
   maxGraphemes?: number;
+  minGraphemes?: number;
   items?: LexiconProperty;
   refs?: string[];
   closed?: boolean;
@@ -39,6 +38,8 @@ interface LexiconDef {
   maximum?: number;
   accept?: string[];
   maxSize?: number;
+  knownValues?: string[];
+  format?: string;
 }
 
 interface LexiconObject {
@@ -63,6 +64,7 @@ interface LexiconProperty {
   minLength?: number;
   maxLength?: number;
   maxGraphemes?: number;
+  minGraphemes?: number;
   minimum?: number;
   maximum?: number;
   enum?: string[];
