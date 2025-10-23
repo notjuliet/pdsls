@@ -115,15 +115,17 @@ const retrieveSession = async () => {
       const lastSignedIn = localStorage.getItem("lastSignedIn");
 
       if (lastSignedIn) {
+        const sessions = localStorage.getItem("sessions");
+        const newSessions: Sessions = sessions ? JSON.parse(sessions) : {};
         try {
           const session = await getSession(lastSignedIn as Did);
           const rpc = new Client({ handler: new OAuthUserAgent(session) });
           const res = await rpc.get("com.atproto.server.getSession");
+          newSessions[lastSignedIn].signedIn = true;
+          localStorage.setItem("sessions", JSON.stringify(newSessions));
           if (!res.ok) throw res.data.error;
           return session;
         } catch (err) {
-          const sessions = localStorage.getItem("sessions");
-          const newSessions: Sessions = sessions ? JSON.parse(sessions) : {};
           newSessions[lastSignedIn].signedIn = false;
           localStorage.setItem("sessions", JSON.stringify(newSessions));
           throw err;
