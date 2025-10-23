@@ -143,6 +143,9 @@ const ConstraintsList = (props: { property: LexiconProperty }) => (
     <Show when={props.property.maxGraphemes !== undefined}>
       <span>maxGraphemes: {props.property.maxGraphemes}</span>
     </Show>
+    <Show when={props.property.minGraphemes !== undefined}>
+      <span>minGraphemes: {props.property.minGraphemes}</span>
+    </Show>
     <Show when={props.property.minimum !== undefined}>
       <span>min: {props.property.minimum}</span>
     </Show>
@@ -183,6 +186,7 @@ const PropertyRow = (props: {
     property.minLength !== undefined ||
     property.maxLength !== undefined ||
     property.maxGraphemes !== undefined ||
+    property.minGraphemes !== undefined ||
     property.minimum !== undefined ||
     property.maximum !== undefined ||
     property.maxSize !== undefined ||
