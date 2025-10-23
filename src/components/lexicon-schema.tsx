@@ -246,7 +246,7 @@ const PropertyRow = (props: {
       <Show when={props.property.items && hasConstraints(props.property.items)}>
         <ConstraintsList property={props.property.items!} />
       </Show>
-      <Show when={props.property.description}>
+      <Show when={props.property.description && !props.hideNameType}>
         <p class="text-sm text-neutral-700 dark:text-neutral-300">{props.property.description}</p>
       </Show>
     </div>
@@ -278,6 +278,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
     props.def.minLength !== undefined ||
     props.def.maxLength !== undefined ||
     props.def.maxGraphemes !== undefined ||
+    props.def.minGraphemes !== undefined ||
     props.def.minimum !== undefined ||
     props.def.maximum !== undefined ||
     props.def.maxSize !== undefined ||
@@ -286,7 +287,8 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
     props.def.const ||
     props.def.default !== undefined ||
     props.def.closed ||
-    props.def.items;
+    props.def.items ||
+    props.def.knownValues;
 
   const handleHeaderClick = () => {
     window.history.replaceState(null, "", `#schema:${props.name}`);
@@ -311,17 +313,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
         </span>
       </div>
 
-      <Show
-        when={
-          props.def.description &&
-          (props.def.properties ||
-            props.def.parameters ||
-            props.def.input ||
-            props.def.output ||
-            props.def.errors ||
-            props.def.record)
-        }
-      >
+      <Show when={props.def.description}>
         <p class="text-sm text-neutral-700 dark:text-neutral-300">{props.def.description}</p>
       </Show>
 
