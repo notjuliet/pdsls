@@ -210,12 +210,12 @@ export const RepoView = () => {
                 buttonClass="rounded-sm p-1"
                 menuClass="top-8 p-2 text-sm"
               >
+                <CopyMenu content={params.repo} label="Copy DID" icon="lucide--copy" />
                 <NavMenu
                   href={`/jetstream?dids=${params.repo}`}
                   label="Jetstream"
                   icon="lucide--radio-tower"
                 />
-                <CopyMenu content={params.repo} label="Copy DID" icon="lucide--copy" />
                 <NavMenu
                   href={
                     did.startsWith("did:plc") ?
