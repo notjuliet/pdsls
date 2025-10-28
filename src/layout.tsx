@@ -79,8 +79,10 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           style='font-feature-settings: "cv05"'
           class="flex items-center gap-1 text-xl font-semibold"
         >
-          <span class="iconify tabler--binary-tree-filled text-[#76c4e5]"></span>
-          <span>PDSls</span>
+          <span>🎃</span>
+          <span class="bg-linear-to-r from-orange-400 via-orange-600 to-orange-800 bg-clip-text text-transparent">
+            PDSls
+          </span>
         </A>
         <div class="dark:bg-dark-300/60 relative flex items-center gap-1 rounded-lg bg-neutral-50/60">
           <Show when={location.pathname !== "/"}>
