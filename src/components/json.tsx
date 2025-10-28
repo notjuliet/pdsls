@@ -1,6 +1,7 @@
 import { isDid, isNsid, Nsid } from "@atcute/lexicons/syntax";
 import { A, useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createSignal, ErrorBoundary, For, Show } from "solid-js";
+import { setNotif } from "../layout";
 import { resolveLexiconAuthority } from "../utils/api";
 import { ATURI_RE } from "../utils/types/at-uri";
 import { hideMedia } from "../views/settings";
@@ -37,6 +38,11 @@ const JSONString = ({ data, isType }: { data: string; isType?: boolean }) => {
       navigate(`/at://${authority}/com.atproto.lexicon.schema/${nsid}${hash}`);
     } catch (err) {
       console.error("Failed to resolve lexicon authority:", err);
+      setNotif({
+        show: true,
+        icon: "lucide--circle-alert",
+        text: "Could not resolve schema",
+      });
     }
   };
 
