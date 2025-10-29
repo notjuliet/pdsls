@@ -95,8 +95,8 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         const star = document.createElement("div");
         star.className = "star";
         star.textContent = "✨";
-        star.style.left = e.pageX + "px";
-        star.style.top = e.pageY + "px";
+        star.style.left = e.clientX + "px";
+        star.style.top = e.clientY + "px";
 
         const tx = (Math.random() - 0.5) * 50;
         const ty = (Math.random() - 0.5) * 50;
