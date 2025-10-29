@@ -36,6 +36,8 @@ const Layout = (props: RouteSectionProps<unknown>) => {
 
   if (location.search.includes("hrt=true")) localStorage.setItem("hrt", "true");
   else if (location.search.includes("hrt=false")) localStorage.setItem("hrt", "false");
+  if (location.search.includes("sailor=true")) localStorage.setItem("sailor", "true");
+  else if (location.search.includes("sailor=false")) localStorage.setItem("sailor", "false");
 
   createEffect(async () => {
     if (props.params.repo && !props.params.repo.startsWith("did:")) {
@@ -53,6 +55,59 @@ const Layout = (props: RouteSectionProps<unknown>) => {
 
   onMount(() => {
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeEvent);
+
+    if (localStorage.getItem("sailor") === "true") {
+      const style = document.createElement("style");
+      style.textContent = `
+          html, * {
+            cursor: url(/cursor.cur), pointer;
+          }
+
+          .star {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 20px;
+            animation: sparkle 0.8s ease-out forwards;
+          }
+
+          @keyframes sparkle {
+            0% {
+              opacity: 1;
+              transform: translate(0, 0) rotate(0deg) scale(1);
+            }
+            100% {
+              opacity: 0;
+              transform: translate(var(--tx), var(--ty)) rotate(180deg) scale(0);
+            }
+          }
+        `;
+      document.head.appendChild(style);
+
+      let lastTime = 0;
+      const throttleDelay = 30;
+
+      document.addEventListener("mousemove", (e) => {
+        const now = Date.now();
+        if (now - lastTime < throttleDelay) return;
+        lastTime = now;
+
+        const star = document.createElement("div");
+        star.className = "star";
+        star.textContent = "✨";
+        star.style.left = e.pageX + "px";
+        star.style.top = e.pageY + "px";
+
+        const tx = (Math.random() - 0.5) * 50;
+        const ty = (Math.random() - 0.5) * 50;
+        star.style.setProperty("--tx", tx + "px");
+        star.style.setProperty("--ty", ty + "px");
+
+        document.body.appendChild(star);
+
+        setTimeout(() => star.remove(), 800);
+      });
+    }
   });
 
   return (
