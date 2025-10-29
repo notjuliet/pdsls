@@ -5,7 +5,6 @@ import {
   deleteStoredSession,
   getSession,
   OAuthUserAgent,
-  resolveFromIdentity,
 } from "@atcute/oauth-browser-client";
 import { A } from "@solidjs/router";
 import { createSignal, For, onMount, Show } from "solid-js";
@@ -53,10 +52,9 @@ export const AccountManager = () => {
       localStorage.setItem("lastSignedIn", did);
       await retrieveSession();
     } catch {
-      const resolved = await resolveFromIdentity(did);
       const authUrl = await createAuthorizationUrl({
         scope: import.meta.env.VITE_OAUTH_SCOPE,
-        ...resolved,
+        target: { type: "account", identifier: did },
       });
 
       await new Promise((resolve) => setTimeout(resolve, 250));

@@ -1,23 +1,27 @@
 import { Client } from "@atcute/client";
 import { Did } from "@atcute/lexicons";
-import { isHandle } from "@atcute/lexicons/syntax";
+import { isDid, isHandle } from "@atcute/lexicons/syntax";
 import {
   configureOAuth,
   createAuthorizationUrl,
+  defaultIdentityResolver,
   finalizeAuthorization,
   getSession,
   OAuthUserAgent,
-  resolveFromIdentity,
-  resolveFromService,
   type Session,
 } from "@atcute/oauth-browser-client";
 import { createSignal, Show } from "solid-js";
+import { didDocumentResolver, handleResolver } from "../utils/api";
 
 configureOAuth({
   metadata: {
     client_id: import.meta.env.VITE_OAUTH_CLIENT_ID,
     redirect_uri: import.meta.env.VITE_OAUTH_REDIRECT_URL,
   },
+  identityResolver: defaultIdentityResolver({
+    handleResolver: handleResolver,
+    didDocumentResolver: didDocumentResolver,
+  }),
 });
 
 export const [agent, setAgent] = createSignal<OAuthUserAgent | undefined>();
@@ -37,19 +41,13 @@ const Login = () => {
     try {
       setNotice("");
       if (!handle) return;
-      let resolved;
-      if (!isHandle(handle)) {
-        setNotice(`Resolving your service...`);
-        resolved = await resolveFromService(handle);
-      } else {
-        setNotice(`Resolving your identity...`);
-        resolved = await resolveFromIdentity(handle);
-      }
-
       setNotice(`Contacting your data server...`);
       const authUrl = await createAuthorizationUrl({
         scope: import.meta.env.VITE_OAUTH_SCOPE,
-        ...resolved,
+        target:
+          isHandle(handle) || isDid(handle) ?
+            { type: "account", identifier: handle }
+          : { type: "pds", serviceUrl: handle },
       });
 
       setNotice(`Redirecting...`);
@@ -101,8 +99,8 @@ const retrieveSession = async () => {
     if (params.has("state") && (params.has("code") || params.has("error"))) {
       history.replaceState(null, "", location.pathname + location.search);
 
-      const session = await finalizeAuthorization(params);
-      const did = session.info.sub;
+      const auth = await finalizeAuthorization(params);
+      const did = auth.session.info.sub;
 
       localStorage.setItem("lastSignedIn", did);
 
@@ -110,7 +108,7 @@ const retrieveSession = async () => {
       const newSessions: Sessions = sessions ? JSON.parse(sessions) : { [did]: {} };
       newSessions[did] = { signedIn: true };
       localStorage.setItem("sessions", JSON.stringify(newSessions));
-      return session;
+      return auth.session;
     } else {
       const lastSignedIn = localStorage.getItem("lastSignedIn");
 

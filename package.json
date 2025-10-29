@@ -9,7 +9,7 @@
     "serve": "vite preview"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.70",
+    "@iconify-json/lucide": "^1.2.71",
     "@iconify/tailwind4": "^1.0.6",
     "@tailwindcss/vite": "^4.1.16",
     "prettier": "^3.6.2",
@@ -29,10 +29,10 @@
     "@atcute/identity": "^1.1.1",
     "@atcute/identity-resolver": "^1.1.4",
     "@atcute/leaflet": "^1.0.11",
-    "@atcute/lexicon-doc": "^1.1.3",
+    "@atcute/lexicon-doc": "^1.1.4",
     "@atcute/lexicon-resolver": "^0.1.3",
     "@atcute/lexicons": "^1.2.2",
-    "@atcute/oauth-browser-client": "^1.0.27",
+    "@atcute/oauth-browser-client": "^2.0.1",
     "@atcute/repo": "^0.1.0",
     "@atcute/tangled": "^1.0.10",
     "@atcute/tid": "^1.0.3",
@@ -48,7 +48,7 @@
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.3",
     "codemirror": "^6.0.2",
-    "solid-js": "^1.9.9"
+    "solid-js": "^1.9.10"
   },
   "packageManager": "pnpm@10.17.1+sha512.17c560fca4867ae9473a3899ad84a88334914f379be46d455cbf92e5cf4b39d34985d452d2583baf19967fa76cb5c17bc9e245529d0b98745721aa7200ecaf7a"
 }

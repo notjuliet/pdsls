@@ -19,7 +19,7 @@ import { AtprotoDid, isHandle, Nsid } from "@atcute/lexicons/syntax";
 import { createStore } from "solid-js/store";
 import { setPDS } from "../components/navbar";
 
-const didDocumentResolver = new CompositeDidDocumentResolver({
+export const didDocumentResolver = new CompositeDidDocumentResolver({
   methods: {
     plc: new PlcDidDocumentResolver({
       apiUrl: localStorage.getItem("plcDirectory") ?? "https://plc.directory",
@@ -28,7 +28,7 @@ const didDocumentResolver = new CompositeDidDocumentResolver({
   },
 });
 
-const handleResolver = new CompositeHandleResolver({
+export const handleResolver = new CompositeHandleResolver({
   strategy: "dns-first",
   methods: {
     dns: new DohJsonHandleResolver({ dohUrl: "https://dns.google/resolve?" }),
