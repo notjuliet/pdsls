@@ -74,11 +74,11 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           @keyframes sparkle {
             0% {
               opacity: 1;
-              transform: translate(0, 0) rotate(0deg) scale(1);
+              transform: translate(0, 0) rotate(var(--ttheta1)) scale(1);
             }
             100% {
               opacity: 0;
-              transform: translate(var(--tx), var(--ty)) rotate(180deg) scale(0);
+              transform: translate(var(--tx), var(--ty)) rotate(var(--ttheta2)) scale(0);
             }
           }
         `;
@@ -100,8 +100,12 @@ const Layout = (props: RouteSectionProps<unknown>) => {
 
         const tx = (Math.random() - 0.5) * 50;
         const ty = (Math.random() - 0.5) * 50;
+        const ttheta1 = Math.random() * 360;
+        const ttheta2 = ttheta1 + (Math.random() - 0.5) * 540;
         star.style.setProperty("--tx", tx + "px");
         star.style.setProperty("--ty", ty + "px");
+        star.style.setProperty("--ttheta1", ttheta1 + "deg");
+        star.style.setProperty("--ttheta2", ttheta2 + "deg");
 
         document.body.appendChild(star);
 
