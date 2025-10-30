@@ -120,6 +120,7 @@ const JSONObject = (props: {
   const [hide, setHide] = createSignal(
     localStorage.hideMedia === "true" || params.rkey === undefined,
   );
+  const [mediaLoaded, setMediaLoaded] = createSignal(false);
 
   createEffect(() => {
     if (hideMedia()) setHide(hideMedia());
@@ -191,19 +192,22 @@ const JSONObject = (props: {
                   <img
                     class="h-auto max-h-64 max-w-[16rem] object-contain"
                     src={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${props.repo}&cid=${blob.ref.$link}`}
+                    onLoad={() => setMediaLoaded(true)}
                   />
                 </Show>
                 <Show when={blob.mimeType === "video/mp4"}>
                   <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
-                    <VideoPlayer did={props.repo} cid={blob.ref.$link} />
+                    <VideoPlayer did={props.repo} cid={blob.ref.$link} onLoad={() => setMediaLoaded(true)} />
                   </ErrorBoundary>
                 </Show>
-                <button
-                  onclick={() => setHide(true)}
-                  class="absolute top-1 right-1 flex items-center rounded-lg bg-neutral-900/70 p-1.5 text-white opacity-100 backdrop-blur-sm transition-opacity hover:bg-neutral-900/80 active:bg-neutral-900/90 sm:opacity-0 sm:group-hover/media:opacity-100 dark:bg-neutral-100/70 dark:text-neutral-900 dark:hover:bg-neutral-100/80 dark:active:bg-neutral-100/90"
-                >
-                  <span class="iconify lucide--eye-off text-base"></span>
-                </button>
+                <Show when={mediaLoaded()}>
+                  <button
+                    onclick={() => setHide(true)}
+                    class="absolute top-1 right-1 flex items-center rounded-lg bg-neutral-900/70 p-1.5 text-white opacity-100 backdrop-blur-sm transition-opacity hover:bg-neutral-900/80 active:bg-neutral-900/90 sm:opacity-0 sm:group-hover/media:opacity-100 dark:bg-neutral-100/70 dark:text-neutral-900 dark:hover:bg-neutral-100/80 dark:active:bg-neutral-100/90"
+                  >
+                    <span class="iconify lucide--eye-off text-base"></span>
+                  </button>
+                </Show>
               </Show>
               <Show when={hide()}>
                 <button
