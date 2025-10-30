@@ -59,7 +59,9 @@ export const RepoView = () => {
           "flex flex-1 items-center border-b-2": true,
           "border-transparent group-hover:border-neutral-400 dark:group-hover:border-neutral-600":
             (location.hash !== `#${props.tab}` && !!location.hash) ||
-            (!location.hash && props.tab !== "collections"),
+            (!location.hash &&
+              ((!error() && props.tab !== "collections") ||
+                (!!error() && props.tab !== "identity"))),
         }}
       >
         {props.label}
@@ -101,7 +103,6 @@ export const RepoView = () => {
 
     if (!pds) {
       setError("Missing PDS");
-      navigate(`/at://${params.repo}#identity`);
       return {};
     }
 
@@ -134,7 +135,6 @@ export const RepoView = () => {
         default:
           setError("Unreachable");
       }
-      navigate(`/at://${params.repo}#identity`);
     }
 
     return res.data;
@@ -335,7 +335,7 @@ export const RepoView = () => {
               </For>
             </div>
           </Show>
-          <Show when={location.hash === "#identity"}>
+          <Show when={location.hash === "#identity" || (error() && !location.hash)}>
             <Show when={didDoc()}>
               {(didDocument) => (
                 <div class="flex flex-col gap-y-1 wrap-anywhere">
