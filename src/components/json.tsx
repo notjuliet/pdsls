@@ -6,7 +6,6 @@ import { resolveLexiconAuthority } from "../utils/api";
 import { ATURI_RE } from "../utils/types/at-uri";
 import { hideMedia } from "../views/settings";
 import { pds } from "./navbar";
-import Tooltip from "./tooltip";
 import VideoPlayer from "./video-player";
 
 interface AtBlob {
@@ -185,38 +184,37 @@ const JSONObject = (props: {
     return (
       <>
         <Show when={pds() && params.rkey}>
-          <span class="flex gap-x-1">
-            <Show when={blob.mimeType.startsWith("image/") && !hide()}>
-              <img
-                class="h-auto max-h-64 max-w-[16rem] object-contain"
-                src={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${props.repo}&cid=${blob.ref.$link}`}
-              />
-            </Show>
-            <Show when={blob.mimeType === "video/mp4" && !hide()}>
-              <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
-                <VideoPlayer did={props.repo} cid={blob.ref.$link} />
-              </ErrorBoundary>
-            </Show>
-            <span
-              classList={{
-                "flex items-center justify-between gap-1": true,
-                "flex-col": !hide(),
-              }}
-            >
-              <Show when={blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4"}>
-                <Tooltip text={hide() ? "Show" : "Hide"}>
-                  <button
-                    onclick={() => setHide(!hide())}
-                    class={`${!hide() ? "-mt-1 -ml-0.5" : ""} flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600`}
-                  >
-                    <span
-                      class={`iconify text-base ${hide() ? "lucide--eye-off" : "lucide--eye"}`}
-                    ></span>
-                  </button>
-                </Tooltip>
+          <Show when={blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4"}>
+            <span class="group/media relative flex w-fit">
+              <Show when={!hide()}>
+                <Show when={blob.mimeType.startsWith("image/")}>
+                  <img
+                    class="h-auto max-h-64 max-w-[16rem] object-contain"
+                    src={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${props.repo}&cid=${blob.ref.$link}`}
+                  />
+                </Show>
+                <Show when={blob.mimeType === "video/mp4"}>
+                  <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
+                    <VideoPlayer did={props.repo} cid={blob.ref.$link} />
+                  </ErrorBoundary>
+                </Show>
+                <button
+                  onclick={() => setHide(true)}
+                  class="absolute top-1 right-1 flex items-center rounded-lg bg-neutral-900/70 p-1.5 text-white opacity-100 backdrop-blur-sm transition-opacity hover:bg-neutral-900/80 active:bg-neutral-900/90 sm:opacity-0 sm:group-hover/media:opacity-100 dark:bg-neutral-100/70 dark:text-neutral-900 dark:hover:bg-neutral-100/80 dark:active:bg-neutral-100/90"
+                >
+                  <span class="iconify lucide--eye-off text-base"></span>
+                </button>
+              </Show>
+              <Show when={hide()}>
+                <button
+                  onclick={() => setHide(false)}
+                  class="flex items-center rounded-lg bg-neutral-200 p-1.5 transition-colors hover:bg-neutral-300 active:bg-neutral-400 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
+                >
+                  <span class="iconify lucide--eye text-base"></span>
+                </button>
               </Show>
             </span>
-          </span>
+          </Show>
         </Show>
         {rawObj}
       </>
