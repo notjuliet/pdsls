@@ -79,16 +79,18 @@ export const RepoView = () => {
     try {
       pds = await resolvePDS(did);
     } catch {
-      try {
-        const did = await resolveHandle(params.repo as Handle);
-        navigate(location.pathname.replace(params.repo, did));
-      } catch {
+      if (!did.startsWith("did:")) {
         try {
-          const nsid = params.repo as Nsid;
-          const res = await resolveLexiconAuthority(nsid);
-          navigate(`/at://${res}/com.atproto.lexicon.schema/${nsid}`);
+          const did = await resolveHandle(params.repo as Handle);
+          navigate(location.pathname.replace(params.repo, did));
         } catch {
-          navigate(`/${did}`);
+          try {
+            const nsid = params.repo as Nsid;
+            const res = await resolveLexiconAuthority(nsid);
+            navigate(`/at://${res}/com.atproto.lexicon.schema/${nsid}`);
+          } catch {
+            navigate(`/${did}`);
+          }
         }
       }
     }
@@ -96,6 +98,12 @@ export const RepoView = () => {
     getRotationKeys();
 
     validateHandles();
+
+    if (!pds) {
+      setError("Missing PDS");
+      navigate(`/at://${params.repo}#identity`);
+      return {};
+    }
 
     rpc = new Client({ handler: new CredentialManager({ service: pds }) });
     const res = await rpc.get("com.atproto.repo.describeRepo", {
