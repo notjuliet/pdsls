@@ -1,6 +1,6 @@
 import { isCid, isDid, isNsid, Nsid } from "@atcute/lexicons/syntax";
 import { A, useNavigate, useParams } from "@solidjs/router";
-import { createEffect, createSignal, ErrorBoundary, For, Show } from "solid-js";
+import { createEffect, createSignal, ErrorBoundary, For, on, Show } from "solid-js";
 import { setNotif } from "../layout";
 import { resolveLexiconAuthority } from "../utils/api";
 import { ATURI_RE } from "../utils/types/at-uri";
@@ -125,6 +125,16 @@ const JSONObject = (props: {
   createEffect(() => {
     if (hideMedia()) setHide(hideMedia());
   });
+
+  createEffect(
+    on(
+      hide,
+      (value) => {
+        if (value === false) setMediaLoaded(false);
+      },
+      { defer: true },
+    ),
+  );
 
   const isBlob = props.data.$type === "blob";
   const isBlobContext = isBlob || props.parentIsBlob;
