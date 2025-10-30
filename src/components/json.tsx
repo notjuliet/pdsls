@@ -191,7 +191,7 @@ const JSONObject = ({ data, repo }: { data: { [x: string]: JSONType }; repo: str
                 <a
                   href={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${repo}&cid=${blob.ref.$link}`}
                   target="_blank"
-                  class={`${!hide() ? "-mb-1 -ml-0.5" : ""} flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600`}
+                  class={`${!hide() && (blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4") ? "-mb-1 -ml-0.5" : ""} flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600`}
                 >
                   <span class="iconify lucide--external-link text-base"></span>
                 </a>
