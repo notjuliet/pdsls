@@ -22,9 +22,9 @@
   },
   "dependencies": {
     "@atcute/atproto": "^3.1.8",
-    "@atcute/bluesky": "^3.2.8",
+    "@atcute/bluesky": "^3.2.9",
     "@atcute/client": "^4.0.5",
-    "@atcute/crypto": "^2.2.5",
+    "@atcute/crypto": "^2.2.6",
     "@atcute/did-plc": "^0.1.7",
     "@atcute/identity": "^1.1.1",
     "@atcute/identity-resolver": "^1.1.4",
