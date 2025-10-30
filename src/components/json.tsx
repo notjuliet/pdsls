@@ -197,7 +197,11 @@ const JSONObject = (props: {
                 </Show>
                 <Show when={blob.mimeType === "video/mp4"}>
                   <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
-                    <VideoPlayer did={props.repo} cid={blob.ref.$link} onLoad={() => setMediaLoaded(true)} />
+                    <VideoPlayer
+                      did={props.repo}
+                      cid={blob.ref.$link}
+                      onLoad={() => setMediaLoaded(true)}
+                    />
                   </ErrorBoundary>
                 </Show>
                 <Show when={mediaLoaded()}>
