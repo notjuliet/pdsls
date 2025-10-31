@@ -215,7 +215,7 @@ export const PlcLogView = (props: { did: string }) => {
         </Show>
         <Show when={oldValue && newValue}>
           <div></div>
-          <div class="flex min-w-0 flex-col gap-1 text-sm">
+          <div class="flex min-w-0 flex-col text-sm">
             <div class="flex items-start gap-2 text-red-600 dark:text-red-400">
               <span class="shrink-0">−</span>
               <span class="break-all">{oldValue}</span>
