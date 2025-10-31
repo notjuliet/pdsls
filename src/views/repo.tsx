@@ -338,7 +338,8 @@ export const RepoView = () => {
           <Show when={location.hash === "#identity" || (error() && !location.hash)}>
             <Show when={didDoc()}>
               {(didDocument) => (
-                <div class="flex flex-col gap-y-1 wrap-anywhere">
+                <div class="flex flex-col gap-1 wrap-anywhere">
+                  {/* ID Section */}
                   <div>
                     <div class="flex items-center gap-1">
                       <div class="iconify lucide--id-card" />
@@ -346,15 +347,17 @@ export const RepoView = () => {
                     </div>
                     <div class="text-sm">{didDocument().id}</div>
                   </div>
+
+                  {/* Aliases Section */}
                   <div>
                     <div class="flex items-center gap-1">
                       <div class="iconify lucide--at-sign" />
                       <p class="font-semibold">Aliases</p>
                     </div>
-                    <ul>
+                    <div class="flex flex-col gap-0.5">
                       <For each={didDocument().alsoKnownAs}>
                         {(alias) => (
-                          <li class="flex items-center gap-1 text-sm">
+                          <div class="flex items-center gap-1 text-sm">
                             <span>{alias}</span>
                             <Show when={alias.startsWith("at://")}>
                               <Tooltip
@@ -367,7 +370,8 @@ export const RepoView = () => {
                               >
                                 <span
                                   classList={{
-                                    "iconify lucide--circle-check": validHandles[alias] === true,
+                                    "iconify lucide--circle-check text-green-600 dark:text-green-400":
+                                      validHandles[alias] === true,
                                     "iconify lucide--circle-x text-red-500 dark:text-red-400":
                                       validHandles[alias] === false,
                                     "iconify lucide--loader-circle animate-spin":
@@ -376,76 +380,93 @@ export const RepoView = () => {
                                 ></span>
                               </Tooltip>
                             </Show>
-                          </li>
+                          </div>
                         )}
                       </For>
-                    </ul>
+                    </div>
                   </div>
+
+                  {/* Services Section */}
                   <div>
                     <div class="flex items-center gap-1">
                       <div class="iconify lucide--hard-drive" />
                       <p class="font-semibold">Services</p>
                     </div>
-                    <ul>
+                    <div class="flex flex-col gap-0.5">
                       <For each={didDocument().service}>
                         {(service) => (
-                          <li class="flex flex-col text-sm">
-                            <span>#{service.id.split("#")[1]}</span>
+                          <div class="text-sm">
+                            <div class="text-neutral-600 dark:text-neutral-400">
+                              #{service.id.split("#")[1]}
+                            </div>
                             <a
-                              class="w-fit underline"
+                              class="underline hover:text-blue-400"
                               href={service.serviceEndpoint.toString()}
                               target="_blank"
                               rel="noopener"
                             >
                               {service.serviceEndpoint.toString()}
                             </a>
-                          </li>
+                          </div>
                         )}
                       </For>
-                    </ul>
+                    </div>
                   </div>
+
+                  {/* Verification Methods Section */}
                   <div>
                     <div class="flex items-center gap-1">
                       <div class="iconify lucide--shield-check" />
                       <p class="font-semibold">Verification Methods</p>
                     </div>
-                    <ul>
+                    <div class="flex flex-col gap-0.5">
                       <For each={didDocument().verificationMethod}>
                         {(verif) => (
                           <Show when={verif.publicKeyMultibase}>
                             {(key) => (
-                              <li class="flex flex-col text-sm">
-                                <span>
-                                  <span>#{verif.id.split("#")[1]}</span>
-                                  <ErrorBoundary fallback={<>unknown</>}>
-                                    {" "}
-                                    ({parsePublicMultikey(key()).type})
+                              <div class="text-sm">
+                                <div class="flex items-baseline gap-1">
+                                  <span class="text-neutral-600 dark:text-neutral-400">
+                                    #{verif.id.split("#")[1]}
+                                  </span>
+                                  <ErrorBoundary
+                                    fallback={<span class="text-neutral-500">unknown</span>}
+                                  >
+                                    <span class="dark:bg-dark-100 rounded bg-neutral-200 px-1 py-0.5 font-mono text-xs">
+                                      {parsePublicMultikey(key()).type}
+                                    </span>
                                   </ErrorBoundary>
-                                </span>
-                                <span class="truncate">{key()}</span>
-                              </li>
+                                </div>
+                                <div class="font-mono break-all">{key()}</div>
+                              </div>
                             )}
                           </Show>
                         )}
                       </For>
-                    </ul>
-                  </div>
-                  <div>
-                    <div class="flex items-center gap-1">
-                      <div class="iconify lucide--key-round" />
-                      <p class="font-semibold">Rotation Keys</p>
                     </div>
-                    <ul>
-                      <For each={rotationKeys()}>
-                        {(key) => (
-                          <li class="text-xs">
-                            <span>{key.replace("did:key:", "")}</span>
-                            <span> ({parseDidKey(key).type})</span>
-                          </li>
-                        )}
-                      </For>
-                    </ul>
                   </div>
+
+                  {/* Rotation Keys Section */}
+                  <Show when={rotationKeys().length > 0}>
+                    <div>
+                      <div class="flex items-center gap-1">
+                        <div class="iconify lucide--key-round" />
+                        <p class="font-semibold">Rotation Keys</p>
+                      </div>
+                      <div class="flex flex-col gap-0.5">
+                        <For each={rotationKeys()}>
+                          {(key) => (
+                            <div class="text-sm">
+                              <span class="dark:bg-dark-100 rounded bg-neutral-200 px-1 py-0.5 font-mono text-xs">
+                                {parseDidKey(key).type}
+                              </span>
+                              <div class="font-mono break-all">{key.replace("did:key:", "")}</div>
+                            </div>
+                          )}
+                        </For>
+                      </div>
+                    </div>
+                  </Show>
                 </div>
               )}
             </Show>
