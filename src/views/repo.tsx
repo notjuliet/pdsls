@@ -21,6 +21,7 @@ import {
   MenuProvider,
   NavMenu,
 } from "../components/dropdown.jsx";
+import { setPDS } from "../components/navbar.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import {
@@ -103,6 +104,7 @@ export const RepoView = () => {
 
     if (!pds) {
       setError("Missing PDS");
+      setPDS("Missing PDS");
       return {};
     }
 
@@ -196,7 +198,7 @@ export const RepoView = () => {
             <RepoTab tab="backlinks" label="Backlinks" />
           </div>
           <div class="flex gap-1">
-            <Show when={error()}>
+            <Show when={error() && error() !== "Missing PDS"}>
               <div class="flex items-center gap-1 text-red-500 dark:text-red-400">
                 <span class="iconify lucide--alert-triangle"></span>
                 <span>{error()}</span>

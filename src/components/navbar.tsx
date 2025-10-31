@@ -49,24 +49,38 @@ export const NavBar = (props: { params: Params }) => {
       <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
         <div class="flex min-h-6 basis-full items-center gap-2 sm:min-h-7">
           <Tooltip text="PDS">
-            <span class="iconify lucide--hard-drive shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
+            <span
+              classList={{
+                "iconify shrink-0 transition-colors duration-200": true,
+                "lucide--alert-triangle text-red-500 dark:text-red-400": pds() === "Missing PDS",
+                "lucide--hard-drive text-neutral-500 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200":
+                  pds() !== "Missing PDS",
+              }}
+            ></span>
           </Tooltip>
           <Show when={pds()}>
             <Show
-              when={props.params.repo}
-              fallback={<span class="py-0.5 font-medium">{pds()}</span>}
+              when={pds() === "Missing PDS"}
+              fallback={
+                <Show
+                  when={props.params.repo}
+                  fallback={<span class="py-0.5 font-medium">{pds()}</span>}
+                >
+                  <A
+                    end
+                    href={pds()!}
+                    inactiveClass="text-blue-400 py-0.5 w-full font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
+                  >
+                    {pds()}
+                  </A>
+                </Show>
+              }
             >
-              <A
-                end
-                href={pds()!}
-                inactiveClass="text-blue-400 py-0.5 w-full font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
-              >
-                {pds()}
-              </A>
+              <span class="py-0.5 font-medium text-red-500 dark:text-red-400">{pds()}</span>
             </Show>
           </Show>
         </div>
-        <Show when={pds()}>
+        <Show when={pds() && pds() !== "Missing PDS"}>
           <CopyButton content={pds()!} label="Copy PDS" />
         </Show>
       </div>
