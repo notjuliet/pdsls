@@ -139,8 +139,8 @@ export const NavBar = (props: { params: Params }) => {
             <A
               end
               href={`/at://${props.params.repo}/labels`}
-              class="py-0.5"
-              inactiveClass="text-blue-400 grow font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
+              class="py-0.5 font-medium"
+              inactiveClass="text-blue-400 grow hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
             >
               labels
             </A>
