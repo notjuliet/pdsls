@@ -169,7 +169,7 @@ export const PlcLogView = (props: { did: string }) => {
     return (
       <div
         classList={{
-          "grid grid-cols-[auto_1fr] gap-x-2 gap-y-1": true,
+          "grid grid-cols-[auto_1fr] gap-x-2": true,
           "opacity-60": diff.orig.nullified,
         }}
       >
