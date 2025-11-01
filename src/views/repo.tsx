@@ -180,7 +180,7 @@ export const RepoView = () => {
 
   return (
     <Show when={repo()}>
-      <div class="flex w-full flex-col gap-2 wrap-break-word">
+      <div class="flex w-full flex-col gap-3 wrap-break-word">
         <div
           class={`dark:shadow-dark-700 dark:bg-dark-300 flex justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-sm shadow-xs dark:border-neutral-700`}
         >
@@ -307,7 +307,7 @@ export const RepoView = () => {
                 }}
               />
             </Show>
-            <div class="flex flex-col overflow-hidden text-sm">
+            <div class="-mt-1 flex flex-col overflow-hidden text-sm">
               <For
                 each={Object.keys(nsids() ?? {}).filter((authority) =>
                   filter() ?
