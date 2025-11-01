@@ -307,7 +307,10 @@ export const RepoView = () => {
                 }}
               />
             </Show>
-            <div class="-mt-1 flex flex-col overflow-hidden text-sm">
+            <div
+              class="flex flex-col overflow-hidden text-sm"
+              classList={{ "-mt-1": !showFilter() }}
+            >
               <For
                 each={Object.keys(nsids() ?? {}).filter((authority) =>
                   filter() ?
