@@ -1,15 +1,15 @@
 export const Home = () => {
   return (
     <div class="flex w-full flex-col gap-4 wrap-break-word">
-      <div>
+      <div class="flex flex-col gap-0.5">
         <div>
-          <span class="text-lg font-semibold">AT Protocol Explorer</span>
+          <span class="text-xl font-semibold">AT Protocol Explorer</span>
         </div>
         <div class="flex items-center gap-1">
           <div class="iconify lucide--search" />
           <span>
             Browse the public data on{" "}
-            <a class="underline" href="https://atproto.com" target="_blank">
+            <a class="underline hover:text-blue-400" href="https://atproto.com" target="_blank">
               atproto
             </a>
             .
@@ -24,10 +24,14 @@ export const Home = () => {
           <span>Jetstream and firehose streaming.</span>
         </div>
         <div class="flex items-center gap-1">
-          <div class="iconify lucide--send-to-back" />
+          <div class="iconify lucide--link" />
           <span>
             Backlinks support with{" "}
-            <a href="https://constellation.microcosm.blue" class="underline" target="_blank">
+            <a
+              href="https://constellation.microcosm.blue"
+              class="underline hover:text-blue-400"
+              target="_blank"
+            >
               constellation
             </a>
             .
