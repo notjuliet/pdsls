@@ -256,7 +256,7 @@ export const PlcLogView = (props: { did: string }) => {
         <For each={plcOps()}>
           {([entry, diffs]) => (
             <Show when={shouldShowEntry(diffs)}>
-              <div class="flex flex-col gap-2">
+              <div class="flex flex-col gap-1">
                 <div class="flex items-center gap-2 text-sm">
                   <div class="iconify lucide--clock text-neutral-600 dark:text-neutral-400" />
                   <span class="font-medium text-neutral-700 dark:text-neutral-300">
