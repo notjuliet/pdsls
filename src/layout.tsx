@@ -154,11 +154,23 @@ const Layout = (props: RouteSectionProps<unknown>) => {
             <DropdownMenu
               icon="lucide--menu text-xl"
               buttonClass="rounded-lg p-1"
-              menuClass="top-10 p-3"
+              menuClass="top-10 p-3 text-sm"
             >
               <NavMenu href="/jetstream" label="Jetstream" />
               <NavMenu href="/firehose" label="Firehose" />
               <NavMenu href="/settings" label="Settings" />
+              <NavMenu
+                href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz"
+                label="Bluesky"
+                newTab
+                external
+              />
+              <NavMenu
+                href="https://tangled.org/@pdsls.dev/pdsls/"
+                label="Source"
+                newTab
+                external
+              />
               <ThemeSelection />
             </DropdownMenu>
           </MenuProvider>

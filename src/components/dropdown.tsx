@@ -48,6 +48,7 @@ export const NavMenu = (props: {
   label: string;
   icon?: string;
   newTab?: boolean;
+  external?: boolean;
 }) => {
   const ctx = useContext(MenuContext);
 
@@ -56,12 +57,16 @@ export const NavMenu = (props: {
       href={props.href}
       onClick={() => ctx?.setShowMenu(false)}
       class="flex items-center gap-1.5 rounded-lg p-1 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      classList={{ "justify-between": props.external }}
       target={props.newTab ? "_blank" : undefined}
     >
       <Show when={props.icon}>
         <span class={"iconify shrink-0 " + props.icon}></span>
       </Show>
       <span class="whitespace-nowrap">{props.label}</span>
+      <Show when={props.external}>
+        <span class="iconify lucide--external-link"></span>
+      </Show>
     </A>
   );
 };
