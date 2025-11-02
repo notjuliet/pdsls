@@ -9,10 +9,10 @@ import { Button } from "../components/button.jsx";
 import { JSONType, JSONValue } from "../components/json.jsx";
 import { agent } from "../components/login.jsx";
 import { Modal } from "../components/modal.jsx";
+import { addNotification, removeNotification } from "../components/notification.jsx";
 import { StickyOverlay } from "../components/sticky.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
-import { setNotif } from "../layout.jsx";
 import { resolvePDS } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 
@@ -149,11 +149,11 @@ const CollectionView = () => {
         },
       });
     }
-    setNotif({
-      show: true,
-      icon: "lucide--trash-2",
-      text: `${recsToDel.length} records ${recreate() ? "recreated" : "deleted"}`,
+    const id = addNotification({
+      message: `${recsToDel.length} records ${recreate() ? "recreated" : "deleted"}`,
+      type: "success",
     });
+    setTimeout(() => removeNotification(id), 3000);
     setBatchDelete(false);
     setRecords([]);
     setCursor(undefined);

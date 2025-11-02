@@ -1,11 +1,11 @@
 import { isCid, isDid, isNsid, Nsid } from "@atcute/lexicons/syntax";
 import { A, useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createSignal, ErrorBoundary, For, on, Show } from "solid-js";
-import { setNotif } from "../layout";
 import { resolveLexiconAuthority } from "../utils/api";
 import { ATURI_RE } from "../utils/types/at-uri";
 import { hideMedia } from "../views/settings";
 import { pds } from "./navbar";
+import { addNotification, removeNotification } from "./notification";
 import VideoPlayer from "./video-player";
 
 interface AtBlob {
@@ -43,11 +43,11 @@ const JSONString = (props: {
       navigate(`/at://${authority}/com.atproto.lexicon.schema/${nsid}${hash}`);
     } catch (err) {
       console.error("Failed to resolve lexicon authority:", err);
-      setNotif({
-        show: true,
-        icon: "lucide--circle-alert",
-        text: "Could not resolve schema",
+      const id = addNotification({
+        message: "Could not resolve schema",
+        type: "error",
       });
+      setTimeout(() => removeNotification(id), 5000);
     }
   };
 

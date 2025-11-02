@@ -22,6 +22,11 @@ import {
   NavMenu,
 } from "../components/dropdown.jsx";
 import { setPDS } from "../components/navbar.jsx";
+import {
+  addNotification,
+  removeNotification,
+  updateNotification,
+} from "../components/notification.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import {
@@ -155,14 +160,54 @@ export const RepoView = () => {
   };
 
   const downloadRepo = async () => {
+    let notificationId: string | null = null;
+
     try {
       setDownloading(true);
+      notificationId = addNotification({
+        message: "Downloading repository...",
+        progress: 0,
+        total: 0,
+        type: "info",
+      });
+
       const response = await fetch(`${pds}/xrpc/com.atproto.sync.getRepo?did=${did}`);
       if (!response.ok) {
         throw new Error(`HTTP error status: ${response.status}`);
       }
 
-      const blob = await response.blob();
+      const contentLength = response.headers.get("content-length");
+      const total = contentLength ? parseInt(contentLength, 10) : 0;
+      let loaded = 0;
+
+      const reader = response.body?.getReader();
+      const chunks: Uint8Array[] = [];
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          chunks.push(value);
+          loaded += value.length;
+
+          if (total > 0) {
+            const progress = Math.round((loaded / total) * 100);
+            updateNotification(notificationId, {
+              progress,
+              total,
+            });
+          } else {
+            const progressMB = Math.round((loaded / (1024 * 1024)) * 10) / 10;
+            updateNotification(notificationId, {
+              progress: progressMB,
+              total: 0,
+            });
+          }
+        }
+      }
+
+      const blob = new Blob(chunks);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -172,8 +217,27 @@ export const RepoView = () => {
 
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+
+      updateNotification(notificationId, {
+        message: "Repository downloaded successfully",
+        type: "success",
+        progress: undefined,
+      });
+      setTimeout(() => {
+        if (notificationId) removeNotification(notificationId);
+      }, 3000);
     } catch (error) {
       console.error("Download failed:", error);
+      if (notificationId) {
+        updateNotification(notificationId, {
+          message: "Download failed",
+          type: "error",
+          progress: undefined,
+        });
+        setTimeout(() => {
+          if (notificationId) removeNotification(notificationId);
+        }, 5000);
+      }
     }
     setDownloading(false);
   };

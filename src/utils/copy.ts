@@ -1,6 +1,10 @@
-import { setNotif } from "../layout";
+import { addNotification, removeNotification } from "../components/notification";
 
 export const addToClipboard = (text: string) => {
   navigator.clipboard.writeText(text);
-  setNotif({ show: true, icon: "lucide--clipboard-check", text: "Copied to clipboard" });
+  const id = addNotification({
+    message: "Copied to clipboard",
+    type: "success",
+  });
+  setTimeout(() => removeNotification(id), 3000);
 };

@@ -1,23 +1,18 @@
 import { Handle } from "@atcute/lexicons";
 import { Meta, MetaProvider } from "@solidjs/meta";
 import { A, RouteSectionProps, useLocation, useNavigate } from "@solidjs/router";
-import { createEffect, createSignal, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
+import { createEffect, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
 import { AccountManager } from "./components/account.jsx";
 import { RecordEditor } from "./components/create.jsx";
 import { DropdownMenu, MenuProvider, NavMenu } from "./components/dropdown.jsx";
 import { agent } from "./components/login.jsx";
 import { NavBar } from "./components/navbar.jsx";
+import { NotificationContainer } from "./components/notification.jsx";
 import { Search, SearchButton, showSearch } from "./components/search.jsx";
 import { themeEvent, ThemeSelection } from "./components/theme.jsx";
 import { resolveHandle } from "./utils/api.js";
 
 export const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 1;
-
-export const [notif, setNotif] = createSignal<{
-  show: boolean;
-  icon?: string;
-  text?: string;
-}>({ show: false });
 
 const headers: Record<string, string> = {
   "did:plc:ia76kvnndjutgedggx2ibrem": "bunny.jpg",
@@ -33,7 +28,6 @@ const headers: Record<string, string> = {
 const Layout = (props: RouteSectionProps<unknown>) => {
   const location = useLocation();
   const navigate = useNavigate();
-  let timeout: number;
 
   if (location.search.includes("hrt=true")) localStorage.setItem("hrt", "true");
   else if (location.search.includes("hrt=false")) localStorage.setItem("hrt", "false");
@@ -44,13 +38,6 @@ const Layout = (props: RouteSectionProps<unknown>) => {
     if (props.params.repo && !props.params.repo.startsWith("did:")) {
       const did = await resolveHandle(props.params.repo as Handle);
       navigate(location.pathname.replace(props.params.repo, did));
-    }
-  });
-
-  createEffect(() => {
-    if (notif().show) {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => setNotif({ show: false }), 3000);
     }
   });
 
@@ -197,15 +184,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           </ErrorBoundary>
         </Show>
       </div>
-      <Show when={notif().show}>
-        <button
-          class="dark:shadow-dark-700 dark:bg-dark-100 fixed bottom-10 z-50 flex items-center rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-md dark:border-neutral-700"
-          onClick={() => setNotif({ show: false })}
-        >
-          <span class={`iconify ${notif().icon} mr-1`}></span>
-          {notif().text}
-        </button>
-      </Show>
+      <NotificationContainer />
     </div>
   );
 };

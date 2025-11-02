@@ -15,8 +15,8 @@ import { LexiconSchemaView } from "../components/lexicon-schema.jsx";
 import { agent } from "../components/login.jsx";
 import { Modal } from "../components/modal.jsx";
 import { pds } from "../components/navbar.jsx";
+import { addNotification, removeNotification } from "../components/notification.jsx";
 import Tooltip from "../components/tooltip.jsx";
-import { setNotif } from "../layout.jsx";
 import { resolveLexiconAuthority, resolveLexiconSchema, resolvePDS } from "../utils/api.js";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 import { lexicons } from "../utils/types/lexicons.js";
@@ -134,7 +134,11 @@ export const RecordView = () => {
         rkey: params.rkey,
       },
     });
-    setNotif({ show: true, icon: "lucide--trash-2", text: "Record deleted" });
+    const id = addNotification({
+      message: "Record deleted",
+      type: "success",
+    });
+    setTimeout(() => removeNotification(id), 3000);
     navigate(`/at://${params.repo}/${params.collection}`);
   };
 

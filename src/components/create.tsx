@@ -6,10 +6,10 @@ import { useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { Editor, editorView } from "../components/editor.jsx";
 import { agent } from "../components/login.jsx";
-import { setNotif } from "../layout.jsx";
 import { sessions } from "./account.jsx";
 import { Button } from "./button.jsx";
 import { Modal } from "./modal.jsx";
+import { addNotification, removeNotification } from "./notification.jsx";
 import { TextInput } from "./text-input.jsx";
 import Tooltip from "./tooltip.jsx";
 
@@ -93,7 +93,11 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
       return;
     }
     setOpenDialog(false);
-    setNotif({ show: true, icon: "lucide--file-check", text: "Record created" });
+    const id = addNotification({
+      message: "Record created",
+      type: "success",
+    });
+    setTimeout(() => removeNotification(id), 3000);
     navigate(`/${res.data.uri}`);
   };
 
@@ -143,7 +147,11 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
         }
       }
       setOpenDialog(false);
-      setNotif({ show: true, icon: "lucide--file-check", text: "Record edited" });
+      const id = addNotification({
+        message: "Record edited",
+        type: "success",
+      });
+      setTimeout(() => removeNotification(id), 3000);
       props.refetch();
     } catch (err: any) {
       setNotice(err.message);
