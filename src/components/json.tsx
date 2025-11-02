@@ -73,7 +73,7 @@ const JSONString = (props: {
               >
                 {part}
               </button>
-            : isCid(part) && props.isLink && props.parentIsBlob ?
+            : isCid(part) && props.isLink && props.parentIsBlob && params.repo ?
               <A
                 class="text-blue-400 hover:underline active:underline"
                 rel="noopener"
