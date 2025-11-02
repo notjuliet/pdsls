@@ -44,7 +44,7 @@ export const PlcLogView = (props: { did: string }) => {
     return (
       <button
         classList={{
-          "flex items-center gap-1 sm:gap-1.5 rounded-lg px-2 py-1.5 text-xs sm:text-sm transition-colors": true,
+          "flex items-center gap-1 sm:gap-1.5 rounded-lg px-3 py-2 sm:px-2 sm:py-1.5 text-base sm:text-sm transition-colors": true,
           "bg-neutral-700 text-white dark:bg-neutral-200 dark:text-neutral-900": isActive(),
           "bg-neutral-200 text-neutral-700 hover:bg-neutral-300 dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-600":
             !isActive(),
@@ -52,7 +52,7 @@ export const PlcLogView = (props: { did: string }) => {
         onclick={toggleFilter}
       >
         <span class={props.icon}></span>
-        <span class="font-medium">{props.label}</span>
+        <span class="hidden font-medium sm:inline">{props.label}</span>
       </button>
     );
   };
