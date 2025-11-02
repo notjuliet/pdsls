@@ -30,7 +30,7 @@ export const NotificationContainer = () => {
       <For each={notifications()}>
         {(notification) => (
           <div
-            class="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto flex min-w-64 flex-col gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 shadow-md dark:border-neutral-700"
+            class="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto flex min-w-64 flex-col gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 shadow-md select-none dark:border-neutral-700"
             classList={{
               "border-blue-500 dark:border-blue-400": notification.type === "info",
               "border-green-500 dark:border-green-400": notification.type === "success",
