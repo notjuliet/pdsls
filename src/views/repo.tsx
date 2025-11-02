@@ -91,13 +91,16 @@ export const RepoView = () => {
         try {
           const did = await resolveHandle(params.repo as Handle);
           navigate(location.pathname.replace(params.repo, did));
+          return;
         } catch {
           try {
             const nsid = params.repo as Nsid;
             const res = await resolveLexiconAuthority(nsid);
             navigate(`/at://${res}/com.atproto.lexicon.schema/${nsid}`);
+            return;
           } catch {
             navigate(`/${did}`);
+            return;
           }
         }
       }
