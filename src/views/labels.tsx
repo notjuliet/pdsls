@@ -159,7 +159,7 @@ export const LabelView = () => {
     <div class="flex w-full flex-col items-center">
       <form
         ref={formRef}
-        class="flex w-full max-w-3xl flex-col gap-y-2 px-3 py-2"
+        class="flex w-full max-w-3xl flex-col gap-y-2 px-3 pb-2"
         onSubmit={(e) => {
           e.preventDefault();
           handleSearch();
