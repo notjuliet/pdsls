@@ -1,183 +1,283 @@
 import { ComAtprotoLabelDefs } from "@atcute/atproto";
 import { Client, CredentialManager } from "@atcute/client";
+import { isAtprotoDid } from "@atcute/identity";
+import { Handle } from "@atcute/lexicons";
 import { A, useSearchParams } from "@solidjs/router";
-import { createSignal, For, onMount, Show } from "solid-js";
+import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { Button } from "../components/button.jsx";
 import { StickyOverlay } from "../components/sticky.jsx";
 import { TextInput } from "../components/text-input.jsx";
-import { labelerCache, resolvePDS } from "../utils/api.js";
+import { labelerCache, resolveHandle, resolvePDS } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
+
+const LABELS_PER_PAGE = 50;
+
+const LabelCard = (props: { label: ComAtprotoLabelDefs.Label }) => {
+  const label = props.label;
+
+  return (
+    <div class="flex flex-col gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
+      <div class="flex flex-wrap items-center gap-x-2 gap-y-2">
+        <div class="inline-flex items-center gap-x-1 rounded-full bg-neutral-200 px-2 py-0.5 text-sm font-medium text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200">
+          <span class="iconify lucide--tag shrink-0" />
+          {label.val}
+        </div>
+        <Show when={label.neg}>
+          <div class="inline-flex items-center gap-x-1 rounded-full border border-orange-400 bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:border-orange-600 dark:bg-orange-900/30 dark:text-orange-400">
+            <span class="iconify lucide--minus shrink-0 text-sm" />
+            <span>Negated</span>
+          </div>
+        </Show>
+        <div class="flex flex-wrap gap-3 text-xs text-neutral-600 dark:text-neutral-400">
+          <div class="flex items-center gap-x-1">
+            <span class="iconify lucide--calendar shrink-0" />
+            <span>{localDateFromTimestamp(new Date(label.cts).getTime())}</span>
+          </div>
+          <Show when={label.exp}>
+            {(exp) => (
+              <div class="flex items-center gap-x-1">
+                <span class="iconify lucide--clock-fading shrink-0" />
+                <span>e{localDateFromTimestamp(new Date(exp()).getTime())}</span>
+              </div>
+            )}
+          </Show>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-y-0.5">
+        <div class="text-xs font-medium tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
+          URI
+        </div>
+        <A
+          href={`/at://${label.uri.replace("at://", "")}`}
+          class="text-sm break-all text-blue-600 hover:underline dark:text-blue-400"
+        >
+          {label.uri}
+        </A>
+      </div>
+
+      <Show when={label.cid}>
+        <div class="flex flex-col gap-y-0.5">
+          <div class="text-xs font-medium tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
+            CID
+          </div>
+          <div class="text-sm break-all text-neutral-700 dark:text-neutral-300">{label.cid}</div>
+        </div>
+      </Show>
+    </div>
+  );
+};
 
 export const LabelView = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [cursor, setCursor] = createSignal<string>();
   const [labels, setLabels] = createSignal<ComAtprotoLabelDefs.Label[]>([]);
-  const [filter, setFilter] = createSignal<string>();
-  const [labelCount, setLabelCount] = createSignal(0);
+  const [filter, setFilter] = createSignal("");
   const [loading, setLoading] = createSignal(false);
-  let rpc: Client;
+  const [error, setError] = createSignal<string>();
+  const [didInput, setDidInput] = createSignal(searchParams.did ?? "");
+
+  let rpc: Client | undefined;
   let formRef!: HTMLFormElement;
 
+  const filteredLabels = createMemo(() => {
+    const filterValue = filter().trim().toLowerCase();
+    if (!filterValue) return labels();
+    return labels().filter((label) => label.val.toLowerCase().includes(filterValue));
+  });
+
+  const hasSearched = createMemo(() => Boolean(searchParams.uriPatterns));
+
   onMount(async () => {
-    const formData = new FormData();
-    if (searchParams.did) formData.append("did", searchParams.did.toString());
-    if (searchParams.did) fetchLabels(formData);
+    if (searchParams.did && searchParams.uriPatterns) {
+      const formData = new FormData();
+      formData.append("did", searchParams.did.toString());
+      formData.append("uriPatterns", searchParams.uriPatterns.toString());
+      await fetchLabels(formData);
+    }
   });
 
   const fetchLabels = async (formData: FormData, reset?: boolean) => {
+    let did = formData.get("did")?.toString()?.trim();
+    const uriPatterns = formData.get("uriPatterns")?.toString()?.trim();
+
+    if (!did || !uriPatterns) {
+      setError("Please provide both DID and URI patterns");
+      return;
+    }
+
     if (reset) {
       setLabels([]);
       setCursor(undefined);
+      setError(undefined);
     }
 
-    const did = formData.get("did")?.toString();
-    if (!did) return;
-    await resolvePDS(did);
-    rpc = new Client({
-      handler: new CredentialManager({ service: labelerCache[did] }),
-    });
+    try {
+      setLoading(true);
+      setError(undefined);
 
-    const uriPatterns = formData.get("uriPatterns")?.toString();
-    if (!uriPatterns) return;
+      if (!isAtprotoDid(did)) did = await resolveHandle(did as Handle);
+      await resolvePDS(did);
+      if (!labelerCache[did]) throw new Error("Repository is not a labeler");
+      rpc = new Client({
+        handler: new CredentialManager({ service: labelerCache[did] }),
+      });
 
-    setSearchParams({
-      did: formData.get("did")?.toString(),
-      uriPatterns: formData.get("uriPatterns")?.toString(),
-    });
+      setSearchParams({ did, uriPatterns });
+      setDidInput(did);
 
-    setLoading(true);
-    const res = await rpc.get("com.atproto.label.queryLabels", {
-      params: {
-        uriPatterns: uriPatterns.toString().trim().split(","),
-        sources: [did as `did:${string}:${string}`],
-        cursor: cursor(),
-      },
-    });
-    setLoading(false);
-    if (!res.ok) throw new Error(res.data.error);
-    setCursor(res.data.labels.length < 50 ? undefined : res.data.cursor);
-    setLabels(labels().concat(res.data.labels) ?? res.data.labels);
-    return res.data.labels;
+      const res = await rpc.get("com.atproto.label.queryLabels", {
+        params: {
+          uriPatterns: uriPatterns.split(",").map((p) => p.trim()),
+          sources: [did as `did:${string}:${string}`],
+          cursor: cursor(),
+        },
+      });
+
+      if (!res.ok) throw new Error(res.data.error || "Failed to fetch labels");
+
+      const newLabels = res.data.labels || [];
+      setCursor(newLabels.length < LABELS_PER_PAGE ? undefined : res.data.cursor);
+      setLabels(reset ? newLabels : [...labels(), ...newLabels]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+      console.error("Failed to fetch labels:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filterLabels = () => {
-    const newFilter = labels().filter((label) => (filter() ? filter() === label.val : true));
-    setLabelCount(newFilter.length);
-    return newFilter;
+  const handleSearch = () => {
+    fetchLabels(new FormData(formRef), true);
+  };
+
+  const handleLoadMore = () => {
+    fetchLabels(new FormData(formRef));
   };
 
   return (
     <div class="flex w-full flex-col items-center">
-      <form ref={formRef} class="flex w-full flex-col items-center gap-y-1 px-2">
-        <label class="flex w-full items-center gap-x-2 px-1">
-          <span class="">DID</span>
-          <TextInput name="did" value={searchParams.did ?? ""} class="grow" />
-        </label>
-        <label for="uriPatterns" class="ml-2 w-full text-sm">
-          URI Patterns (comma-separated)
-        </label>
-        <div class="flex w-full items-center gap-x-1 px-1">
-          <textarea
-            id="uriPatterns"
-            name="uriPatterns"
-            spellcheck={false}
-            rows={2}
-            value={searchParams.uriPatterns ?? "*"}
-            class="dark:bg-dark-100 dark:shadow-dark-700 grow rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 text-sm shadow-xs focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
-          />
-          <div class="flex justify-center">
-            <Show when={!loading()}>
-              <button
-                type="button"
-                onClick={() => fetchLabels(new FormData(formRef), true)}
-                class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-              >
-                <span class="iconify lucide--search text-lg"></span>
-              </button>
-            </Show>
-            <Show when={loading()}>
-              <div class="m-1 flex items-center">
-                <span class="iconify lucide--loader-circle animate-spin text-lg"></span>
-              </div>
-            </Show>
+      <form
+        ref={formRef}
+        class="flex w-full max-w-3xl flex-col gap-y-2 px-3 py-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSearch();
+        }}
+      >
+        <div class="flex flex-col gap-y-1.5">
+          <label class="flex w-full flex-col gap-y-1">
+            <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              Labeler DID/Handle
+            </span>
+            <TextInput
+              name="did"
+              value={didInput()}
+              onInput={(e) => setDidInput(e.currentTarget.value)}
+              placeholder="did:plc:..."
+              class="w-full"
+            />
+          </label>
+
+          <label class="flex w-full flex-col gap-y-1">
+            <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              URI Patterns (comma-separated)
+            </span>
+            <textarea
+              id="uriPatterns"
+              name="uriPatterns"
+              spellcheck={false}
+              rows={2}
+              value={searchParams.uriPatterns ?? "*"}
+              placeholder="at://did:web:example.com/app.bsky.feed.post/*"
+              class="dark:bg-dark-100 dark:shadow-dark-700 grow rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1.5 text-sm shadow-xs focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
+            />
+          </label>
+        </div>
+
+        <Button
+          type="submit"
+          disabled={loading()}
+          class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 w-fit items-center justify-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+        >
+          <span class="iconify lucide--search" />
+          <span>Search Labels</span>
+        </Button>
+
+        <Show when={error()}>
+          <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
+            {error()}
           </div>
-        </div>
+        </Show>
       </form>
-      <StickyOverlay>
-        <TextInput
-          placeholder="Filter by label"
-          name="filter"
-          onInput={(e) => setFilter(e.currentTarget.value)}
-          class="w-full text-sm"
-        />
-        <div class="flex items-center gap-x-2">
-          <Show when={labelCount() && labels().length}>
-            <div>
-              <span>
-                {labelCount()} label{labelCount() > 1 ? "s" : ""}
-              </span>
+
+      <Show when={hasSearched()}>
+        <StickyOverlay>
+          <div class="flex w-full items-center gap-x-2">
+            <TextInput
+              placeholder="Filter by label value"
+              name="filter"
+              value={filter()}
+              onInput={(e) => setFilter(e.currentTarget.value)}
+              class="min-w-0 grow text-sm"
+            />
+            <div class="flex shrink-0 items-center gap-x-2 text-sm">
+              <Show when={labels().length > 0}>
+                <span class="whitespace-nowrap text-neutral-600 dark:text-neutral-400">
+                  {filteredLabels().length}/{labels().length}
+                </span>
+              </Show>
+
+              <Show when={cursor()}>
+                <Button
+                  onClick={handleLoadMore}
+                  disabled={loading()}
+                  class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 w-20 items-center justify-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+                >
+                  <Show
+                    when={!loading()}
+                    fallback={<span class="iconify lucide--loader-circle animate-spin" />}
+                  >
+                    Load More
+                  </Show>
+                </Button>
+              </Show>
+            </div>
+          </div>
+        </StickyOverlay>
+
+        <div class="w-full max-w-3xl px-3 py-2">
+          <Show when={loading() && labels().length === 0}>
+            <div class="flex flex-col items-center justify-center py-12 text-center">
+              <span class="iconify lucide--loader-circle mb-3 animate-spin text-4xl text-neutral-400" />
+              <p class="text-sm text-neutral-600 dark:text-neutral-400">Loading labels...</p>
             </div>
           </Show>
-          <Show when={cursor()}>
-            <div class="flex h-8 w-22 items-center justify-center text-nowrap">
-              <Show when={!loading()}>
-                <Button onClick={() => fetchLabels(new FormData(formRef))}>Load More</Button>
-              </Show>
-              <Show when={loading()}>
-                <div class="iconify lucide--loader-circle animate-spin text-xl" />
-              </Show>
-            </div>
-          </Show>
-        </div>
-      </StickyOverlay>
-      <Show when={labels().length}>
-        <div class="flex flex-col gap-2 divide-y-[0.5px] divide-neutral-400 text-sm wrap-anywhere whitespace-pre-wrap dark:divide-neutral-600">
-          <For each={filterLabels()}>
-            {(label) => (
-              <div class="flex items-center justify-between gap-2 pb-2">
-                <div class="flex flex-col">
-                  <div class="flex items-center gap-x-2">
-                    <div class="min-w-16 font-semibold">URI</div>
-                    <A
-                      href={`/at://${label.uri.replace("at://", "")}`}
-                      class="text-blue-400 hover:underline active:underline"
-                    >
-                      {label.uri}
-                    </A>
-                  </div>
-                  <Show when={label.cid}>
-                    <div class="flex items-center gap-x-2">
-                      <div class="min-w-16 font-semibold">CID</div>
-                      {label.cid}
-                    </div>
-                  </Show>
-                  <div class="flex items-center gap-x-2">
-                    <div class="min-w-16 font-semibold">Label</div>
-                    {label.val}
-                  </div>
-                  <div class="flex items-center gap-x-2">
-                    <div class="min-w-16 font-semibold">Created</div>
-                    {localDateFromTimestamp(new Date(label.cts).getTime())}
-                  </div>
-                  <Show when={label.exp}>
-                    {(exp) => (
-                      <div class="flex items-center gap-x-2">
-                        <div class="min-w-16 font-semibold">Expires</div>
-                        {localDateFromTimestamp(new Date(exp()).getTime())}
-                      </div>
-                    )}
-                  </Show>
-                </div>
-                <Show when={label.neg}>
-                  <div class="iconify lucide--minus shrink-0 text-lg text-red-500 dark:text-red-400" />
-                </Show>
+
+          <Show when={!loading() || labels().length > 0}>
+            <Show when={filteredLabels().length > 0}>
+              <div class="grid gap-2">
+                <For each={filteredLabels()}>{(label) => <LabelCard label={label} />}</For>
               </div>
-            )}
-          </For>
+            </Show>
+
+            <Show when={labels().length > 0 && filteredLabels().length === 0}>
+              <div class="flex flex-col items-center justify-center py-8 text-center">
+                <span class="iconify lucide--search-x mb-2 text-3xl text-neutral-400" />
+                <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                  No labels match your filter
+                </p>
+              </div>
+            </Show>
+
+            <Show when={labels().length === 0 && !loading()}>
+              <div class="flex flex-col items-center justify-center py-8 text-center">
+                <span class="iconify lucide--inbox mb-2 text-3xl text-neutral-400" />
+                <p class="text-sm text-neutral-600 dark:text-neutral-400">No labels found</p>
+              </div>
+            </Show>
+          </Show>
         </div>
-      </Show>
-      <Show when={!labels().length && !loading() && searchParams.uriPatterns}>
-        <div class="mt-2">No results</div>
       </Show>
     </div>
   );

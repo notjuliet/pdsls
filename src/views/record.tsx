@@ -9,7 +9,13 @@ import { createResource, createSignal, ErrorBoundary, Show, Suspense } from "sol
 import { Backlinks } from "../components/backlinks.jsx";
 import { Button } from "../components/button.jsx";
 import { RecordEditor, setPlaceholder } from "../components/create.jsx";
-import { CopyMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
+import {
+  CopyMenu,
+  DropdownMenu,
+  MenuProvider,
+  MenuSeparator,
+  NavMenu,
+} from "../components/dropdown.jsx";
 import { JSONValue } from "../components/json.jsx";
 import { LexiconSchemaView } from "../components/lexicon-schema.jsx";
 import { agent } from "../components/login.jsx";
@@ -238,6 +244,7 @@ export const RecordView = () => {
                 <Show when={record()?.cid}>
                   {(cid) => <CopyMenu content={cid()} label="Copy CID" icon="lucide--copy" />}
                 </Show>
+                <MenuSeparator />
                 <Show when={externalLink()}>
                   {(externalLink) => (
                     <NavMenu

@@ -4,7 +4,7 @@ import { A, RouteSectionProps, useLocation, useNavigate } from "@solidjs/router"
 import { createEffect, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
 import { AccountManager } from "./components/account.jsx";
 import { RecordEditor } from "./components/create.jsx";
-import { DropdownMenu, MenuProvider, NavMenu } from "./components/dropdown.jsx";
+import { DropdownMenu, MenuProvider, MenuSeparator, NavMenu } from "./components/dropdown.jsx";
 import { agent } from "./components/login.jsx";
 import { NavBar } from "./components/navbar.jsx";
 import { NotificationContainer } from "./components/notification.jsx";
@@ -141,12 +141,13 @@ const Layout = (props: RouteSectionProps<unknown>) => {
             <DropdownMenu
               icon="lucide--menu text-xl"
               buttonClass="rounded-lg p-1"
-              menuClass="top-8 p-3 text-sm"
+              menuClass="top-11 p-3 text-sm"
             >
               <NavMenu href="/jetstream" label="Jetstream" />
               <NavMenu href="/firehose" label="Firehose" />
               <NavMenu href="/labels" label="Labels" />
               <NavMenu href="/settings" label="Settings" />
+              <MenuSeparator />
               <NavMenu
                 href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz"
                 label="Bluesky"

@@ -89,6 +89,10 @@ export const ActionMenu = (props: {
   );
 };
 
+export const MenuSeparator = () => {
+  return <div class="my-1 h-[0.5px] bg-neutral-300 dark:bg-neutral-600" />;
+};
+
 export const DropdownMenu = (props: {
   icon: string;
   buttonClass?: string;

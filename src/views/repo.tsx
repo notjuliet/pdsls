@@ -19,6 +19,7 @@ import {
   CopyMenu,
   DropdownMenu,
   MenuProvider,
+  MenuSeparator,
   NavMenu,
 } from "../components/dropdown.jsx";
 import { setPDS } from "../components/navbar.jsx";
@@ -31,6 +32,7 @@ import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import {
   didDocCache,
+  labelerCache,
   resolveHandle,
   resolveLexiconAuthority,
   resolvePDS,
@@ -293,6 +295,21 @@ export const RepoView = () => {
                   label="Jetstream"
                   icon="lucide--radio-tower"
                 />
+                <Show when={params.repo in labelerCache}>
+                  <NavMenu
+                    href={`/labels?did=${params.repo}&uriPatterns=*`}
+                    label="Labels"
+                    icon="lucide--tag"
+                  />
+                </Show>
+                <Show when={error()?.length === 0 || error() === undefined}>
+                  <ActionMenu
+                    label="Export Repo"
+                    icon={downloading() ? "lucide--loader-circle animate-spin" : "lucide--download"}
+                    onClick={() => downloadRepo()}
+                  />
+                </Show>
+                <MenuSeparator />
                 <NavMenu
                   href={
                     did.startsWith("did:plc") ?
@@ -309,13 +326,6 @@ export const RepoView = () => {
                     newTab
                     label="Audit Log"
                     icon="lucide--external-link"
-                  />
-                </Show>
-                <Show when={error()?.length === 0 || error() === undefined}>
-                  <ActionMenu
-                    label="Export Repo"
-                    icon={downloading() ? "lucide--loader-circle animate-spin" : "lucide--download"}
-                    onClick={() => downloadRepo()}
                   />
                 </Show>
               </DropdownMenu>
