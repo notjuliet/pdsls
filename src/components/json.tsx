@@ -87,7 +87,7 @@ const JSONString = (props: {
               ["http:", "https:", "web+at:"].includes(new URL(part).protocol) &&
               part.split("\n").length === 1
             ) ?
-              <a class="underline" href={part} target="_blank" rel="noopener">
+              <a class="underline hover:text-blue-400" href={part} target="_blank" rel="noopener">
                 {part}
               </a>
             : part}
