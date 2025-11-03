@@ -1,7 +1,7 @@
-import { A, Params, useLocation } from "@solidjs/router";
+import { A, Params } from "@solidjs/router";
 import { createEffect, createSignal, Show } from "solid-js";
 import { isTouchDevice } from "../layout";
-import { didDocCache, labelerCache } from "../utils/api";
+import { didDocCache } from "../utils/api";
 import { addToClipboard } from "../utils/copy";
 import Tooltip from "./tooltip";
 
@@ -29,7 +29,6 @@ const CopyButton = (props: { content: string; label: string }) => {
 };
 
 export const NavBar = (props: { params: Params }) => {
-  const location = useLocation();
   const [handle, setHandle] = createSignal(props.params.repo);
   const [showHandle, setShowHandle] = createSignal(localStorage.showHandle === "true");
 
@@ -93,7 +92,7 @@ export const NavBar = (props: { params: Params }) => {
               <Tooltip text="Repository">
                 <span class="iconify lucide--book-user shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
               </Tooltip>
-              {props.params.collection || location.pathname.includes("/labels") ?
+              {props.params.collection ?
                 <A
                   end
                   href={`/at://${props.params.repo}`}
@@ -124,26 +123,6 @@ export const NavBar = (props: { params: Params }) => {
               </Tooltip>
               <CopyButton content={props.params.repo} label="Copy DID" />
             </div>
-          </div>
-        </Show>
-
-        {/* Labels Level */}
-        <Show
-          when={
-            !props.params.collection &&
-            (props.params.repo in labelerCache || location.pathname.endsWith("/labels"))
-          }
-        >
-          <div class="group flex items-center gap-2 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-            <span class="iconify lucide--tag text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
-            <A
-              end
-              href={`/at://${props.params.repo}/labels`}
-              class="py-0.5 font-medium"
-              inactiveClass="text-blue-400 grow hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
-            >
-              labels
-            </A>
           </div>
         </Show>
 

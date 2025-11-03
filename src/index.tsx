@@ -17,10 +17,10 @@ render(
     <Router root={Layout}>
       <Route path="/" component={Home} />
       <Route path={["/jetstream", "/firehose"]} component={StreamView} />
+      <Route path="/labels" component={LabelView} />
       <Route path="/settings" component={Settings} />
       <Route path="/:pds" component={PdsView} />
       <Route path="/:pds/:repo" component={RepoView} />
-      <Route path="/:pds/:repo/labels" component={LabelView} />
       <Route path="/:pds/:repo/:collection" component={CollectionView} />
       <Route path="/:pds/:repo/:collection/:rkey" component={RecordView} />
     </Router>

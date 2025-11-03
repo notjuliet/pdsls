@@ -145,6 +145,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
             >
               <NavMenu href="/jetstream" label="Jetstream" />
               <NavMenu href="/firehose" label="Firehose" />
+              <NavMenu href="/labels" label="Labels" />
               <NavMenu href="/settings" label="Settings" />
               <NavMenu
                 href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz"
