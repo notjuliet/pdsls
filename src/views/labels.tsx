@@ -272,7 +272,7 @@ export const LabelView = () => {
 
             <Show when={labels().length === 0 && !loading()}>
               <div class="flex flex-col items-center justify-center py-8 text-center">
-                <span class="iconify lucide--inbox mb-2 text-3xl text-neutral-400" />
+                <span class="iconify lucide--tags mb-2 text-3xl text-neutral-400" />
                 <p class="text-sm text-neutral-600 dark:text-neutral-400">No labels found</p>
               </div>
             </Show>
