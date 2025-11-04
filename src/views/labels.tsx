@@ -18,50 +18,38 @@ const LabelCard = (props: { label: ComAtprotoLabelDefs.Label }) => {
   return (
     <div class="flex flex-col gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
       <div class="flex flex-wrap items-center gap-x-2 gap-y-2">
-        <div class="inline-flex items-center gap-x-1 rounded-full bg-neutral-200 px-2 py-0.5 text-sm font-medium text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200">
+        <div class="inline-flex items-center gap-x-1 text-sm font-medium">
           <span class="iconify lucide--tag shrink-0" />
           {label.val}
         </div>
         <Show when={label.neg}>
-          <div class="inline-flex items-center gap-x-1 rounded-full border border-orange-400 bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:border-orange-600 dark:bg-orange-900/30 dark:text-orange-400">
-            <span class="iconify lucide--minus shrink-0 text-sm" />
-            <span>Negated</span>
+          <div class="inline-flex items-center gap-x-1 text-xs font-medium text-red-500 dark:text-red-400">
+            <span>negated</span>
           </div>
         </Show>
         <div class="flex flex-wrap gap-3 text-xs text-neutral-600 dark:text-neutral-400">
-          <div class="flex items-center gap-x-1">
-            <span class="iconify lucide--calendar shrink-0" />
-            <span>{localDateFromTimestamp(new Date(label.cts).getTime())}</span>
-          </div>
+          <span>{localDateFromTimestamp(new Date(label.cts).getTime())}</span>
           <Show when={label.exp}>
             {(exp) => (
               <div class="flex items-center gap-x-1">
                 <span class="iconify lucide--clock-fading shrink-0" />
-                <span>e{localDateFromTimestamp(new Date(exp()).getTime())}</span>
+                <span>{localDateFromTimestamp(new Date(exp()).getTime())}</span>
               </div>
             )}
           </Show>
         </div>
       </div>
 
-      <div class="flex flex-col gap-y-0.5">
-        <div class="text-xs font-medium tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
-          URI
-        </div>
-        <A
-          href={`/at://${label.uri.replace("at://", "")}`}
-          class="text-sm break-all text-blue-600 hover:underline dark:text-blue-400"
-        >
-          {label.uri}
-        </A>
-      </div>
+      <A
+        href={`/at://${label.uri.replace("at://", "")}`}
+        class="text-sm break-all text-blue-600 hover:underline dark:text-blue-400"
+      >
+        {label.uri}
+      </A>
 
       <Show when={label.cid}>
-        <div class="flex flex-col gap-y-0.5">
-          <div class="text-xs font-medium tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
-            CID
-          </div>
-          <div class="text-sm break-all text-neutral-700 dark:text-neutral-300">{label.cid}</div>
+        <div class="font-mono text-xs break-all text-neutral-700 dark:text-neutral-300">
+          {label.cid}
         </div>
       </Show>
     </div>
