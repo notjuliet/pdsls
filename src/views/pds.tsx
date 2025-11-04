@@ -136,7 +136,7 @@ const PdsView = () => {
           <MenuProvider>
             <DropdownMenu
               icon="lucide--ellipsis-vertical"
-              buttonClass="rounded-sm p-1"
+              buttonClass="rounded-sm p-1.5"
               menuClass="top-8 p-2 text-sm"
             >
               <CopyMenu content={params.pds} label="Copy PDS" icon="lucide--copy" />

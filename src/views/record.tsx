@@ -199,12 +199,12 @@ export const RecordView = () => {
             <RecordTab tab="backlinks" label="Backlinks" />
             <RecordTab tab="info" label="Info" error />
           </div>
-          <div class="flex gap-1">
+          <div class="flex gap-0.5">
             <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
               <RecordEditor create={false} record={record()?.value} refetch={refetch} />
               <Tooltip text="Delete">
                 <button
-                  class="flex items-center rounded-sm p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                  class="flex items-center rounded-sm p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                   onclick={() => setOpenDelete(true)}
                 >
                   <span class="iconify lucide--trash-2"></span>
@@ -228,7 +228,7 @@ export const RecordView = () => {
             <MenuProvider>
               <DropdownMenu
                 icon="lucide--ellipsis-vertical"
-                buttonClass="rounded-sm p-1"
+                buttonClass="rounded-sm p-1.5"
                 menuClass="top-8 p-2 text-sm"
               >
                 <CopyMenu

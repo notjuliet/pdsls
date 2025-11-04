@@ -266,7 +266,7 @@ export const RepoView = () => {
             </Show>
             <RepoTab tab="backlinks" label="Backlinks" />
           </div>
-          <div class="flex gap-1">
+          <div class="flex gap-0.5">
             <Show when={error() && error() !== "Missing PDS"}>
               <div class="flex items-center gap-1 text-red-500 dark:text-red-400">
                 <span class="iconify lucide--alert-triangle"></span>
@@ -276,7 +276,7 @@ export const RepoView = () => {
             <Show when={!error() && (!location.hash || location.hash === "#collections")}>
               <Tooltip text="Filter collections">
                 <button
-                  class="flex items-center rounded-sm p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                  class="flex items-center rounded-sm p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                   onClick={() => setShowFilter(!showFilter())}
                 >
                   <span class="iconify lucide--filter"></span>
@@ -286,7 +286,7 @@ export const RepoView = () => {
             <MenuProvider>
               <DropdownMenu
                 icon="lucide--ellipsis-vertical"
-                buttonClass="rounded-sm p-1"
+                buttonClass="rounded-sm p-1.5"
                 menuClass="top-8 p-2 text-sm"
               >
                 <CopyMenu content={params.repo} label="Copy DID" icon="lucide--copy" />
