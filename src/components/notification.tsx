@@ -9,6 +9,7 @@ export type Notification = {
 };
 
 const [notifications, setNotifications] = createSignal<Notification[]>([]);
+const [removingIds, setRemovingIds] = createSignal<Set<string>>(new Set());
 
 export const addNotification = (notification: Omit<Notification, "id">) => {
   const id = `notification-${Date.now()}-${Math.random()}`;
@@ -21,7 +22,15 @@ export const updateNotification = (id: string, updates: Partial<Notification>) =
 };
 
 export const removeNotification = (id: string) => {
-  setNotifications(notifications().filter((n) => n.id !== id));
+  setRemovingIds(new Set([...removingIds(), id]));
+  setTimeout(() => {
+    setNotifications(notifications().filter((n) => n.id !== id));
+    setRemovingIds((ids) => {
+      const newIds = new Set(ids);
+      newIds.delete(id);
+      return newIds;
+    });
+  }, 250);
 };
 
 export const NotificationContainer = () => {
@@ -35,6 +44,8 @@ export const NotificationContainer = () => {
               "border-blue-500 dark:border-blue-400": notification.type === "info",
               "border-green-500 dark:border-green-400": notification.type === "success",
               "border-red-500 dark:border-red-400": notification.type === "error",
+              "animate-[slideIn_0.25s_ease-in]": !removingIds().has(notification.id),
+              "animate-[slideOut_0.25s_ease-in]": removingIds().has(notification.id),
             }}
             onClick={() => removeNotification(notification.id)}
           >
