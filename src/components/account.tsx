@@ -147,7 +147,7 @@ export const AccountManager = () => {
       </Modal>
       <button
         onclick={() => setOpenManager(true)}
-        class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+        class={`flex items-center rounded-lg ${agent() && avatars[agent()!.sub] ? "p-1.25" : "p-1.5"} hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600`}
       >
         {agent() && avatars[agent()!.sub] ?
           <img
