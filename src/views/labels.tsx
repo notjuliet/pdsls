@@ -81,9 +81,41 @@ export const LabelView = () => {
   let formRef!: HTMLFormElement;
 
   const filteredLabels = createMemo(() => {
-    const filterValue = filter().trim().toLowerCase();
+    const filterValue = filter().trim();
     if (!filterValue) return labels();
-    return labels().filter((label) => label.val.toLowerCase().includes(filterValue));
+
+    const filters = filterValue
+      .split(/[\s,]+/)
+      .map((f) => f.trim())
+      .filter((f) => f.length > 0);
+
+    const exclusions: string[] = [];
+    const inclusions: string[] = [];
+
+    filters.forEach((f) => {
+      if (f.startsWith("-")) {
+        exclusions.push(f.slice(1).toLowerCase());
+      } else {
+        inclusions.push(f.toLowerCase());
+      }
+    });
+
+    return labels().filter((label) => {
+      const labelValue = label.val.toLowerCase();
+
+      // Check exclusions (exact match)
+      if (exclusions.some((exc) => labelValue === exc)) {
+        return false;
+      }
+
+      // If there are inclusions, at least one must match (partial match)
+      if (inclusions.length > 0) {
+        return inclusions.some((inc) => labelValue.includes(inc));
+      }
+
+      // If only exclusions were specified, include everything not excluded
+      return true;
+    });
   });
 
   const hasSearched = createMemo(() => Boolean(searchParams.uriPatterns));
@@ -215,11 +247,11 @@ export const LabelView = () => {
         <StickyOverlay>
           <div class="flex w-full items-center gap-x-2">
             <TextInput
-              placeholder="Filter by label value"
+              placeholder="Filter labels (space separated, -label to exclude)"
               name="filter"
               value={filter()}
               onInput={(e) => setFilter(e.currentTarget.value)}
-              class="min-w-0 grow text-sm"
+              class="min-w-0 grow text-sm placeholder:text-xs"
             />
             <div class="flex shrink-0 items-center gap-x-2 text-sm">
               <Show when={labels().length > 0}>
