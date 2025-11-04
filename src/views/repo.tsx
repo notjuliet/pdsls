@@ -397,28 +397,26 @@ export const RepoView = () => {
               >
                 {(authority) => {
                   const reversedDomain = authority.split(".").reverse().join(".");
-                  const [faviconError, setFaviconError] = createSignal(false);
+                  const [faviconLoaded, setFaviconLoaded] = createSignal(false);
 
                   return (
                     <div class="dark:hover:bg-dark-200 flex items-start gap-2 rounded-lg p-1 hover:bg-neutral-200">
                       <div class="flex h-5 w-4 shrink-0 items-center justify-center">
-                        <Show
-                          when={!faviconError()}
-                          fallback={
-                            <span class="iconify lucide--globe size-4 text-neutral-400 dark:text-neutral-500" />
-                          }
-                        >
-                          <img
-                            src={
-                              reversedDomain === "bsky.app" ?
-                                "https://web-cdn.bsky.app/static/apple-touch-icon.png"
-                              : `https://${reversedDomain}/favicon.ico`
-                            }
-                            alt={`${reversedDomain} favicon`}
-                            class="h-4 w-4"
-                            onError={() => setFaviconError(true)}
-                          />
+                        <Show when={!faviconLoaded()}>
+                          <span class="iconify lucide--globe size-4 text-neutral-400 dark:text-neutral-500" />
                         </Show>
+                        <img
+                          src={
+                            reversedDomain === "bsky.app" ?
+                              "https://web-cdn.bsky.app/static/apple-touch-icon.png"
+                            : `https://${reversedDomain}/favicon.ico`
+                          }
+                          alt={`${reversedDomain} favicon`}
+                          class="h-4 w-4"
+                          classList={{ hidden: !faviconLoaded() }}
+                          onLoad={() => setFaviconLoaded(true)}
+                          onError={() => setFaviconLoaded(false)}
+                        />
                       </div>
                       <div class="flex flex-1 flex-col">
                         <For
