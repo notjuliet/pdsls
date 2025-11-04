@@ -407,7 +407,7 @@ export const RepoView = () => {
                         </Show>
                         <img
                           src={
-                            reversedDomain === "bsky.app" ?
+                            ["bsky.app", "bsky.chat"].includes(reversedDomain) ?
                               "https://web-cdn.bsky.app/static/apple-touch-icon.png"
                             : `https://${reversedDomain}/favicon.ico`
                           }
