@@ -367,7 +367,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
             <button
               id="close"
               onclick={() => setOpenDialog(false)}
-              class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+              class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
             >
               <span class="iconify lucide--x"></span>
             </button>
@@ -479,14 +479,14 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
       </Modal>
       <Tooltip text={`${props.create ? "Create" : "Edit"} record`}>
         <button
-          class={`flex items-center ${props.create ? "p-1" : "p-1.5"} hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 ${props.create ? "rounded-lg" : "rounded-sm"}`}
+          class={`flex items-center p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 ${props.create ? "rounded-lg" : "rounded-sm"}`}
           onclick={() => {
             setNotice("");
             setOpenDialog(true);
           }}
         >
           <div
-            class={props.create ? "iconify lucide--square-pen text-xl" : "iconify lucide--pencil"}
+            class={props.create ? "iconify lucide--square-pen text-lg" : "iconify lucide--pencil"}
           />
         </button>
       </Tooltip>

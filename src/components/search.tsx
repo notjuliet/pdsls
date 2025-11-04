@@ -29,11 +29,11 @@ const SearchButton = () => {
   return (
     <button
       onclick={() => setShowSearch(!showSearch())}
-      class={`flex items-center gap-0.5 rounded-lg ${isTouchDevice ? "p-1 text-xl hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600" : "dark:bg-dark-100/70 box-border h-7 border-[0.5px] border-neutral-300 bg-neutral-100/70 p-1.5 text-xs hover:bg-neutral-200 active:bg-neutral-300 dark:border-neutral-600 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"}`}
+      class={`flex items-center gap-1 rounded-md ${isTouchDevice ? "p-1.5 text-xl hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600" : "dark:bg-dark-100/70 box-border h-7 border-[0.5px] border-neutral-300 bg-neutral-100/70 px-2 mr-1 text-baseline text-xs hover:bg-neutral-200 active:bg-neutral-300 dark:border-neutral-600 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"}`}
     >
-      <span class="iconify lucide--search"></span>
+	  <span class={`iconify lucide--search ${isTouchDevice ? "text-lg" : ""}`}></span>
       <Show when={!isTouchDevice}>
-        <kbd class="font-sans text-neutral-500 select-none dark:text-neutral-400">
+        <kbd class="font-sans leading-none text-neutral-500 select-none dark:text-neutral-400">
           {/Mac/i.test(navigator.platform) ? "⌘" : "⌃"}K
         </kbd>
       </Show>
