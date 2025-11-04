@@ -89,28 +89,48 @@ export const LabelView = () => {
       .map((f) => f.trim())
       .filter((f) => f.length > 0);
 
-    const exclusions: string[] = [];
-    const inclusions: string[] = [];
+    const exclusions: { pattern: string; hasWildcard: boolean }[] = [];
+    const inclusions: { pattern: string; hasWildcard: boolean }[] = [];
 
     filters.forEach((f) => {
       if (f.startsWith("-")) {
-        exclusions.push(f.slice(1).toLowerCase());
+        const lower = f.slice(1).toLowerCase();
+        exclusions.push({
+          pattern: lower,
+          hasWildcard: lower.includes("*"),
+        });
       } else {
-        inclusions.push(f.toLowerCase());
+        const lower = f.toLowerCase();
+        inclusions.push({
+          pattern: lower,
+          hasWildcard: lower.includes("*"),
+        });
       }
     });
+
+    const matchesPattern = (value: string, filter: { pattern: string; hasWildcard: boolean }) => {
+      if (filter.hasWildcard) {
+        // Convert wildcard pattern to regex
+        const regexPattern = filter.pattern
+          .replace(/[.+?^${}()|[\]\\]/g, "\\$&") // Escape special regex chars except *
+          .replace(/\*/g, ".*"); // Replace * with .*
+        const regex = new RegExp(`^${regexPattern}$`);
+        return regex.test(value);
+      } else {
+        return value === filter.pattern;
+      }
+    };
 
     return labels().filter((label) => {
       const labelValue = label.val.toLowerCase();
 
-      // Check exclusions (exact match)
-      if (exclusions.some((exc) => labelValue === exc)) {
+      if (exclusions.some((exc) => matchesPattern(labelValue, exc))) {
         return false;
       }
 
-      // If there are inclusions, at least one must match (partial match)
+      // If there are inclusions, at least one must match
       if (inclusions.length > 0) {
-        return inclusions.some((inc) => labelValue.includes(inc));
+        return inclusions.some((inc) => matchesPattern(labelValue, inc));
       }
 
       // If only exclusions were specified, include everything not excluded
@@ -247,7 +267,7 @@ export const LabelView = () => {
         <StickyOverlay>
           <div class="flex w-full items-center gap-x-2">
             <TextInput
-              placeholder="Filter labels (space separated, -label to exclude)"
+              placeholder="Filter labels (* for partial, -exclude)"
               name="filter"
               value={filter()}
               onInput={(e) => setFilter(e.currentTarget.value)}
