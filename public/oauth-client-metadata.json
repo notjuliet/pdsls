@@ -2,7 +2,7 @@
   "client_id": "https://pdsls.dev/oauth-client-metadata.json",
   "client_name": "PDSls",
   "client_uri": "https://pdsls.dev",
-  "logo_uri": "https://pdsls.dev/favicon.png",
+  "logo_uri": "https://pdsls.dev/favicon.ico",
   "redirect_uris": ["https://pdsls.dev/"],
   "scope": "atproto transition:generic",
   "grant_types": ["authorization_code", "refresh_token"],

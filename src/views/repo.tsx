@@ -395,25 +395,53 @@ export const RepoView = () => {
                   : true,
                 )}
               >
-                {(authority) => (
-                  <div class="dark:hover:bg-dark-200 flex flex-col rounded-lg p-1 hover:bg-neutral-200">
-                    <For
-                      each={nsids()?.[authority].nsids.filter((nsid) =>
-                        filter() ? nsid.startsWith(filter()!.split(".").slice(2).join(".")) : true,
-                      )}
-                    >
-                      {(nsid) => (
-                        <A
-                          href={`/at://${did}/${authority}.${nsid}`}
-                          class="hover:underline active:underline"
+                {(authority) => {
+                  const reversedDomain = authority.split(".").reverse().join(".");
+                  const [faviconError, setFaviconError] = createSignal(false);
+
+                  return (
+                    <div class="dark:hover:bg-dark-200 flex items-start gap-2 rounded-lg p-1 hover:bg-neutral-200">
+                      <div class="flex h-5 w-4 shrink-0 items-center justify-center">
+                        <Show
+                          when={!faviconError()}
+                          fallback={
+                            <span class="iconify lucide--globe size-4 text-neutral-400 dark:text-neutral-500" />
+                          }
                         >
-                          <span>{authority}</span>
-                          <span class="text-neutral-500 dark:text-neutral-400">.{nsid}</span>
-                        </A>
-                      )}
-                    </For>
-                  </div>
-                )}
+                          <img
+                            src={
+                              reversedDomain === "bsky.app" ?
+                                "https://web-cdn.bsky.app/static/apple-touch-icon.png"
+                              : `https://${reversedDomain}/favicon.ico`
+                            }
+                            alt={`${reversedDomain} favicon`}
+                            class="h-4 w-4"
+                            onError={() => setFaviconError(true)}
+                          />
+                        </Show>
+                      </div>
+                      <div class="flex flex-1 flex-col">
+                        <For
+                          each={nsids()?.[authority].nsids.filter((nsid) =>
+                            filter() ?
+                              nsid.startsWith(filter()!.split(".").slice(2).join("."))
+                            : true,
+                          )}
+                        >
+                          {(nsid) => (
+                            <A
+                              href={`/at://${did}/${authority}.${nsid}`}
+                              class="hover:underline active:underline"
+                            >
+                              <span>{authority}</span>
+                              <span class="text-neutral-500 dark:text-neutral-400">.{nsid}</span>
+                            </A>
+                          )}
+                        </For>
+                      </div>
+                    </div>
+                  );
+                }}
               </For>
             </div>
           </Show>
