@@ -177,7 +177,7 @@ export const PlcLogView = (props: { did: string }) => {
         <div class="flex min-w-0 items-center gap-1.5">
           <p
             classList={{
-              "font-semibold text-sm": true,
+              "font-medium text-sm": true,
               "line-through": diff.orig.nullified,
             }}
           >
@@ -235,7 +235,7 @@ export const PlcLogView = (props: { did: string }) => {
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-1.5 text-sm">
           <div class="iconify lucide--filter" />
-          <p class="font-semibold">Filter by type</p>
+          <p class="font-medium">Filter by type</p>
         </div>
         <div class="flex flex-wrap gap-1 sm:gap-2">
           <FilterButton icon="iconify lucide--at-sign" event="handle" label="Alias" />
