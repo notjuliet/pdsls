@@ -77,6 +77,7 @@ const Login = () => {
           id="username"
           name="username"
           autocomplete="username"
+          aria-label="Your AT Protocol handle"
           class="grow py-1 select-none placeholder:text-sm focus:outline-none"
           onInput={(e) => setLoginInput(e.currentTarget.value)}
         />
