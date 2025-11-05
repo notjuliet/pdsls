@@ -391,7 +391,10 @@ export const RepoView = () => {
               <For
                 each={Object.keys(nsids() ?? {}).filter((authority) =>
                   filter() ?
-                    authority.startsWith(filter()!) || filter()?.startsWith(authority)
+                    authority.includes(filter()!) ||
+                    nsids()?.[authority].nsids.some((nsid) =>
+                      `${authority}.${nsid}`.includes(filter()!),
+                    )
                   : true,
                 )}
               >
@@ -421,9 +424,7 @@ export const RepoView = () => {
                       <div class="flex flex-1 flex-col">
                         <For
                           each={nsids()?.[authority].nsids.filter((nsid) =>
-                            filter() ?
-                              nsid.startsWith(filter()!.split(".").slice(2).join("."))
-                            : true,
+                            filter() ? `${authority}.${nsid}`.includes(filter()!) : true,
                           )}
                         >
                           {(nsid) => (
