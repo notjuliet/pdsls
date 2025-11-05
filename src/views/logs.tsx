@@ -257,12 +257,9 @@ export const PlcLogView = (props: { did: string }) => {
           {([entry, diffs]) => (
             <Show when={shouldShowEntry(diffs)}>
               <div class="flex flex-col gap-1">
-                <div class="flex items-center gap-2 text-sm">
-                  <div class="iconify lucide--clock text-neutral-600 dark:text-neutral-400" />
-                  <span class="font-medium text-neutral-700 dark:text-neutral-300">
-                    {localDateFromTimestamp(new Date(entry.createdAt).getTime())}
-                  </span>
-                </div>
+                <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                  {localDateFromTimestamp(new Date(entry.createdAt).getTime())}
+                </span>
                 <div class="flex flex-col gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 text-sm dark:border-neutral-700 dark:bg-neutral-800">
                   <For each={diffs.filter(shouldShowDiff)}>
                     {(diff) => <DiffItem diff={diff} />}
