@@ -129,7 +129,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <span class="iconify tabler--binary-tree-filled text-[#76c4e5]"></span>
           <span>PDSls</span>
         </A>
-        <div class="dark:bg-dark-300/60 relative flex items-center gap-0.5 py-0.5 px-1 rounded-lg bg-neutral-50/60">
+        <div class="dark:bg-dark-300/60 relative flex items-center gap-0.5 rounded-lg bg-neutral-50/60 px-1 py-0.5">
           <Show when={location.pathname !== "/"}>
             <SearchButton />
           </Show>
@@ -174,7 +174,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         </Show>
         <Show keyed when={location.pathname}>
           <ErrorBoundary
-            fallback={(err) => <div class="mt-3 wrap-break-word">Error: {err.message}</div>}
+            fallback={(err) => <div class="mt-3 wrap-anywhere">Error: {err.message}</div>}
           >
             <Suspense
               fallback={
