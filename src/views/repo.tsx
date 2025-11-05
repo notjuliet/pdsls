@@ -447,7 +447,7 @@ export const RepoView = () => {
           <Show when={location.hash === "#identity" || (error() && !location.hash)}>
             <Show when={didDoc()}>
               {(didDocument) => (
-                <div class="flex flex-col gap-1 wrap-anywhere">
+                <div class="flex flex-col gap-2 wrap-anywhere">
                   {/* ID Section */}
                   <div>
                     <div class="flex items-center gap-1">
