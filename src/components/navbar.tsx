@@ -37,7 +37,7 @@ export const NavBar = (props: { params: Params }) => {
       const hdl =
         didDocCache[props.params.repo]?.alsoKnownAs
           ?.filter((alias) => alias.startsWith("at://"))[0]
-          .split("at://")[1] ?? props.params.repo;
+          ?.split("at://")[1] ?? props.params.repo;
       if (hdl !== handle()) setHandle(hdl);
     }
   });
