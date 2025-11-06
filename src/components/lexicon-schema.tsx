@@ -304,12 +304,13 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
 
   return (
     <div class="flex flex-col gap-3" id={`def-${props.name}`}>
-      <div class="flex items-center gap-2">
+      <div class="group flex items-center gap-2">
         <button
           type="button"
           onClick={handleHeaderClick}
-          class="cursor-pointer text-lg font-semibold hover:underline"
+          class="relative cursor-pointer text-lg font-semibold hover:underline"
         >
+          <span class="iconify lucide--link absolute top-1/2 -left-6 -translate-y-1/2 text-base opacity-0 transition-opacity group-hover:opacity-100" />
           {props.name === "main" ? "Main Definition" : props.name}
         </button>
         <span class={`rounded px-2 py-0.5 text-xs font-semibold uppercase ${defTypeColor()}`}>
