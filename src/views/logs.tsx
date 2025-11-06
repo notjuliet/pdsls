@@ -170,7 +170,7 @@ export const PlcLogView = (props: { did: string }) => {
       <div
         classList={{
           "grid grid-cols-[auto_1fr] gap-y-0.5 gap-x-2": true,
-          "opacity-60": diff.orig.nullified,
+          "opacity-70": diff.orig.nullified,
         }}
       >
         <div class={`${icon} iconify shrink-0 self-center`} />
@@ -184,7 +184,7 @@ export const PlcLogView = (props: { did: string }) => {
             {title}
           </p>
           <Show when={badge}>
-            <span class="shrink-0 rounded bg-neutral-200 px-1.5 py-0.5 text-xs font-medium dark:bg-neutral-700">
+            <span class="shrink-0 rounded bg-neutral-200 px-1.5 py-0.5 text-xs font-medium text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300">
               #{badge}
             </span>
           </Show>
@@ -199,8 +199,8 @@ export const PlcLogView = (props: { did: string }) => {
           <div
             classList={{
               "text-sm break-all flex items-start gap-2 min-w-0": true,
-              "text-green-500 dark:text-green-300": isAddition,
-              "text-red-400 dark:text-red-300": isRemoval,
+              "text-green-700 dark:text-green-300": isAddition,
+              "text-red-700 dark:text-red-300": isRemoval,
               "text-neutral-600 dark:text-neutral-400": !isAddition && !isRemoval,
             }}
           >
@@ -216,11 +216,11 @@ export const PlcLogView = (props: { did: string }) => {
         <Show when={oldValue && newValue}>
           <div></div>
           <div class="flex min-w-0 flex-col text-sm">
-            <div class="flex items-start gap-2 text-red-400 dark:text-red-300">
+            <div class="flex items-start gap-2 text-red-700 dark:text-red-300">
               <span class="shrink-0">−</span>
               <span class="break-all">{oldValue}</span>
             </div>
-            <div class="flex items-start gap-2 text-green-500 dark:text-green-300">
+            <div class="flex items-start gap-2 text-green-700 dark:text-green-300">
               <span class="shrink-0">+</span>
               <span class="break-all">{newValue}</span>
             </div>
