@@ -1,6 +1,6 @@
 export const Home = () => {
   return (
-    <div class="flex w-full flex-col gap-4 wrap-break-word">
+    <div class="flex w-full flex-col gap-3 wrap-break-word">
       <div class="flex flex-col gap-0.5">
         <div>
           <span class="text-xl font-semibold">AT Protocol Explorer</span>
