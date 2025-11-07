@@ -61,11 +61,11 @@ export const RepoView = () => {
     tab: "collections" | "backlinks" | "identity" | "blobs" | "logs";
     label: string;
   }) => (
-    <A class="group flex justify-center" href={`/at://${params.repo}#${props.tab}`}>
+    <A class="flex items-center" href={`/at://${params.repo}#${props.tab}`}>
       <span
         classList={{
-          "flex flex-1 items-center border-b-2": true,
-          "border-transparent group-hover:border-neutral-400 dark:group-hover:border-neutral-600":
+          "flex items-center border-b-2": true,
+          "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
             (location.hash !== `#${props.tab}` && !!location.hash) ||
             (!location.hash &&
               ((!error() && props.tab !== "collections") ||
