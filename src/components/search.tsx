@@ -252,7 +252,7 @@ const Search = () => {
             {(prefixItem, index) => (
               <button
                 type="button"
-                class={`flex items-center rounded-lg p-2 transition-colors duration-150 ${
+                class={`flex items-center rounded-lg p-2 ${
                   index() === selectedIndex() ?
                     "bg-neutral-200 dark:bg-neutral-700"
                   : "hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
@@ -277,7 +277,7 @@ const Search = () => {
               const adjustedIndex = getPrefixSuggestions().length + index();
               return (
                 <A
-                  class={`flex items-center gap-2 rounded-lg p-2 transition-colors duration-150 ${
+                  class={`flex items-center gap-2 rounded-lg p-2 ${
                     adjustedIndex === selectedIndex() ?
                       "bg-neutral-200 dark:bg-neutral-700"
                     : "hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
