@@ -253,7 +253,7 @@ export const RepoView = () => {
         <div
           class={`dark:shadow-dark-700 dark:bg-dark-300 flex justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-sm shadow-xs dark:border-neutral-700`}
         >
-          <div class="flex gap-2 text-xs sm:gap-4 sm:text-sm">
+          <div class="ml-1 flex gap-2 text-xs sm:gap-4 sm:text-sm">
             <Show when={!error()}>
               <RepoTab tab="collections" label="Collections" />
             </Show>
