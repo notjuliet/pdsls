@@ -505,7 +505,7 @@ export const RepoView = () => {
                       <For each={didDocument().service}>
                         {(service) => (
                           <div class="text-sm">
-                            <div class="text-neutral-600 dark:text-neutral-400">
+                            <div class="font-medium text-neutral-700 dark:text-neutral-300">
                               #{service.id.split("#")[1]}
                             </div>
                             <a
@@ -535,16 +535,14 @@ export const RepoView = () => {
                             {(key) => (
                               <div class="text-sm">
                                 <div class="flex items-baseline gap-1">
-                                  <span class="text-neutral-600 dark:text-neutral-400">
+                                  <span class="font-medium text-neutral-700 dark:text-neutral-300">
                                     #{verif.id.split("#")[1]}
                                   </span>
-                                  <ErrorBoundary
-                                    fallback={<span class="text-neutral-500">unknown</span>}
-                                  >
-                                    <span class="dark:bg-dark-100 rounded bg-neutral-200 px-1 py-0.5 font-mono text-xs">
+                                  <span class="rounded bg-neutral-200 px-1 py-0.5 text-xs text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300">
+                                    <ErrorBoundary fallback={<>unknown</>}>
                                       {parsePublicMultikey(key()).type}
-                                    </span>
-                                  </ErrorBoundary>
+                                    </ErrorBoundary>
+                                  </span>
                                 </div>
                                 <div class="font-mono break-all">{key()}</div>
                               </div>
@@ -566,7 +564,7 @@ export const RepoView = () => {
                         <For each={rotationKeys()}>
                           {(key) => (
                             <div class="text-sm">
-                              <span class="dark:bg-dark-100 rounded bg-neutral-200 px-1 py-0.5 font-mono text-xs">
+                              <span class="rounded bg-neutral-200 px-1 py-0.5 text-xs text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300">
                                 {parseDidKey(key).type}
                               </span>
                               <div class="font-mono break-all">{key.replace("did:key:", "")}</div>
