@@ -112,7 +112,7 @@ const TypeBadge = (props: { type: string; format?: string; refType?: string }) =
         <button
           type="button"
           onClick={handleClick}
-          class="inline-block cursor-pointer rounded bg-blue-100 px-1.5 py-0.5 font-mono text-xs text-blue-800 hover:bg-blue-200 hover:underline active:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 dark:active:bg-blue-900/50"
+          class="inline-block cursor-pointer truncate rounded bg-blue-100 px-1.5 py-0.5 font-mono text-xs text-blue-800 hover:bg-blue-200 hover:underline active:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 dark:active:bg-blue-900/50"
         >
           {displayType}
         </button>
