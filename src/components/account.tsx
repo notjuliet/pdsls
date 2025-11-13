@@ -30,15 +30,13 @@ export const AccountManager = () => {
       const sessionDids = Object.keys(storedSessions) as Did[];
       sessionDids.forEach(async (did) => {
         const doc = await resolveDidDoc(did);
-        doc.alsoKnownAs?.forEach((alias) => {
-          if (alias.startsWith("at://")) {
-            setSessions(did, {
-              signedIn: storedSessions[did].signedIn,
-              handle: alias.replace("at://", ""),
-            });
-            return;
-          }
-        });
+        const alias = doc.alsoKnownAs?.find((alias) => alias.startsWith("at://"));
+        if (alias) {
+          setSessions(did, {
+            signedIn: storedSessions[did].signedIn,
+            handle: alias.replace("at://", ""),
+          });
+        }
       });
       sessionDids.forEach(async (did) => {
         const avatar = await getAvatar(did);
