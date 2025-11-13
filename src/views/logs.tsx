@@ -2,9 +2,10 @@ import {
   CompatibleOperationOrTombstone,
   defs,
   IndexedEntry,
+  IndexedEntryLog,
   processIndexedEntryLog,
 } from "@atcute/did-plc";
-import { createResource, createSignal, For, Show } from "solid-js";
+import { createEffect, createResource, createSignal, For, Show } from "solid-js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
 
@@ -12,6 +13,8 @@ type PlcEvent = "handle" | "rotation_key" | "service" | "verification_method";
 
 export const PlcLogView = (props: { did: string }) => {
   const [activePlcEvent, setActivePlcEvent] = createSignal<PlcEvent | undefined>();
+  const [validLog, setValidLog] = createSignal<boolean | undefined>(undefined);
+  const [rawLogs, setRawLogs] = createSignal<IndexedEntryLog | undefined>(undefined);
 
   const shouldShowDiff = (diff: DiffEntry) =>
     !activePlcEvent() || diff.type.startsWith(activePlcEvent()!);
@@ -25,17 +28,32 @@ export const PlcLogView = (props: { did: string }) => {
     );
     const json = await res.json();
     const logs = defs.indexedEntryLog.parse(json);
-    try {
-      await processIndexedEntryLog(props.did as any, logs);
-    } catch (e) {
-      console.error(e);
-    }
+    setRawLogs(logs);
     const opHistory = createOperationHistory(logs).reverse();
     return Array.from(groupBy(opHistory, (item) => item.orig));
   };
 
+  const validateLog = async (logs: IndexedEntryLog) => {
+    try {
+      await processIndexedEntryLog(props.did as any, logs);
+      setValidLog(true);
+    } catch (e) {
+      console.error(e);
+      setValidLog(false);
+    }
+  };
+
   const [plcOps] =
     createResource<[IndexedEntry<CompatibleOperationOrTombstone>, DiffEntry[]][]>(fetchPlcLogs);
+
+  createEffect(() => {
+    const logs = rawLogs();
+    if (logs) {
+      setValidLog(undefined);
+      // Defer validation to next tick to avoid blocking rendering
+      setTimeout(() => validateLog(logs), 0);
+    }
+  });
 
   const FilterButton = (props: { icon: string; event: PlcEvent; label: string }) => {
     const isActive = () => activePlcEvent() === props.event;
@@ -231,7 +249,7 @@ export const PlcLogView = (props: { did: string }) => {
   };
 
   return (
-    <div class="flex w-full flex-col gap-4 wrap-anywhere">
+    <div class="flex w-full flex-col gap-3 wrap-anywhere">
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-1.5 text-sm">
           <div class="iconify lucide--filter" />
@@ -251,6 +269,20 @@ export const PlcLogView = (props: { did: string }) => {
             label="Verification"
           />
         </div>
+      </div>
+      <div class="flex items-center gap-1.5 text-sm font-medium">
+        <Show when={validLog() === true}>
+          <span class="iconify lucide--check-circle-2 text-green-500 dark:text-green-400"></span>
+          <span>Valid log</span>
+        </Show>
+        <Show when={validLog() === false}>
+          <span class="iconify lucide--x-circle text-red-500 dark:text-red-400"></span>
+          <span>Log validation failed</span>
+        </Show>
+        <Show when={validLog() === undefined}>
+          <span class="iconify lucide--loader-circle animate-spin"></span>
+          <span>Validating log...</span>
+        </Show>
       </div>
       <div class="flex flex-col gap-3">
         <For each={plcOps()}>
