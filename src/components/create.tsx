@@ -342,7 +342,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
         <div
           data-draggable
           classList={{
-            "dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto absolute top-18 left-[50%] w-screen -translate-x-1/2 cursor-grab rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-xl lg:w-3xl dark:border-neutral-700 starting:opacity-0": true,
+            "dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto absolute top-18 left-[50%] max-w-3xl w-[calc(100%-1rem)] -translate-x-1/2 cursor-grab rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0": true,
             "opacity-60 hover:opacity-100": nonBlocking(),
           }}
           ref={dragBox}
