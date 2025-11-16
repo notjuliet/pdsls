@@ -115,7 +115,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
             writes: [
               {
                 collection: params.collection as `${string}.${string}.${string}`,
-                rkey: params.rkey,
+                rkey: params.rkey!,
                 $type: "com.atproto.repo.applyWrites#delete",
               },
               {
@@ -136,7 +136,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
           input: {
             repo: agent()!.sub,
             collection: params.collection as `${string}.${string}.${string}`,
-            rkey: params.rkey,
+            rkey: params.rkey!,
             record: editedRecord,
             validate: validate(),
           },

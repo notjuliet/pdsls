@@ -87,7 +87,7 @@ const CollectionView = () => {
   let rpc: Client;
 
   const fetchRecords = async () => {
-    if (!pds) pds = await resolvePDS(did);
+    if (!pds) pds = await resolvePDS(did!);
     if (!rpc) rpc = new Client({ handler: new CredentialManager({ service: pds }) });
     const res = await rpc.get("com.atproto.repo.listRecords", {
       params: {

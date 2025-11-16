@@ -121,7 +121,7 @@ export const NavBar = (props: { params: Params }) => {
                   ></span>
                 </button>
               </Tooltip>
-              <CopyButton content={props.params.repo} label="Copy DID" />
+              <CopyButton content={props.params.repo!} label="Copy DID" />
             </div>
           </div>
         </Show>

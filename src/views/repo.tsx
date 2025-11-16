@@ -55,7 +55,7 @@ export const RepoView = () => {
   const [rotationKeys, setRotationKeys] = createSignal<Array<string>>([]);
   let rpc: Client;
   let pds: string;
-  const did = params.repo;
+  const did = params.repo!;
 
   const RepoTab = (props: {
     tab: "collections" | "backlinks" | "identity" | "blobs" | "logs";
@@ -92,7 +92,7 @@ export const RepoView = () => {
       if (!did.startsWith("did:")) {
         try {
           const did = await resolveHandle(params.repo as Handle);
-          navigate(location.pathname.replace(params.repo, did));
+          navigate(location.pathname.replace(params.repo!, did));
           return;
         } catch {
           try {
@@ -289,13 +289,13 @@ export const RepoView = () => {
                 buttonClass="rounded-sm p-1.5"
                 menuClass="top-9 p-2 text-sm"
               >
-                <CopyMenu content={params.repo} label="Copy DID" icon="lucide--copy" />
+                <CopyMenu content={params.repo!} label="Copy DID" icon="lucide--copy" />
                 <NavMenu
                   href={`/jetstream?dids=${params.repo}`}
                   label="Jetstream"
                   icon="lucide--radio-tower"
                 />
-                <Show when={params.repo in labelerCache}>
+                <Show when={params.repo && params.repo in labelerCache}>
                   <NavMenu
                     href={`/labels?did=${params.repo}&uriPatterns=*`}
                     label="Labels"

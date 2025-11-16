@@ -48,13 +48,13 @@ export const RecordView = () => {
     setValidRecord(undefined);
     setValidSchema(undefined);
     setLexiconUri(undefined);
-    const pds = await resolvePDS(did);
+    const pds = await resolvePDS(did!);
     rpc = new Client({ handler: new CredentialManager({ service: pds }) });
     const res = await rpc.get("com.atproto.repo.getRecord", {
       params: {
         repo: did as ActorIdentifier,
         collection: params.collection as `${string}.${string}.${string}`,
-        rkey: params.rkey,
+        rkey: params.rkey!,
       },
     });
     if (!res.ok) {
@@ -78,7 +78,7 @@ export const RecordView = () => {
     cid?: string | undefined;
   }) => {
     try {
-      if (params.collection in lexicons) {
+      if (params.collection && params.collection in lexicons) {
         if (is(lexicons[params.collection], record.value)) setValidSchema(true);
         else setValidSchema(false);
       } else if (params.collection === "com.atproto.lexicon.schema") {
@@ -96,7 +96,7 @@ export const RecordView = () => {
         params: {
           did: did as Did,
           collection: params.collection as Nsid,
-          rkey: params.rkey,
+          rkey: params.rkey!,
         },
         as: "bytes",
       });
@@ -104,9 +104,9 @@ export const RecordView = () => {
 
       await verifyRecord({
         did: did as AtprotoDid,
-        collection: params.collection,
-        rkey: params.rkey,
-        carBytes: data,
+        collection: params.collection!,
+        rkey: params.rkey!,
+        carBytes: data as Uint8Array<ArrayBufferLike>,
       });
 
       setValidRecord(true);
@@ -137,7 +137,7 @@ export const RecordView = () => {
       input: {
         repo: params.repo as ActorIdentifier,
         collection: params.collection as `${string}.${string}.${string}`,
-        rkey: params.rkey,
+        rkey: params.rkey!,
       },
     });
     const id = addNotification({

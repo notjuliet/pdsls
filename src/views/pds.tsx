@@ -21,7 +21,8 @@ const PdsView = () => {
     createSignal<InferXRPCBodyOutput<ComAtprotoServerDescribeServer.mainSchema["output"]>>();
   const [cursor, setCursor] = createSignal<string>();
   setPDS(params.pds);
-  const pds = params.pds.startsWith("localhost") ? `http://${params.pds}` : `https://${params.pds}`;
+  const pds =
+    params.pds!.startsWith("localhost") ? `http://${params.pds}` : `https://${params.pds}`;
   const rpc = new Client({ handler: new CredentialManager({ service: pds }) });
 
   const getVersion = async () => {
@@ -139,7 +140,7 @@ const PdsView = () => {
               buttonClass="rounded-sm p-1.5"
               menuClass="top-9 p-2 text-sm"
             >
-              <CopyMenu content={params.pds} label="Copy PDS" icon="lucide--copy" />
+              <CopyMenu content={params.pds!} label="Copy PDS" icon="lucide--copy" />
               <NavMenu
                 href={`/firehose?instance=wss://${params.pds}`}
                 label="Firehose"
