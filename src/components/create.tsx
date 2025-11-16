@@ -3,7 +3,7 @@ import { Did } from "@atcute/lexicons";
 import { getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { remove } from "@mary/exif-rm";
 import { useNavigate, useParams } from "@solidjs/router";
-import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js";
+import { createEffect, createSignal, For, onCleanup, Show } from "solid-js";
 import { Editor, editorView } from "../components/editor.jsx";
 import { agent } from "../components/login.jsx";
 import { sessions } from "./account.jsx";
@@ -22,7 +22,8 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   const [notice, setNotice] = createSignal("");
   const [openUpload, setOpenUpload] = createSignal(false);
   const [validate, setValidate] = createSignal<boolean | undefined>(undefined);
-  const [nonBlocking, setNonBlocking] = createSignal(false);
+  const [isMaximized, setIsMaximized] = createSignal(false);
+  const [isMinimized, setIsMinimized] = createSignal(false);
   let blobInput!: HTMLInputElement;
   let formRef!: HTMLFormElement;
 
@@ -62,7 +63,6 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   createEffect(() => {
     if (openDialog()) {
       setValidate(undefined);
-      setNonBlocking(false);
     }
   });
 
@@ -158,77 +158,6 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     }
   };
 
-  const dragBox = (box: HTMLDivElement) => {
-    let isDragging = false;
-    let offsetX: number;
-    let offsetY: number;
-
-    const handleMouseDown = (e: MouseEvent) => {
-      if (!(e.target instanceof HTMLElement)) return;
-
-      const closestDraggable = e.target.closest("[data-draggable]") as HTMLElement;
-      if (closestDraggable && closestDraggable !== box) return;
-
-      if (
-        ["INPUT", "SELECT", "BUTTON", "LABEL"].includes(e.target.tagName) ||
-        e.target.closest("#editor, #close")
-      )
-        return;
-
-      e.preventDefault();
-      isDragging = true;
-      box.classList.add("cursor-grabbing");
-
-      const rect = box.getBoundingClientRect();
-
-      box.style.left = rect.left + "px";
-      box.style.top = rect.top + "px";
-
-      box.classList.remove("-translate-x-1/2");
-
-      offsetX = e.clientX - rect.left;
-      offsetY = e.clientY - rect.top;
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
-        let newLeft = e.clientX - offsetX;
-        let newTop = e.clientY - offsetY;
-
-        const boxWidth = box.offsetWidth;
-        const boxHeight = box.offsetHeight;
-
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-
-        newLeft = Math.max(0, Math.min(newLeft, viewportWidth - boxWidth));
-        newTop = Math.max(0, Math.min(newTop, viewportHeight - boxHeight));
-
-        box.style.left = newLeft + "px";
-        box.style.top = newTop + "px";
-      }
-    };
-
-    const handleMouseUp = () => {
-      if (isDragging) {
-        isDragging = false;
-        box.classList.remove("cursor-grabbing");
-      }
-    };
-
-    onMount(() => {
-      box.addEventListener("mousedown", handleMouseDown);
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-    });
-
-    onCleanup(() => {
-      box.removeEventListener("mousedown", handleMouseDown);
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    });
-  };
-
   const FileUpload = (props: { file: File }) => {
     const [uploading, setUploading] = createSignal(false);
     const [error, setError] = createSignal("");
@@ -276,11 +205,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     };
 
     return (
-      <div
-        data-draggable
-        class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] w-[20rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0"
-        ref={dragBox}
-      >
+      <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] w-[20rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
         <h2 class="mb-2 font-semibold">Upload blob</h2>
         <div class="flex flex-col gap-2 text-sm">
           <div class="flex flex-col gap-1">
@@ -337,42 +262,49 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
         open={openDialog()}
         onClose={() => setOpenDialog(false)}
         closeOnClick={false}
-        nonBlocking={nonBlocking()}
+        nonBlocking={isMinimized()}
       >
         <div
-          data-draggable
           classList={{
-            "dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto absolute top-18 left-[50%] max-w-3xl w-[calc(100%-1rem)] -translate-x-1/2 cursor-grab rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0": true,
-            "opacity-60 hover:opacity-100": nonBlocking(),
+            "dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto absolute top-18 left-1/2 -translate-x-1/2 flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-all duration-200 dark:border-neutral-700 starting:opacity-0": true,
+            "w-[calc(100%-1rem)] max-w-3xl h-[60vh]": !isMaximized(),
+            "w-[calc(100%-1rem)] max-w-7xl h-[85vh]": isMaximized(),
+            hidden: isMinimized(),
           }}
-          ref={dragBox}
         >
           <div class="mb-2 flex w-full justify-between text-base">
             <div class="flex items-center gap-2">
               <span class="font-semibold select-none">
                 {props.create ? "Creating" : "Editing"} record
               </span>
-              <Tooltip text={nonBlocking() ? "Lock" : "Unlock"}>
-                <button
-                  type="button"
-                  onclick={() => setNonBlocking(!nonBlocking())}
-                  class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                >
-                  <span
-                    class={`iconify ${nonBlocking() ? "lucide--lock-open" : "lucide--lock"}`}
-                  ></span>
-                </button>
-              </Tooltip>
             </div>
-            <button
-              id="close"
-              onclick={() => setOpenDialog(false)}
-              class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-            >
-              <span class="iconify lucide--x"></span>
-            </button>
+            <div class="flex items-center gap-1">
+              <button
+                type="button"
+                onclick={() => setIsMinimized(true)}
+                class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+              >
+                <span class="iconify lucide--minus"></span>
+              </button>
+              <button
+                type="button"
+                onclick={() => setIsMaximized(!isMaximized())}
+                class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+              >
+                <span
+                  class={`iconify ${isMaximized() ? "lucide--minimize-2" : "lucide--maximize-2"}`}
+                ></span>
+              </button>
+              <button
+                id="close"
+                onclick={() => setOpenDialog(false)}
+                class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+              >
+                <span class="iconify lucide--x"></span>
+              </button>
+            </div>
           </div>
-          <form ref={formRef} class="flex flex-col gap-y-2">
+          <form ref={formRef} class="flex min-h-0 flex-1 flex-col gap-y-2 overflow-y-auto">
             <Show when={props.create}>
               <div class="flex flex-wrap items-center gap-1 text-sm">
                 <span>at://</span>
@@ -405,15 +337,17 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                 />
               </div>
             </Show>
-            <Editor
-              content={JSON.stringify(
-                !props.create ? props.record
-                : params.rkey ? placeholder()
-                : defaultPlaceholder(),
-                null,
-                2,
-              )}
-            />
+            <div class="min-h-0 flex-1">
+              <Editor
+                content={JSON.stringify(
+                  !props.create ? props.record
+                  : params.rkey ? placeholder()
+                  : defaultPlaceholder(),
+                  null,
+                  2,
+                )}
+              />
+            </div>
             <div class="flex flex-col gap-2">
               <Show when={notice()}>
                 <div class="text-sm text-red-500 dark:text-red-400">{notice()}</div>
@@ -477,12 +411,22 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
           </form>
         </div>
       </Modal>
+      <Show when={isMinimized() && openDialog()}>
+        <button
+          class="dark:bg-dark-300 dark:hover:bg-dark-200 dark:active:bg-dark-100 fixed right-4 bottom-4 z-30 flex items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-3 py-2 shadow-md hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700"
+          onclick={() => setIsMinimized(false)}
+        >
+          <span class="iconify lucide--square-pen text-lg"></span>
+          <span class="text-sm font-medium">{props.create ? "Creating" : "Editing"} record</span>
+        </button>
+      </Show>
       <Tooltip text={`${props.create ? "Create" : "Edit"} record`}>
         <button
           class={`flex items-center p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 ${props.create ? "rounded-lg" : "rounded-sm"}`}
           onclick={() => {
             setNotice("");
             setOpenDialog(true);
+            setIsMinimized(false);
           }}
         >
           <div

@@ -30,7 +30,9 @@ const Editor = (props: { content: string }) => {
       },
       ".cm-scroller": {
         overflow: "auto",
-        maxHeight: "20rem",
+      },
+      "&": {
+        height: "100%",
       },
     });
 
@@ -58,7 +60,7 @@ const Editor = (props: { content: string }) => {
     <div
       ref={editorDiv}
       id="editor"
-      class="dark:shadow-dark-700 cursor-auto border-[0.5px] border-neutral-300 shadow-xs dark:border-neutral-700"
+      class="dark:shadow-dark-700 h-full cursor-auto border-[0.5px] border-neutral-300 shadow-xs dark:border-neutral-700"
     ></div>
   );
 };
