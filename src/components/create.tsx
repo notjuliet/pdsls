@@ -267,7 +267,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
         <div
           classList={{
             "dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto absolute top-18 left-1/2 -translate-x-1/2 flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-all duration-200 dark:border-neutral-700 starting:opacity-0": true,
-            "w-[calc(100%-1rem)] max-w-3xl h-[60vh]": !isMaximized(),
+            "w-[calc(100%-1rem)] max-w-3xl h-[65vh]": !isMaximized(),
             "w-[calc(100%-1rem)] max-w-7xl h-[85vh]": isMaximized(),
             hidden: isMinimized(),
           }}
