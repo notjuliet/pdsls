@@ -381,7 +381,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                 <div class="flex items-center justify-end gap-2">
                   <button
                     type="button"
-                    class="flex items-center gap-1 rounded-sm p-1.5 text-sm hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                    class="flex items-center gap-1 rounded-sm p-1.5 text-xs hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                     onClick={() =>
                       setValidate(
                         validate() === true ? false
@@ -393,7 +393,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                     <Tooltip text={getValidateLabel()}>
                       <span class={`iconify ${getValidateIcon()}`}></span>
                     </Tooltip>
-                    <span class="text-xs">Validate</span>
+                    <span>Validate</span>
                   </button>
                   <Show when={!props.create}>
                     <Button onClick={() => editRecord(true)}>Recreate</Button>
