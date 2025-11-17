@@ -28,8 +28,10 @@ export const ThemeSelection = () => {
     return (
       <button
         classList={{
-          "p-1.5 flex items-center rounded-full": true,
-          "bg-neutral-200 dark:bg-neutral-600": theme() === props.theme,
+          "p-1.5 flex items-center rounded-full border-[0.5px]": true,
+          "bg-neutral-200/60 border-neutral-300/60 dark:border-neutral-500/60 dark:bg-neutral-600":
+            theme() === props.theme,
+          "border-transparent": theme() !== props.theme,
         }}
         onclick={() => updateTheme(props.theme)}
       >
@@ -39,7 +41,7 @@ export const ThemeSelection = () => {
   };
 
   return (
-    <div class="mt-2 flex items-center justify-between gap-1 text-base">
+    <div class="dark:bg-dark-100 dark:inset-shadow-dark-200 mt-2 flex items-center justify-between gap-1 rounded-full border-[0.5px] border-neutral-200/60 bg-white p-1 text-base text-neutral-800 inset-shadow-sm dark:border-neutral-600 dark:text-neutral-300">
       <ThemeButton theme="system" icon="lucide--monitor" />
       <ThemeButton theme="light" icon="lucide--sun" />
       <ThemeButton theme="dark" icon="lucide--moon" />
