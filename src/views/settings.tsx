@@ -5,7 +5,7 @@ export const [hideMedia, setHideMedia] = createSignal(localStorage.hideMedia ===
 
 const Settings = () => {
   return (
-    <div class="flex w-full flex-col gap-3">
+    <div class="flex w-full flex-col gap-3 px-2">
       <div class="flex items-center gap-1 font-semibold">
         <span>Settings</span>
       </div>
