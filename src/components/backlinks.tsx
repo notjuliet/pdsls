@@ -56,27 +56,20 @@ const Backlinks = (props: { target: string }) => {
           {(collection) => (
             <div>
               <div class="flex items-center gap-1">
-                <span
-                  title="Collection containing linking records"
-                  class="iconify lucide--book-text shrink-0"
-                ></span>
+                <span class="iconify lucide--book-text shrink-0"></span>
                 {collection}
               </div>
               <For each={response()![collection]}>
                 {({ path, counts }) => (
                   <div class="ml-4.5">
                     <div class="flex items-center gap-1">
-                      <span
-                        title="Record path where the link is found"
-                        class="iconify lucide--route shrink-0"
-                      ></span>
+                      <span class="iconify lucide--route shrink-0"></span>
                       {path.slice(1)}
                     </div>
                     <div class="ml-4.5">
                       <p>
                         <button
                           class="text-blue-400 hover:underline active:underline"
-                          title="Show linking records"
                           onclick={() =>
                             (
                               show()?.collection === collection &&
@@ -92,7 +85,6 @@ const Backlinks = (props: { target: string }) => {
                         {" from "}
                         <button
                           class="text-blue-400 hover:underline active:underline"
-                          title="Show linking DIDs"
                           onclick={() =>
                             (
                               show()?.collection === collection &&

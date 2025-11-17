@@ -40,7 +40,7 @@
     "@codemirror/lang-json": "^6.0.2",
     "@codemirror/lint": "^6.9.2",
     "@codemirror/state": "^6.5.2",
-    "@codemirror/view": "^6.38.7",
+    "@codemirror/view": "^6.38.8",
     "@fsegurai/codemirror-theme-basic-dark": "^6.2.2",
     "@fsegurai/codemirror-theme-basic-light": "^6.2.2",
     "@mary/exif-rm": "jsr:^0.2.2",
