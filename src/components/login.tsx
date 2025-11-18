@@ -65,7 +65,7 @@ const Login = () => {
       <label for="username" class="hidden">
         Add account
       </label>
-      <div class="dark:bg-dark-100 dark:shadow-dark-700 flex grow items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 shadow-xs focus-within:outline-[1px] focus-within:outline-neutral-600 dark:border-neutral-600 dark:focus-within:outline-neutral-400">
+      <div class="dark:bg-dark-100 dark:inset-shadow-dark-200 flex grow items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 inset-shadow-xs focus-within:outline-[1px] focus-within:outline-neutral-600 dark:border-neutral-600 dark:focus-within:outline-neutral-400">
         <label
           for="username"
           class="iconify lucide--user-round-plus shrink-0 text-neutral-500 dark:text-neutral-400"

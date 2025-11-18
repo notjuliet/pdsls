@@ -25,7 +25,7 @@ export const TextInput = (props: TextInputProps) => {
       disabled={props.disabled}
       required={props.required}
       class={
-        "dark:bg-dark-100 dark:shadow-dark-700 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 shadow-xs select-none placeholder:text-sm focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400 " +
+        "dark:bg-dark-100 dark:inset-shadow-dark-200 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 inset-shadow-xs select-none placeholder:text-sm focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400 " +
         props.class
       }
       onInput={props.onInput}
