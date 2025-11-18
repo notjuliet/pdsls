@@ -309,7 +309,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
               <div class="flex flex-wrap items-center gap-1 text-sm">
                 <span>at://</span>
                 <select
-                  class="dark:bg-dark-100 dark:shadow-dark-700 max-w-40 truncate rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 shadow-xs select-none focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
+                  class="dark:bg-dark-100 max-w-40 truncate rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 select-none focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
                   name="repo"
                   id="repo"
                 >
