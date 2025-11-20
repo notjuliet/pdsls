@@ -257,16 +257,16 @@ export const PlcLogView = (props: { did: string }) => {
         </div>
         <div class="flex flex-wrap gap-1 sm:gap-2">
           <FilterButton icon="iconify lucide--at-sign" event="handle" label="Alias" />
-          <FilterButton
-            icon="iconify lucide--key-round"
-            event="rotation_key"
-            label="Rotation Key"
-          />
           <FilterButton icon="iconify lucide--hard-drive" event="service" label="Service" />
           <FilterButton
             icon="iconify lucide--shield-check"
             event="verification_method"
             label="Verification"
+          />
+          <FilterButton
+            icon="iconify lucide--key-round"
+            event="rotation_key"
+            label="Rotation Key"
           />
         </div>
       </div>
