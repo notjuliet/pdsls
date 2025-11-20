@@ -187,7 +187,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     return (
       <button
         type="button"
-        class="flex items-center gap-2 rounded-lg p-2 text-left text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+        class="flex items-center gap-2 rounded-md p-2 text-left text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
         onClick={props.onClick}
       >
         <span class={`iconify ${props.icon}`}></span>

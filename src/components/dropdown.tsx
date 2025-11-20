@@ -33,7 +33,7 @@ export const CopyMenu = (props: { content: string; label: string; icon?: string 
         addToClipboard(props.content);
         ctx?.setShowMenu(false);
       }}
-      class="flex items-center gap-1.5 rounded-lg p-1 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      class="flex items-center gap-1.5 rounded-md p-1 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
     >
       <Show when={props.icon}>
         <span class={"iconify shrink-0 " + props.icon}></span>
@@ -56,7 +56,7 @@ export const NavMenu = (props: {
     <A
       href={props.href}
       onClick={() => ctx?.setShowMenu(false)}
-      class="flex items-center gap-1.5 rounded-lg p-1 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      class="flex items-center gap-1.5 rounded-md p-1 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
       classList={{ "justify-between": props.external }}
       target={props.newTab ? "_blank" : undefined}
     >
@@ -79,7 +79,7 @@ export const ActionMenu = (props: {
   return (
     <button
       onClick={props.onClick}
-      class="flex items-center gap-1.5 rounded-lg p-1 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      class="flex items-center gap-1.5 rounded-md p-1 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
     >
       <Show when={props.icon}>
         <span class={"iconify shrink-0 " + props.icon}></span>
