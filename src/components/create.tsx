@@ -183,6 +183,19 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     setOpenInsertMenu(false);
   };
 
+  const MenuItem = (props: { icon: string; label: string; onClick: () => void }) => {
+    return (
+      <button
+        type="button"
+        class="flex items-center gap-2 rounded-lg p-2 text-left text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+        onClick={props.onClick}
+      >
+        <span class={`iconify ${props.icon}`}></span>
+        <span>{props.label}</span>
+      </button>
+    );
+  };
+
   const FileUpload = (props: { file: File }) => {
     const [uploading, setUploading] = createSignal(false);
     const [error, setError] = createSignal("");
@@ -381,32 +394,26 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                 <div class="relative" ref={insertMenuRef}>
                   <button
                     type="button"
-                    class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 flex w-fit rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+                    class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 flex w-fit rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1.5 text-base shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
                     onClick={() => setOpenInsertMenu(!openInsertMenu())}
                   >
                     <span class="iconify lucide--plus select-none"></span>
                   </button>
                   <Show when={openInsertMenu()}>
-                    <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute bottom-full left-0 mb-1 flex w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 shadow-md dark:border-neutral-700 z-10">
-                      <button
-                        type="button"
-                        class="flex items-center gap-2 px-3 py-2 text-left text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 rounded-t-lg"
+                    <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute bottom-full left-0 z-10 mb-1 flex w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1.5 shadow-md dark:border-neutral-700">
+                      <MenuItem
+                        icon="lucide--upload"
+                        label="Upload blob"
                         onClick={() => {
                           setOpenInsertMenu(false);
                           blobInput.click();
                         }}
-                      >
-                        <span class="iconify lucide--upload"></span>
-                        <span>Upload blob</span>
-                      </button>
-                      <button
-                        type="button"
-                        class="flex items-center gap-2 px-3 py-2 text-left text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 rounded-b-lg"
+                      />
+                      <MenuItem
+                        icon="lucide--clock"
+                        label="Insert timestamp"
                         onClick={insertTimestamp}
-                      >
-                        <span class="iconify lucide--clock"></span>
-                        <span>Insert timestamp</span>
-                      </button>
+                      />
                     </div>
                   </Show>
                   <input
