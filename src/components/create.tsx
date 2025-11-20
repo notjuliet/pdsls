@@ -21,11 +21,25 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   const [openDialog, setOpenDialog] = createSignal(false);
   const [notice, setNotice] = createSignal("");
   const [openUpload, setOpenUpload] = createSignal(false);
+  const [openInsertMenu, setOpenInsertMenu] = createSignal(false);
   const [validate, setValidate] = createSignal<boolean | undefined>(undefined);
   const [isMaximized, setIsMaximized] = createSignal(false);
   const [isMinimized, setIsMinimized] = createSignal(false);
   let blobInput!: HTMLInputElement;
   let formRef!: HTMLFormElement;
+  let insertMenuRef!: HTMLDivElement;
+
+  createEffect(() => {
+    if (openInsertMenu()) {
+      const handleClickOutside = (e: MouseEvent) => {
+        if (insertMenuRef && !insertMenuRef.contains(e.target as Node)) {
+          setOpenInsertMenu(false);
+        }
+      };
+      document.addEventListener("mousedown", handleClickOutside);
+      onCleanup(() => document.removeEventListener("mousedown", handleClickOutside));
+    }
+  });
 
   const defaultPlaceholder = () => {
     return {
@@ -156,6 +170,17 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     } catch (err: any) {
       setNotice(err.message);
     }
+  };
+
+  const insertTimestamp = () => {
+    const timestamp = new Date().toISOString();
+    editorView.dispatch({
+      changes: {
+        from: editorView.state.selection.main.head,
+        insert: `"${timestamp}"`,
+      },
+    });
+    setOpenInsertMenu(false);
   };
 
   const FileUpload = (props: { file: File }) => {
@@ -353,10 +378,37 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                 <div class="text-sm text-red-500 dark:text-red-400">{notice()}</div>
               </Show>
               <div class="flex justify-between gap-2">
-                <button
-                  type="button"
-                  class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 flex w-fit rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 text-xs shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
-                >
+                <div class="relative" ref={insertMenuRef}>
+                  <button
+                    type="button"
+                    class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 flex w-fit rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+                    onClick={() => setOpenInsertMenu(!openInsertMenu())}
+                  >
+                    <span class="iconify lucide--plus select-none"></span>
+                  </button>
+                  <Show when={openInsertMenu()}>
+                    <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute bottom-full left-0 mb-1 flex w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 shadow-md dark:border-neutral-700 z-10">
+                      <button
+                        type="button"
+                        class="flex items-center gap-2 px-3 py-2 text-left text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 rounded-t-lg"
+                        onClick={() => {
+                          setOpenInsertMenu(false);
+                          blobInput.click();
+                        }}
+                      >
+                        <span class="iconify lucide--upload"></span>
+                        <span>Upload blob</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="flex items-center gap-2 px-3 py-2 text-left text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 rounded-b-lg"
+                        onClick={insertTimestamp}
+                      >
+                        <span class="iconify lucide--clock"></span>
+                        <span>Insert timestamp</span>
+                      </button>
+                    </div>
+                  </Show>
                   <input
                     type="file"
                     id="blob"
@@ -366,11 +418,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                       if (e.target.files !== null) setOpenUpload(true);
                     }}
                   />
-                  <label class="flex items-center gap-1 px-2 py-1.5 select-none" for="blob">
-                    <span class="iconify lucide--upload"></span>
-                    Upload
-                  </label>
-                </button>
+                </div>
                 <Modal
                   open={openUpload()}
                   onClose={() => setOpenUpload(false)}
