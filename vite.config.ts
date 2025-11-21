@@ -1,4 +1,5 @@
 import tailwindcss from "@tailwindcss/vite";
+import { execSync } from "child_process";
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 import metadata from "./public/oauth-client-metadata.json";
@@ -6,11 +7,30 @@ import metadata from "./public/oauth-client-metadata.json";
 const SERVER_HOST = "127.0.0.1";
 const SERVER_PORT = 13213;
 
+const getVersion = (): string => {
+  try {
+    const describe = execSync("git describe --tags --long --dirty --always").toString().trim();
+
+    const match = describe.match(/^v?(.+?)-(\d+)-g([a-f0-9]+)(-dirty)?$/);
+
+    if (match) {
+      const [, version, commits, hash, dirty] = match;
+      if (commits === "0") {
+        return `v${version}${dirty ? "-dirty" : ""}`;
+      }
+      return `v${version}.dev${commits}+g${hash}${dirty ? "-dirty" : ""}`;
+    }
+
+    return `v0.0.0.dev+g${describe}`;
+  } catch {
+    return "v0.0.0-unknown";
+  }
+};
+
 export default defineConfig({
   plugins: [
     tailwindcss(),
     solidPlugin(),
-    // Injects OAuth-related variables
     {
       name: "oauth",
       config(_conf, { command }) {
@@ -35,6 +55,7 @@ export default defineConfig({
 
         process.env.VITE_CLIENT_URI = metadata.client_uri;
         process.env.VITE_OAUTH_SCOPE = metadata.scope;
+        process.env.VITE_APP_VERSION = getVersion();
       },
     },
   ],
