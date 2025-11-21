@@ -4,6 +4,7 @@ import { DidDocument } from "@atcute/identity";
 import { ActorIdentifier, Did, Handle, Nsid } from "@atcute/lexicons";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import {
+  createEffect,
   createResource,
   createSignal,
   ErrorBoundary,
@@ -57,25 +58,47 @@ export const RepoView = () => {
   let pds: string;
   const did = params.repo!;
 
+  // Handle scrolling to a collection group when hash is like #collections:app.bsky
+  createEffect(() => {
+    const hash = location.hash;
+    if (hash.startsWith("#collections:")) {
+      const authority = hash.slice(13);
+      requestAnimationFrame(() => {
+        const element = document.getElementById(`collection-${authority}`);
+        if (element) element.scrollIntoView({ behavior: "instant", block: "start" });
+      });
+    }
+  });
+
   const RepoTab = (props: {
     tab: "collections" | "backlinks" | "identity" | "blobs" | "logs";
     label: string;
-  }) => (
-    <A class="flex items-center" href={`/at://${params.repo}#${props.tab}`}>
-      <span
-        classList={{
-          "flex items-center border-b-2": true,
-          "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
-            (location.hash !== `#${props.tab}` && !!location.hash) ||
-            (!location.hash &&
-              ((!error() && props.tab !== "collections") ||
-                (!!error() && props.tab !== "identity"))),
-        }}
-      >
-        {props.label}
-      </span>
-    </A>
-  );
+  }) => {
+    const isActive = () => {
+      if (!location.hash) {
+        if (!error() && props.tab === "collections") return true;
+        if (!!error() && props.tab === "identity") return true;
+        return false;
+      }
+      if (props.tab === "collections")
+        return location.hash === "#collections" || location.hash.startsWith("#collections:");
+      return location.hash === `#${props.tab}`;
+    };
+
+    return (
+      <A class="flex items-center" href={`/at://${params.repo}#${props.tab}`}>
+        <span
+          classList={{
+            "flex items-center border-b-2": true,
+            "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
+              !isActive(),
+          }}
+        >
+          {props.label}
+        </span>
+      </A>
+    );
+  };
 
   const getRotationKeys = async () => {
     const res = await fetch(
@@ -271,7 +294,7 @@ export const RepoView = () => {
                 <span>{error()}</span>
               </div>
             </Show>
-            <Show when={!error() && (!location.hash || location.hash === "#collections")}>
+            <Show when={!error() && (!location.hash || location.hash.startsWith("#collections"))}>
               <Tooltip text="Filter collections">
                 <button
                   class="flex items-center rounded-sm p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
@@ -370,7 +393,7 @@ export const RepoView = () => {
               </Suspense>
             </ErrorBoundary>
           </Show>
-          <Show when={nsids() && (!location.hash || location.hash === "#collections")}>
+          <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
             <Show when={showFilter()}>
               <TextInput
                 name="filter"
@@ -382,10 +405,7 @@ export const RepoView = () => {
                 }}
               />
             </Show>
-            <div
-              class="flex flex-col overflow-hidden text-sm"
-              classList={{ "-mt-1": !showFilter() }}
-            >
+            <div class="flex flex-col text-sm wrap-anywhere" classList={{ "-mt-1": !showFilter() }}>
               <For
                 each={Object.keys(nsids() ?? {}).filter((authority) =>
                   filter() ?
@@ -400,9 +420,22 @@ export const RepoView = () => {
                   const reversedDomain = authority.split(".").reverse().join(".");
                   const [faviconLoaded, setFaviconLoaded] = createSignal(false);
 
+                  const isHighlighted = () => location.hash === `#collections:${authority}`;
+
                   return (
-                    <div class="dark:hover:bg-dark-200 flex items-start gap-2 rounded-lg p-1 hover:bg-neutral-200">
-                      <div class="flex h-5 w-4 shrink-0 items-center justify-center">
+                    <div
+                      id={`collection-${authority}`}
+                      class="group flex items-start gap-2 rounded-lg p-1 transition-colors"
+                      classList={{
+                        "dark:hover:bg-dark-200 hover:bg-neutral-200": !isHighlighted(),
+                        "bg-blue-100 dark:bg-blue-500/25": isHighlighted(),
+                      }}
+                    >
+                      <a
+                        href={`#collections:${authority}`}
+                        class="relative flex h-5 w-4 shrink-0 items-center justify-center hover:opacity-70"
+                      >
+                        <span class="iconify lucide--link absolute top-1/2 -left-5 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100" />
                         <Show when={!faviconLoaded()}>
                           <span class="iconify lucide--globe size-4 text-neutral-400 dark:text-neutral-500" />
                         </Show>
@@ -418,7 +451,7 @@ export const RepoView = () => {
                           onLoad={() => setFaviconLoaded(true)}
                           onError={() => setFaviconLoaded(false)}
                         />
-                      </div>
+                      </a>
                       <div class="flex flex-1 flex-col">
                         <For
                           each={nsids()?.[authority].nsids.filter((nsid) =>
