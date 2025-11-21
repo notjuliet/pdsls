@@ -199,7 +199,7 @@ const JSONObject = (props: {
               <Show when={!hide()}>
                 <Show when={blob.mimeType.startsWith("image/")}>
                   <img
-                    class="h-auto max-h-64 max-w-[16rem] object-contain"
+                    class="h-auto max-h-48 max-w-48 object-contain sm:max-h-64 sm:max-w-64"
                     src={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${props.repo}&cid=${blob.ref.$link}`}
                     onLoad={() => setMediaLoaded(true)}
                   />
@@ -216,7 +216,7 @@ const JSONObject = (props: {
                 <Show when={mediaLoaded()}>
                   <button
                     onclick={() => setHide(true)}
-                    class="absolute top-1 right-1 flex items-center rounded-lg bg-neutral-900/70 p-1.5 text-white opacity-100 backdrop-blur-sm transition-opacity hover:bg-neutral-900/80 active:bg-neutral-900/90 sm:opacity-0 sm:group-hover/media:opacity-100 dark:bg-neutral-100/70 dark:text-neutral-900 dark:hover:bg-neutral-100/80 dark:active:bg-neutral-100/90"
+                    class="absolute top-1 right-1 flex items-center rounded-lg bg-neutral-900/70 p-1.5 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover/media:opacity-100 hover:bg-neutral-900/80 active:bg-neutral-900/90 dark:bg-neutral-100/70 dark:text-neutral-900 dark:hover:bg-neutral-100/80 dark:active:bg-neutral-100/90"
                   >
                     <span class="iconify lucide--eye-off text-base"></span>
                   </button>
