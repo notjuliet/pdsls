@@ -435,7 +435,9 @@ export const RepoView = () => {
                         href={`#collections:${authority}`}
                         class="relative flex h-5 w-4 shrink-0 items-center justify-center hover:opacity-70"
                       >
-                        <span class="iconify lucide--link absolute top-1/2 -left-5 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100" />
+                        <span class="absolute top-1/2 -left-5 flex -translate-y-1/2 items-center text-base opacity-0 transition-opacity group-hover:opacity-100">
+                          <span class="iconify lucide--link absolute -left-2 w-7"></span>
+                        </span>
                         <Show when={!faviconLoaded()}>
                           <span class="iconify lucide--globe size-4 text-neutral-400 dark:text-neutral-500" />
                         </Show>
