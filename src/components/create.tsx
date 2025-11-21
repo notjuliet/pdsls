@@ -1,5 +1,6 @@
 import { Client } from "@atcute/client";
 import { Did } from "@atcute/lexicons";
+import { isNsid, isRecordKey } from "@atcute/lexicons/syntax";
 import { getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { remove } from "@mary/exif-rm";
 import { useNavigate, useParams } from "@solidjs/router";
@@ -25,6 +26,8 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   const [validate, setValidate] = createSignal<boolean | undefined>(undefined);
   const [isMaximized, setIsMaximized] = createSignal(false);
   const [isMinimized, setIsMinimized] = createSignal(false);
+  const [collectionError, setCollectionError] = createSignal("");
+  const [rkeyError, setRkeyError] = createSignal("");
   let blobInput!: HTMLInputElement;
   let formRef!: HTMLFormElement;
   let insertMenuRef!: HTMLDivElement;
@@ -77,6 +80,8 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   createEffect(() => {
     if (openDialog()) {
       setValidate(undefined);
+      setCollectionError("");
+      setRkeyError("");
     }
   });
 
@@ -365,16 +370,35 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                   id="collection"
                   name="collection"
                   placeholder="Collection (default: $type)"
-                  class="w-40 placeholder:text-xs lg:w-52"
+                  class={`w-40 placeholder:text-xs lg:w-52 ${collectionError() ? "border-red-500 focus:outline-red-500 dark:border-red-400 dark:focus:outline-red-400" : ""}`}
+                  onInput={(e) => {
+                    const value = e.currentTarget.value;
+                    if (!value || isNsid(value)) setCollectionError("");
+                    else
+                      setCollectionError(
+                        "Invalid collection: use reverse domain format (e.g. app.bsky.feed.post)",
+                      );
+                  }}
                 />
                 <span>/</span>
                 <TextInput
                   id="rkey"
                   name="rkey"
                   placeholder="Record key (default: TID)"
-                  class="w-40 placeholder:text-xs lg:w-52"
+                  class={`w-40 placeholder:text-xs lg:w-52 ${rkeyError() ? "border-red-500 focus:outline-red-500 dark:border-red-400 dark:focus:outline-red-400" : ""}`}
+                  onInput={(e) => {
+                    const value = e.currentTarget.value;
+                    if (!value || isRecordKey(value)) setRkeyError("");
+                    else setRkeyError("Invalid record key: 1-512 chars, use a-z A-Z 0-9 . _ ~ : -");
+                  }}
                 />
               </div>
+              <Show when={collectionError() || rkeyError()}>
+                <div class="text-xs text-red-500 dark:text-red-400">
+                  <div>{collectionError()}</div>
+                  <div>{rkeyError()}</div>
+                </div>
+              </Show>
             </Show>
             <div class="min-h-0 flex-1">
               <Editor

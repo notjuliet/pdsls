@@ -1,8 +1,7 @@
-import { isCid, isDid, isNsid, Nsid } from "@atcute/lexicons/syntax";
+import { isCid, isDid, isNsid, isResourceUri, Nsid } from "@atcute/lexicons/syntax";
 import { A, useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createSignal, ErrorBoundary, For, on, Show } from "solid-js";
 import { resolveLexiconAuthority } from "../utils/api";
-import { ATURI_RE } from "../utils/types/at-uri";
 import { hideMedia } from "../views/settings";
 import { pds } from "./navbar";
 import { addNotification, removeNotification } from "./notification";
@@ -57,7 +56,7 @@ const JSONString = (props: {
       <For each={props.data.split(/(\s)/)}>
         {(part) => (
           <>
-            {ATURI_RE.test(part) ?
+            {isResourceUri(part) ?
               <A class="text-blue-400 hover:underline active:underline" href={`/${part}`}>
                 {part}
               </A>
