@@ -294,25 +294,13 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
     props.def.items ||
     props.def.knownValues;
 
-  const handleHeaderClick = () => {
-    window.history.replaceState(null, "", `#schema:${props.name}`);
-    const element = document.getElementById(`def-${props.name}`);
-    if (element) {
-      element.scrollIntoView({ behavior: "instant", block: "start" });
-    }
-  };
-
   return (
     <div class="flex flex-col gap-3" id={`def-${props.name}`}>
       <div class="group flex items-center gap-2">
-        <button
-          type="button"
-          onClick={handleHeaderClick}
-          class="relative cursor-pointer text-lg font-semibold hover:underline"
-        >
+        <a href={`#schema:${props.name}`} class="relative text-lg font-semibold hover:underline">
           <span class="iconify lucide--link absolute top-1/2 -left-6 -translate-y-1/2 text-base opacity-0 transition-opacity group-hover:opacity-100" />
           {props.name === "main" ? "Main Definition" : props.name}
-        </button>
+        </a>
         <span class={`rounded px-2 py-0.5 text-xs font-semibold uppercase ${defTypeColor()}`}>
           {props.def.type}
         </span>
@@ -523,8 +511,10 @@ export const LexiconSchemaView = (props: { schema: LexiconSchema }) => {
     const hash = location.hash;
     if (hash.startsWith("#schema:")) {
       const defName = hash.slice(8);
-      const element = document.getElementById(`def-${defName}`);
-      if (element) element.scrollIntoView({ behavior: "instant", block: "start" });
+      requestAnimationFrame(() => {
+        const element = document.getElementById(`def-${defName}`);
+        if (element) element.scrollIntoView({ behavior: "instant", block: "start" });
+      });
     }
   });
 
