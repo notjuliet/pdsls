@@ -9,7 +9,7 @@
     "serve": "vite preview"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.73",
+    "@iconify-json/lucide": "^1.2.75",
     "@iconify/tailwind4": "^1.1.0",
     "@tailwindcss/vite": "^4.1.17",
     "prettier": "^3.6.2",
@@ -17,7 +17,7 @@
     "prettier-plugin-tailwindcss": "^0.7.1",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
-    "vite": "^7.2.2",
+    "vite": "^7.2.4",
     "vite-plugin-solid": "^2.11.10"
   },
   "dependencies": {
@@ -26,12 +26,12 @@
     "@atcute/client": "^4.0.5",
     "@atcute/crypto": "^2.2.6",
     "@atcute/did-plc": "^0.2.0",
-    "@atcute/identity": "^1.1.2",
+    "@atcute/identity": "^1.1.3",
     "@atcute/identity-resolver": "^1.1.4",
     "@atcute/leaflet": "^1.0.12",
-    "@atcute/lexicon-doc": "^1.3.0",
-    "@atcute/lexicon-resolver": "^0.1.3",
-    "@atcute/lexicons": "^1.2.3",
+    "@atcute/lexicon-doc": "^2.0.1",
+    "@atcute/lexicon-resolver": "^0.1.4",
+    "@atcute/lexicons": "^1.2.4",
     "@atcute/oauth-browser-client": "^2.0.1",
     "@atcute/repo": "^0.1.0",
     "@atcute/tangled": "^1.0.12",

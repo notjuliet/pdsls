@@ -1,8 +1,10 @@
 import { Client, CredentialManager } from "@atcute/client";
+import { DidDocument, getPdsEndpoint } from "@atcute/identity";
 import { lexiconDoc } from "@atcute/lexicon-doc";
-import { ResolvedSchema } from "@atcute/lexicon-resolver";
-import { ActorIdentifier, is, Nsid, ResourceUri } from "@atcute/lexicons";
-import { AtprotoDid, Did } from "@atcute/lexicons/syntax";
+import { RecordValidator } from "@atcute/lexicon-doc/validations";
+import { FailedLexiconResolutionError, ResolvedSchema } from "@atcute/lexicon-resolver";
+import { ActorIdentifier, is, Nsid } from "@atcute/lexicons";
+import { AtprotoDid, Did, isNsid } from "@atcute/lexicons/syntax";
 import { verifyRecord } from "@atcute/repo";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, Show, Suspense } from "solid-js";
@@ -23,16 +25,171 @@ import { Modal } from "../components/modal.jsx";
 import { pds } from "../components/navbar.jsx";
 import { addNotification, removeNotification } from "../components/notification.jsx";
 import Tooltip from "../components/tooltip.jsx";
-import { resolveLexiconAuthority, resolveLexiconSchema, resolvePDS } from "../utils/api.js";
+import {
+  didDocumentResolver,
+  resolveLexiconAuthority,
+  resolveLexiconSchema,
+  resolvePDS,
+} from "../utils/api.js";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 import { lexicons } from "../utils/types/lexicons.js";
+
+const authorityCache = new Map<string, Promise<AtprotoDid>>();
+const documentCache = new Map<string, Promise<DidDocument>>();
+const schemaCache = new Map<string, Promise<unknown>>();
+
+const getAuthoritySegment = (nsid: string): string => {
+  const segments = nsid.split(".");
+  return segments.slice(0, -1).join(".");
+};
+
+const resolveSchema = async (authority: AtprotoDid, nsid: Nsid): Promise<unknown> => {
+  const cacheKey = `${authority}:${nsid}`;
+
+  let cachedSchema = schemaCache.get(cacheKey);
+  if (cachedSchema) {
+    return cachedSchema;
+  }
+
+  const schemaPromise = (async () => {
+    let didDocPromise = documentCache.get(authority);
+    if (!didDocPromise) {
+      didDocPromise = didDocumentResolver.resolve(authority);
+      documentCache.set(authority, didDocPromise);
+    }
+
+    const didDocument = await didDocPromise;
+    const pdsEndpoint = getPdsEndpoint(didDocument);
+
+    if (!pdsEndpoint) {
+      throw new FailedLexiconResolutionError(nsid, {
+        cause: new TypeError(`no pds service in did document; did=${authority}`),
+      });
+    }
+
+    const rpc = new Client({ handler: new CredentialManager({ service: pdsEndpoint }) });
+    const response = await rpc.get("com.atproto.repo.getRecord", {
+      params: {
+        repo: authority,
+        collection: "com.atproto.lexicon.schema",
+        rkey: nsid,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`got http ${response.status}`);
+    }
+
+    return response.data.value;
+  })();
+
+  schemaCache.set(cacheKey, schemaPromise);
+
+  try {
+    return await schemaPromise;
+  } catch (err) {
+    schemaCache.delete(cacheKey);
+    throw err;
+  }
+};
+
+const extractRefs = (obj: any): Nsid[] => {
+  const refs: Set<string> = new Set();
+
+  const traverse = (value: any) => {
+    if (!value || typeof value !== "object") return;
+
+    if (value.type === "ref" && value.ref) {
+      const ref = value.ref;
+      if (!ref.startsWith("#")) {
+        const nsid = ref.split("#")[0];
+        if (isNsid(nsid)) refs.add(nsid);
+      }
+    }
+
+    if (value.type === "union" && Array.isArray(value.refs)) {
+      for (const ref of value.refs) {
+        if (!ref.startsWith("#")) {
+          const nsid = ref.split("#")[0];
+          if (isNsid(nsid)) refs.add(nsid);
+        }
+      }
+    }
+
+    if (Array.isArray(value)) value.forEach(traverse);
+    else Object.values(value).forEach(traverse);
+  };
+
+  traverse(obj);
+  return Array.from(refs) as Nsid[];
+};
+
+const resolveAllLexicons = async (
+  nsid: Nsid,
+  depth: number = 0,
+  resolved: Map<string, any> = new Map(),
+  failed: Set<string> = new Set(),
+  inFlight: Map<string, Promise<void>> = new Map(),
+): Promise<{ resolved: Map<string, any>; failed: Set<string> }> => {
+  if (depth >= 10) {
+    console.warn(`Maximum recursion depth reached for ${nsid}`);
+    return { resolved, failed };
+  }
+
+  if (resolved.has(nsid) || failed.has(nsid)) return { resolved, failed };
+
+  if (inFlight.has(nsid)) {
+    await inFlight.get(nsid);
+    return { resolved, failed };
+  }
+
+  const fetchPromise = (async () => {
+    let authority: AtprotoDid | undefined;
+    const authoritySegment = getAuthoritySegment(nsid);
+    try {
+      let authorityPromise = authorityCache.get(authoritySegment);
+      if (!authorityPromise) {
+        authorityPromise = resolveLexiconAuthority(nsid);
+        authorityCache.set(authoritySegment, authorityPromise);
+      }
+
+      authority = await authorityPromise;
+      const schema = await resolveSchema(authority, nsid);
+
+      resolved.set(nsid, schema);
+
+      const refs = extractRefs(schema);
+
+      if (refs.length > 0) {
+        await Promise.all(
+          refs.map((ref) => resolveAllLexicons(ref, depth + 1, resolved, failed, inFlight)),
+        );
+      }
+    } catch (err) {
+      console.error(`Failed to resolve lexicon ${nsid}:`, err);
+      failed.add(nsid);
+      authorityCache.delete(authoritySegment);
+      if (authority) {
+        documentCache.delete(authority);
+      }
+    } finally {
+      inFlight.delete(nsid);
+    }
+  })();
+
+  inFlight.set(nsid, fetchPromise);
+  await fetchPromise;
+
+  return { resolved, failed };
+};
 
 export const RecordView = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams();
   const [openDelete, setOpenDelete] = createSignal(false);
-  const [notice, setNotice] = createSignal("");
+  const [verifyError, setVerifyError] = createSignal("");
+  const [validationError, setValidationError] = createSignal("");
   const [externalLink, setExternalLink] = createSignal<
     { label: string; link: string; icon?: string } | undefined
   >();
@@ -41,6 +198,7 @@ export const RecordView = () => {
   const [validSchema, setValidSchema] = createSignal<boolean | undefined>(undefined);
   const [schema, setSchema] = createSignal<ResolvedSchema>();
   const [lexiconNotFound, setLexiconNotFound] = createSignal<boolean>();
+  const [remoteValidation, setRemoteValidation] = createSignal<boolean>();
   const did = params.repo;
   let rpc: Client;
 
@@ -59,39 +217,69 @@ export const RecordView = () => {
     });
     if (!res.ok) {
       setValidRecord(false);
-      setNotice(res.data.error);
+      setVerifyError(res.data.error);
       throw new Error(res.data.error);
     }
     setPlaceholder(res.data.value);
     setExternalLink(checkUri(res.data.uri, res.data.value));
     resolveLexicon(params.collection as Nsid);
-    verify(res.data);
+    verifyRecordIntegrity();
+    validateLocalSchema(res.data.value);
 
     return res.data;
   };
 
   const [record, { refetch }] = createResource(fetchRecord);
 
-  const verify = async (record: {
-    uri: ResourceUri;
-    value: Record<string, unknown>;
-    cid?: string | undefined;
-  }) => {
+  const validateLocalSchema = async (record: Record<string, unknown>) => {
     try {
-      if (params.collection && params.collection in lexicons) {
-        if (is(lexicons[params.collection], record.value)) setValidSchema(true);
-        else setValidSchema(false);
-      } else if (params.collection === "com.atproto.lexicon.schema") {
+      if (params.collection === "com.atproto.lexicon.schema") {
         setLexiconNotFound(false);
-        try {
-          lexiconDoc.parse(record.value, { mode: "passthrough" });
-          setValidSchema(true);
-        } catch (e) {
-          console.error(e);
-          setValidSchema(false);
-        }
+        lexiconDoc.parse(record, { mode: "passthrough" });
+        setValidSchema(true);
+      } else if (params.collection && params.collection in lexicons) {
+        if (is(lexicons[params.collection], record)) setValidSchema(true);
+        else setValidSchema(false);
+      }
+    } catch (err: any) {
+      console.error("Schema validation error:", err);
+      setValidSchema(false);
+      setValidationError(err.message || String(err));
+    }
+  };
+
+  const validateRemoteSchema = async (record: Record<string, unknown>) => {
+    try {
+      setRemoteValidation(true);
+      const { resolved, failed } = await resolveAllLexicons(params.collection as Nsid);
+
+      if (failed.size > 0) {
+        console.error(`Failed to resolve ${failed.size} documents:`, Array.from(failed));
+        setValidSchema(false);
+        setValidationError(`Unable to resolve lexicon documents: ${Array.from(failed).join(", ")}`);
+        return;
       }
 
+      const lexiconDocs = Object.fromEntries(resolved);
+      console.log(lexiconDocs);
+
+      const validator = new RecordValidator(lexiconDocs, params.collection as Nsid);
+      validator.parse({
+        key: params.rkey ?? null,
+        object: record,
+      });
+
+      setValidSchema(true);
+    } catch (err: any) {
+      console.error("Schema validation error:", err);
+      setValidSchema(false);
+      setValidationError(err.message || String(err));
+    }
+    setRemoteValidation(false);
+  };
+
+  const verifyRecordIntegrity = async () => {
+    try {
       const { ok, data } = await rpc.get("com.atproto.sync.getRecord", {
         params: {
           did: did as Did,
@@ -111,8 +299,8 @@ export const RecordView = () => {
 
       setValidRecord(true);
     } catch (err: any) {
-      console.error(err);
-      setNotice(err.message);
+      console.error("Record verification error:", err);
+      setVerifyError(err.message);
       setValidRecord(false);
     }
   };
@@ -332,18 +520,39 @@ export const RecordView = () => {
                 ></span>
               </div>
               <Show when={validRecord() === false}>
-                <div class="wrap-break-word">{notice()}</div>
+                <div class="text-xs wrap-break-word">{verifyError()}</div>
               </Show>
             </div>
-            <Show when={validSchema() !== undefined}>
+            <div>
               <div class="flex items-center gap-1">
                 <span class="iconify lucide--file-check"></span>
                 <p class="font-semibold">Schema validation</p>
                 <span
-                  class={`iconify ${validSchema() ? "lucide--check text-green-500 dark:text-green-400" : "lucide--x text-red-500 dark:text-red-400"}`}
+                  classList={{
+                    "iconify lucide--check text-green-500 dark:text-green-400":
+                      validSchema() === true,
+                    "iconify lucide--x text-red-500 dark:text-red-400": validSchema() === false,
+                    "iconify lucide--loader-circle animate-spin":
+                      validSchema() === undefined && remoteValidation(),
+                  }}
                 ></span>
               </div>
-            </Show>
+              <Show when={validSchema() === false}>
+                <div class="text-xs wrap-break-word">{validationError()}</div>
+              </Show>
+              <Show
+                when={
+                  !remoteValidation() &&
+                  validSchema() === undefined &&
+                  params.collection &&
+                  !(params.collection in lexicons)
+                }
+              >
+                <Button onClick={() => validateRemoteSchema(record()!.value)}>
+                  Validate remotely
+                </Button>
+              </Show>
+            </div>
             <Show when={lexiconUri()}>
               <div>
                 <div class="flex items-center gap-1">
