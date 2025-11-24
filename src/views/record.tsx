@@ -549,7 +549,7 @@ export const RecordView = () => {
                 }
               >
                 <Button onClick={() => validateRemoteSchema(record()!.value)}>
-                  Validate remotely
+                  Validate via resolution
                 </Button>
               </Show>
             </div>
