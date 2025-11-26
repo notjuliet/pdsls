@@ -6,22 +6,22 @@ export const uriTemplates: TemplateMap = {
   "app.bsky.actor.profile": (uri) => ({
     label: "Bluesky",
     link: `https://bsky.app/profile/${uri.repo}`,
-    icon: "ri--bluesky",
+    icon: "simple-icons--bluesky text-[#0085ff]",
   }),
   "app.bsky.feed.post": (uri) => ({
     label: "Bluesky",
     link: `https://bsky.app/profile/${uri.repo}/post/${uri.rkey}`,
-    icon: "ri--bluesky",
+    icon: "simple-icons--bluesky text-[#0085ff]",
   }),
   "app.bsky.graph.list": (uri) => ({
     label: "Bluesky",
     link: `https://bsky.app/profile/${uri.repo}/lists/${uri.rkey}`,
-    icon: "ri--bluesky",
+    icon: "simple-icons--bluesky text-[#0085ff]",
   }),
   "app.bsky.feed.generator": (uri) => ({
     label: "Bluesky",
     link: `https://bsky.app/profile/${uri.repo}/feed/${uri.rkey}`,
-    icon: "ri--bluesky",
+    icon: "simple-icons--bluesky text-[#0085ff]",
   }),
   "fyi.unravel.frontpage.post": (uri) => ({
     label: "Frontpage",
