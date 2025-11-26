@@ -207,7 +207,7 @@ const CollectionView = () => {
                           setLastSelected(undefined);
                           setBatchDelete(!batchDelete());
                         }}
-                        class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                        class="flex items-center rounded-md p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                       >
                         <span
                           class={`iconify text-lg ${batchDelete() ? "lucide--circle-x" : "lucide--trash-2"} `}
@@ -221,7 +221,7 @@ const CollectionView = () => {
                       children={
                         <button
                           onclick={() => selectAll()}
-                          class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                          class="flex items-center rounded-md p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                         >
                           <span class="iconify lucide--copy-check text-lg"></span>
                         </button>
@@ -235,7 +235,7 @@ const CollectionView = () => {
                             setRecreate(true);
                             setOpenDelete(true);
                           }}
-                          class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                          class="flex items-center rounded-md p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                         >
                           <span class="iconify lucide--recycle text-lg text-green-500 dark:text-green-400"></span>
                         </button>
@@ -249,7 +249,7 @@ const CollectionView = () => {
                             setRecreate(false);
                             setOpenDelete(true);
                           }}
-                          class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                          class="flex items-center rounded-md p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                         >
                           <span class="iconify lucide--trash-2 text-lg text-red-500 dark:text-red-400"></span>
                         </button>
@@ -278,7 +278,7 @@ const CollectionView = () => {
               <Tooltip text="Jetstream">
                 <A
                   href={`/jetstream?collections=${params.collection}&dids=${params.repo}`}
-                  class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                  class="flex items-center rounded-md p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                 >
                   <span class="iconify lucide--radio-tower text-lg"></span>
                 </A>

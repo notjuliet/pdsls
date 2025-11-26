@@ -59,7 +59,7 @@ const PdsView = () => {
       <div class="flex items-center">
         <A
           href={`/at://${repo.did}`}
-          class="grow truncate rounded py-0.5 font-mono hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+          class="grow truncate rounded-md p-0.5 font-mono hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
         >
           {repo.did}
         </A>
@@ -70,7 +70,7 @@ const PdsView = () => {
         </Show>
         <button
           onclick={() => setOpenInfo(true)}
-          class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+          class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
         >
           <span class="iconify lucide--info"></span>
         </button>
@@ -111,26 +111,24 @@ const PdsView = () => {
   };
 
   const Tab = (props: { tab: "repos" | "info"; label: string }) => (
-    <div class="flex items-center gap-0.5">
-      <A
-        classList={{
-          "flex items-center gap-1 border-b-2": true,
-          "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
-            (!!location.hash && location.hash !== `#${props.tab}`) ||
-            (!location.hash && props.tab !== "repos"),
-        }}
-        href={`/${params.pds}#${props.tab}`}
-      >
-        {props.label}
-      </A>
-    </div>
+    <A
+      classList={{
+        "border-b-2": true,
+        "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
+          (!!location.hash && location.hash !== `#${props.tab}`) ||
+          (!location.hash && props.tab !== "repos"),
+      }}
+      href={`/${params.pds}#${props.tab}`}
+    >
+      {props.label}
+    </A>
   );
 
   return (
     <Show when={repos() || response()}>
       <div class="flex w-full flex-col">
         <div class="dark:shadow-dark-700 dark:bg-dark-300 mb-2 flex w-full justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-sm shadow-xs dark:border-neutral-700">
-          <div class="ml-1 flex gap-3">
+          <div class="ml-1 flex items-center gap-3">
             <Tab tab="repos" label="Repositories" />
             <Tab tab="info" label="Info" />
           </div>

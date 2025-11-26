@@ -83,7 +83,7 @@ const Login = () => {
         />
         <button
           onclick={() => login(loginInput())}
-          class="flex items-center rounded-lg p-1 hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
+          class="flex items-center rounded-md p-1 hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
         >
           <span class="iconify lucide--log-in"></span>
         </button>

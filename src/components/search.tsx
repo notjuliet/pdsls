@@ -238,7 +238,7 @@ const Search = () => {
         <Show when={input()} fallback={ListUrlsTooltip()}>
           <button
             type="button"
-            class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
+            class="flex items-center rounded-md p-1 hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
             onClick={() => setInput(undefined)}
           >
             <span class="iconify lucide--x"></span>
@@ -352,7 +352,7 @@ const ListUrlsTooltip = () => {
       </Modal>
       <button
         type="button"
-        class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
+        class="flex items-center rounded-md p-1 hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
         onClick={() => setOpenList(true)}
       >
         <span class="iconify lucide--help-circle"></span>
