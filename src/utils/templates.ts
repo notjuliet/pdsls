@@ -55,4 +55,9 @@ export const uriTemplates: TemplateMap = {
     link: `https://tangled.org/${uri.repo}/${record.name}`,
     icon: "i-tangled",
   }),
+  "pub.leaflet.document": (uri) => ({
+    label: "Leaflet",
+    link: `https://leaflet.pub/p/${uri.repo}/${uri.rkey}`,
+    icon: "iconify-color i-leaflet",
+  }),
 };
