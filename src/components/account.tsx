@@ -100,21 +100,28 @@ export const AccountManager = () => {
           <div class="mb-3 max-h-80 overflow-y-auto md:max-h-100">
             <For each={Object.keys(sessions)}>
               {(did) => (
-                <div class="flex items-center">
+                <div class="flex w-full items-center justify-between">
+                  <A
+                    href={`/at://${did}`}
+                    onClick={() => setOpenManager(false)}
+                    class="flex items-center rounded-md p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                  >
+                    <Show
+                      when={avatars[did as Did]}
+                      fallback={<span class="iconify lucide--user-round m-0.5 size-5"></span>}
+                    >
+                      <img
+                        src={avatars[did as Did].replace("img/avatar/", "img/avatar_thumbnail/")}
+                        class="size-6 rounded-full"
+                      />
+                    </Show>
+                  </A>
                   <button
-                    class="flex w-full items-center justify-between gap-1 truncate rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                    class="flex grow items-center justify-between gap-1 truncate rounded-md p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                     onclick={() => resumeSession(did as Did)}
                   >
-                    <span class="flex items-center gap-2 truncate">
-                      <Show when={avatars[did as Did]}>
-                        <img
-                          src={avatars[did as Did].replace("img/avatar/", "img/avatar_thumbnail/")}
-                          class="size-6 rounded-full"
-                        />
-                      </Show>
-                      <span class="truncate">
-                        {sessions[did]?.handle ? sessions[did].handle : did}
-                      </span>
+                    <span class="truncate">
+                      {sessions[did]?.handle ? sessions[did].handle : did}
                     </span>
                     <Show when={did === agent()?.sub && sessions[did].signedIn}>
                       <span class="iconify lucide--check shrink-0 text-green-500 dark:text-green-400"></span>
@@ -123,16 +130,9 @@ export const AccountManager = () => {
                       <span class="iconify lucide--circle-alert shrink-0 text-red-500 dark:text-red-400"></span>
                     </Show>
                   </button>
-                  <A
-                    href={`/at://${did}`}
-                    onClick={() => setOpenManager(false)}
-                    class="flex items-center rounded-lg p-2 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                  >
-                    <span class="iconify lucide--user-round"></span>
-                  </A>
                   <button
                     onclick={() => removeSession(did as Did)}
-                    class="flex items-center rounded-lg p-2 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                    class="flex items-center rounded-md p-2 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                   >
                     <span class="iconify lucide--x"></span>
                   </button>
