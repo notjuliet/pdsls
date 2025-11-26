@@ -60,4 +60,9 @@ export const uriTemplates: TemplateMap = {
     link: `https://leaflet.pub/p/${uri.repo}/${uri.rkey}`,
     icon: "iconify-color i-leaflet",
   }),
+  "pub.leaflet.publication": (uri) => ({
+    label: "Leaflet",
+    link: `https://leaflet.pub/lish/${uri.repo}/${uri.rkey}`,
+    icon: "iconify-color i-leaflet",
+  }),
 };
