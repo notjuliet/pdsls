@@ -3,7 +3,6 @@ export type AppUrl = `${string}.${string}` | `localhost:${number}`;
 export enum App {
   Bluesky,
   Tangled,
-  Whitewind,
   Frontpage,
   Pinksea,
   Linkat,
@@ -12,7 +11,6 @@ export enum App {
 export const appName = {
   [App.Bluesky]: "Bluesky",
   [App.Tangled]: "Tangled",
-  [App.Whitewind]: "Whitewind",
   [App.Frontpage]: "Frontpage",
   [App.Pinksea]: "Pinksea",
   [App.Linkat]: "Linkat",
@@ -29,7 +27,6 @@ export const appList: Record<AppUrl, App> = {
   "main.bsky.dev": App.Bluesky,
   "social.daniela.lol": App.Bluesky,
   "tangled.org": App.Tangled,
-  "whtwnd.com": App.Whitewind,
   "frontpage.fyi": App.Frontpage,
   "pinksea.art": App.Pinksea,
   "linkat.blue": App.Linkat,
@@ -91,13 +88,6 @@ export const appHandleLink: Record<App, (url: string[]) => string> = {
     }
 
     return `at://${user}`;
-  },
-  [App.Whitewind]: (path) => {
-    if (path.length === 2) {
-      return `at://${path[0]}/com.whtwnd.blog.entry/${path[1]}`;
-    }
-
-    return `at://${path[0]}/com.whtwnd.blog.entry`;
   },
   [App.Frontpage]: (path) => {
     if (path.length === 3) {
