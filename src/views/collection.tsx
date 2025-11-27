@@ -3,15 +3,7 @@ import { Client, CredentialManager } from "@atcute/client";
 import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
 import { A, useParams } from "@solidjs/router";
-import {
-  createEffect,
-  createMemo,
-  createResource,
-  createSignal,
-  For,
-  Show,
-  untrack,
-} from "solid-js";
+import { createEffect, createMemo, createResource, createSignal, For, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Button } from "../components/button.jsx";
 import { JSONType, JSONValue } from "../components/json.jsx";
@@ -213,11 +205,7 @@ const CollectionView = () => {
                     children={
                       <button
                         onclick={() => {
-                          setRecords(
-                            { from: 0, to: untrack(() => records.length) - 1 },
-                            "toDelete",
-                            false,
-                          );
+                          setRecords({ from: 0, to: records.length - 1 }, "toDelete", false);
                           setLastSelected(undefined);
                           setBatchDelete(!batchDelete());
                         }}
