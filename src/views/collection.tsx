@@ -3,7 +3,15 @@ import { Client, CredentialManager } from "@atcute/client";
 import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
 import { A, useParams } from "@solidjs/router";
-import { createEffect, createResource, createSignal, For, Show, untrack } from "solid-js";
+import {
+  createEffect,
+  createMemo,
+  createResource,
+  createSignal,
+  For,
+  Show,
+  untrack,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 import { Button } from "../components/button.jsx";
 import { JSONType, JSONValue } from "../components/json.jsx";
@@ -116,6 +124,12 @@ const CollectionView = () => {
   };
 
   const [response, { refetch }] = createResource(fetchRecords);
+
+  const filteredRecords = createMemo(() =>
+    records.filter((rec) =>
+      filter() ? JSON.stringify(rec.record.value).includes(filter()!) : true,
+    ),
+  );
 
   const deleteRecords = async () => {
     const recsToDel = records.filter((record) => record.toDelete);
@@ -310,7 +324,7 @@ const CollectionView = () => {
                     <span>{records.filter((rec) => rec.toDelete).length}</span>
                     <span>/</span>
                   </Show>
-                  <span>{records.length} records</span>
+                  <span>{filter() ? filteredRecords().length : records.length} records</span>
                 </div>
                 <div class="flex w-20 items-center justify-end">
                   <Show when={cursor()}>
@@ -327,11 +341,7 @@ const CollectionView = () => {
           </div>
         </StickyOverlay>
         <div class="flex max-w-full flex-col px-2 font-mono">
-          <For
-            each={records.filter((rec) =>
-              filter() ? JSON.stringify(rec.record.value).includes(filter()!) : true,
-            )}
-          >
+          <For each={filteredRecords()}>
             {(record, index) => (
               <>
                 <Show when={batchDelete()}>
