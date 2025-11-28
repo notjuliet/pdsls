@@ -56,7 +56,7 @@ const PdsView = () => {
     const [openInfo, setOpenInfo] = createSignal(false);
 
     return (
-      <div class="flex items-center">
+      <div class="flex items-center gap-0.5">
         <A
           href={`/at://${repo.did}`}
           class="grow truncate rounded-md p-0.5 font-mono hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
@@ -75,33 +75,44 @@ const PdsView = () => {
           <span class="iconify lucide--info"></span>
         </button>
         <Modal open={openInfo()} onClose={() => setOpenInfo(false)}>
-          <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] w-max max-w-full -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 wrap-break-word shadow-md transition-opacity duration-200 sm:max-w-lg dark:border-neutral-700 starting:opacity-0">
-            <div class="mb-1 flex justify-between gap-2">
-              <div class="flex items-center gap-1">
-                <span class="iconify lucide--info"></span>
-                <span class="font-semibold">{repo.did}</span>
-              </div>
+          <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] w-max max-w-full -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-white p-3 shadow-md transition-opacity duration-200 sm:max-w-xl dark:border-neutral-700 starting:opacity-0">
+            <div class="mb-2 flex items-center justify-between gap-4">
+              <p class="truncate font-semibold">{repo.did}</p>
               <button
                 onclick={() => setOpenInfo(false)}
-                class="flex items-center rounded-lg p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                class="flex shrink-0 items-center rounded-md p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 active:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
               >
                 <span class="iconify lucide--x"></span>
               </button>
             </div>
-            <div class="flex flex-col text-sm">
-              <span>
-                Head: <span class="text-xs">{repo.head}</span>
-              </span>
+            <div class="grid grid-cols-[auto_1fr] items-baseline gap-x-1 text-sm">
+              <span class="font-medium">Head:</span>
+              <span class="wrap-anywhere text-neutral-700 dark:text-neutral-300">{repo.head}</span>
+
               <Show when={TID.validate(repo.rev)}>
-                <span>
-                  Rev: {repo.rev} ({localDateFromTimestamp(TID.parse(repo.rev).timestamp / 1000)})
-                </span>
+                <span class="font-medium">Rev:</span>
+                <div class="flex flex-col">
+                  <span class="text-neutral-700 dark:text-neutral-300">{repo.rev}</span>
+                  <span class="text-neutral-600 dark:text-neutral-400">
+                    {localDateFromTimestamp(TID.parse(repo.rev).timestamp / 1000)}
+                  </span>
+                </div>
               </Show>
+
               <Show when={repo.active !== undefined}>
-                <span>Active: {repo.active ? "true" : "false"}</span>
+                <span class="font-medium">Active:</span>
+                <span
+                  class={`iconify self-center ${
+                    repo.active ?
+                      "lucide--check text-green-500 dark:text-green-400"
+                    : "lucide--x text-red-500 dark:text-red-400"
+                  }`}
+                ></span>
               </Show>
+
               <Show when={repo.status}>
-                <span>Status: {repo.status}</span>
+                <span class="font-medium">Status:</span>
+                <span class="text-neutral-700 dark:text-neutral-300">{repo.status}</span>
               </Show>
             </div>
           </div>
