@@ -1,4 +1,5 @@
 import { createSignal, For, Show } from "solid-js";
+import { createStore } from "solid-js/store";
 
 export type Notification = {
   id: string;
@@ -8,23 +9,23 @@ export type Notification = {
   type?: "info" | "success" | "error";
 };
 
-const [notifications, setNotifications] = createSignal<Notification[]>([]);
+const [notifications, setNotifications] = createStore<Notification[]>([]);
 const [removingIds, setRemovingIds] = createSignal<Set<string>>(new Set());
 
 export const addNotification = (notification: Omit<Notification, "id">) => {
   const id = `notification-${Date.now()}-${Math.random()}`;
-  setNotifications([...notifications(), { ...notification, id }]);
+  setNotifications(notifications.length, { ...notification, id });
   return id;
 };
 
 export const updateNotification = (id: string, updates: Partial<Notification>) => {
-  setNotifications(notifications().map((n) => (n.id === id ? { ...n, ...updates } : n)));
+  setNotifications((n) => n.id === id, updates);
 };
 
 export const removeNotification = (id: string) => {
   setRemovingIds(new Set([...removingIds(), id]));
   setTimeout(() => {
-    setNotifications(notifications().filter((n) => n.id !== id));
+    setNotifications((n) => n.filter((notification) => notification.id !== id));
     setRemovingIds((ids) => {
       const newIds = new Set(ids);
       newIds.delete(id);
@@ -36,7 +37,7 @@ export const removeNotification = (id: string) => {
 export const NotificationContainer = () => {
   return (
     <div class="pointer-events-none fixed bottom-4 left-4 z-50 flex flex-col gap-2">
-      <For each={notifications()}>
+      <For each={notifications}>
         {(notification) => (
           <div
             class="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto flex min-w-64 flex-col gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 shadow-md select-none dark:border-neutral-700"
