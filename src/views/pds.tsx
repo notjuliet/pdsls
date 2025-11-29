@@ -85,14 +85,15 @@ const PdsView = () => {
                 <span class="iconify lucide--x"></span>
               </button>
             </div>
-            <div class="grid grid-cols-[auto_1fr] items-baseline gap-x-1 text-sm">
+            <div class="grid grid-cols-[auto_1fr] items-baseline gap-x-1 gap-y-0.5 text-sm">
               <span class="font-medium">Head:</span>
               <span class="wrap-anywhere text-neutral-700 dark:text-neutral-300">{repo.head}</span>
 
               <Show when={TID.validate(repo.rev)}>
                 <span class="font-medium">Rev:</span>
-                <div class="flex flex-col">
+                <div class="flex gap-1">
                   <span class="text-neutral-700 dark:text-neutral-300">{repo.rev}</span>
+                  <span class="text-neutral-600 dark:text-neutral-400">·</span>
                   <span class="text-neutral-600 dark:text-neutral-400">
                     {localDateFromTimestamp(TID.parse(repo.rev).timestamp / 1000)}
                   </span>
