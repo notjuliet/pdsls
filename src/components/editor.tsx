@@ -7,15 +7,15 @@ import { basicDark } from "@fsegurai/codemirror-theme-basic-dark";
 import { basicLight } from "@fsegurai/codemirror-theme-basic-light";
 import { basicSetup, EditorView } from "codemirror";
 import { onCleanup, onMount } from "solid-js";
-
-export let editorView: EditorView;
+import { editorInstance } from "./create";
 
 const Editor = (props: { content: string }) => {
   let editorDiv!: HTMLDivElement;
   let themeColor = new Compartment();
+  let view: EditorView;
 
   const themeEvent = () => {
-    editorView.dispatch({
+    view.dispatch({
       effects: themeColor.reconfigure(
         window.matchMedia("(prefers-color-scheme: dark)").matches ? basicDark : basicLight,
       ),
@@ -38,7 +38,7 @@ const Editor = (props: { content: string }) => {
 
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeEvent);
 
-    editorView = new EditorView({
+    view = new EditorView({
       doc: props.content,
       parent: editorDiv,
       extensions: [
@@ -50,6 +50,7 @@ const Editor = (props: { content: string }) => {
         themeColor.of(document.documentElement.classList.contains("dark") ? basicDark : basicLight),
       ],
     });
+    editorInstance.view = view;
   });
 
   onCleanup(() =>

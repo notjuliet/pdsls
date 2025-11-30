@@ -4,8 +4,7 @@ import { isNsid, isRecordKey } from "@atcute/lexicons/syntax";
 import { getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { remove } from "@mary/exif-rm";
 import { useNavigate, useParams } from "@solidjs/router";
-import { createEffect, createSignal, For, onCleanup, Show } from "solid-js";
-import { Editor, editorView } from "../components/editor.jsx";
+import { createEffect, createSignal, For, lazy, onCleanup, Show, Suspense } from "solid-js";
 import { agent } from "../components/login.jsx";
 import { sessions } from "./account.jsx";
 import { Button } from "./button.jsx";
@@ -14,6 +13,9 @@ import { addNotification, removeNotification } from "./notification.jsx";
 import { TextInput } from "./text-input.jsx";
 import Tooltip from "./tooltip.jsx";
 
+const Editor = lazy(() => import("../components/editor.jsx").then((m) => ({ default: m.Editor })));
+
+export const editorInstance = { view: null as any };
 export const [placeholder, setPlaceholder] = createSignal<any>();
 
 export const RecordEditor = (props: { create: boolean; record?: any; refetch?: any }) => {
@@ -93,7 +95,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     const rkey = formData.get("rkey");
     let record: any;
     try {
-      record = JSON.parse(editorView.state.doc.toString());
+      record = JSON.parse(editorInstance.view.state.doc.toString());
     } catch (e: any) {
       setNotice(e.message);
       return;
@@ -121,7 +123,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   };
 
   const editRecord = async (recreate?: boolean) => {
-    const record = editorView.state.doc.toString();
+    const record = editorInstance.view.state.doc.toString();
     if (!record) return;
     const rpc = new Client({ handler: agent()! });
     try {
@@ -179,9 +181,9 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
 
   const insertTimestamp = () => {
     const timestamp = new Date().toISOString();
-    editorView.dispatch({
+    editorInstance.view.dispatch({
       changes: {
-        from: editorView.state.selection.main.head,
+        from: editorInstance.view.state.selection.main.head,
         insert: `"${timestamp}"`,
       },
     });
@@ -238,9 +240,9 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
         setError(res.data.error);
         return;
       }
-      editorView.dispatch({
+      editorInstance.view.dispatch({
         changes: {
-          from: editorView.state.selection.main.head,
+          from: editorInstance.view.state.selection.main.head,
           insert: JSON.stringify(res.data.blob, null, 2),
         },
       });
@@ -401,15 +403,23 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
               </Show>
             </Show>
             <div class="min-h-0 flex-1">
-              <Editor
-                content={JSON.stringify(
-                  !props.create ? props.record
-                  : params.rkey ? placeholder()
-                  : defaultPlaceholder(),
-                  null,
-                  2,
-                )}
-              />
+              <Suspense
+                fallback={
+                  <div class="flex h-full items-center justify-center">
+                    <span class="iconify lucide--loader-circle animate-spin text-xl"></span>
+                  </div>
+                }
+              >
+                <Editor
+                  content={JSON.stringify(
+                    !props.create ? props.record
+                    : params.rkey ? placeholder()
+                    : defaultPlaceholder(),
+                    null,
+                    2,
+                  )}
+                />
+              </Suspense>
             </div>
             <div class="flex flex-col gap-2">
               <Show when={notice()}>
