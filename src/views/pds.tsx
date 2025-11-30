@@ -75,7 +75,7 @@ const PdsView = () => {
           <span class="iconify lucide--info"></span>
         </button>
         <Modal open={openInfo()} onClose={() => setOpenInfo(false)}>
-          <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] w-max max-w-full -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-white p-3 shadow-md transition-opacity duration-200 sm:max-w-xl dark:border-neutral-700 starting:opacity-0">
+          <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] w-max max-w-[90vw] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-white p-3 shadow-md transition-opacity duration-200 sm:max-w-xl dark:border-neutral-700 starting:opacity-0">
             <div class="mb-2 flex items-center justify-between gap-4">
               <p class="truncate font-semibold">{repo.did}</p>
               <button
