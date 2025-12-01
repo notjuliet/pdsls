@@ -152,7 +152,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
               <NavMenu
                 href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz"
                 label="Bluesky"
-                icon="simple-icons--bluesky"
+                icon="simple-icons--bluesky text-[#0085ff]"
                 newTab
               />
               <NavMenu
