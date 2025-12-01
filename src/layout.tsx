@@ -142,7 +142,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
             <DropdownMenu
               icon="lucide--menu text-lg"
               buttonClass="rounded-lg p-1.5"
-              menuClass="top-11 p-3 text-sm"
+              menuClass="top-11 px-3 py-2 text-sm"
             >
               <NavMenu href="/jetstream" label="Jetstream" icon="lucide--radio-tower" />
               <NavMenu href="/firehose" label="Firehose" icon="lucide--droplet" />
