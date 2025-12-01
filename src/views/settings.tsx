@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import { TextInput } from "../components/text-input.jsx";
+import { ThemeSelection } from "../components/theme.jsx";
 
 export const [hideMedia, setHideMedia] = createSignal(localStorage.hideMedia === "true");
 
@@ -9,7 +10,7 @@ const Settings = () => {
       <div class="flex items-center gap-1 font-semibold">
         <span>Settings</span>
       </div>
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-3">
         <div class="flex flex-col gap-0.5">
           <label for="plcDirectory" class="select-none">
             PLC Directory
@@ -24,6 +25,7 @@ const Settings = () => {
             }}
           />
         </div>
+        <ThemeSelection />
         <div class="flex justify-between">
           <div class="flex items-center gap-1">
             <input

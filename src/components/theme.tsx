@@ -24,27 +24,32 @@ export const ThemeSelection = () => {
     else localStorage.theme = newTheme;
   };
 
-  const ThemeButton = (props: { theme: string; icon: string }) => {
+  const ThemeOption = (props: { theme: string; icon: string; label: string }) => {
     return (
       <button
         classList={{
-          "p-1.5 flex items-center rounded-full border-[0.5px]": true,
-          "bg-neutral-200/60 border-neutral-300/60 dark:border-neutral-500/60 dark:bg-neutral-600":
+          "flex items-center gap-2 rounded-xl border px-3 py-2": true,
+          "bg-neutral-200/60 border-neutral-300 dark:border-neutral-500 dark:bg-neutral-700":
             theme() === props.theme,
-          "border-transparent": theme() !== props.theme,
+          "border-neutral-200 dark:border-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800":
+            theme() !== props.theme,
         }}
         onclick={() => updateTheme(props.theme)}
       >
         <span class={"iconify " + props.icon}></span>
+        <span>{props.label}</span>
       </button>
     );
   };
 
   return (
-    <div class="dark:bg-dark-100 dark:inset-shadow-dark-200 mt-2 flex items-center justify-between gap-1 rounded-full border-[0.5px] border-neutral-200/60 bg-white p-1 text-base text-neutral-800 inset-shadow-sm dark:border-neutral-600 dark:text-neutral-300">
-      <ThemeButton theme="system" icon="lucide--monitor" />
-      <ThemeButton theme="light" icon="lucide--sun" />
-      <ThemeButton theme="dark" icon="lucide--moon" />
+    <div class="flex flex-col gap-0.5">
+      <label class="select-none">Theme</label>
+      <div class="flex gap-2">
+        <ThemeOption theme="system" icon="lucide--monitor" label="System" />
+        <ThemeOption theme="light" icon="lucide--sun" label="Light" />
+        <ThemeOption theme="dark" icon="lucide--moon" label="Dark" />
+      </div>
     </div>
   );
 };

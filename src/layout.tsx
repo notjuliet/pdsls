@@ -9,7 +9,7 @@ import { agent } from "./components/login.jsx";
 import { NavBar } from "./components/navbar.jsx";
 import { NotificationContainer } from "./components/notification.jsx";
 import { Search, SearchButton, showSearch } from "./components/search.jsx";
-import { themeEvent, ThemeSelection } from "./components/theme.jsx";
+import { themeEvent } from "./components/theme.jsx";
 import { resolveHandle } from "./utils/api.js";
 
 export const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 1;
@@ -161,7 +161,6 @@ const Layout = (props: RouteSectionProps<unknown>) => {
                 newTab
                 external
               />
-              <ThemeSelection />
             </DropdownMenu>
           </MenuProvider>
         </div>
