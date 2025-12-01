@@ -417,7 +417,7 @@ export const RecordView = () => {
               <DropdownMenu
                 icon="lucide--ellipsis-vertical"
                 buttonClass="rounded-sm p-1.5"
-                menuClass="top-9 p-2 text-sm"
+                menuClass="top-9 text-sm"
               >
                 <CopyMenu
                   content={JSON.stringify(record()?.value, null, 2)}

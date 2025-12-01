@@ -33,7 +33,7 @@ export const CopyMenu = (props: { content: string; label: string; icon?: string 
         addToClipboard(props.content);
         ctx?.setShowMenu(false);
       }}
-      class="flex items-center gap-1.5 rounded-md p-1 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      class="flex items-center gap-2 rounded-md p-1.5 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
     >
       <Show when={props.icon}>
         <span class={"iconify shrink-0 " + props.icon}></span>
@@ -56,7 +56,7 @@ export const NavMenu = (props: {
     <A
       href={props.href}
       onClick={() => ctx?.setShowMenu(false)}
-      class="flex items-center gap-1.5 rounded-md p-1 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      class="flex items-center gap-2 rounded-md p-1.5 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
       classList={{ "justify-between": props.external }}
       target={props.newTab ? "_blank" : undefined}
     >
@@ -79,7 +79,7 @@ export const ActionMenu = (props: {
   return (
     <button
       onClick={props.onClick}
-      class="flex items-center gap-1.5 rounded-md p-1 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      class="flex items-center gap-2 rounded-md p-1.5 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
     >
       <Show when={props.icon}>
         <span class={"iconify shrink-0 " + props.icon}></span>
@@ -127,7 +127,7 @@ export const DropdownMenu = (props: {
         <div
           ref={setMenu}
           class={
-            "dark:bg-dark-300 dark:shadow-dark-700 absolute right-0 z-40 flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 shadow-md dark:border-neutral-700 " +
+            "dark:bg-dark-300 dark:shadow-dark-700 absolute right-0 z-40 flex min-w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-md dark:border-neutral-700 " +
             props.menuClass
           }
         >
