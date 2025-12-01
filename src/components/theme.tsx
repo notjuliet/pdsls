@@ -31,7 +31,7 @@ export const ThemeSelection = () => {
           "flex items-center gap-2 rounded-xl border px-3 py-2": true,
           "bg-neutral-200/60 border-neutral-300 dark:border-neutral-500 dark:bg-neutral-700":
             theme() === props.theme,
-          "border-neutral-200 dark:border-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800":
+          "border-neutral-200 dark:border-neutral-600 hover:bg-neutral-200/30 dark:hover:bg-neutral-800":
             theme() !== props.theme,
         }}
         onclick={() => updateTheme(props.theme)}
