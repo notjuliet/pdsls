@@ -17,26 +17,24 @@ const LabelCard = (props: { label: ComAtprotoLabelDefs.Label }) => {
 
   return (
     <div class="flex flex-col gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
-      <div class="flex flex-wrap items-center gap-x-2 gap-y-2">
-        <div class="inline-flex items-center gap-x-1 text-sm font-medium">
-          <span class="iconify lucide--tag shrink-0" />
-          {label.val}
-        </div>
-        <Show when={label.neg}>
-          <div class="inline-flex items-center gap-x-1 text-xs font-medium text-red-500 dark:text-red-400">
-            <span>negated</span>
-          </div>
-        </Show>
-        <div class="flex flex-wrap gap-3 text-xs text-neutral-600 dark:text-neutral-400">
-          <span>{localDateFromTimestamp(new Date(label.cts).getTime())}</span>
-          <Show when={label.exp}>
-            {(exp) => (
-              <div class="flex items-center gap-x-1">
-                <span class="iconify lucide--clock-fading shrink-0" />
-                <span>{localDateFromTimestamp(new Date(exp()).getTime())}</span>
-              </div>
-            )}
+      <div class="flex gap-1 text-sm">
+        <span class="iconify lucide--tag shrink-0 self-center" />
+        <div class="flex flex-wrap items-baseline gap-2">
+          <span class="font-medium">{label.val}</span>
+          <Show when={label.neg}>
+            <span class="text-xs font-medium text-red-500 dark:text-red-400">negated</span>
           </Show>
+          <div class="flex flex-wrap gap-2 text-xs text-neutral-600 dark:text-neutral-400">
+            <span>{localDateFromTimestamp(new Date(label.cts).getTime())}</span>
+            <Show when={label.exp}>
+              {(exp) => (
+                <div class="flex items-center gap-x-1">
+                  <span class="iconify lucide--clock-fading shrink-0" />
+                  <span>{localDateFromTimestamp(new Date(exp()).getTime())}</span>
+                </div>
+              )}
+            </Show>
+          </div>
         </div>
       </div>
 
