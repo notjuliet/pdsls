@@ -22,7 +22,13 @@ const VideoPlayer = (props: VideoPlayerProps) => {
   });
 
   return (
-    <video ref={video} class="max-h-80 max-w-[20rem]" controls playsinline onLoadedData={props.onLoad}>
+    <video
+      ref={video}
+      class="max-h-80 max-w-[20rem]"
+      controls
+      playsinline
+      onLoadedData={props.onLoad}
+    >
       <source type="video/mp4" />
     </video>
   );
