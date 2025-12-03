@@ -113,16 +113,16 @@ export const RepoView = () => {
       if (!did.startsWith("did:")) {
         try {
           const did = await resolveHandle(params.repo as Handle);
-          navigate(location.pathname.replace(params.repo!, did));
+          navigate(location.pathname.replace(params.repo!, did), { replace: true });
           return;
         } catch {
           try {
             const nsid = params.repo as Nsid;
             const res = await resolveLexiconAuthority(nsid);
-            navigate(`/at://${res}/com.atproto.lexicon.schema/${nsid}`);
+            navigate(`/at://${res}/com.atproto.lexicon.schema/${nsid}`, { replace: true });
             return;
           } catch {
-            navigate(`/${did}`);
+            navigate(`/${did}`, { replace: true });
             return;
           }
         }

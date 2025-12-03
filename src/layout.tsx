@@ -38,7 +38,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
   createEffect(async () => {
     if (props.params.repo && !props.params.repo.startsWith("did:")) {
       const did = await resolveHandle(props.params.repo as Handle);
-      navigate(location.pathname.replace(props.params.repo, did));
+      navigate(location.pathname.replace(props.params.repo, did), { replace: true });
     }
   });
 
