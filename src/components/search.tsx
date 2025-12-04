@@ -255,7 +255,7 @@ const Search = () => {
             {(prefixItem, index) => (
               <button
                 type="button"
-                class={`flex items-center rounded-lg p-2 ${
+                class={`flex items-center rounded-md p-2 ${
                   index() === selectedIndex() ?
                     "bg-neutral-200 dark:bg-neutral-700"
                   : "hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
@@ -280,7 +280,7 @@ const Search = () => {
               const adjustedIndex = getPrefixSuggestions().length + index();
               return (
                 <A
-                  class={`flex items-center gap-2 rounded-lg p-2 ${
+                  class={`flex items-center gap-2 rounded-md p-2 ${
                     adjustedIndex === selectedIndex() ?
                       "bg-neutral-200 dark:bg-neutral-700"
                     : "hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
@@ -290,9 +290,16 @@ const Search = () => {
                 >
                   <img
                     src={actor.avatar?.replace("img/avatar/", "img/avatar_thumbnail/")}
-                    class="size-8 rounded-full"
+                    class="size-9 rounded-full"
                   />
-                  <span>{actor.handle}</span>
+                  <div class="flex flex-col">
+                    <Show when={actor.displayName}>
+                      <span class="text-sm font-medium">{actor.displayName}</span>
+                    </Show>
+                    <span class="text-xs text-neutral-600 dark:text-neutral-400">
+                      @{actor.handle}
+                    </span>
+                  </div>
                 </A>
               );
             }}
