@@ -111,8 +111,8 @@ const Search = () => {
     const currentInput = input();
     if (!currentInput) return SEARCH_PREFIXES;
 
-    const { prefix } = parsePrefix(currentInput);
-    if (prefix) return [];
+    const { prefix, query } = parsePrefix(currentInput);
+    if (prefix && query.length > 0) return [];
 
     return SEARCH_PREFIXES.filter((p) => p.prefix.startsWith(currentInput.toLowerCase()));
   };
