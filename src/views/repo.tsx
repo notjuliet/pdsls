@@ -1,5 +1,4 @@
 import { Client, CredentialManager } from "@atcute/client";
-import { parseDidKey, parsePublicMultikey } from "@atcute/crypto";
 import { DidDocument } from "@atcute/identity";
 import { ActorIdentifier, Did, Handle, Nsid } from "@atcute/lexicons";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
@@ -39,6 +38,7 @@ import {
   resolvePDS,
   validateHandle,
 } from "../utils/api.js";
+import { detectDidKeyType, detectKeyType } from "../utils/key.js";
 import { BlobView } from "./blob.jsx";
 import { PlcLogView } from "./logs.jsx";
 
@@ -566,9 +566,7 @@ export const RepoView = () => {
                                     #{verif.id.split("#")[1]}
                                   </span>
                                   <span class="rounded bg-neutral-200 px-1 py-0.5 text-xs text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300">
-                                    <ErrorBoundary fallback={<>unknown</>}>
-                                      {parsePublicMultikey(key()).type}
-                                    </ErrorBoundary>
+                                    {detectKeyType(key())}
                                   </span>
                                 </div>
                                 <div class="font-mono break-all">{key()}</div>
@@ -592,7 +590,7 @@ export const RepoView = () => {
                           {(key) => (
                             <div class="text-sm">
                               <span class="rounded bg-neutral-200 px-1 py-0.5 text-xs text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300">
-                                {parseDidKey(key).type}
+                                {detectDidKeyType(key)}
                               </span>
                               <div class="font-mono break-all">{key.replace("did:key:", "")}</div>
                             </div>

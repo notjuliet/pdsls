@@ -32,6 +32,7 @@
     "@atcute/lexicon-doc": "^2.0.4",
     "@atcute/lexicon-resolver": "^0.1.5",
     "@atcute/lexicons": "^1.2.5",
+    "@atcute/multibase": "^1.1.6",
     "@atcute/oauth-browser-client": "^2.0.1",
     "@atcute/repo": "^0.1.0",
     "@atcute/tangled": "^1.0.12",
