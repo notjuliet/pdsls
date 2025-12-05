@@ -140,37 +140,41 @@ export const RepoView = () => {
     }
 
     rpc = new Client({ handler: new CredentialManager({ service: pds }) });
-    const res = await rpc.get("com.atproto.repo.describeRepo", {
-      params: { repo: did as ActorIdentifier },
-    });
-    if (res.ok) {
-      const collections: Record<string, { hidden: boolean; nsids: string[] }> = {};
-      res.data.collections.forEach((c) => {
-        const nsid = c.split(".");
-        if (nsid.length > 2) {
-          const authority = `${nsid[0]}.${nsid[1]}`;
-          collections[authority] = {
-            nsids: (collections[authority]?.nsids ?? []).concat(nsid.slice(2).join(".")),
-            hidden: false,
-          };
-        }
+    try {
+      const res = await rpc.get("com.atproto.repo.describeRepo", {
+        params: { repo: did as ActorIdentifier },
       });
-      setNsids(collections);
-    } else {
-      console.error(res.data.error);
-      switch (res.data.error) {
-        case "RepoDeactivated":
-          setError("Deactivated");
-          break;
-        case "RepoTakendown":
-          setError("Takendown");
-          break;
-        default:
-          setError("Unreachable");
+      if (res.ok) {
+        const collections: Record<string, { hidden: boolean; nsids: string[] }> = {};
+        res.data.collections.forEach((c) => {
+          const nsid = c.split(".");
+          if (nsid.length > 2) {
+            const authority = `${nsid[0]}.${nsid[1]}`;
+            collections[authority] = {
+              nsids: (collections[authority]?.nsids ?? []).concat(nsid.slice(2).join(".")),
+              hidden: false,
+            };
+          }
+        });
+        setNsids(collections);
+      } else {
+        console.error(res.data.error);
+        switch (res.data.error) {
+          case "RepoDeactivated":
+            setError("Deactivated");
+            break;
+          case "RepoTakendown":
+            setError("Takendown");
+            break;
+          default:
+            setError("Unreachable");
+        }
       }
-    }
 
-    return res.data;
+      return res.data;
+    } catch {
+      return {};
+    }
   };
 
   const [repo] = createResource(fetchRepo);
