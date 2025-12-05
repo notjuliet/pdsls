@@ -303,11 +303,7 @@ export const RepoView = () => {
               </Tooltip>
             </Show>
             <MenuProvider>
-              <DropdownMenu
-                icon="lucide--ellipsis-vertical"
-                buttonClass="rounded-sm p-1.5"
-                menuClass="top-9 text-sm"
-              >
+              <DropdownMenu icon="lucide--ellipsis-vertical" buttonClass="rounded-sm p-1.5">
                 <CopyMenu content={params.repo!} label="Copy DID" icon="lucide--copy" />
                 <NavMenu
                   href={`/jetstream?dids=${params.repo}`}

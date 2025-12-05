@@ -414,11 +414,7 @@ export const RecordView = () => {
               </Modal>
             </Show>
             <MenuProvider>
-              <DropdownMenu
-                icon="lucide--ellipsis-vertical"
-                buttonClass="rounded-sm p-1.5"
-                menuClass="top-9 text-sm"
-              >
+              <DropdownMenu icon="lucide--ellipsis-vertical" buttonClass="rounded-sm p-1.5">
                 <CopyMenu
                   content={JSON.stringify(record()?.value, null, 2)}
                   label="Copy record"

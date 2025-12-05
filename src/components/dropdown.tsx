@@ -10,6 +10,7 @@ import {
   Show,
   useContext,
 } from "solid-js";
+import { Portal } from "solid-js/web";
 import { addToClipboard } from "../utils/copy";
 
 const MenuContext = createContext<{
@@ -102,14 +103,29 @@ export const DropdownMenu = (props: {
   const ctx = useContext(MenuContext);
   const [menu, setMenu] = createSignal<HTMLDivElement>();
   const [menuButton, setMenuButton] = createSignal<HTMLButtonElement>();
+  const [buttonRect, setButtonRect] = createSignal<DOMRect>();
 
   const clickEvent = (event: MouseEvent) => {
     const target = event.target as Node;
     if (!menuButton()?.contains(target) && !menu()?.contains(target)) ctx?.setShowMenu(false);
   };
 
-  onMount(() => window.addEventListener("click", clickEvent));
-  onCleanup(() => window.removeEventListener("click", clickEvent));
+  const updatePosition = () => {
+    const rect = menuButton()?.getBoundingClientRect();
+    if (rect) setButtonRect(rect);
+  };
+
+  onMount(() => {
+    window.addEventListener("click", clickEvent);
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+  });
+
+  onCleanup(() => {
+    window.removeEventListener("click", clickEvent);
+    window.removeEventListener("scroll", updatePosition, true);
+    window.removeEventListener("resize", updatePosition);
+  });
 
   return (
     <div class="relative">
@@ -119,20 +135,30 @@ export const DropdownMenu = (props: {
           props.buttonClass
         }
         ref={setMenuButton}
-        onClick={() => ctx?.setShowMenu(!ctx?.showMenu())}
+        onClick={() => {
+          updatePosition();
+          ctx?.setShowMenu(!ctx?.showMenu());
+        }}
       >
         <span class={"iconify " + props.icon}></span>
       </button>
       <Show when={ctx?.showMenu()}>
-        <div
-          ref={setMenu}
-          class={
-            "dark:bg-dark-300 dark:shadow-dark-700 absolute right-0 z-40 flex min-w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-md dark:border-neutral-700 " +
-            props.menuClass
-          }
-        >
-          {props.children}
-        </div>
+        <Portal>
+          <div
+            ref={setMenu}
+            style={{
+              position: "fixed",
+              top: `${(buttonRect()?.bottom ?? 0) + 4}px`,
+              left: `${(buttonRect()?.right ?? 0) - 160}px`,
+            }}
+            class={
+              "dark:bg-dark-300 dark:shadow-dark-700 z-50 flex min-w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-sm shadow-md dark:border-neutral-700 " +
+              props.menuClass
+            }
+          >
+            {props.children}
+          </div>
+        </Portal>
       </Show>
     </div>
   );

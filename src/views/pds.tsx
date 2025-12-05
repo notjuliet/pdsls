@@ -145,11 +145,7 @@ const PdsView = () => {
             <Tab tab="info" label="Info" />
           </div>
           <MenuProvider>
-            <DropdownMenu
-              icon="lucide--ellipsis-vertical"
-              buttonClass="rounded-sm p-1.5"
-              menuClass="top-9 text-sm"
-            >
+            <DropdownMenu icon="lucide--ellipsis-vertical" buttonClass="rounded-sm p-1.5">
               <CopyMenu content={params.pds!} label="Copy PDS" icon="lucide--copy" />
               <NavMenu
                 href={`/firehose?instance=wss://${params.pds}`}

@@ -36,7 +36,7 @@ export const removeNotification = (id: string) => {
 
 export const NotificationContainer = () => {
   return (
-    <div class="pointer-events-none fixed bottom-4 left-4 z-50 flex flex-col gap-2">
+    <div class="pointer-events-none fixed bottom-4 left-4 z-60 flex flex-col gap-2">
       <For each={notifications}>
         {(notification) => (
           <div

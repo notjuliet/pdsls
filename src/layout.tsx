@@ -139,11 +139,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           </Show>
           <AccountManager />
           <MenuProvider>
-            <DropdownMenu
-              icon="lucide--menu text-lg"
-              buttonClass="rounded-lg p-1.5"
-              menuClass="top-11 text-sm"
-            >
+            <DropdownMenu icon="lucide--menu text-lg" buttonClass="rounded-lg p-1.5">
               <NavMenu href="/jetstream" label="Jetstream" icon="lucide--radio-tower" />
               <NavMenu href="/firehose" label="Firehose" icon="lucide--droplet" />
               <NavMenu href="/labels" label="Labels" icon="lucide--tags" />

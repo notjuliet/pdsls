@@ -10,10 +10,44 @@ import { A } from "@solidjs/router";
 import { createSignal, For, onMount, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import { resolveDidDoc } from "../utils/api.js";
+import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "./dropdown.jsx";
 import { agent, Login, retrieveSession, Sessions, setAgent } from "./login.jsx";
 import { Modal } from "./modal.jsx";
 
 export const [sessions, setSessions] = createStore<Sessions>();
+
+const AccountDropdown = (props: { did: Did }) => {
+  const removeSession = async (did: Did) => {
+    const currentSession = agent()?.sub;
+    try {
+      const session = await getSession(did, { allowStale: true });
+      const agent = new OAuthUserAgent(session);
+      await agent.signOut();
+    } catch {
+      deleteStoredSession(did);
+    }
+    setSessions(
+      produce((accs) => {
+        delete accs[did];
+      }),
+    );
+    localStorage.setItem("sessions", JSON.stringify(sessions));
+    if (currentSession === did) setAgent(undefined);
+  };
+
+  return (
+    <MenuProvider>
+      <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-md p-2">
+        <NavMenu href={`/at://${props.did}`} label="Go to repo" icon="lucide--user-round" />
+        <ActionMenu
+          icon="lucide--x"
+          label="Remove account"
+          onClick={() => removeSession(props.did)}
+        />
+      </DropdownMenu>
+    </MenuProvider>
+  );
+};
 
 export const AccountManager = () => {
   const [openManager, setOpenManager] = createSignal(false);
@@ -59,24 +93,6 @@ export const AccountManager = () => {
 
       location.assign(authUrl);
     }
-  };
-
-  const removeSession = async (did: Did) => {
-    const currentSession = agent()?.sub;
-    try {
-      const session = await getSession(did, { allowStale: true });
-      const agent = new OAuthUserAgent(session);
-      await agent.signOut();
-    } catch {
-      deleteStoredSession(did);
-    }
-    setSessions(
-      produce((accs) => {
-        delete accs[did];
-      }),
-    );
-    localStorage.setItem("sessions", JSON.stringify(sessions));
-    if (currentSession === did) setAgent(undefined);
   };
 
   const getAvatar = async (did: Did) => {
@@ -130,12 +146,7 @@ export const AccountManager = () => {
                       <span class="iconify lucide--circle-alert shrink-0 text-red-500 dark:text-red-400"></span>
                     </Show>
                   </button>
-                  <button
-                    onclick={() => removeSession(did as Did)}
-                    class="flex items-center rounded-md p-2 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                  >
-                    <span class="iconify lucide--x"></span>
-                  </button>
+                  <AccountDropdown did={did as Did} />
                 </div>
               )}
             </For>
