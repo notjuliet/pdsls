@@ -1,8 +1,6 @@
 import { createSignal, For } from "solid-js";
 import { buildScopeString, GRANULAR_SCOPES } from "./scope-utils";
 
-export { hasScope, hasUserScope, parseScopeString } from "./scope-utils";
-
 interface ScopeSelectorProps {
   onConfirm: (scopeString: string) => void;
   onCancel: () => void;

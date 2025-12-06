@@ -5,7 +5,7 @@ import { getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { remove } from "@mary/exif-rm";
 import { useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createSignal, For, lazy, onCleanup, Show, Suspense } from "solid-js";
-import { hasUserScope } from "../auth/scope-selector.jsx";
+import { hasUserScope } from "../auth/scope-utils";
 import { agent, sessions } from "../auth/state";
 import { Button } from "./button.jsx";
 import { Modal } from "./modal.jsx";

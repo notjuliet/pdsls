@@ -5,7 +5,7 @@ import * as TID from "@atcute/tid";
 import { A, useParams } from "@solidjs/router";
 import { createEffect, createMemo, createResource, createSignal, For, Show } from "solid-js";
 import { createStore } from "solid-js/store";
-import { hasUserScope } from "../auth/scope-selector.jsx";
+import { hasUserScope } from "../auth/scope-utils";
 import { agent } from "../auth/state";
 import { Button } from "../components/button.jsx";
 import { JSONType, JSONValue } from "../components/json.jsx";

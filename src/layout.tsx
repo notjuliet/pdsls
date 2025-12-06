@@ -3,7 +3,7 @@ import { Meta, MetaProvider } from "@solidjs/meta";
 import { A, RouteSectionProps, useLocation, useNavigate } from "@solidjs/router";
 import { createEffect, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
 import { AccountManager } from "./auth/account.jsx";
-import { hasUserScope } from "./auth/scope-selector.jsx";
+import { hasUserScope } from "./auth/scope-utils";
 import { RecordEditor } from "./components/create.jsx";
 import { DropdownMenu, MenuProvider, MenuSeparator, NavMenu } from "./components/dropdown.jsx";
 import { NavBar } from "./components/navbar.jsx";
