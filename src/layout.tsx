@@ -2,10 +2,10 @@ import { Handle } from "@atcute/lexicons";
 import { Meta, MetaProvider } from "@solidjs/meta";
 import { A, RouteSectionProps, useLocation, useNavigate } from "@solidjs/router";
 import { createEffect, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
-import { AccountManager } from "./components/account.jsx";
+import { AccountManager } from "./auth/account.jsx";
+import { hasUserScope } from "./auth/scope-utils";
 import { RecordEditor } from "./components/create.jsx";
 import { DropdownMenu, MenuProvider, MenuSeparator, NavMenu } from "./components/dropdown.jsx";
-import { agent } from "./components/login.jsx";
 import { NavBar } from "./components/navbar.jsx";
 import { NotificationContainer } from "./components/notification.jsx";
 import { Search, SearchButton, showSearch } from "./components/search.jsx";
@@ -131,7 +131,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <Show when={location.pathname !== "/"}>
             <SearchButton />
           </Show>
-          <Show when={agent()}>
+          <Show when={hasUserScope("create")}>
             <RecordEditor create={true} />
           </Show>
           <AccountManager />

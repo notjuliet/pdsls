@@ -5,9 +5,10 @@ import * as TID from "@atcute/tid";
 import { A, useParams } from "@solidjs/router";
 import { createEffect, createMemo, createResource, createSignal, For, Show } from "solid-js";
 import { createStore } from "solid-js/store";
+import { hasUserScope } from "../auth/scope-utils";
+import { agent } from "../auth/state";
 import { Button } from "../components/button.jsx";
 import { JSONType, JSONValue } from "../components/json.jsx";
-import { agent } from "../components/login.jsx";
 import { Modal } from "../components/modal.jsx";
 import { addNotification, removeNotification } from "../components/notification.jsx";
 import { StickyOverlay } from "../components/sticky.jsx";
@@ -198,7 +199,7 @@ const CollectionView = () => {
         <StickyOverlay>
           <div class="flex w-full flex-col gap-2">
             <div class="flex items-center gap-1">
-              <Show when={agent() && agent()?.sub === did}>
+              <Show when={agent() && agent()?.sub === did && hasUserScope("delete")}>
                 <div class="flex items-center">
                   <Tooltip
                     text={batchDelete() ? "Cancel" : "Delete"}

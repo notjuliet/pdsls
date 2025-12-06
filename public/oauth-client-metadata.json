@@ -4,7 +4,7 @@
   "client_uri": "https://pdsls.dev",
   "logo_uri": "https://pdsls.dev/favicon.ico",
   "redirect_uris": ["https://pdsls.dev/"],
-  "scope": "atproto transition:generic",
+  "scope": "atproto repo:*?action=create repo:*?action=update repo:*?action=delete blob:*/*",
   "grant_types": ["authorization_code", "refresh_token"],
   "response_types": ["code"],
   "token_endpoint_auth_method": "none",
