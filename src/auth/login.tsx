@@ -1,44 +1,19 @@
-import { Client } from "@atcute/client";
-import { Did } from "@atcute/lexicons";
-import {
-  configureOAuth,
-  defaultIdentityResolver,
-  finalizeAuthorization,
-  getSession,
-  OAuthUserAgent,
-  type Session,
-} from "@atcute/oauth-browser-client";
 import { createSignal, Show } from "solid-js";
-import { didDocumentResolver, handleResolver } from "../../utils/api";
+import "./oauth-config";
 import { useOAuthScopeFlow } from "./scope-flow";
 import { ScopeSelector } from "./scope-selector";
+import { retrieveSession } from "./session-manager";
 
-configureOAuth({
-  metadata: {
-    client_id: import.meta.env.VITE_OAUTH_CLIENT_ID,
-    redirect_uri: import.meta.env.VITE_OAUTH_REDIRECT_URL,
-  },
-  identityResolver: defaultIdentityResolver({
-    handleResolver: handleResolver,
-    didDocumentResolver: didDocumentResolver,
-  }),
-});
-
-export const [agent, setAgent] = createSignal<OAuthUserAgent | undefined>();
-
-type Account = {
-  signedIn: boolean;
-  handle?: string;
-  grantedScopes?: string;
-};
-
-export type Sessions = Record<string, Account>;
+// Re-export for backwards compatibility
+export { agent, setAgent } from "./state";
+export type { Sessions } from "./state";
+export { retrieveSession };
 
 interface LoginProps {
   onCancel?: () => void;
 }
 
-const Login = (props: LoginProps) => {
+export const Login = (props: LoginProps) => {
   const [notice, setNotice] = createSignal("");
   const [loginInput, setLoginInput] = createSignal("");
 
@@ -120,54 +95,3 @@ const Login = (props: LoginProps) => {
     </div>
   );
 };
-
-const retrieveSession = async () => {
-  const init = async (): Promise<Session | undefined> => {
-    const params = new URLSearchParams(location.hash.slice(1));
-
-    if (params.has("state") && (params.has("code") || params.has("error"))) {
-      history.replaceState(null, "", location.pathname + location.search);
-
-      const auth = await finalizeAuthorization(params);
-      const did = auth.session.info.sub;
-
-      localStorage.setItem("lastSignedIn", did);
-
-      const grantedScopes =
-        localStorage.getItem("pendingScopes") || import.meta.env.VITE_OAUTH_SCOPE;
-      localStorage.removeItem("pendingScopes");
-
-      const sessions = localStorage.getItem("sessions");
-      const newSessions: Sessions = sessions ? JSON.parse(sessions) : { [did]: {} };
-      newSessions[did] = { signedIn: true, grantedScopes };
-      localStorage.setItem("sessions", JSON.stringify(newSessions));
-      return auth.session;
-    } else {
-      const lastSignedIn = localStorage.getItem("lastSignedIn");
-
-      if (lastSignedIn) {
-        const sessions = localStorage.getItem("sessions");
-        const newSessions: Sessions = sessions ? JSON.parse(sessions) : {};
-        try {
-          const session = await getSession(lastSignedIn as Did);
-          const rpc = new Client({ handler: new OAuthUserAgent(session) });
-          const res = await rpc.get("com.atproto.server.getSession");
-          newSessions[lastSignedIn].signedIn = true;
-          localStorage.setItem("sessions", JSON.stringify(newSessions));
-          if (!res.ok) throw res.data.error;
-          return session;
-        } catch (err) {
-          newSessions[lastSignedIn].signedIn = false;
-          localStorage.setItem("sessions", JSON.stringify(newSessions));
-          throw err;
-        }
-      }
-    }
-  };
-
-  const session = await init();
-
-  if (session) setAgent(new OAuthUserAgent(session));
-};
-
-export { Login, retrieveSession };

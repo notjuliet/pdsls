@@ -1,17 +1,26 @@
-import { Client, CredentialManager } from "@atcute/client";
 import { Did } from "@atcute/lexicons";
 import { deleteStoredSession, getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { A } from "@solidjs/router";
 import { createSignal, For, onMount, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
-import { resolveDidDoc } from "../../utils/api.js";
-import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../dropdown.jsx";
-import { Modal } from "../modal.jsx";
-import { agent, Login, retrieveSession, Sessions, setAgent } from "./login.jsx";
+import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
+import { Modal } from "../components/modal.jsx";
+import { Login } from "./login.jsx";
 import { useOAuthScopeFlow } from "./scope-flow.js";
-import { parseScopeString, ScopeSelector } from "./scope-selector.jsx";
+import { ScopeSelector } from "./scope-selector.jsx";
+import { parseScopeString } from "./scope-utils.js";
+import {
+  getAvatar,
+  loadHandleForSession,
+  loadSessionsFromStorage,
+  resumeSession,
+  retrieveSession,
+  saveSessionToStorage,
+} from "./session-manager.js";
+import { agent, sessions, setAgent, setSessions } from "./state.js";
 
-export const [sessions, setSessions] = createStore<Sessions>();
+// Re-export for backwards compatibility
+export { agent, sessions, setAgent, setSessions };
 
 const AccountDropdown = (props: { did: Did; onEditPermissions: (did: Did) => void }) => {
   const removeSession = async (did: Did) => {
@@ -28,7 +37,7 @@ const AccountDropdown = (props: { did: Did; onEditPermissions: (did: Did) => voi
         delete accs[did];
       }),
     );
-    localStorage.setItem("sessions", JSON.stringify(sessions));
+    saveSessionToStorage(sessions);
     if (currentSession === did) setAgent(undefined);
   };
 
@@ -64,11 +73,6 @@ export const AccountManager = () => {
     return avatarUrl.replace("img/avatar/", "img/avatar_thumbnail/");
   };
 
-  const resumeSession = async (did: Did) => {
-    localStorage.setItem("lastSignedIn", did);
-    await retrieveSession();
-  };
-
   const scopeFlow = useOAuthScopeFlow({
     beforeRedirect: (account) => resumeSession(account as Did),
   });
@@ -86,20 +90,11 @@ export const AccountManager = () => {
       await retrieveSession();
     } catch {}
 
-    const localSessions = localStorage.getItem("sessions");
-    if (localSessions) {
-      const storedSessions: Sessions = JSON.parse(localSessions);
+    const storedSessions = loadSessionsFromStorage();
+    if (storedSessions) {
       const sessionDids = Object.keys(storedSessions) as Did[];
       sessionDids.forEach(async (did) => {
-        const doc = await resolveDidDoc(did);
-        const alias = doc.alsoKnownAs?.find((alias) => alias.startsWith("at://"));
-        if (alias) {
-          setSessions(did, {
-            signedIn: storedSessions[did].signedIn,
-            handle: alias.replace("at://", ""),
-            grantedScopes: storedSessions[did].grantedScopes,
-          });
-        }
+        await loadHandleForSession(did, storedSessions);
       });
       sessionDids.forEach(async (did) => {
         const avatar = await getAvatar(did);
@@ -107,17 +102,6 @@ export const AccountManager = () => {
       });
     }
   });
-
-  const getAvatar = async (did: Did) => {
-    const rpc = new Client({
-      handler: new CredentialManager({ service: "https://public.api.bsky.app" }),
-    });
-    const res = await rpc.get("app.bsky.actor.getProfile", { params: { actor: did } });
-    if (res.ok) {
-      return res.data.avatar;
-    }
-    return undefined;
-  };
 
   return (
     <>

@@ -1,0 +1,14 @@
+import { OAuthUserAgent } from "@atcute/oauth-browser-client";
+import { createSignal } from "solid-js";
+import { createStore } from "solid-js/store";
+
+export type Account = {
+  signedIn: boolean;
+  handle?: string;
+  grantedScopes?: string;
+};
+
+export type Sessions = Record<string, Account>;
+
+export const [agent, setAgent] = createSignal<OAuthUserAgent | undefined>();
+export const [sessions, setSessions] = createStore<Sessions>();
