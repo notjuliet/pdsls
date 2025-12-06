@@ -61,6 +61,7 @@ export const Login = (props: LoginProps) => {
               id="username"
               name="username"
               autocomplete="username"
+              autofocus
               aria-label="Your AT Protocol handle"
               class="grow py-1 select-none placeholder:text-sm focus:outline-none"
               onInput={(e) => setLoginInput(e.currentTarget.value)}
@@ -76,11 +77,7 @@ export const Login = (props: LoginProps) => {
       </Show>
 
       <Show when={scopeFlow.showScopeSelector()}>
-        <ScopeSelector
-          account={scopeFlow.pendingAccount()}
-          onConfirm={scopeFlow.complete}
-          onCancel={handleCancel}
-        />
+        <ScopeSelector onConfirm={scopeFlow.complete} onCancel={handleCancel} />
       </Show>
 
       <Show when={notice()}>
