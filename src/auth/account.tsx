@@ -62,10 +62,6 @@ export const AccountManager = () => {
   const [avatars, setAvatars] = createStore<Record<Did, string>>();
   const [showingAddAccount, setShowingAddAccount] = createSignal(false);
 
-  const getAccountDisplayName = (did: string) => {
-    return sessions[did]?.handle || did;
-  };
-
   const getThumbnailUrl = (avatarUrl: string) => {
     return avatarUrl.replace("img/avatar/", "img/avatar_thumbnail/");
   };
@@ -138,7 +134,7 @@ export const AccountManager = () => {
                       class="flex grow items-center justify-between gap-1 truncate rounded-md p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                       onclick={() => handleAccountClick(did as Did)}
                     >
-                      <span class="truncate">{getAccountDisplayName(did)}</span>
+                      <span class="truncate">{sessions[did]?.handle || did}</span>
                       <Show when={did === agent()?.sub && sessions[did].signedIn}>
                         <span class="iconify lucide--check shrink-0 text-green-500 dark:text-green-400"></span>
                       </Show>
@@ -169,7 +165,6 @@ export const AccountManager = () => {
 
           <Show when={scopeFlow.showScopeSelector()}>
             <ScopeSelector
-              account={getAccountDisplayName(scopeFlow.pendingAccount())}
               initialScopes={parseScopeString(
                 sessions[scopeFlow.pendingAccount()]?.grantedScopes || "",
               )}
