@@ -487,7 +487,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                     </Tooltip>
                     <span>Validate</span>
                   </button>
-                  <Show when={!props.create}>
+                  <Show when={!props.create && hasUserScope("create") && hasUserScope("delete")}>
                     <Button onClick={() => editRecord(true)}>Recreate</Button>
                   </Show>
                   <Button
