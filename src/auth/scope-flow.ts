@@ -39,7 +39,7 @@ export const useOAuthScopeFlow = (options: UseOAuthScopeFlowOptions = {}) => {
         } catch {}
       }
 
-      // Store the requested scopes before redirect so we can save them after OAuth callback
+      // Store the requested scopes before redirect so we can save them after callback
       localStorage.setItem("pendingScopes", scopeString);
 
       options.onRedirecting?.();

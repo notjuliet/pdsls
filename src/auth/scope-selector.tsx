@@ -1,7 +1,6 @@
 import { createSignal, For } from "solid-js";
 import { buildScopeString, GRANULAR_SCOPES } from "./scope-utils";
 
-// Re-export scope utilities for convenience
 export { hasScope, hasUserScope, parseScopeString } from "./scope-utils";
 
 interface ScopeSelectorProps {

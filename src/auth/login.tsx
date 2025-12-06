@@ -2,12 +2,6 @@ import { createSignal, Show } from "solid-js";
 import "./oauth-config";
 import { useOAuthScopeFlow } from "./scope-flow";
 import { ScopeSelector } from "./scope-selector";
-import { retrieveSession } from "./session-manager";
-
-// Re-export for backwards compatibility
-export { agent, setAgent } from "./state";
-export type { Sessions } from "./state";
-export { retrieveSession };
 
 interface LoginProps {
   onCancel?: () => void;

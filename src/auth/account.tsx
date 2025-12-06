@@ -19,9 +19,6 @@ import {
 } from "./session-manager.js";
 import { agent, sessions, setAgent, setSessions } from "./state.js";
 
-// Re-export for backwards compatibility
-export { agent, sessions, setAgent, setSessions };
-
 const AccountDropdown = (props: { did: Did; onEditPermissions: (did: Did) => void }) => {
   const removeSession = async (did: Did) => {
     const currentSession = agent()?.sub;
