@@ -230,20 +230,22 @@ const CollectionView = () => {
                         </button>
                       }
                     />
-                    <Tooltip
-                      text="Recreate"
-                      children={
-                        <button
-                          onclick={() => {
-                            setRecreate(true);
-                            setOpenDelete(true);
-                          }}
-                          class="flex items-center rounded-md p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                        >
-                          <span class="iconify lucide--recycle text-lg text-green-500 dark:text-green-400"></span>
-                        </button>
-                      }
-                    />
+                    <Show when={hasUserScope("create")}>
+                      <Tooltip
+                        text="Recreate"
+                        children={
+                          <button
+                            onclick={() => {
+                              setRecreate(true);
+                              setOpenDelete(true);
+                            }}
+                            class="flex items-center rounded-md p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                          >
+                            <span class="iconify lucide--recycle text-lg text-green-500 dark:text-green-400"></span>
+                          </button>
+                        }
+                      />
+                    </Show>
                     <Tooltip
                       text="Delete"
                       children={
