@@ -13,11 +13,23 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
     props.initialScopes || new Set(["create", "update", "delete", "blob"]),
   );
 
+  const isBlobDisabled = () => {
+    const scopes = selectedScopes();
+    return !scopes.has("create") && !scopes.has("update");
+  };
+
   const toggleScope = (scopeId: string) => {
     setSelectedScopes((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(scopeId)) {
         newSet.delete(scopeId);
+        if (
+          (scopeId === "create" || scopeId === "update") &&
+          !newSet.has("create") &&
+          !newSet.has("update")
+        ) {
+          newSet.delete("blob");
+        }
       } else {
         newSet.add(scopeId);
       }
@@ -41,11 +53,15 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
       <div class="flex flex-col gap-y-2">
         <For each={GRANULAR_SCOPES}>
           {(scope) => (
-            <div class="flex items-center gap-2">
+            <div
+              class="flex items-center gap-2"
+              classList={{ "opacity-50": scope.id === "blob" && isBlobDisabled() }}
+            >
               <input
                 id={`scope-${scope.id}`}
                 type="checkbox"
                 checked={selectedScopes().has(scope.id)}
+                disabled={scope.id === "blob" && isBlobDisabled()}
                 onChange={() => toggleScope(scope.id)}
               />
               <label for={`scope-${scope.id}`} class="flex grow items-center gap-2 select-none">
