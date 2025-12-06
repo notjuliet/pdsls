@@ -45,7 +45,7 @@ export const Login = (props: LoginProps) => {
             <div class="font-semibold">Add account</div>
           </div>
         </Show>
-        <form onsubmit={(e) => e.preventDefault()}>
+        <form class="flex flex-col gap-2" onsubmit={(e) => e.preventDefault()}>
           <label for="username" class="hidden">
             Add account
           </label>
@@ -66,13 +66,13 @@ export const Login = (props: LoginProps) => {
               class="grow py-1 select-none placeholder:text-sm focus:outline-none"
               onInput={(e) => setLoginInput(e.currentTarget.value)}
             />
-            <button
-              onclick={() => initiateLogin(loginInput())}
-              class="flex items-center rounded-md p-1 hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
-            >
-              <span class="iconify lucide--log-in"></span>
-            </button>
           </div>
+          <button
+            onclick={() => initiateLogin(loginInput())}
+            class="grow rounded-lg border-[0.5px] border-neutral-300 bg-neutral-100 px-3 py-2 hover:bg-neutral-200 active:bg-neutral-300 dark:border-neutral-600 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+          >
+            Continue
+          </button>
         </form>
       </Show>
 

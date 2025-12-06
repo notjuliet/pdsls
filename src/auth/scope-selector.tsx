@@ -75,14 +75,12 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
           )}
         </For>
       </div>
-      <div class="mt-2 flex gap-2">
-        <button
-          onclick={handleConfirm}
-          class="grow rounded-lg border-[0.5px] border-neutral-300 bg-white px-3 py-1.5 hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-600 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-        >
-          Continue
-        </button>
-      </div>
+      <button
+        onclick={handleConfirm}
+        class="mt-2 grow rounded-lg border-[0.5px] border-neutral-300 bg-neutral-100 px-3 py-2 hover:bg-neutral-200 active:bg-neutral-300 dark:border-neutral-600 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      >
+        Continue
+      </button>
     </div>
   );
 };
