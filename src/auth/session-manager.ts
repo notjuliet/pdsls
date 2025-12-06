@@ -53,8 +53,7 @@ export const retrieveSession = async (): Promise<void> => {
 
       localStorage.setItem("lastSignedIn", did);
 
-      const grantedScopes =
-        localStorage.getItem("pendingScopes") || import.meta.env.VITE_OAUTH_SCOPE;
+      const grantedScopes = localStorage.getItem("pendingScopes") || "atproto";
       localStorage.removeItem("pendingScopes");
 
       const sessions = loadSessionsFromStorage();

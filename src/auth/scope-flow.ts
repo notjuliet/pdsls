@@ -27,7 +27,7 @@ export const useOAuthScopeFlow = (options: UseOAuthScopeFlowOptions = {}) => {
     setShowScopeSelector(true);
   };
 
-  const complete = async (scopeString: string) => {
+  const complete = async (scopeString: string, scopeIds: string) => {
     try {
       const account = pendingAccount();
 
@@ -39,8 +39,7 @@ export const useOAuthScopeFlow = (options: UseOAuthScopeFlowOptions = {}) => {
         } catch {}
       }
 
-      // Store the requested scopes before redirect so we can save them after callback
-      localStorage.setItem("pendingScopes", scopeString);
+      localStorage.setItem("pendingScopes", scopeIds);
 
       options.onRedirecting?.();
 

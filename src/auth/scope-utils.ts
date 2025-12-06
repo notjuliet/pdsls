@@ -30,23 +30,19 @@ export const buildScopeString = (selected: Set<string>): string => {
   return [...BASE_SCOPES, ...granular].join(" ");
 };
 
-export const parseScopeString = (scopeString: string): Set<string> => {
-  const selected = new Set<string>();
-  if (!scopeString) return selected;
-
-  for (const scope of GRANULAR_SCOPES) {
-    if (scopeString.includes(scope.scope)) {
-      selected.add(scope.id);
-    }
-  }
-
-  return selected;
+export const scopeIdsToString = (scopeIds: Set<string>): string => {
+  return ["atproto", ...Array.from(scopeIds)].join(",");
 };
 
-export const hasScope = (scopeString: string | undefined, scopeId: string): boolean => {
-  if (!scopeString) return false;
-  const scope = GRANULAR_SCOPES.find((s) => s.id === scopeId);
-  return scope ? scopeString.includes(scope.scope) : false;
+export const parseScopeString = (scopeIdsString: string): Set<string> => {
+  if (!scopeIdsString) return new Set();
+  const ids = scopeIdsString.split(",").filter(Boolean);
+  return new Set(ids.filter((id) => id !== "atproto"));
+};
+
+export const hasScope = (grantedScopes: string | undefined, scopeId: string): boolean => {
+  if (!grantedScopes) return false;
+  return grantedScopes.split(",").includes(scopeId);
 };
 
 export const hasUserScope = (scopeId: string): boolean => {

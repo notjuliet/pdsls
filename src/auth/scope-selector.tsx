@@ -1,8 +1,8 @@
 import { createSignal, For } from "solid-js";
-import { buildScopeString, GRANULAR_SCOPES } from "./scope-utils";
+import { buildScopeString, GRANULAR_SCOPES, scopeIdsToString } from "./scope-utils";
 
 interface ScopeSelectorProps {
-  onConfirm: (scopeString: string) => void;
+  onConfirm: (scopeString: string, scopeIds: string) => void;
   onCancel: () => void;
   initialScopes?: Set<string>;
   account?: string;
@@ -38,8 +38,10 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
   };
 
   const handleConfirm = () => {
-    const scopeString = buildScopeString(selectedScopes());
-    props.onConfirm(scopeString);
+    const scopes = selectedScopes();
+    const scopeString = buildScopeString(scopes);
+    const scopeIds = scopeIdsToString(scopes);
+    props.onConfirm(scopeString, scopeIds);
   };
 
   return (
