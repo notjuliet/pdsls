@@ -5,8 +5,9 @@ import { getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { remove } from "@mary/exif-rm";
 import { useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createSignal, For, lazy, onCleanup, Show, Suspense } from "solid-js";
-import { agent } from "../components/login.jsx";
-import { sessions } from "./account.jsx";
+import { agent } from "../components/auth/login.jsx";
+import { sessions } from "./auth/account.jsx";
+import { hasUserScope } from "./auth/scope-selector.jsx";
 import { Button } from "./button.jsx";
 import { Modal } from "./modal.jsx";
 import { addNotification, removeNotification } from "./notification.jsx";
@@ -436,14 +437,16 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                   </button>
                   <Show when={openInsertMenu()}>
                     <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute bottom-full left-0 z-10 mb-1 flex w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1.5 shadow-md dark:border-neutral-700">
-                      <MenuItem
-                        icon="lucide--upload"
-                        label="Upload blob"
-                        onClick={() => {
-                          setOpenInsertMenu(false);
-                          blobInput.click();
-                        }}
-                      />
+                      <Show when={hasUserScope("blob")}>
+                        <MenuItem
+                          icon="lucide--upload"
+                          label="Upload blob"
+                          onClick={() => {
+                            setOpenInsertMenu(false);
+                            blobInput.click();
+                          }}
+                        />
+                      </Show>
                       <MenuItem
                         icon="lucide--clock"
                         label="Insert timestamp"
