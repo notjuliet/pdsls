@@ -153,13 +153,18 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
           return;
         }
       } else {
-        const res = await rpc.post("com.atproto.repo.putRecord", {
+        const res = await rpc.post("com.atproto.repo.applyWrites", {
           input: {
             repo: agent()!.sub,
-            collection: params.collection as `${string}.${string}.${string}`,
-            rkey: params.rkey!,
-            record: editedRecord,
             validate: validate(),
+            writes: [
+              {
+                collection: params.collection as `${string}.${string}.${string}`,
+                rkey: params.rkey!,
+                $type: "com.atproto.repo.applyWrites#update",
+                value: editedRecord,
+              },
+            ],
           },
         });
         if (!res.ok) {
