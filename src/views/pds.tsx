@@ -1,5 +1,5 @@
 import { ComAtprotoServerDescribeServer, ComAtprotoSyncListRepos } from "@atcute/atproto";
-import { Client, CredentialManager } from "@atcute/client";
+import { Client, simpleFetchHandler } from "@atcute/client";
 import { InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
 import { A, useLocation, useParams } from "@solidjs/router";
@@ -23,7 +23,7 @@ const PdsView = () => {
   setPDS(params.pds);
   const pds =
     params.pds!.startsWith("localhost") ? `http://${params.pds}` : `https://${params.pds}`;
-  const rpc = new Client({ handler: new CredentialManager({ service: pds }) });
+  const rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
 
   const getVersion = async () => {
     // @ts-expect-error: undocumented endpoint

@@ -1,4 +1,4 @@
-import { Client, CredentialManager } from "@atcute/client";
+import { Client, simpleFetchHandler } from "@atcute/client";
 import { DidDocument } from "@atcute/identity";
 import { ActorIdentifier, Did, Handle, Nsid } from "@atcute/lexicons";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
@@ -139,7 +139,7 @@ export const RepoView = () => {
       return {};
     }
 
-    rpc = new Client({ handler: new CredentialManager({ service: pds }) });
+    rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
     try {
       const res = await rpc.get("com.atproto.repo.describeRepo", {
         params: { repo: did as ActorIdentifier },

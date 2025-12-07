@@ -1,4 +1,4 @@
-import { Client, CredentialManager } from "@atcute/client";
+import { Client, simpleFetchHandler } from "@atcute/client";
 import { createResource, createSignal, For, Show } from "solid-js";
 import { Button } from "../components/button";
 
@@ -9,7 +9,7 @@ const BlobView = (props: { pds: string; repo: string }) => {
   let rpc: Client;
 
   const fetchBlobs = async () => {
-    if (!rpc) rpc = new Client({ handler: new CredentialManager({ service: props.pds }) });
+    if (!rpc) rpc = new Client({ handler: simpleFetchHandler({ service: props.pds }) });
     const res = await rpc.get("com.atproto.sync.listBlobs", {
       params: {
         did: props.repo as `did:${string}:${string}`,

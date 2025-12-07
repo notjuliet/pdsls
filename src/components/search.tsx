@@ -1,4 +1,4 @@
-import { Client, CredentialManager } from "@atcute/client";
+import { Client, simpleFetchHandler } from "@atcute/client";
 import { Nsid } from "@atcute/lexicons";
 import { A, useLocation, useNavigate } from "@solidjs/router";
 import { createResource, createSignal, For, onCleanup, onMount, Show } from "solid-js";
@@ -67,7 +67,7 @@ const Search = () => {
   const navigate = useNavigate();
   let searchInput!: HTMLInputElement;
   const rpc = new Client({
-    handler: new CredentialManager({ service: "https://public.api.bsky.app" }),
+    handler: simpleFetchHandler({ service: "https://public.api.bsky.app" }),
   });
 
   onMount(() => {

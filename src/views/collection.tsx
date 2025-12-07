@@ -1,5 +1,5 @@
 import { ComAtprotoRepoApplyWrites, ComAtprotoRepoGetRecord } from "@atcute/atproto";
-import { Client, CredentialManager } from "@atcute/client";
+import { Client, simpleFetchHandler } from "@atcute/client";
 import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
 import { A, useParams } from "@solidjs/router";
@@ -89,7 +89,7 @@ const CollectionView = () => {
 
   const fetchRecords = async () => {
     if (!pds) pds = await resolvePDS(did!);
-    if (!rpc) rpc = new Client({ handler: new CredentialManager({ service: pds }) });
+    if (!rpc) rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
     const res = await rpc.get("com.atproto.repo.listRecords", {
       params: {
         repo: did as ActorIdentifier,

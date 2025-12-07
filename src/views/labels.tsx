@@ -1,5 +1,5 @@
 import { ComAtprotoLabelDefs } from "@atcute/atproto";
-import { Client, CredentialManager } from "@atcute/client";
+import { Client, simpleFetchHandler } from "@atcute/client";
 import { isAtprotoDid } from "@atcute/identity";
 import { Handle } from "@atcute/lexicons";
 import { A, useSearchParams } from "@solidjs/router";
@@ -158,7 +158,7 @@ export const LabelView = () => {
       await resolvePDS(did);
       if (!labelerCache[did]) throw new Error("Repository is not a labeler");
       rpc = new Client({
-        handler: new CredentialManager({ service: labelerCache[did] }),
+        handler: simpleFetchHandler({ service: labelerCache[did] }),
       });
 
       setSearchParams({ did, uriPatterns });

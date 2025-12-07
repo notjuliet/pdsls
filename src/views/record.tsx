@@ -1,4 +1,4 @@
-import { Client, CredentialManager } from "@atcute/client";
+import { Client, simpleFetchHandler } from "@atcute/client";
 import { DidDocument, getPdsEndpoint } from "@atcute/identity";
 import { lexiconDoc } from "@atcute/lexicon-doc";
 import { RecordValidator } from "@atcute/lexicon-doc/validations";
@@ -68,7 +68,7 @@ const resolveSchema = async (authority: AtprotoDid, nsid: Nsid): Promise<unknown
       });
     }
 
-    const rpc = new Client({ handler: new CredentialManager({ service: pdsEndpoint }) });
+    const rpc = new Client({ handler: simpleFetchHandler({ service: pdsEndpoint }) });
     const response = await rpc.get("com.atproto.repo.getRecord", {
       params: {
         repo: authority,
@@ -208,7 +208,7 @@ export const RecordView = () => {
     setValidSchema(undefined);
     setLexiconUri(undefined);
     const pds = await resolvePDS(did!);
-    rpc = new Client({ handler: new CredentialManager({ service: pds }) });
+    rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
     const res = await rpc.get("com.atproto.repo.getRecord", {
       params: {
         repo: did as ActorIdentifier,

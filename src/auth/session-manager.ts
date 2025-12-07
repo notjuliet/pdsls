@@ -1,4 +1,4 @@
-import { Client, CredentialManager } from "@atcute/client";
+import { Client, simpleFetchHandler } from "@atcute/client";
 import { Did } from "@atcute/lexicons";
 import {
   finalizeAuthorization,
@@ -20,7 +20,7 @@ export const loadSessionsFromStorage = (): Sessions | null => {
 
 export const getAvatar = async (did: Did): Promise<string | undefined> => {
   const rpc = new Client({
-    handler: new CredentialManager({ service: "https://public.api.bsky.app" }),
+    handler: simpleFetchHandler({ service: "https://public.api.bsky.app" }),
   });
   const res = await rpc.get("app.bsky.actor.getProfile", { params: { actor: did } });
   if (res.ok) {
