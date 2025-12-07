@@ -6,8 +6,14 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@font-face {
+  font-family: "Figtree";
+  src: url("/fonts/Figtree[wght].woff2") format("woff2");
+  font-display: swap;
+}
+
 @theme {
-  --font-sans: "Inter", sans-serif;
+  --font-sans: "Figtree", sans-serif;
   --font-mono: "Roboto Mono", monospace;
   --font-pecita: "Pecita", serif;
 
