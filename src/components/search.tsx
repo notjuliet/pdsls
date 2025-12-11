@@ -1,7 +1,15 @@
 import { Client, simpleFetchHandler } from "@atcute/client";
 import { Nsid } from "@atcute/lexicons";
-import { A, useLocation, useNavigate } from "@solidjs/router";
-import { createResource, createSignal, For, onCleanup, onMount, Show } from "solid-js";
+import { A, useNavigate } from "@solidjs/router";
+import {
+  createEffect,
+  createResource,
+  createSignal,
+  For,
+  onCleanup,
+  onMount,
+  Show,
+} from "solid-js";
 import { isTouchDevice } from "../layout";
 import { resolveLexiconAuthority } from "../utils/api";
 import { appHandleLink, appList, appName, AppUrl } from "../utils/app-urls";
@@ -38,7 +46,17 @@ const SearchButton = () => {
 
     if ((ev.ctrlKey || ev.metaKey) && ev.key == "k") {
       ev.preventDefault();
-      setShowSearch(!showSearch());
+
+      if (showSearch()) {
+        const searchInput = document.querySelector("#input") as HTMLInputElement;
+        if (searchInput && document.activeElement !== searchInput) {
+          searchInput.focus();
+        } else {
+          setShowSearch(false);
+        }
+      } else {
+        setShowSearch(true);
+      }
     } else if (ev.key == "Escape") {
       ev.preventDefault();
       setShowSearch(false);
@@ -71,8 +89,6 @@ const Search = () => {
   });
 
   onMount(() => {
-    if (useLocation().pathname !== "/") searchInput.focus();
-
     const handlePaste = (e: ClipboardEvent) => {
       if (e.target === searchInput) return;
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
@@ -83,6 +99,10 @@ const Search = () => {
 
     window.addEventListener("paste", handlePaste);
     onCleanup(() => window.removeEventListener("paste", handlePaste));
+  });
+
+  createEffect(() => {
+    if (showSearch()) searchInput.focus();
   });
 
   const fetchTypeahead = async (input: string) => {

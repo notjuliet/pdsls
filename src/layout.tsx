@@ -128,9 +128,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <span>PDSls</span>
         </A>
         <div class="dark:bg-dark-300/60 relative flex items-center gap-0.5 rounded-lg bg-neutral-50/60 px-1 py-0.5">
-          <Show when={location.pathname !== "/"}>
-            <SearchButton />
-          </Show>
+          <SearchButton />
           <Show when={hasUserScope("create")}>
             <RecordEditor create={true} />
           </Show>
