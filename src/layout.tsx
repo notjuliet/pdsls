@@ -1,9 +1,10 @@
 import { Handle } from "@atcute/lexicons";
 import { Meta, MetaProvider } from "@solidjs/meta";
 import { A, RouteSectionProps, useLocation, useNavigate } from "@solidjs/router";
-import { createEffect, ErrorBoundary, onMount, Show, Suspense } from "solid-js";
+import { createEffect, ErrorBoundary, onCleanup, onMount, Show, Suspense } from "solid-js";
 import { AccountManager } from "./auth/account.jsx";
 import { hasUserScope } from "./auth/scope-utils";
+import { agent } from "./auth/state.js";
 import { RecordEditor } from "./components/create.jsx";
 import { DropdownMenu, MenuProvider, MenuSeparator, NavMenu } from "./components/dropdown.jsx";
 import { NavBar } from "./components/navbar.jsx";
@@ -44,6 +45,19 @@ const Layout = (props: RouteSectionProps<unknown>) => {
 
   onMount(() => {
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeEvent);
+
+    const handleGoToRepo = (ev: KeyboardEvent) => {
+      if (document.querySelector("[data-modal]")) return;
+      if (ev.target instanceof HTMLInputElement || ev.target instanceof HTMLTextAreaElement) return;
+
+      if (ev.key === "g" && agent()?.sub) {
+        ev.preventDefault();
+        navigate(`/at://${agent()!.sub}`);
+      }
+    };
+
+    window.addEventListener("keydown", handleGoToRepo);
+    onCleanup(() => window.removeEventListener("keydown", handleGoToRepo));
 
     if (localStorage.getItem("sailor") === "true") {
       const style = document.createElement("style");

@@ -41,7 +41,11 @@ const AccountDropdown = (props: { did: Did; onEditPermissions: (did: Did) => voi
   return (
     <MenuProvider>
       <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-md p-2">
-        <NavMenu href={`/at://${props.did}`} label="Go to repo" icon="lucide--user-round" />
+        <NavMenu
+          href={`/at://${props.did}`}
+          label={agent()?.sub === props.did ? "Go to repo (g)" : "Go to repo"}
+          icon="lucide--user-round"
+        />
         <ActionMenu
           icon="lucide--settings"
           label="Edit permissions"
