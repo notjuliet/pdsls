@@ -12,14 +12,14 @@ importers:
         specifier: ^3.1.9
         version: 3.1.9
       '@atcute/bluesky':
-        specifier: ^3.2.11
-        version: 3.2.11
+        specifier: ^3.2.14
+        version: 3.2.14
       '@atcute/client':
-        specifier: ^4.1.0
-        version: 4.1.0
+        specifier: ^4.1.1
+        version: 4.1.1
       '@atcute/crypto':
-        specifier: ^2.2.6
-        version: 2.2.6
+        specifier: ^2.3.0
+        version: 2.3.0
       '@atcute/did-plc':
         specifier: ^0.2.0
         version: 0.2.0
@@ -27,17 +27,17 @@ importers:
         specifier: ^1.1.3
         version: 1.1.3
       '@atcute/identity-resolver':
-        specifier: ^1.1.4
-        version: 1.1.4(@atcute/identity@1.1.3)
+        specifier: ^1.2.0
+        version: 1.2.0(@atcute/identity@1.1.3)
       '@atcute/leaflet':
-        specifier: ^1.0.12
-        version: 1.0.12
+        specifier: ^1.0.13
+        version: 1.0.13
       '@atcute/lexicon-doc':
-        specifier: ^2.0.4
-        version: 2.0.4
+        specifier: ^2.0.5
+        version: 2.0.5
       '@atcute/lexicon-resolver':
         specifier: ^0.1.5
-        version: 0.1.5(@atcute/identity-resolver@1.1.4(@atcute/identity@1.1.3))(@atcute/identity@1.1.3)
+        version: 0.1.5(@atcute/identity-resolver@1.2.0(@atcute/identity@1.1.3))(@atcute/identity@1.1.3)
       '@atcute/lexicons':
         specifier: ^1.2.5
         version: 1.2.5
@@ -45,14 +45,14 @@ importers:
         specifier: ^1.1.6
         version: 1.1.6
       '@atcute/oauth-browser-client':
-        specifier: ^2.0.1
-        version: 2.0.1
+        specifier: ^2.0.3
+        version: 2.0.3(@atcute/identity@1.1.3)
       '@atcute/repo':
         specifier: ^0.1.0
         version: 0.1.0
       '@atcute/tangled':
-        specifier: ^1.0.12
-        version: 1.0.12
+        specifier: ^1.0.13
+        version: 1.0.13
       '@atcute/tid':
         specifier: ^1.0.3
         version: 1.0.3
@@ -69,14 +69,14 @@ importers:
         specifier: ^6.5.2
         version: 6.5.2
       '@codemirror/view':
-        specifier: ^6.38.8
-        version: 6.38.8
+        specifier: ^6.39.2
+        version: 6.39.2
       '@fsegurai/codemirror-theme-basic-dark':
         specifier: ^6.2.3
-        version: 6.2.3(@codemirror/language@6.11.3)(@codemirror/state@6.5.2)(@codemirror/view@6.38.8)(@lezer/highlight@1.2.3)
+        version: 6.2.3(@codemirror/language@6.11.3)(@codemirror/state@6.5.2)(@codemirror/view@6.39.2)(@lezer/highlight@1.2.3)
       '@fsegurai/codemirror-theme-basic-light':
         specifier: ^6.2.3
-        version: 6.2.3(@codemirror/language@6.11.3)(@codemirror/state@6.5.2)(@codemirror/view@6.38.8)(@lezer/highlight@1.2.3)
+        version: 6.2.3(@codemirror/language@6.11.3)(@codemirror/state@6.5.2)(@codemirror/view@6.39.2)(@lezer/highlight@1.2.3)
       '@mary/exif-rm':
         specifier: jsr:^0.2.2
         version: '@jsr/mary__exif-rm@0.2.2'
@@ -97,14 +97,14 @@ importers:
         version: 1.9.10
     devDependencies:
       '@iconify-json/lucide':
-        specifier: ^1.2.77
-        version: 1.2.77
+        specifier: ^1.2.79
+        version: 1.2.79
       '@iconify/tailwind4':
         specifier: ^1.2.0
         version: 1.2.0(tailwindcss@4.1.17)
       '@tailwindcss/vite':
         specifier: ^4.1.17
-        version: 4.1.17(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))
+        version: 4.1.17(vite@7.2.7(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))
       prettier:
         specifier: ^3.7.4
         version: 3.7.4
@@ -121,11 +121,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: ^7.2.6
-        version: 7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
+        specifier: ^7.2.7
+        version: 7.2.7(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
       vite-plugin-solid:
         specifier: ^2.11.10
-        version: 2.11.10(solid-js@1.9.10)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))
+        version: 2.11.10(solid-js@1.9.10)(vite@7.2.7(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))
 
 packages:
 
@@ -135,8 +135,8 @@ packages:
   '@atcute/atproto@3.1.9':
     resolution: {integrity: sha512-DyWwHCTdR4hY2BPNbLXgVmm7lI+fceOwWbE4LXbGvbvVtSn+ejSVFaAv01Ra3kWDha0whsOmbJL8JP0QPpf1+w==}
 
-  '@atcute/bluesky@3.2.11':
-    resolution: {integrity: sha512-AboS6y4t+zaxIq7E4noue10csSpIuk/Uwo30/l6GgGBDPXrd7STw8Yb5nGZQP+TdG/uC8/c2mm7UnY65SDOh6A==}
+  '@atcute/bluesky@3.2.14':
+    resolution: {integrity: sha512-XlVuF55AYIyplmKvlGLlj+cUvk9ggxNRPczkTPIY991xJ4qDxDHpBJ39ekAV4dWcuBoRo2o9JynzpafPu2ljDA==}
 
   '@atcute/car@3.1.3':
     resolution: {integrity: sha512-WJ13bAEt7TjDMVi09ubjLtvhdljbWInGm9Kfy7Y6NhrmiyC/aZYaA/zHX/bHI6xv1c/h3SQduWqxOr4ae49eqA==}
@@ -150,28 +150,28 @@ packages:
   '@atcute/cid@2.2.6':
     resolution: {integrity: sha512-bTAHHbJ24p+E//V4KCS4xdmd39o211jJswvqQOevj7vk+5IYcgDLx1ryZWZ1sEPOo9x875li/kj5gpKL14RDwQ==}
 
-  '@atcute/client@4.1.0':
-    resolution: {integrity: sha512-AYhSu3RSDA2VDkVGOmad320NRbUUUf5pCFWJcOzlk25YC/4kyzmMFfpzhf1jjjEcY+anNBXGGhav/kKB1evggQ==}
+  '@atcute/client@4.1.1':
+    resolution: {integrity: sha512-FROCbTTCeL5u4tO/n72jDEKyKqjdlXMB56Ehve3W/gnnLGCYWvN42sS7tvL1Mgu6sbO3yZwsXKDrmM2No4XpjA==}
 
-  '@atcute/crypto@2.2.6':
-    resolution: {integrity: sha512-vkuexF+kmrKE1/Uqzub99Qi4QpnxA2jbu60E6PTgL4XypELQ6rb59MB/J1VbY2gs0kd3ET7+L3+NWpKD5nXyfA==}
+  '@atcute/crypto@2.3.0':
+    resolution: {integrity: sha512-w5pkJKCjbNMQu+F4JRHbR3ROQyhi1wbn+GSC6WDQamcYHkZmEZk1/eoI354bIQOOfkEM6aFLv718iskrkon4GQ==}
 
   '@atcute/did-plc@0.2.0':
     resolution: {integrity: sha512-1sGek8GRM/Ph7nLVRREm8FqM7g4shGckItvdVwJcRbUa8Rh0zOsXQa0QyYWAC0k40BhkqO9FwKXhJEaXCmF5oQ==}
 
-  '@atcute/identity-resolver@1.1.4':
-    resolution: {integrity: sha512-/SVh8vf2cXFJenmBnGeYF2aY3WGQm3cJeew5NWTlkqoy3LvJ5wkvKq9PWu4Tv653VF40rPOp6LOdVr9Fa+q5rA==}
+  '@atcute/identity-resolver@1.2.0':
+    resolution: {integrity: sha512-5UbSJfdV3JIkF8ksXz7g4nKBWasf2wROvzM66cfvTIWydWFO6/oS1KZd+zo9Eokje5Scf5+jsY9ZfgVARLepXg==}
     peerDependencies:
       '@atcute/identity': ^1.0.0
 
   '@atcute/identity@1.1.3':
     resolution: {integrity: sha512-oIqPoI8TwWeQxvcLmFEZLdN2XdWcaLVtlm8pNk0E72As9HNzzD9pwKPrLr3rmTLRIoULPPFmq9iFNsTeCIU9ng==}
 
-  '@atcute/leaflet@1.0.12':
-    resolution: {integrity: sha512-T5laBTl8vwzy0eZXBy07IQSjsLqhbZmRJsffnNQ6XMSc+lnCZ/NHfuKy8TNJbDU6dc26Z7o5l0ELfWz5QESo+w==}
+  '@atcute/leaflet@1.0.13':
+    resolution: {integrity: sha512-0/rjFqjXhOHFHsVYxGJVj3OAt40LvlV1VwjVx+T//JDcP9UUkzerhaHkefw2aWfpYnwxDMujuAf8P69xKtIaVg==}
 
-  '@atcute/lexicon-doc@2.0.4':
-    resolution: {integrity: sha512-YfwlYFoYiBvRIYG0I1zsINCTFugFtS8l67uT3nQ04zdKVflzdg8uUj8cNZYRNY1V7okoOPdikhR4kPFhYGyemw==}
+  '@atcute/lexicon-doc@2.0.5':
+    resolution: {integrity: sha512-fNCp94ehGjWFZMIqP6pWD1F9MOJogNCyqsaMVZluPSIclZ+lDL528iXB56aW4u0eSiD6Y9WJB1OI/lElG39cSA==}
 
   '@atcute/lexicon-resolver@0.1.5':
     resolution: {integrity: sha512-0bx1/zdMQPuxvRcHW6ykAxRxktC2rEZLoAVSFoLSWDAA92Tf09F9QPK5wgXSF4MNODm1dvzMEdWSMIvlg8sr3A==}
@@ -188,20 +188,20 @@ packages:
   '@atcute/multibase@1.1.6':
     resolution: {integrity: sha512-HBxuCgYLKPPxETV0Rot4VP9e24vKl8JdzGCZOVsDaOXJgbRZoRIF67Lp0H/OgnJeH/Xpva8Z5ReoTNJE5dn3kg==}
 
-  '@atcute/oauth-browser-client@2.0.1':
-    resolution: {integrity: sha512-lG021GkeORG06zfFf4bH85egObjBEKHNgAWHvbtY/E2dX4wxo88hf370pJDx8acdnuUJLJ2VKPikJtZwo4Heeg==}
+  '@atcute/oauth-browser-client@2.0.3':
+    resolution: {integrity: sha512-rzUjwhjE4LRRKdQnCFQag/zXRZMEAB1hhBoLfnoQuHwWbmDUCL7fzwC3jRhDPp3om8XaYNDj8a/iqRip0wRqoQ==}
 
   '@atcute/repo@0.1.0':
     resolution: {integrity: sha512-INiYAuma8dydBu7cqd2WVpcXh3mzhIepYBUqFWAK5MqMulPRLTRCc/9GW3G9pxYrOdlvLCVamG2Jf8XK0nuFEw==}
 
-  '@atcute/tangled@1.0.12':
-    resolution: {integrity: sha512-JKA5sOhd8SLhDFhY+PKHqLLytQBBKSiwcaEzfYUJBeyfvqXFPNNAwvRbe3VST4IQ3izoOu3O0R9/b1mjL45UzA==}
+  '@atcute/tangled@1.0.13':
+    resolution: {integrity: sha512-K95jmjDXl/f1FFzOJkk07ibNbFsPmn64sdrMACxQmUibO9WcfSjzjZLPXuH6WHFnCNtIBG3x1FQ7ndQgLoZAmw==}
 
   '@atcute/tid@1.0.3':
     resolution: {integrity: sha512-wfMJx1IMdnu0CZgWl0uR4JO2s6PGT1YPhpytD4ZHzEYKKQVuqV6Eb/7vieaVo1eYNMp2FrY67FZObeR7utRl2w==}
 
-  '@atcute/uint8array@1.0.5':
-    resolution: {integrity: sha512-XLWWxoR2HNl2qU+FCr0rp1APwJXci7HnzbOQLxK55OaMNBXZ19+xNC5ii4QCsThsDxa4JS/JTzuiQLziITWf2Q==}
+  '@atcute/uint8array@1.0.6':
+    resolution: {integrity: sha512-ucfRBQc7BFT8n9eCyGOzDHEMKF/nZwhS2pPao4Xtab1ML3HdFYcX2DM1tadCzas85QTGxHe5urnUAAcNKGRi9A==}
 
   '@atcute/util-fetch@1.0.4':
     resolution: {integrity: sha512-sIU9Qk0dE8PLEXSfhy+gIJV+HpiiknMytCI2SqLlqd0vgZUtEKI/EQfP+23LHWvP+CLCzVDOa6cpH045OlmNBg==}
@@ -315,8 +315,8 @@ packages:
   '@codemirror/state@6.5.2':
     resolution: {integrity: sha512-FVqsPqtPWKVVL3dPSxy8wEF/ymIEuVzF1PK3VbUgrxXpJUSHQWWZz4JMToquRxnkw+36LTamCZG2iua2Ptq0fA==}
 
-  '@codemirror/view@6.38.8':
-    resolution: {integrity: sha512-XcE9fcnkHCbWkjeKyi0lllwXmBLtyYb5dt89dJyx23I9+LSh5vZDIuk7OLG4VM1lgrXZQcY6cxyZyk5WVPRv/A==}
+  '@codemirror/view@6.39.2':
+    resolution: {integrity: sha512-YCbOfs4cq49ulN/MVhrUV22rKDJv/fHUs4cR98McAI59/coVwUa2N3RAoNVDgeJNchrQzBxTT3vzto4ZbTYVtw==}
 
   '@cyberalien/svg-utils@1.0.11':
     resolution: {integrity: sha512-qEE9mnyI+avfGT3emKuRs3ucYkITeaV0Xi7VlYN41f+uGnZBecQP3jwz/AF437H9J4Q7qPClHKm4NiTYpNE6hA==}
@@ -637,8 +637,8 @@ packages:
       '@codemirror/view': ^6.0.0
       '@lezer/highlight': ^1.0.0
 
-  '@iconify-json/lucide@1.2.77':
-    resolution: {integrity: sha512-FF3Z+np6Ksb0MaoQymhCHZ4xs5Oo8992Fw7By7bCgVCbBCClYV3wxpF8KzsI1FlxHD4ZXR42NVmXuqdW8YQGgA==}
+  '@iconify-json/lucide@1.2.79':
+    resolution: {integrity: sha512-CcwoXfC2Y7UVW0PXopmXtB4Do/eUJkhAqQqOnVENEiw3FwU707TK4uyIUqdo9tlvBaFBl95wnJf3smqsTnSyKA==}
 
   '@iconify/tailwind4@1.2.0':
     resolution: {integrity: sha512-+t7XqfojOB0zzZdd8gV7IQZGq1AaIHTlsxMVzagxYR0hAlJCLUD63o3iSlNKRMH3ZR7gZ8y5c9dJ7J431avRbA==}
@@ -682,8 +682,8 @@ packages:
   '@lezer/json@1.0.3':
     resolution: {integrity: sha512-BP9KzdF9Y35PDpv04r0VeSTKDeox5vVr3efE7eBbx3r4s3oNLfunchejZhjArmeieBH+nVOpgIiBJpEAv8ilqQ==}
 
-  '@lezer/lr@1.4.4':
-    resolution: {integrity: sha512-LHL17Mq0OcFXm1pGQssuGTQFPPdxARjKM8f7GA5+sGtHi0K3R84YaSbmche0+RKWHnCsx9asEe5OWOI4FHfe4A==}
+  '@lezer/lr@1.4.5':
+    resolution: {integrity: sha512-/YTRKP5yPPSo1xImYQk7AZZMAgap0kegzqCSYHjAL9x1AZ0ZQW+IpcEzMKagCsbTsLnVeWkxYrCNeXG8xEPrjg==}
 
   '@marijn/find-cluster-break@1.0.2':
     resolution: {integrity: sha512-l0h88YhZFyKdXIFNfSWpyjStDjGHwZ/U7iobcK1cQQD8sejsONdQtTVU+1wVN1PBw40PiiHB1vA5S7VTfQiP9g==}
@@ -944,8 +944,8 @@ packages:
       solid-js:
         optional: true
 
-  baseline-browser-mapping@2.9.0:
-    resolution: {integrity: sha512-Mh++g+2LPfzZToywfE1BUzvZbfOY52Nil0rn9H1CPC5DJ7fX+Vir7nToBeoiSbB1zTNeGYbELEvJESujgGrzXw==}
+  baseline-browser-mapping@2.9.6:
+    resolution: {integrity: sha512-v9BVVpOTLB59C9E7aSnmIF8h7qRsFpx+A2nugVMTszEOMcfjlZMsXRm4LF23I3Z9AJxc8ANpIvzbzONoX9VJlg==}
     hasBin: true
 
   boolbase@1.0.0:
@@ -956,8 +956,8 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
 
-  caniuse-lite@1.0.30001759:
-    resolution: {integrity: sha512-Pzfx9fOKoKvevQf8oCXoyNRQ5QyxJj+3O0Rqx2V5oxT61KGx8+n6hV/IUyJeifUci2clnmmKVpvtiqRzgiWjSw==}
+  caniuse-lite@1.0.30001760:
+    resolution: {integrity: sha512-7AAMPcueWELt1p3mi13HR/LHH0TJLT11cnwDJEs3xA4+CK/PLKeO9Kl1oru24htkyUKtkGCvAx4ohB0Ttry8Dw==}
 
   codemirror@6.0.2:
     resolution: {integrity: sha512-VhydHotNW5w1UGK0Qj96BwSk/Zqbp9WbnyK2W/eVMv4QyF41INRGpjUhFJY7/uDNuudSc33a/PKr4iDqRduvHw==}
@@ -1023,8 +1023,8 @@ packages:
   domutils@3.2.2:
     resolution: {integrity: sha512-6kZKyUajlDuqlHKVX1w7gyslj9MPIXzIFiz/rGu35uC1wMi+kMhQwGhl4lt9unC9Vb9INnY9Z3/ZA3+FhASLaw==}
 
-  electron-to-chromium@1.5.263:
-    resolution: {integrity: sha512-DrqJ11Knd+lo+dv+lltvfMDLU27g14LMdH2b0O3Pio4uk0x+z7OR+JrmyacTPN2M8w3BrZ7/RTwG3R9B7irPlg==}
+  electron-to-chromium@1.5.267:
+    resolution: {integrity: sha512-0Drusm6MVRXSOJpGbaSVgcQsuB4hEkMpHXaVstcPmhu5LIedxs1xNK/nIxmQIU/RPC0+1/o0AVZfBTkTNJOdUw==}
 
   enhanced-resolve@5.18.3:
     resolution: {integrity: sha512-d4lC8xfavMeBjzGr2vECC3fsGXziXZQyJxD868h2M/mBI3PwAuODxAkLkq5HYuvrPYcUtiLzsTo8U3PgX3Ocww==}
@@ -1391,8 +1391,8 @@ packages:
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
-  update-browserslist-db@1.2.1:
-    resolution: {integrity: sha512-R9NcHbbZ45RoWfTdhn1J9SS7zxNvlddv4YRrHTUaFdtjbmfncfedB45EC9IaqJQ97iAR1GZgOfyRQO+ExIF6EQ==}
+  update-browserslist-db@1.2.2:
+    resolution: {integrity: sha512-E85pfNzMQ9jpKkA7+TJAi4TJN+tBCuWh5rUcS/sv6cFi+1q9LYDwDI5dpUL0u/73EElyQ8d3TEaeW4sPedBqYA==}
     hasBin: true
     peerDependencies:
       browserslist: '>= 4.21.0'
@@ -1407,8 +1407,8 @@ packages:
       '@testing-library/jest-dom':
         optional: true
 
-  vite@7.2.6:
-    resolution: {integrity: sha512-tI2l/nFHC5rLh7+5+o7QjKjSR04ivXDF4jcgV0f/bTQ+OJiITy5S6gaynVsEM+7RqzufMnVbIon6Sr5x1SDYaQ==}
+  vite@7.2.7:
+    resolution: {integrity: sha512-ITcnkFeR3+fI8P1wMgItjGrR10170d8auB4EpMLPqmx6uxElH3a/hHGQabSHKdqd4FXWO1nFIp9rRn7JQ34ACQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -1476,7 +1476,7 @@ snapshots:
     dependencies:
       '@atcute/lexicons': 1.2.5
 
-  '@atcute/bluesky@3.2.11':
+  '@atcute/bluesky@3.2.14':
     dependencies:
       '@atcute/atproto': 3.1.9
       '@atcute/lexicons': 1.2.5
@@ -1485,7 +1485,7 @@ snapshots:
     dependencies:
       '@atcute/cbor': 2.2.8
       '@atcute/cid': 2.2.6
-      '@atcute/uint8array': 1.0.5
+      '@atcute/uint8array': 1.0.6
       '@atcute/varint': 1.0.3
       yocto-queue: 1.2.2
 
@@ -1493,43 +1493,43 @@ snapshots:
     dependencies:
       '@atcute/cbor': 2.2.8
       '@atcute/cid': 2.2.6
-      '@atcute/uint8array': 1.0.5
+      '@atcute/uint8array': 1.0.6
       '@atcute/varint': 1.0.3
 
   '@atcute/cbor@2.2.8':
     dependencies:
       '@atcute/cid': 2.2.6
       '@atcute/multibase': 1.1.6
-      '@atcute/uint8array': 1.0.5
+      '@atcute/uint8array': 1.0.6
 
   '@atcute/cid@2.2.6':
     dependencies:
       '@atcute/multibase': 1.1.6
-      '@atcute/uint8array': 1.0.5
+      '@atcute/uint8array': 1.0.6
 
-  '@atcute/client@4.1.0':
+  '@atcute/client@4.1.1':
     dependencies:
       '@atcute/identity': 1.1.3
       '@atcute/lexicons': 1.2.5
 
-  '@atcute/crypto@2.2.6':
+  '@atcute/crypto@2.3.0':
     dependencies:
       '@atcute/multibase': 1.1.6
-      '@atcute/uint8array': 1.0.5
+      '@atcute/uint8array': 1.0.6
       '@noble/secp256k1': 3.0.0
 
   '@atcute/did-plc@0.2.0':
     dependencies:
       '@atcute/cbor': 2.2.8
       '@atcute/cid': 2.2.6
-      '@atcute/crypto': 2.2.6
+      '@atcute/crypto': 2.3.0
       '@atcute/identity': 1.1.3
       '@atcute/lexicons': 1.2.5
       '@atcute/multibase': 1.1.6
-      '@atcute/uint8array': 1.0.5
+      '@atcute/uint8array': 1.0.6
       '@badrap/valita': 0.4.6
 
-  '@atcute/identity-resolver@1.1.4(@atcute/identity@1.1.3)':
+  '@atcute/identity-resolver@1.2.0(@atcute/identity@1.1.3)':
     dependencies:
       '@atcute/identity': 1.1.3
       '@atcute/lexicons': 1.2.5
@@ -1541,23 +1541,23 @@ snapshots:
       '@atcute/lexicons': 1.2.5
       '@badrap/valita': 0.4.6
 
-  '@atcute/leaflet@1.0.12':
+  '@atcute/leaflet@1.0.13':
     dependencies:
       '@atcute/atproto': 3.1.9
       '@atcute/lexicons': 1.2.5
 
-  '@atcute/lexicon-doc@2.0.4':
+  '@atcute/lexicon-doc@2.0.5':
     dependencies:
       '@atcute/identity': 1.1.3
       '@atcute/lexicons': 1.2.5
       '@badrap/valita': 0.4.6
 
-  '@atcute/lexicon-resolver@0.1.5(@atcute/identity-resolver@1.1.4(@atcute/identity@1.1.3))(@atcute/identity@1.1.3)':
+  '@atcute/lexicon-resolver@0.1.5(@atcute/identity-resolver@1.2.0(@atcute/identity@1.1.3))(@atcute/identity@1.1.3)':
     dependencies:
-      '@atcute/crypto': 2.2.6
+      '@atcute/crypto': 2.3.0
       '@atcute/identity': 1.1.3
-      '@atcute/identity-resolver': 1.1.4(@atcute/identity@1.1.3)
-      '@atcute/lexicon-doc': 2.0.4
+      '@atcute/identity-resolver': 1.2.0(@atcute/identity@1.1.3)
+      '@atcute/lexicon-doc': 2.0.5
       '@atcute/lexicons': 1.2.5
       '@atcute/repo': 0.1.0
       '@atcute/util-fetch': 1.0.4
@@ -1572,40 +1572,41 @@ snapshots:
     dependencies:
       '@atcute/cbor': 2.2.8
       '@atcute/cid': 2.2.6
-      '@atcute/uint8array': 1.0.5
+      '@atcute/uint8array': 1.0.6
 
   '@atcute/multibase@1.1.6':
     dependencies:
-      '@atcute/uint8array': 1.0.5
+      '@atcute/uint8array': 1.0.6
 
-  '@atcute/oauth-browser-client@2.0.1':
+  '@atcute/oauth-browser-client@2.0.3(@atcute/identity@1.1.3)':
     dependencies:
-      '@atcute/client': 4.1.0
-      '@atcute/identity': 1.1.3
-      '@atcute/identity-resolver': 1.1.4(@atcute/identity@1.1.3)
+      '@atcute/client': 4.1.1
+      '@atcute/identity-resolver': 1.2.0(@atcute/identity@1.1.3)
       '@atcute/lexicons': 1.2.5
       '@atcute/multibase': 1.1.6
-      '@atcute/uint8array': 1.0.5
+      '@atcute/uint8array': 1.0.6
       nanoid: 5.1.6
+    transitivePeerDependencies:
+      - '@atcute/identity'
 
   '@atcute/repo@0.1.0':
     dependencies:
       '@atcute/car': 5.0.0
       '@atcute/cbor': 2.2.8
       '@atcute/cid': 2.2.6
-      '@atcute/crypto': 2.2.6
+      '@atcute/crypto': 2.3.0
       '@atcute/lexicons': 1.2.5
       '@atcute/mst': 0.1.0
-      '@atcute/uint8array': 1.0.5
+      '@atcute/uint8array': 1.0.6
 
-  '@atcute/tangled@1.0.12':
+  '@atcute/tangled@1.0.13':
     dependencies:
       '@atcute/atproto': 3.1.9
       '@atcute/lexicons': 1.2.5
 
   '@atcute/tid@1.0.3': {}
 
-  '@atcute/uint8array@1.0.5': {}
+  '@atcute/uint8array@1.0.6': {}
 
   '@atcute/util-fetch@1.0.4':
     dependencies:
@@ -1730,14 +1731,14 @@ snapshots:
     dependencies:
       '@codemirror/language': 6.11.3
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.38.8
+      '@codemirror/view': 6.39.2
       '@lezer/common': 1.4.0
 
   '@codemirror/commands@6.10.0':
     dependencies:
       '@codemirror/language': 6.11.3
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.38.8
+      '@codemirror/view': 6.39.2
       '@lezer/common': 1.4.0
 
   '@codemirror/lang-json@6.0.2':
@@ -1748,29 +1749,29 @@ snapshots:
   '@codemirror/language@6.11.3':
     dependencies:
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.38.8
+      '@codemirror/view': 6.39.2
       '@lezer/common': 1.4.0
       '@lezer/highlight': 1.2.3
-      '@lezer/lr': 1.4.4
+      '@lezer/lr': 1.4.5
       style-mod: 4.1.3
 
   '@codemirror/lint@6.9.2':
     dependencies:
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.38.8
+      '@codemirror/view': 6.39.2
       crelt: 1.0.6
 
   '@codemirror/search@6.5.11':
     dependencies:
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.38.8
+      '@codemirror/view': 6.39.2
       crelt: 1.0.6
 
   '@codemirror/state@6.5.2':
     dependencies:
       '@marijn/find-cluster-break': 1.0.2
 
-  '@codemirror/view@6.38.8':
+  '@codemirror/view@6.39.2':
     dependencies:
       '@codemirror/state': 6.5.2
       crelt: 1.0.6
@@ -1931,21 +1932,21 @@ snapshots:
   '@esbuild/win32-x64@0.25.12':
     optional: true
 
-  '@fsegurai/codemirror-theme-basic-dark@6.2.3(@codemirror/language@6.11.3)(@codemirror/state@6.5.2)(@codemirror/view@6.38.8)(@lezer/highlight@1.2.3)':
+  '@fsegurai/codemirror-theme-basic-dark@6.2.3(@codemirror/language@6.11.3)(@codemirror/state@6.5.2)(@codemirror/view@6.39.2)(@lezer/highlight@1.2.3)':
     dependencies:
       '@codemirror/language': 6.11.3
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.38.8
+      '@codemirror/view': 6.39.2
       '@lezer/highlight': 1.2.3
 
-  '@fsegurai/codemirror-theme-basic-light@6.2.3(@codemirror/language@6.11.3)(@codemirror/state@6.5.2)(@codemirror/view@6.38.8)(@lezer/highlight@1.2.3)':
+  '@fsegurai/codemirror-theme-basic-light@6.2.3(@codemirror/language@6.11.3)(@codemirror/state@6.5.2)(@codemirror/view@6.39.2)(@lezer/highlight@1.2.3)':
     dependencies:
       '@codemirror/language': 6.11.3
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.38.8
+      '@codemirror/view': 6.39.2
       '@lezer/highlight': 1.2.3
 
-  '@iconify-json/lucide@1.2.77':
+  '@iconify-json/lucide@1.2.79':
     dependencies:
       '@iconify/types': 2.0.0
 
@@ -2005,9 +2006,9 @@ snapshots:
     dependencies:
       '@lezer/common': 1.4.0
       '@lezer/highlight': 1.2.3
-      '@lezer/lr': 1.4.4
+      '@lezer/lr': 1.4.5
 
-  '@lezer/lr@1.4.4':
+  '@lezer/lr@1.4.5':
     dependencies:
       '@lezer/common': 1.4.0
 
@@ -2158,12 +2159,12 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.1.17
       '@tailwindcss/oxide-win32-x64-msvc': 4.1.17
 
-  '@tailwindcss/vite@4.1.17(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))':
+  '@tailwindcss/vite@4.1.17(vite@7.2.7(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))':
     dependencies:
       '@tailwindcss/node': 4.1.17
       '@tailwindcss/oxide': 4.1.17
       tailwindcss: 4.1.17
-      vite: 7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
+      vite: 7.2.7(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
 
   '@types/babel__core@7.20.5':
     dependencies:
@@ -2211,19 +2212,19 @@ snapshots:
     optionalDependencies:
       solid-js: 1.9.10
 
-  baseline-browser-mapping@2.9.0: {}
+  baseline-browser-mapping@2.9.6: {}
 
   boolbase@1.0.0: {}
 
   browserslist@4.28.1:
     dependencies:
-      baseline-browser-mapping: 2.9.0
-      caniuse-lite: 1.0.30001759
-      electron-to-chromium: 1.5.263
+      baseline-browser-mapping: 2.9.6
+      caniuse-lite: 1.0.30001760
+      electron-to-chromium: 1.5.267
       node-releases: 2.0.27
-      update-browserslist-db: 1.2.1(browserslist@4.28.1)
+      update-browserslist-db: 1.2.2(browserslist@4.28.1)
 
-  caniuse-lite@1.0.30001759: {}
+  caniuse-lite@1.0.30001760: {}
 
   codemirror@6.0.2:
     dependencies:
@@ -2233,7 +2234,7 @@ snapshots:
       '@codemirror/lint': 6.9.2
       '@codemirror/search': 6.5.11
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.38.8
+      '@codemirror/view': 6.39.2
 
   commander@11.1.0: {}
 
@@ -2293,7 +2294,7 @@ snapshots:
       domelementtype: 2.3.0
       domhandler: 5.0.3
 
-  electron-to-chromium@1.5.263: {}
+  electron-to-chromium@1.5.267: {}
 
   enhanced-resolve@5.18.3:
     dependencies:
@@ -2616,13 +2617,13 @@ snapshots:
   undici-types@7.16.0:
     optional: true
 
-  update-browserslist-db@1.2.1(browserslist@4.28.1):
+  update-browserslist-db@1.2.2(browserslist@4.28.1):
     dependencies:
       browserslist: 4.28.1
       escalade: 3.2.0
       picocolors: 1.1.1
 
-  vite-plugin-solid@2.11.10(solid-js@1.9.10)(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)):
+  vite-plugin-solid@2.11.10(solid-js@1.9.10)(vite@7.2.7(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)):
     dependencies:
       '@babel/core': 7.28.5
       '@types/babel__core': 7.20.5
@@ -2630,12 +2631,12 @@ snapshots:
       merge-anything: 5.1.7
       solid-js: 1.9.10
       solid-refresh: 0.6.3(solid-js@1.9.10)
-      vite: 7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
-      vitefu: 1.1.1(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))
+      vite: 7.2.7(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
+      vitefu: 1.1.1(vite@7.2.7(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))
     transitivePeerDependencies:
       - supports-color
 
-  vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2):
+  vite@7.2.7(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2):
     dependencies:
       esbuild: 0.25.12
       fdir: 6.5.0(picomatch@4.0.3)
@@ -2650,9 +2651,9 @@ snapshots:
       lightningcss: 1.30.2
       tsx: 4.19.2
 
-  vitefu@1.1.1(vite@7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)):
+  vitefu@1.1.1(vite@7.2.7(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)):
     optionalDependencies:
-      vite: 7.2.6(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
+      vite: 7.2.7(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
 
   w3c-keyname@2.2.8: {}
 
