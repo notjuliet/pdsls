@@ -4,7 +4,16 @@ import { isNsid, isRecordKey } from "@atcute/lexicons/syntax";
 import { getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { remove } from "@mary/exif-rm";
 import { useNavigate, useParams } from "@solidjs/router";
-import { createEffect, createSignal, For, lazy, onCleanup, Show, Suspense } from "solid-js";
+import {
+  createEffect,
+  createSignal,
+  For,
+  lazy,
+  onCleanup,
+  onMount,
+  Show,
+  Suspense,
+} from "solid-js";
 import { hasUserScope } from "../auth/scope-utils";
 import { agent, sessions } from "../auth/state";
 import { Button } from "./button.jsx";
@@ -44,6 +53,26 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
       document.addEventListener("mousedown", handleClickOutside);
       onCleanup(() => document.removeEventListener("mousedown", handleClickOutside));
     }
+  });
+
+  onMount(() => {
+    const keyEvent = (ev: KeyboardEvent) => {
+      if (ev.target instanceof HTMLInputElement || ev.target instanceof HTMLTextAreaElement) return;
+
+      const key = props.create ? "n" : "e";
+      if (ev.key === key) {
+        ev.preventDefault();
+
+        if (openDialog() && isMinimized()) {
+          setIsMinimized(false);
+        } else if (!openDialog() && !document.querySelector("[data-modal]")) {
+          setOpenDialog(true);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", keyEvent);
+    onCleanup(() => window.removeEventListener("keydown", keyEvent));
   });
 
   const defaultPlaceholder = () => {
@@ -517,7 +546,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
           <span class="text-sm font-medium">{props.create ? "Creating" : "Editing"} record</span>
         </button>
       </Show>
-      <Tooltip text={`${props.create ? "Create" : "Edit"} record`}>
+      <Tooltip text={props.create ? "Create record (n)" : "Edit record (e)"}>
         <button
           class={`flex items-center p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 ${props.create ? "rounded-lg" : "rounded-sm"}`}
           onclick={() => {
