@@ -58,6 +58,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   onMount(() => {
     const keyEvent = (ev: KeyboardEvent) => {
       if (ev.target instanceof HTMLInputElement || ev.target instanceof HTMLTextAreaElement) return;
+      if ((ev.target as HTMLElement).closest("[data-modal]")) return;
 
       const key = props.create ? "n" : "e";
       if (ev.key === key) {
