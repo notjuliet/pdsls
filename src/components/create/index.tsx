@@ -373,6 +373,11 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                         label="Insert DID"
                         onClick={insertDidFromHandle}
                       />
+                      <MenuItem
+                        icon="lucide--clock"
+                        label="Insert timestamp"
+                        onClick={insertTimestamp}
+                      />
                       <Show when={hasUserScope("blob")}>
                         <MenuItem
                           icon="lucide--upload"
@@ -383,11 +388,6 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                           }}
                         />
                       </Show>
-                      <MenuItem
-                        icon="lucide--clock"
-                        label="Insert timestamp"
-                        onClick={insertTimestamp}
-                      />
                     </div>
                   </Show>
                   <input
