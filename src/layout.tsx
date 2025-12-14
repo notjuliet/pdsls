@@ -5,7 +5,7 @@ import { createEffect, ErrorBoundary, onCleanup, onMount, Show, Suspense } from 
 import { AccountManager } from "./auth/account.jsx";
 import { hasUserScope } from "./auth/scope-utils";
 import { agent } from "./auth/state.js";
-import { RecordEditor } from "./components/create.jsx";
+import { RecordEditor } from "./components/create";
 import { DropdownMenu, MenuProvider, MenuSeparator, NavMenu } from "./components/dropdown.jsx";
 import { NavBar } from "./components/navbar.jsx";
 import { NotificationContainer } from "./components/notification.jsx";

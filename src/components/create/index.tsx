@@ -2,7 +2,6 @@ import { Client } from "@atcute/client";
 import { Did } from "@atcute/lexicons";
 import { isNsid, isRecordKey } from "@atcute/lexicons/syntax";
 import { getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
-import { remove } from "@mary/exif-rm";
 import { useNavigate, useParams } from "@solidjs/router";
 import {
   createEffect,
@@ -14,18 +13,21 @@ import {
   Show,
   Suspense,
 } from "solid-js";
-import { hasUserScope } from "../auth/scope-utils";
-import { agent, sessions } from "../auth/state";
-import { Button } from "./button.jsx";
-import { Modal } from "./modal.jsx";
-import { addNotification, removeNotification } from "./notification.jsx";
-import { TextInput } from "./text-input.jsx";
-import Tooltip from "./tooltip.jsx";
+import { hasUserScope } from "../../auth/scope-utils";
+import { agent, sessions } from "../../auth/state";
+import { Button } from "../button.jsx";
+import { Modal } from "../modal.jsx";
+import { addNotification, removeNotification } from "../notification.jsx";
+import { TextInput } from "../text-input.jsx";
+import Tooltip from "../tooltip.jsx";
+import { FileUpload } from "./file-upload";
+import { HandleInput } from "./handle-input";
+import { MenuItem } from "./menu-item";
+import { editorInstance, placeholder, setPlaceholder } from "./state";
 
-const Editor = lazy(() => import("../components/editor.jsx").then((m) => ({ default: m.Editor })));
+const Editor = lazy(() => import("../editor.jsx").then((m) => ({ default: m.Editor })));
 
-export const editorInstance = { view: null as any };
-export const [placeholder, setPlaceholder] = createSignal<any>();
+export { editorInstance, placeholder, setPlaceholder };
 
 export const RecordEditor = (props: { create: boolean; record?: any; refetch?: any }) => {
   const navigate = useNavigate();
@@ -34,6 +36,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   const [notice, setNotice] = createSignal("");
   const [openUpload, setOpenUpload] = createSignal(false);
   const [openInsertMenu, setOpenInsertMenu] = createSignal(false);
+  const [openHandleDialog, setOpenHandleDialog] = createSignal(false);
   const [validate, setValidate] = createSignal<boolean | undefined>(undefined);
   const [isMaximized, setIsMaximized] = createSignal(false);
   const [isMinimized, setIsMinimized] = createSignal(false);
@@ -225,115 +228,9 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     setOpenInsertMenu(false);
   };
 
-  const MenuItem = (props: { icon: string; label: string; onClick: () => void }) => {
-    return (
-      <button
-        type="button"
-        class="flex items-center gap-2 rounded-md p-2 text-left text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-        onClick={props.onClick}
-      >
-        <span class={`iconify ${props.icon}`}></span>
-        <span>{props.label}</span>
-      </button>
-    );
-  };
-
-  const FileUpload = (props: { file: File }) => {
-    const [uploading, setUploading] = createSignal(false);
-    const [error, setError] = createSignal("");
-
-    onCleanup(() => (blobInput.value = ""));
-
-    const formatFileSize = (bytes: number) => {
-      if (bytes === 0) return "0 Bytes";
-      const k = 1024;
-      const sizes = ["Bytes", "KB", "MB", "GB"];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
-    };
-
-    const uploadBlob = async () => {
-      let blob: Blob;
-
-      const mimetype = (document.getElementById("mimetype") as HTMLInputElement)?.value;
-      (document.getElementById("mimetype") as HTMLInputElement).value = "";
-      if (mimetype) blob = new Blob([props.file], { type: mimetype });
-      else blob = props.file;
-
-      if ((document.getElementById("exif-rm") as HTMLInputElement).checked) {
-        const exifRemoved = remove(new Uint8Array(await blob.arrayBuffer()));
-        if (exifRemoved !== null) blob = new Blob([exifRemoved], { type: blob.type });
-      }
-
-      const rpc = new Client({ handler: agent()! });
-      setUploading(true);
-      const res = await rpc.post("com.atproto.repo.uploadBlob", {
-        input: blob,
-      });
-      setUploading(false);
-      if (!res.ok) {
-        setError(res.data.error);
-        return;
-      }
-      editorInstance.view.dispatch({
-        changes: {
-          from: editorInstance.view.state.selection.main.head,
-          insert: JSON.stringify(res.data.blob, null, 2),
-        },
-      });
-      setOpenUpload(false);
-    };
-
-    return (
-      <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] w-[20rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
-        <h2 class="mb-2 font-semibold">Upload blob</h2>
-        <div class="flex flex-col gap-2 text-sm">
-          <div class="flex flex-col gap-1">
-            <p class="flex gap-1">
-              <span class="truncate">{props.file.name}</span>
-              <span class="shrink-0 text-neutral-600 dark:text-neutral-400">
-                ({formatFileSize(props.file.size)})
-              </span>
-            </p>
-          </div>
-          <div class="flex items-center gap-x-2">
-            <label for="mimetype" class="shrink-0 select-none">
-              MIME type
-            </label>
-            <TextInput id="mimetype" placeholder={props.file.type} />
-          </div>
-          <div class="flex items-center gap-1">
-            <input id="exif-rm" type="checkbox" checked />
-            <label for="exif-rm" class="select-none">
-              Remove EXIF data
-            </label>
-          </div>
-          <p class="text-xs text-neutral-600 dark:text-neutral-400">
-            Metadata will be pasted after the cursor
-          </p>
-          <Show when={error()}>
-            <span class="text-red-500 dark:text-red-400">Error: {error()}</span>
-          </Show>
-          <div class="flex justify-between gap-2">
-            <Button onClick={() => setOpenUpload(false)}>Cancel</Button>
-            <Show when={uploading()}>
-              <div class="flex items-center gap-1">
-                <span class="iconify lucide--loader-circle animate-spin"></span>
-                <span>Uploading</span>
-              </div>
-            </Show>
-            <Show when={!uploading()}>
-              <Button
-                onClick={uploadBlob}
-                class="dark:shadow-dark-700 flex items-center gap-1 rounded-lg bg-blue-500 px-2 py-1.5 text-xs text-white shadow-xs select-none hover:bg-blue-600 active:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 dark:active:bg-blue-400"
-              >
-                Upload
-              </Button>
-            </Show>
-          </div>
-        </div>
-      </div>
-    );
+  const insertDidFromHandle = () => {
+    setOpenInsertMenu(false);
+    setOpenHandleDialog(true);
   };
 
   return (
@@ -471,6 +368,11 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                   </button>
                   <Show when={openInsertMenu()}>
                     <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute bottom-full left-0 z-10 mb-1 flex w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1.5 shadow-md dark:border-neutral-700">
+                      <MenuItem
+                        icon="lucide--id-card"
+                        label="Insert DID"
+                        onClick={insertDidFromHandle}
+                      />
                       <Show when={hasUserScope("blob")}>
                         <MenuItem
                           icon="lucide--upload"
@@ -503,7 +405,18 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                   onClose={() => setOpenUpload(false)}
                   closeOnClick={false}
                 >
-                  <FileUpload file={blobInput.files![0]} />
+                  <FileUpload
+                    file={blobInput.files![0]}
+                    blobInput={blobInput}
+                    onClose={() => setOpenUpload(false)}
+                  />
+                </Modal>
+                <Modal
+                  open={openHandleDialog()}
+                  onClose={() => setOpenHandleDialog(false)}
+                  closeOnClick={false}
+                >
+                  <HandleInput onClose={() => setOpenHandleDialog(false)} />
                 </Modal>
                 <div class="flex items-center justify-end gap-2">
                   <button

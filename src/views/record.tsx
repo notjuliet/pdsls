@@ -12,7 +12,7 @@ import { hasUserScope } from "../auth/scope-utils";
 import { agent } from "../auth/state";
 import { Backlinks } from "../components/backlinks.jsx";
 import { Button } from "../components/button.jsx";
-import { RecordEditor, setPlaceholder } from "../components/create.jsx";
+import { RecordEditor, setPlaceholder } from "../components/create";
 import {
   CopyMenu,
   DropdownMenu,
