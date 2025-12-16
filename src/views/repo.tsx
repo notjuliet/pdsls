@@ -404,75 +404,80 @@ export const RepoView = () => {
               />
             </Show>
             <div class="flex flex-col text-sm wrap-anywhere" classList={{ "-mt-1": !showFilter() }}>
-              <For
-                each={Object.keys(nsids() ?? {}).filter((authority) =>
-                  filter() ?
-                    authority.includes(filter()!) ||
-                    nsids()?.[authority].nsids.some((nsid) =>
-                      `${authority}.${nsid}`.includes(filter()!),
-                    )
-                  : true,
-                )}
+              <Show
+                when={Object.keys(nsids() ?? {}).length != 0}
+                fallback={<span class="text-center text-base mt-3">No collections found.</span>}
               >
-                {(authority) => {
-                  const reversedDomain = authority.split(".").reverse().join(".");
-                  const [faviconLoaded, setFaviconLoaded] = createSignal(false);
+                <For
+                  each={Object.keys(nsids() ?? {}).filter((authority) =>
+                    filter() ?
+                      authority.includes(filter()!) ||
+                      nsids()?.[authority].nsids.some((nsid) =>
+                        `${authority}.${nsid}`.includes(filter()!),
+                      )
+                    : true,
+                  )}
+                >
+                  {(authority) => {
+                    const reversedDomain = authority.split(".").reverse().join(".");
+                    const [faviconLoaded, setFaviconLoaded] = createSignal(false);
 
-                  const isHighlighted = () => location.hash === `#collections:${authority}`;
+                    const isHighlighted = () => location.hash === `#collections:${authority}`;
 
-                  return (
-                    <div
-                      id={`collection-${authority}`}
-                      class="group flex items-start gap-2 rounded-lg p-1 transition-colors"
-                      classList={{
-                        "dark:hover:bg-dark-200 hover:bg-neutral-200": !isHighlighted(),
-                        "bg-blue-100 dark:bg-blue-500/25": isHighlighted(),
-                      }}
-                    >
-                      <a
-                        href={`#collections:${authority}`}
-                        class="relative flex h-5 w-4 shrink-0 items-center justify-center hover:opacity-70"
+                    return (
+                      <div
+                        id={`collection-${authority}`}
+                        class="group flex items-start gap-2 rounded-lg p-1 transition-colors"
+                        classList={{
+                          "dark:hover:bg-dark-200 hover:bg-neutral-200": !isHighlighted(),
+                          "bg-blue-100 dark:bg-blue-500/25": isHighlighted(),
+                        }}
                       >
-                        <span class="absolute top-1/2 -left-5 flex -translate-y-1/2 items-center text-base opacity-0 transition-opacity group-hover:opacity-100">
-                          <span class="iconify lucide--link absolute -left-2 w-7"></span>
-                        </span>
-                        <Show when={!faviconLoaded()}>
-                          <span class="iconify lucide--globe size-4 text-neutral-400 dark:text-neutral-500" />
-                        </Show>
-                        <img
-                          src={
-                            ["bsky.app", "bsky.chat"].includes(reversedDomain) ?
-                              "https://web-cdn.bsky.app/static/apple-touch-icon.png"
-                            : `https://${reversedDomain}/favicon.ico`
-                          }
-                          alt={`${reversedDomain} favicon`}
-                          class="h-4 w-4"
-                          classList={{ hidden: !faviconLoaded() }}
-                          onLoad={() => setFaviconLoaded(true)}
-                          onError={() => setFaviconLoaded(false)}
-                        />
-                      </a>
-                      <div class="flex flex-1 flex-col">
-                        <For
-                          each={nsids()?.[authority].nsids.filter((nsid) =>
-                            filter() ? `${authority}.${nsid}`.includes(filter()!) : true,
-                          )}
+                        <a
+                          href={`#collections:${authority}`}
+                          class="relative flex h-5 w-4 shrink-0 items-center justify-center hover:opacity-70"
                         >
-                          {(nsid) => (
-                            <A
-                              href={`/at://${did}/${authority}.${nsid}`}
-                              class="hover:underline active:underline"
-                            >
-                              <span>{authority}</span>
-                              <span class="text-neutral-500 dark:text-neutral-400">.{nsid}</span>
-                            </A>
-                          )}
-                        </For>
+                          <span class="absolute top-1/2 -left-5 flex -translate-y-1/2 items-center text-base opacity-0 transition-opacity group-hover:opacity-100">
+                            <span class="iconify lucide--link absolute -left-2 w-7"></span>
+                          </span>
+                          <Show when={!faviconLoaded()}>
+                            <span class="iconify lucide--globe size-4 text-neutral-400 dark:text-neutral-500" />
+                          </Show>
+                          <img
+                            src={
+                              ["bsky.app", "bsky.chat"].includes(reversedDomain) ?
+                                "https://web-cdn.bsky.app/static/apple-touch-icon.png"
+                              : `https://${reversedDomain}/favicon.ico`
+                            }
+                            alt={`${reversedDomain} favicon`}
+                            class="h-4 w-4"
+                            classList={{ hidden: !faviconLoaded() }}
+                            onLoad={() => setFaviconLoaded(true)}
+                            onError={() => setFaviconLoaded(false)}
+                          />
+                        </a>
+                        <div class="flex flex-1 flex-col">
+                          <For
+                            each={nsids()?.[authority].nsids.filter((nsid) =>
+                              filter() ? `${authority}.${nsid}`.includes(filter()!) : true,
+                            )}
+                          >
+                            {(nsid) => (
+                              <A
+                                href={`/at://${did}/${authority}.${nsid}`}
+                                class="hover:underline active:underline"
+                              >
+                                <span>{authority}</span>
+                                <span class="text-neutral-500 dark:text-neutral-400">.{nsid}</span>
+                              </A>
+                            )}
+                          </For>
+                        </div>
                       </div>
-                    </div>
-                  );
-                }}
-              </For>
+                    );
+                  }}
+                </For>
+              </Show>
             </div>
           </Show>
           <Show when={location.hash === "#identity" || (error() && !location.hash)}>
