@@ -428,7 +428,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
           {props.name === "main" ? "Main Definition" : props.name}
         </a>
         <span class={`rounded px-2 py-0.5 text-xs font-semibold uppercase ${defTypeColor()}`}>
-          {props.def.type}
+          {props.def.type.replace("-", " ")}
         </span>
       </div>
 
