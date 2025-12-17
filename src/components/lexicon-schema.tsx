@@ -370,11 +370,11 @@ const PermissionRow = (props: { permission: LexiconPermission; index: number }) 
 
       {/* Inherit Audience */}
       <Show when={props.permission.inheritAud}>
-        <div class="flex items-center gap-2 text-xs">
+        <div class="flex items-center gap-1 text-xs">
           <span class="font-semibold text-neutral-500 dark:text-neutral-400">
             Inherit Audience:
           </span>
-          <span class="font-mono">true</span>
+          <span>true</span>
         </div>
       </Show>
     </div>
