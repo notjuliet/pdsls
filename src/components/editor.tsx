@@ -48,6 +48,7 @@ const Editor = (props: { content: string }) => {
         keymap.of([indentWithTab]),
         linter(jsonParseLinter()),
         themeColor.of(document.documentElement.classList.contains("dark") ? basicDark : basicLight),
+        EditorView.lineWrapping,
       ],
     });
     editorInstance.view = view;
