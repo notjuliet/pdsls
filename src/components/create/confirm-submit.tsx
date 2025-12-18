@@ -33,7 +33,7 @@ export const ConfirmSubmit = (props: {
           <div class="flex items-center gap-2">
             <button
               type="button"
-              class="dark:bg-dark-100 flex items-center gap-1.5 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-600 dark:hover:bg-neutral-700"
+              class="dark:bg-dark-100 flex min-w-30 items-center gap-1.5 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-600 dark:hover:bg-neutral-700"
               onClick={cycleValidate}
             >
               <span
@@ -79,7 +79,7 @@ export const ConfirmSubmit = (props: {
           <Button onClick={props.onClose}>Cancel</Button>
           <Button
             onClick={() => props.onConfirm(validate(), recreate())}
-            class="dark:shadow-dark-700 rounded-lg bg-blue-500 px-2 py-1.5 text-xs text-white shadow-xs select-none hover:bg-blue-600 active:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 dark:active:bg-blue-400"
+            class="dark:shadow-dark-700 min-w-12 rounded-lg bg-blue-500 px-2 py-1.5 text-xs text-white shadow-xs select-none hover:bg-blue-600 active:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 dark:active:bg-blue-400"
           >
             {props.isCreate ? "Create" : "Edit"}
           </Button>
