@@ -20,6 +20,7 @@ import { Modal } from "../modal.jsx";
 import { addNotification, removeNotification } from "../notification.jsx";
 import { TextInput } from "../text-input.jsx";
 import Tooltip from "../tooltip.jsx";
+import { ConfirmSubmit } from "./confirm-submit";
 import { FileUpload } from "./file-upload";
 import { HandleInput } from "./handle-input";
 import { MenuItem } from "./menu-item";
@@ -37,7 +38,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   const [openUpload, setOpenUpload] = createSignal(false);
   const [openInsertMenu, setOpenInsertMenu] = createSignal(false);
   const [openHandleDialog, setOpenHandleDialog] = createSignal(false);
-  const [validate, setValidate] = createSignal<boolean | undefined>(undefined);
+  const [openConfirmDialog, setOpenConfirmDialog] = createSignal(false);
   const [isMaximized, setIsMaximized] = createSignal(false);
   const [isMinimized, setIsMinimized] = createSignal(false);
   const [collectionError, setCollectionError] = createSignal("");
@@ -96,31 +97,15 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     };
   };
 
-  const getValidateIcon = () => {
-    return (
-      validate() === true ? "lucide--circle-check"
-      : validate() === false ? "lucide--circle-x"
-      : "lucide--circle"
-    );
-  };
-
-  const getValidateLabel = () => {
-    return (
-      validate() === true ? "True"
-      : validate() === false ? "False"
-      : "Unset"
-    );
-  };
-
   createEffect(() => {
     if (openDialog()) {
-      setValidate(undefined);
       setCollectionError("");
       setRkeyError("");
     }
   });
 
-  const createRecord = async (formData: FormData) => {
+  const createRecord = async (validate: boolean | undefined) => {
+    const formData = new FormData(formRef);
     const repo = formData.get("repo")?.toString();
     if (!repo) return;
     const rpc = new Client({ handler: new OAuthUserAgent(await getSession(repo as Did)) });
@@ -139,13 +124,14 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
         collection: collection ? collection.toString() : record.$type,
         rkey: rkey?.toString().length ? rkey?.toString() : undefined,
         record: record,
-        validate: validate(),
+        validate: validate,
       },
     });
     if (!res.ok) {
       setNotice(`${res.data.error}: ${res.data.message}`);
       return;
     }
+    setOpenConfirmDialog(false);
     setOpenDialog(false);
     const id = addNotification({
       message: "Record created",
@@ -155,7 +141,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
     navigate(`/${res.data.uri}`);
   };
 
-  const editRecord = async (recreate?: boolean) => {
+  const editRecord = async (validate: boolean | undefined, recreate: boolean) => {
     const record = editorInstance.view.state.doc.toString();
     if (!record) return;
     const rpc = new Client({ handler: agent()! });
@@ -165,7 +151,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
         const res = await rpc.post("com.atproto.repo.applyWrites", {
           input: {
             repo: agent()!.sub,
-            validate: validate(),
+            validate: validate,
             writes: [
               {
                 collection: params.collection as `${string}.${string}.${string}`,
@@ -189,7 +175,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
         const res = await rpc.post("com.atproto.repo.applyWrites", {
           input: {
             repo: agent()!.sub,
-            validate: validate(),
+            validate: validate,
             writes: [
               {
                 collection: params.collection as `${string}.${string}.${string}`,
@@ -205,6 +191,7 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
           return;
         }
       }
+      setOpenConfirmDialog(false);
       setOpenDialog(false);
       const id = addNotification({
         message: "Record edited",
@@ -418,32 +405,26 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                 >
                   <HandleInput onClose={() => setOpenHandleDialog(false)} />
                 </Modal>
+                <Modal
+                  open={openConfirmDialog()}
+                  onClose={() => setOpenConfirmDialog(false)}
+                  closeOnClick={false}
+                >
+                  <ConfirmSubmit
+                    isCreate={props.create}
+                    onConfirm={(validate, recreate) => {
+                      if (props.create) {
+                        createRecord(validate);
+                      } else {
+                        editRecord(validate, recreate);
+                      }
+                    }}
+                    onClose={() => setOpenConfirmDialog(false)}
+                  />
+                </Modal>
                 <div class="flex items-center justify-end gap-2">
-                  <button
-                    type="button"
-                    class="flex items-center gap-1 rounded-sm p-1.5 text-xs hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                    onClick={() =>
-                      setValidate(
-                        validate() === true ? false
-                        : validate() === false ? undefined
-                        : true,
-                      )
-                    }
-                  >
-                    <Tooltip text={getValidateLabel()}>
-                      <span class={`iconify ${getValidateIcon()}`}></span>
-                    </Tooltip>
-                    <span>Validate</span>
-                  </button>
-                  <Show when={!props.create && hasUserScope("create") && hasUserScope("delete")}>
-                    <Button onClick={() => editRecord(true)}>Recreate</Button>
-                  </Show>
-                  <Button
-                    onClick={() =>
-                      props.create ? createRecord(new FormData(formRef)) : editRecord()
-                    }
-                  >
-                    {props.create ? "Create" : "Edit"}
+                  <Button onClick={() => setOpenConfirmDialog(true)}>
+                    {props.create ? "Create..." : "Edit..."}
                   </Button>
                 </div>
               </div>
