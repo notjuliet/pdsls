@@ -27,8 +27,8 @@ export const ConfirmSubmit = (props: {
 
   return (
     <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] w-[24rem] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
-      <h2 class="mb-3 font-semibold">{props.isCreate ? "Create" : "Edit"} record</h2>
       <div class="flex flex-col gap-3 text-sm">
+        <h2 class="font-semibold">{props.isCreate ? "Create" : "Edit"} record</h2>
         <div class="flex flex-col gap-1.5">
           <div class="flex items-center gap-2">
             <button
@@ -75,7 +75,7 @@ export const ConfirmSubmit = (props: {
             </p>
           </div>
         </Show>
-        <div class="mt-1 flex justify-between gap-2">
+        <div class="flex justify-between gap-2">
           <Button onClick={props.onClose}>Cancel</Button>
           <Button
             onClick={() => props.onConfirm(validate(), recreate())}
