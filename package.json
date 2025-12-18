@@ -17,7 +17,7 @@
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
-    "vite": "^7.2.7",
+    "vite": "^7.3.0",
     "vite-plugin-solid": "^2.11.10"
   },
   "dependencies": {
@@ -37,7 +37,7 @@
     "@atcute/repo": "^0.1.0",
     "@atcute/tangled": "^1.0.13",
     "@atcute/tid": "^1.0.3",
-    "@codemirror/commands": "^6.10.0",
+    "@codemirror/commands": "^6.10.1",
     "@codemirror/lang-json": "^6.0.2",
     "@codemirror/lint": "^6.9.2",
     "@codemirror/state": "^6.5.2",
