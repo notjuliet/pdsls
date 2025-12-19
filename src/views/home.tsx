@@ -1,7 +1,7 @@
 export const Home = () => {
   return (
     <div class="flex w-full flex-col gap-3 wrap-break-word">
-      <div class="flex flex-col gap-0.5">
+      <div class="flex flex-col gap-1">
         <div>
           <span class="text-xl font-semibold">AT Protocol Explorer</span>
         </div>
@@ -16,14 +16,6 @@ export const Home = () => {
           </span>
         </div>
         <div class="flex items-center gap-1">
-          <div class="iconify lucide--user-round" />
-          <span>Login to manage records in your repository.</span>
-        </div>
-        <div class="flex items-center gap-1">
-          <div class="iconify lucide--radio-tower" />
-          <span>Jetstream and firehose streaming.</span>
-        </div>
-        <div class="flex items-center gap-1">
           <div class="iconify lucide--link" />
           <span>
             Backlinks support with{" "}
@@ -36,6 +28,14 @@ export const Home = () => {
             </a>
             .
           </span>
+        </div>
+        <div class="flex items-center gap-1">
+          <div class="iconify lucide--user-round" />
+          <span>Login to manage records in your repository.</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <div class="iconify lucide--radio-tower" />
+          <span>Jetstream and firehose streaming.</span>
         </div>
         <div class="flex items-center gap-1">
           <div class="iconify lucide--tag" />
