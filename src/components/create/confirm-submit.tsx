@@ -33,7 +33,7 @@ export const ConfirmSubmit = (props: {
           <div class="flex items-center gap-2">
             <button
               type="button"
-              class="-ml-2 flex min-w-30 items-center gap-1.5 rounded-lg px-2 py-1 text-xs hover:bg-neutral-200 dark:hover:bg-neutral-700"
+              class="-ml-2 flex min-w-30 items-center gap-1.5 rounded-lg px-2 py-1 text-xs hover:bg-neutral-200/50 dark:hover:bg-neutral-700"
               onClick={cycleValidate}
             >
               <span
@@ -57,7 +57,7 @@ export const ConfirmSubmit = (props: {
             <div class="flex items-center gap-2">
               <button
                 type="button"
-                class="-ml-2 flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                class="-ml-2 flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs hover:bg-neutral-200/50 dark:hover:bg-neutral-700"
                 onClick={() => setRecreate(!recreate())}
               >
                 <span
