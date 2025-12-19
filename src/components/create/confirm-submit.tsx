@@ -33,15 +33,15 @@ export const ConfirmSubmit = (props: {
           <div class="flex items-center gap-2">
             <button
               type="button"
-              class="dark:bg-dark-100 flex min-w-30 items-center gap-1.5 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-600 dark:hover:bg-neutral-700"
+              class="-ml-2 flex min-w-30 items-center gap-1.5 rounded-lg px-2 py-1 text-xs hover:bg-neutral-200 dark:hover:bg-neutral-700"
               onClick={cycleValidate}
             >
               <span
                 classList={{
                   iconify: true,
-                  "lucide--circle-check text-green-500 dark:text-green-400": validate() === true,
-                  "lucide--circle-x text-red-500 dark:text-red-400": validate() === false,
-                  "lucide--circle text-neutral-500 dark:text-neutral-400": validate() === undefined,
+                  "lucide--square-check text-green-500 dark:text-green-400": validate() === true,
+                  "lucide--square-x text-red-500 dark:text-red-400": validate() === false,
+                  "lucide--square text-neutral-500 dark:text-neutral-400": validate() === undefined,
                 }}
               ></span>
               <span>Validate: {getValidateLabel()}</span>
@@ -57,14 +57,14 @@ export const ConfirmSubmit = (props: {
             <div class="flex items-center gap-2">
               <button
                 type="button"
-                class="dark:bg-dark-100 flex items-center gap-1.5 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-600 dark:hover:bg-neutral-700"
+                class="-ml-2 flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs hover:bg-neutral-200 dark:hover:bg-neutral-700"
                 onClick={() => setRecreate(!recreate())}
               >
                 <span
                   classList={{
                     iconify: true,
-                    "lucide--circle-check text-green-500 dark:text-green-400": recreate(),
-                    "lucide--circle text-neutral-500 dark:text-neutral-400": !recreate(),
+                    "lucide--square-check text-green-500 dark:text-green-400": recreate(),
+                    "lucide--square text-neutral-500 dark:text-neutral-400": !recreate(),
                   }}
                 ></span>
                 <span>Recreate</span>
