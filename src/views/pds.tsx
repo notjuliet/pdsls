@@ -232,7 +232,7 @@ const PdsView = () => {
         </div>
       </div>
       <Show when={!location.hash || location.hash === "#repos"}>
-        <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 py-2">
+        <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 pt-2 pb-4">
           <div class="flex flex-col items-center gap-1 pb-2">
             <p>{repos()?.length} loaded</p>
             <Show when={!response.loading && cursor()}>

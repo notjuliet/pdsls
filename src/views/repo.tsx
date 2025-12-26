@@ -211,7 +211,7 @@ export const RepoView = () => {
       let loaded = 0;
 
       const reader = response.body?.getReader();
-      const chunks: Uint8Array[] = [];
+      const chunks: BlobPart[] = [];
 
       if (reader) {
         while (true) {
@@ -406,7 +406,7 @@ export const RepoView = () => {
             <div class="flex flex-col text-sm wrap-anywhere" classList={{ "-mt-1": !showFilter() }}>
               <Show
                 when={Object.keys(nsids() ?? {}).length != 0}
-                fallback={<span class="text-center text-base mt-3">No collections found.</span>}
+                fallback={<span class="mt-3 text-center text-base">No collections found.</span>}
               >
                 <For
                   each={Object.keys(nsids() ?? {}).filter((authority) =>
