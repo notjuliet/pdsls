@@ -14,6 +14,7 @@ import { addNotification, removeNotification } from "../components/notification.
 import { StickyOverlay } from "../components/sticky.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
+import { isTouchDevice } from "../layout.jsx";
 import { resolvePDS } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 
@@ -44,8 +45,8 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
     <span
       class="relative flex w-full min-w-0 items-baseline rounded px-0.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
       ref={rkeyRef}
-      onmouseover={() => setHover(true)}
-      onmouseleave={() => setHover(false)}
+      onmouseover={() => !isTouchDevice && setHover(true)}
+      onmouseleave={() => !isTouchDevice && setHover(false)}
     >
       <span class="flex items-baseline truncate">
         <span class="shrink-0 text-sm text-blue-400 sm:text-base">{props.record.rkey}</span>
