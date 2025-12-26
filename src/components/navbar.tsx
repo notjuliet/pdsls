@@ -18,7 +18,7 @@ const CopyButton = (props: { content: string; label: string }) => {
             e.stopPropagation();
             addToClipboard(props.content);
           }}
-          class={`-mr-2 hidden items-center rounded px-2 py-1.5 text-neutral-500 transition-all duration-200 group-hover:flex hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70`}
+          class={`-mr-2 hidden items-center rounded px-2 py-1 text-neutral-500 transition-all duration-200 group-hover:flex hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70`}
           aria-label="Copy to clipboard"
         >
           <span class="iconify lucide--link"></span>
@@ -30,7 +30,6 @@ const CopyButton = (props: { content: string; label: string }) => {
 
 export const NavBar = (props: { params: Params }) => {
   const [handle, setHandle] = createSignal(props.params.repo);
-  const [showHandle, setShowHandle] = createSignal(localStorage.showHandle === "true");
 
   createEffect(() => {
     if (pds() !== undefined && props.params.repo) {
@@ -96,33 +95,28 @@ export const NavBar = (props: { params: Params }) => {
                 <A
                   end
                   href={`/at://${props.params.repo}`}
-                  inactiveClass="text-blue-400 w-full py-0.5 font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
+                  inactiveClass="text-blue-400 gap-1 flex flex-wrap items-baseline w-full py-0.5 font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
                 >
-                  {showHandle() ? handle() : props.params.repo}
+                  <Show
+                    when={handle() !== props.params.repo}
+                    fallback={<span>{props.params.repo}</span>}
+                  >
+                    {handle()}
+                    <span class="text-xs">({props.params.repo})</span>
+                  </Show>
                 </A>
-              : <span class="py-0.5 font-medium">
-                  {showHandle() ? handle() : props.params.repo}
+              : <span class="flex flex-wrap items-baseline gap-1 py-0.5 font-medium">
+                  <Show
+                    when={handle() !== props.params.repo}
+                    fallback={<span>{props.params.repo}</span>}
+                  >
+                    {handle()}
+                    <span class="text-xs">({props.params.repo})</span>
+                  </Show>
                 </span>
               }
             </div>
-            <div class="flex">
-              <Tooltip text={showHandle() ? "Show DID" : "Show handle"}>
-                <button
-                  type="button"
-                  class={`items-center rounded px-1.25 py-1.25 text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-700 active:bg-neutral-300/70 sm:px-2 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-200 dark:active:bg-neutral-600/70 ${isTouchDevice ? "flex" : "hidden group-hover:flex"}`}
-                  onclick={() => {
-                    localStorage.showHandle = !showHandle();
-                    setShowHandle(!showHandle());
-                  }}
-                  aria-label="Switch DID/Handle"
-                >
-                  <span
-                    class={`iconify shrink-0 duration-200 ${showHandle() ? "rotate-y-180" : ""} lucide--arrow-left-right`}
-                  ></span>
-                </button>
-              </Tooltip>
-              <CopyButton content={props.params.repo!} label="Copy DID" />
-            </div>
+            <CopyButton content={props.params.repo!} label="Copy DID" />
           </div>
         </Show>
 
