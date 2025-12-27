@@ -1,22 +1,23 @@
 import * as TID from "@atcute/tid";
 import { createResource, createSignal, For, onMount, Show } from "solid-js";
-import {
-  getAllBacklinks,
-  getDidBacklinks,
-  getRecordBacklinks,
-  LinksWithDids,
-  LinksWithRecords,
-} from "../utils/api.js";
+import { getAllBacklinks, getRecordBacklinks, LinksWithRecords } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { Button } from "./button.jsx";
 
-type Backlink = {
+type BacklinksProps = {
+  target: string;
+  collection: string;
+  path: string;
+};
+
+type BacklinkEntry = {
+  collection: string;
   path: string;
   counts: { distinct_dids: number; records: number };
 };
 
-const linksBySource = (links: Record<string, any>) => {
-  let out: Record<string, Backlink[]> = {};
+const flattenLinks = (links: Record<string, any>): BacklinkEntry[] => {
+  const entries: BacklinkEntry[] = [];
   Object.keys(links)
     .toSorted()
     .forEach((collection) => {
@@ -24,106 +25,91 @@ const linksBySource = (links: Record<string, any>) => {
       Object.keys(paths)
         .toSorted()
         .forEach((path) => {
-          if (paths[path].records === 0) return;
-          if (out[collection]) out[collection].push({ path, counts: paths[path] });
-          else out[collection] = [{ path, counts: paths[path] }];
+          if (paths[path].records > 0) {
+            entries.push({ collection, path, counts: paths[path] });
+          }
         });
     });
-  return out;
+  return entries;
+};
+
+const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
+  const [links, setLinks] = createSignal<LinksWithRecords>();
+  const [more, setMore] = createSignal(false);
+
+  onMount(async () => {
+    const res = await getRecordBacklinks(props.target, props.collection, props.path, props.cursor);
+    setLinks(res);
+  });
+
+  return (
+    <Show when={links()} fallback={<p class="px-3 py-2 text-neutral-500">Loading…</p>}>
+      <For each={links()!.linking_records}>
+        {({ did, collection, rkey }) => {
+          const timestamp =
+            TID.validate(rkey) ? localDateFromTimestamp(TID.parse(rkey).timestamp / 1000) : null;
+          return (
+            <a
+              href={`/at://${did}/${collection}/${rkey}`}
+              class="grid grid-cols-[1fr_auto_auto] items-center gap-x-3 px-3 py-1.5 font-mono text-xs hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50"
+            >
+              <span class="text-blue-500 dark:text-blue-400">{rkey}</span>
+              <span class="truncate text-neutral-700 dark:text-neutral-300" title={did}>
+                {did}
+              </span>
+              <span class="text-neutral-500 tabular-nums dark:text-neutral-400">
+                {timestamp ?? ""}
+              </span>
+            </a>
+          );
+        }}
+      </For>
+      <Show when={links()?.cursor}>
+        <Show
+          when={more()}
+          fallback={
+            <div class="p-2">
+              <Button
+                onClick={() => setMore(true)}
+                class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 w-full items-center justify-center gap-1 rounded border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+              >
+                Load More
+              </Button>
+            </div>
+          }
+        >
+          <BacklinkRecords
+            target={props.target}
+            collection={props.collection}
+            path={props.path}
+            cursor={links()!.cursor}
+          />
+        </Show>
+      </Show>
+    </Show>
+  );
 };
 
 const Backlinks = (props: { target: string }) => {
-  const fetchBacklinks = async () => {
+  const [response] = createResource(async () => {
     const res = await getAllBacklinks(props.target);
-    return linksBySource(res.links);
-  };
-
-  const [response] = createResource(fetchBacklinks);
-
-  const [show, setShow] = createSignal<{
-    collection: string;
-    path: string;
-    showDids: boolean;
-  } | null>();
+    return flattenLinks(res.links);
+  });
 
   return (
-    <div class="flex w-full flex-col gap-1 text-sm wrap-anywhere">
-      <Show
-        when={response() && Object.keys(response()!).length}
-        fallback={<p>No backlinks found.</p>}
-      >
-        <For each={Object.keys(response()!)}>
-          {(collection) => (
-            <div>
-              <div class="flex items-center gap-1">
-                <span class="iconify lucide--book-text shrink-0"></span>
-                {collection}
-              </div>
-              <For each={response()![collection]}>
-                {({ path, counts }) => (
-                  <div class="ml-4.5">
-                    <div class="flex items-center gap-1">
-                      <span class="iconify lucide--route shrink-0"></span>
-                      {path.slice(1)}
-                    </div>
-                    <div class="ml-4.5">
-                      <p>
-                        <button
-                          class="text-blue-400 hover:underline active:underline"
-                          onclick={() =>
-                            (
-                              show()?.collection === collection &&
-                              show()?.path === path &&
-                              !show()?.showDids
-                            ) ?
-                              setShow(null)
-                            : setShow({ collection, path, showDids: false })
-                          }
-                        >
-                          {counts.records} record{counts.records < 2 ? "" : "s"}
-                        </button>
-                        {" from "}
-                        <button
-                          class="text-blue-400 hover:underline active:underline"
-                          onclick={() =>
-                            (
-                              show()?.collection === collection &&
-                              show()?.path === path &&
-                              show()?.showDids
-                            ) ?
-                              setShow(null)
-                            : setShow({ collection, path, showDids: true })
-                          }
-                        >
-                          {counts.distinct_dids} DID
-                          {counts.distinct_dids < 2 ? "" : "s"}
-                        </button>
-                      </p>
-                      <Show when={show()?.collection === collection && show()?.path === path}>
-                        <Show when={show()?.showDids}>
-                          <p class="w-full font-semibold">Distinct identities</p>
-                          <BacklinkItems
-                            target={props.target}
-                            collection={collection}
-                            path={path}
-                            dids={true}
-                          />
-                        </Show>
-                        <Show when={!show()?.showDids}>
-                          <p class="w-full font-semibold">Records</p>
-                          <BacklinkItems
-                            target={props.target}
-                            collection={collection}
-                            path={path}
-                            dids={false}
-                          />
-                        </Show>
-                      </Show>
-                    </div>
-                  </div>
-                )}
-              </For>
-            </div>
+    <div class="flex w-full flex-col gap-3 text-sm">
+      <Show when={response()} fallback={<p class="text-neutral-500">Loading…</p>}>
+        <Show when={response()!.length === 0}>
+          <p class="text-neutral-500">No backlinks found.</p>
+        </Show>
+        <For each={response()}>
+          {(entry) => (
+            <BacklinkSection
+              target={props.target}
+              collection={entry.collection}
+              path={entry.path}
+              counts={entry.counts}
+            />
           )}
         </For>
       </Show>
@@ -131,82 +117,40 @@ const Backlinks = (props: { target: string }) => {
   );
 };
 
-// switching on !!did everywhere is pretty annoying, this could probably be two components
-// but i don't want to duplicate or think about how to extract the paging logic
-const BacklinkItems = ({
-  target,
-  collection,
-  path,
-  dids,
-  cursor,
-}: {
-  target: string;
-  collection: string;
-  path: string;
-  dids: boolean;
-  cursor?: string;
-}) => {
-  const [links, setLinks] = createSignal<LinksWithDids | LinksWithRecords>();
-  const [more, setMore] = createSignal<boolean>(false);
-
-  onMount(async () => {
-    const links = await (dids ? getDidBacklinks : getRecordBacklinks)(
-      target,
-      collection,
-      path,
-      cursor,
-    );
-    setLinks(links);
-  });
-
-  // TODO: could pass the `total` into this component, which can be checked against each call to this endpoint to find if it's stale.
-  // also hmm 'total' is misleading/wrong on that api
+const BacklinkSection = (
+  props: BacklinksProps & { counts: { distinct_dids: number; records: number } },
+) => {
+  const [expanded, setExpanded] = createSignal(false);
 
   return (
-    <Show when={links()} fallback={<p>Loading&hellip;</p>}>
-      <Show when={dids}>
-        <For each={(links() as LinksWithDids).linking_dids}>
-          {(did) => (
-            <a
-              href={`/at://${did}`}
-              class="relative flex w-full font-mono text-blue-400 hover:underline active:underline"
-            >
-              {did}
-            </a>
-          )}
-        </For>
-      </Show>
-      <Show when={!dids}>
-        <For each={(links() as LinksWithRecords).linking_records}>
-          {({ did, collection, rkey }) => (
-            <p class="relative flex w-full items-center gap-1 font-mono">
-              <a
-                href={`/at://${did}/${collection}/${rkey}`}
-                class="text-blue-400 hover:underline active:underline"
-              >
-                {rkey}
-              </a>
-              <span class="text-xs text-neutral-500 dark:text-neutral-400">
-                {TID.validate(rkey) ?
-                  localDateFromTimestamp(TID.parse(rkey).timestamp / 1000)
-                : undefined}
-              </span>
-            </p>
-          )}
-        </For>
-      </Show>
-      <Show when={links()?.cursor}>
-        <Show when={more()} fallback={<Button onClick={() => setMore(true)}>Load More</Button>}>
-          <BacklinkItems
-            target={target}
-            collection={collection}
-            path={path}
-            dids={dids}
-            cursor={links()!.cursor}
+    <div class="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700">
+      <button
+        class="flex w-full items-center justify-between gap-3 px-3 py-2 text-left hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
+        onClick={() => setExpanded(!expanded())}
+      >
+        <div class="flex min-w-0 flex-1 flex-col">
+          <span class="w-full truncate">{props.collection}</span>
+          <span class="w-full text-xs wrap-break-word text-neutral-500 dark:text-neutral-400">
+            {props.path.slice(1)}
+          </span>
+        </div>
+        <div class="flex shrink-0 items-center gap-2 text-neutral-700 dark:text-neutral-300">
+          <span class="text-xs">
+            {props.counts.records} from {props.counts.distinct_dids} repo
+            {props.counts.distinct_dids > 1 ? "s" : ""}
+          </span>
+          <span
+            class="iconify lucide--chevron-down transition-transform"
+            classList={{ "rotate-180": expanded() }}
           />
-        </Show>
+        </div>
+      </button>
+      <Show when={expanded()}>
+        <div class="border-t border-neutral-200 bg-neutral-50/50 dark:border-neutral-700 dark:bg-neutral-800/30">
+          <BacklinkRecords target={props.target} collection={props.collection} path={props.path} />
+        </div>
       </Show>
-    </Show>
+    </div>
   );
 };
 
