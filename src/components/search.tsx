@@ -382,7 +382,7 @@ const ListUrlsTooltip = () => {
         class="flex items-center rounded-md p-1 hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
         onClick={() => setOpenList(true)}
       >
-        <span class="iconify lucide--help-circle"></span>
+        <span class="iconify lucide--help-circle text-neutral-600 dark:text-neutral-300"></span>
       </button>
     </>
   );
