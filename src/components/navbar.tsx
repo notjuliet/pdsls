@@ -87,34 +87,40 @@ export const NavBar = (props: { params: Params }) => {
         <Show when={props.params.repo}>
           {/* Repository Level */}
           <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-            <div class="flex basis-full items-center gap-2">
+            <div class="flex min-w-0 basis-full items-center gap-2">
               <Tooltip text="Repository">
                 <span class="iconify lucide--book-user shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
               </Tooltip>
-              {props.params.collection ?
+              <Show
+                when={props.params.collection}
+                fallback={
+                  <span class="flex min-w-0 gap-1 py-0.5 font-medium">
+                    <Show
+                      when={handle() !== props.params.repo}
+                      fallback={<span class="truncate">{props.params.repo}</span>}
+                    >
+                      <span class="shrink-0">{handle()}</span>
+                      <span class="truncate text-neutral-500 dark:text-neutral-400">
+                        ({props.params.repo})
+                      </span>
+                    </Show>
+                  </span>
+                }
+              >
                 <A
                   end
                   href={`/at://${props.params.repo}`}
-                  inactiveClass="text-blue-400 gap-1 flex flex-wrap items-baseline w-full py-0.5 font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
+                  inactiveClass="flex min-w-0 gap-1 py-0.5 font-medium text-blue-400 hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
                 >
                   <Show
                     when={handle() !== props.params.repo}
-                    fallback={<span>{props.params.repo}</span>}
+                    fallback={<span class="truncate">{props.params.repo}</span>}
                   >
-                    {handle()}
-                    <span class="text-xs">({props.params.repo})</span>
+                    <span class="shrink-0">{handle()}</span>
+                    <span class="truncate">({props.params.repo})</span>
                   </Show>
                 </A>
-              : <span class="flex flex-wrap items-baseline gap-1 py-0.5 font-medium">
-                  <Show
-                    when={handle() !== props.params.repo}
-                    fallback={<span>{props.params.repo}</span>}
-                  >
-                    {handle()}
-                    <span class="text-xs">({props.params.repo})</span>
-                  </Show>
-                </span>
-              }
+              </Show>
             </div>
             <CopyButton content={props.params.repo!} label="Copy DID" />
           </div>
