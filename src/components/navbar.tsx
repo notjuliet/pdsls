@@ -110,7 +110,7 @@ export const NavBar = (props: { params: Params }) => {
                 <A
                   end
                   href={`/at://${props.params.repo}`}
-                  inactiveClass="flex min-w-0 gap-1 py-0.5 font-medium text-blue-400 hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
+                  inactiveClass="flex grow min-w-0 gap-1 py-0.5 font-medium text-blue-400 hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
                 >
                   <Show
                     when={handle() !== props.params.repo}

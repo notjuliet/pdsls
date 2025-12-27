@@ -15,14 +15,14 @@ importers:
         specifier: ^3.2.14
         version: 3.2.14
       '@atcute/client':
-        specifier: ^4.1.1
-        version: 4.1.1
+        specifier: ^4.1.2
+        version: 4.1.2
       '@atcute/crypto':
         specifier: ^2.3.0
         version: 2.3.0
       '@atcute/did-plc':
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: ^0.3.1
+        version: 0.3.1
       '@atcute/identity':
         specifier: ^1.1.3
         version: 1.1.3
@@ -33,14 +33,14 @@ importers:
         specifier: ^1.0.14
         version: 1.0.14
       '@atcute/lexicon-doc':
-        specifier: ^2.0.5
-        version: 2.0.5
+        specifier: ^2.0.6
+        version: 2.0.6
       '@atcute/lexicon-resolver':
         specifier: ^0.1.5
         version: 0.1.5(@atcute/identity-resolver@1.2.1(@atcute/identity@1.1.3))(@atcute/identity@1.1.3)
       '@atcute/lexicons':
-        specifier: ^1.2.5
-        version: 1.2.5
+        specifier: ^1.2.6
+        version: 1.2.6
       '@atcute/multibase':
         specifier: ^1.1.6
         version: 1.1.6
@@ -54,8 +54,8 @@ importers:
         specifier: ^1.0.13
         version: 1.0.13
       '@atcute/tid':
-        specifier: ^1.0.3
-        version: 1.0.3
+        specifier: ^1.1.0
+        version: 1.1.0
       '@codemirror/commands':
         specifier: ^6.10.1
         version: 6.10.1
@@ -147,17 +147,17 @@ packages:
   '@atcute/cbor@2.2.8':
     resolution: {integrity: sha512-UzOAN9BuN6JCXgn0ryV8qZuRJUDrNqrbLd6EFM8jc6RYssjRyGRxNy6RZ1NU/07Hd8Tq/0pz8+nQiMu5Zai5uw==}
 
-  '@atcute/cid@2.2.6':
-    resolution: {integrity: sha512-bTAHHbJ24p+E//V4KCS4xdmd39o211jJswvqQOevj7vk+5IYcgDLx1ryZWZ1sEPOo9x875li/kj5gpKL14RDwQ==}
+  '@atcute/cid@2.3.0':
+    resolution: {integrity: sha512-1SRdkTuMs/l5arQ+7Ag0F7JAueZqtzYE0d2gmbkuzi8EPweNU1kYlQs0CE4dSd81YF8PMDTOQty0K2ATq9CW9g==}
 
-  '@atcute/client@4.1.1':
-    resolution: {integrity: sha512-FROCbTTCeL5u4tO/n72jDEKyKqjdlXMB56Ehve3W/gnnLGCYWvN42sS7tvL1Mgu6sbO3yZwsXKDrmM2No4XpjA==}
+  '@atcute/client@4.1.2':
+    resolution: {integrity: sha512-DOJ0hpdBA4QVl4SGUeOUyz5FfYhdjRW1h0XIH9YDgNTipeA0tnUbRs8hWh9Nb7nyn6zMKzO5RpaWyWWWSx9Yxw==}
 
   '@atcute/crypto@2.3.0':
     resolution: {integrity: sha512-w5pkJKCjbNMQu+F4JRHbR3ROQyhi1wbn+GSC6WDQamcYHkZmEZk1/eoI354bIQOOfkEM6aFLv718iskrkon4GQ==}
 
-  '@atcute/did-plc@0.2.0':
-    resolution: {integrity: sha512-1sGek8GRM/Ph7nLVRREm8FqM7g4shGckItvdVwJcRbUa8Rh0zOsXQa0QyYWAC0k40BhkqO9FwKXhJEaXCmF5oQ==}
+  '@atcute/did-plc@0.3.1':
+    resolution: {integrity: sha512-KsuVdRtaaIPMmlcCDcxZzLg6OWm7rajczquhIHfA3s57+c34PFQbdY4Lsc2BvDwZ0fUjmbwzvQI3Zio2VcZa7w==}
 
   '@atcute/identity-resolver@1.2.1':
     resolution: {integrity: sha512-LqWFFf8D8bqW8l0zUV9oZxcXYZ8+uQTZfjURoxH1TLmtmZFSXredtQHsY70k/iSMNDPxWHJXebdlKxJm5ioNIg==}
@@ -170,8 +170,8 @@ packages:
   '@atcute/leaflet@1.0.14':
     resolution: {integrity: sha512-TWbtB7b73GChBaYwfd7aWFyGVObZ/DqrRtwkpWGm1GO8zZmQ9eJyKDUnXim7NOAs2hmKQ1u2wk2AM4AYzkF5Gg==}
 
-  '@atcute/lexicon-doc@2.0.5':
-    resolution: {integrity: sha512-fNCp94ehGjWFZMIqP6pWD1F9MOJogNCyqsaMVZluPSIclZ+lDL528iXB56aW4u0eSiD6Y9WJB1OI/lElG39cSA==}
+  '@atcute/lexicon-doc@2.0.6':
+    resolution: {integrity: sha512-iDYJkuom+tIw3zIvU1ggCEVFfReXKfOUtIhpY2kEg2kQeSfMB75F+8k1QOpeAQBetyWYmjsHqBuSUX9oQS6L1Q==}
 
   '@atcute/lexicon-resolver@0.1.5':
     resolution: {integrity: sha512-0bx1/zdMQPuxvRcHW6ykAxRxktC2rEZLoAVSFoLSWDAA92Tf09F9QPK5wgXSF4MNODm1dvzMEdWSMIvlg8sr3A==}
@@ -179,11 +179,11 @@ packages:
       '@atcute/identity': ^1.1.0
       '@atcute/identity-resolver': ^1.1.3
 
-  '@atcute/lexicons@1.2.5':
-    resolution: {integrity: sha512-9yO9WdgxW8jZ7SbzUycH710z+JmsQ9W9n5S6i6eghYju32kkluFmgBeS47r8e8p2+Dv4DemS7o/3SUGsX9FR5Q==}
+  '@atcute/lexicons@1.2.6':
+    resolution: {integrity: sha512-s76UQd8D+XmHIzrjD9CJ9SOOeeLPHc+sMmcj7UFakAW/dDFXc579fcRdRfuUKvXBL5v1Gs2VgDdlh/IvvQZAwA==}
 
-  '@atcute/mst@0.1.0':
-    resolution: {integrity: sha512-h+iDToKEnBpigk2DOHjSqY63vJtjYKUIztqu1CZ0P+I54wV2SrgoqAXAT1xrW6A1Iup8cjTv+U2H5WVG4KxPLw==}
+  '@atcute/mst@0.1.1':
+    resolution: {integrity: sha512-NZ/lZ68GOjmAgBSeGf6WHyKM5wo1Hhc7PNt9uwsViswGPMNEEKNj9cw+0YGziXee/Qbnvc+CKqbRSPwruhXFQg==}
 
   '@atcute/multibase@1.1.6':
     resolution: {integrity: sha512-HBxuCgYLKPPxETV0Rot4VP9e24vKl8JdzGCZOVsDaOXJgbRZoRIF67Lp0H/OgnJeH/Xpva8Z5ReoTNJE5dn3kg==}
@@ -197,14 +197,20 @@ packages:
   '@atcute/tangled@1.0.13':
     resolution: {integrity: sha512-K95jmjDXl/f1FFzOJkk07ibNbFsPmn64sdrMACxQmUibO9WcfSjzjZLPXuH6WHFnCNtIBG3x1FQ7ndQgLoZAmw==}
 
-  '@atcute/tid@1.0.3':
-    resolution: {integrity: sha512-wfMJx1IMdnu0CZgWl0uR4JO2s6PGT1YPhpytD4ZHzEYKKQVuqV6Eb/7vieaVo1eYNMp2FrY67FZObeR7utRl2w==}
+  '@atcute/tid@1.1.0':
+    resolution: {integrity: sha512-U/YKL9BsBi/bcVXaIwdUBfglnjFxRfqoPd2f1uLsEIDQk1EyxepwdDQYOQ5t/aQctmtywl7lQn6KESQNG+mdfg==}
+
+  '@atcute/time-ms@1.0.0':
+    resolution: {integrity: sha512-iWEOlMBcO3ktB+zQPC2kXka9H/798we+IWq2sjhb+hQJNNfcJrwejzvNi/68Q3jKo/hdfwZjRU9iF8U6D32/2Q==}
 
   '@atcute/uint8array@1.0.6':
     resolution: {integrity: sha512-ucfRBQc7BFT8n9eCyGOzDHEMKF/nZwhS2pPao4Xtab1ML3HdFYcX2DM1tadCzas85QTGxHe5urnUAAcNKGRi9A==}
 
   '@atcute/util-fetch@1.0.4':
     resolution: {integrity: sha512-sIU9Qk0dE8PLEXSfhy+gIJV+HpiiknMytCI2SqLlqd0vgZUtEKI/EQfP+23LHWvP+CLCzVDOa6cpH045OlmNBg==}
+
+  '@atcute/util-text@0.0.1':
+    resolution: {integrity: sha512-t1KZqvn0AYy+h2KcJyHnKF9aEqfRfMUmyY8j1ELtAEIgqN9CxINAjxnoRCJIFUlvWzb+oY3uElQL/Vyk3yss0g==}
 
   '@atcute/varint@1.0.3':
     resolution: {integrity: sha512-fdvMPyBB+McDT+Ai5e9RwEbwYV4yjZ60S2Dn5PTjGqUyxvoCH1z42viuheDZRUDkmfQehXJTZ5az7dSozVNtog==}
@@ -922,6 +928,9 @@ packages:
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
+  '@types/node@22.19.3':
+    resolution: {integrity: sha512-1N9SBnWYOJTrNZCdh/yJE+t910Y128BoyY+zBLWhL3r0TYzlTmFdXrPwHL9DyFZmlEXNQQolTZh3KHV31QDhyA==}
+
   '@types/node@24.10.1':
     resolution: {integrity: sha512-GNWcUTRBgIRJD5zj+Tq0fKOJ5XZajIiBroOF0yvj2bSU1WvNdYS/dn9UxwsujGW4JX06dnHyjV2y9rRaybH0iQ==}
 
@@ -1216,6 +1225,10 @@ packages:
     engines: {node: ^18 || >=20}
     hasBin: true
 
+  node-gyp-build@4.8.4:
+    resolution: {integrity: sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==}
+    hasBin: true
+
   node-releases@2.0.27:
     resolution: {integrity: sha512-nmh3lCkYZ3grZvqcCH+fjmQ7X+H0OeZgP40OierEaAptX4XofMh5kwNbWh7lBduUzCcV/8kZ+NDLCwm2iorIlA==}
 
@@ -1388,8 +1401,14 @@ packages:
   ufo@1.6.1:
     resolution: {integrity: sha512-9a4/uxlTWJ4+a5i0ooc1rU7C7YOw3wT+UGqdeNNHWnOF9qcMBgLRS+4IYUqbczewFx4mLEig6gawh7X6mFlEkA==}
 
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
+
+  unicode-segmenter@0.14.4:
+    resolution: {integrity: sha512-pR5VCiCrLrKOL6FRW61jnk9+wyMtKKowq+jyFY9oc6uHbWKhDL4yVRiI4YZPksGMK72Pahh8m0cn/0JvbDDyJg==}
 
   update-browserslist-db@1.2.3:
     resolution: {integrity: sha512-Js0m9cx+qOgDxo0eMiFGEueWztz+d4+M3rGlmKPT+T4IS/jP4ylw3Nwpu6cpTTP8R1MAC1kF4VbdLt3ARf209w==}
@@ -1474,17 +1493,17 @@ snapshots:
 
   '@atcute/atproto@3.1.9':
     dependencies:
-      '@atcute/lexicons': 1.2.5
+      '@atcute/lexicons': 1.2.6
 
   '@atcute/bluesky@3.2.14':
     dependencies:
       '@atcute/atproto': 3.1.9
-      '@atcute/lexicons': 1.2.5
+      '@atcute/lexicons': 1.2.6
 
   '@atcute/car@3.1.3':
     dependencies:
       '@atcute/cbor': 2.2.8
-      '@atcute/cid': 2.2.6
+      '@atcute/cid': 2.3.0
       '@atcute/uint8array': 1.0.6
       '@atcute/varint': 1.0.3
       yocto-queue: 1.2.2
@@ -1492,25 +1511,25 @@ snapshots:
   '@atcute/car@5.0.0':
     dependencies:
       '@atcute/cbor': 2.2.8
-      '@atcute/cid': 2.2.6
+      '@atcute/cid': 2.3.0
       '@atcute/uint8array': 1.0.6
       '@atcute/varint': 1.0.3
 
   '@atcute/cbor@2.2.8':
     dependencies:
-      '@atcute/cid': 2.2.6
+      '@atcute/cid': 2.3.0
       '@atcute/multibase': 1.1.6
       '@atcute/uint8array': 1.0.6
 
-  '@atcute/cid@2.2.6':
+  '@atcute/cid@2.3.0':
     dependencies:
       '@atcute/multibase': 1.1.6
       '@atcute/uint8array': 1.0.6
 
-  '@atcute/client@4.1.1':
+  '@atcute/client@4.1.2':
     dependencies:
       '@atcute/identity': 1.1.3
-      '@atcute/lexicons': 1.2.5
+      '@atcute/lexicons': 1.2.6
 
   '@atcute/crypto@2.3.0':
     dependencies:
@@ -1518,38 +1537,41 @@ snapshots:
       '@atcute/uint8array': 1.0.6
       '@noble/secp256k1': 3.0.0
 
-  '@atcute/did-plc@0.2.0':
+  '@atcute/did-plc@0.3.1':
     dependencies:
       '@atcute/cbor': 2.2.8
-      '@atcute/cid': 2.2.6
+      '@atcute/cid': 2.3.0
       '@atcute/crypto': 2.3.0
       '@atcute/identity': 1.1.3
-      '@atcute/lexicons': 1.2.5
+      '@atcute/lexicons': 1.2.6
       '@atcute/multibase': 1.1.6
       '@atcute/uint8array': 1.0.6
+      '@atcute/util-fetch': 1.0.4
       '@badrap/valita': 0.4.6
 
   '@atcute/identity-resolver@1.2.1(@atcute/identity@1.1.3)':
     dependencies:
       '@atcute/identity': 1.1.3
-      '@atcute/lexicons': 1.2.5
+      '@atcute/lexicons': 1.2.6
       '@atcute/util-fetch': 1.0.4
       '@badrap/valita': 0.4.6
 
   '@atcute/identity@1.1.3':
     dependencies:
-      '@atcute/lexicons': 1.2.5
+      '@atcute/lexicons': 1.2.6
       '@badrap/valita': 0.4.6
 
   '@atcute/leaflet@1.0.14':
     dependencies:
       '@atcute/atproto': 3.1.9
-      '@atcute/lexicons': 1.2.5
+      '@atcute/lexicons': 1.2.6
 
-  '@atcute/lexicon-doc@2.0.5':
+  '@atcute/lexicon-doc@2.0.6':
     dependencies:
       '@atcute/identity': 1.1.3
-      '@atcute/lexicons': 1.2.5
+      '@atcute/lexicons': 1.2.6
+      '@atcute/uint8array': 1.0.6
+      '@atcute/util-text': 0.0.1
       '@badrap/valita': 0.4.6
 
   '@atcute/lexicon-resolver@0.1.5(@atcute/identity-resolver@1.2.1(@atcute/identity@1.1.3))(@atcute/identity@1.1.3)':
@@ -1557,21 +1579,23 @@ snapshots:
       '@atcute/crypto': 2.3.0
       '@atcute/identity': 1.1.3
       '@atcute/identity-resolver': 1.2.1(@atcute/identity@1.1.3)
-      '@atcute/lexicon-doc': 2.0.5
-      '@atcute/lexicons': 1.2.5
+      '@atcute/lexicon-doc': 2.0.6
+      '@atcute/lexicons': 1.2.6
       '@atcute/repo': 0.1.1
       '@atcute/util-fetch': 1.0.4
       '@badrap/valita': 0.4.6
 
-  '@atcute/lexicons@1.2.5':
+  '@atcute/lexicons@1.2.6':
     dependencies:
+      '@atcute/uint8array': 1.0.6
+      '@atcute/util-text': 0.0.1
       '@standard-schema/spec': 1.1.0
       esm-env: 1.2.2
 
-  '@atcute/mst@0.1.0':
+  '@atcute/mst@0.1.1':
     dependencies:
       '@atcute/cbor': 2.2.8
-      '@atcute/cid': 2.2.6
+      '@atcute/cid': 2.3.0
       '@atcute/uint8array': 1.0.6
 
   '@atcute/multibase@1.1.6':
@@ -1580,9 +1604,9 @@ snapshots:
 
   '@atcute/oauth-browser-client@2.0.3(@atcute/identity@1.1.3)':
     dependencies:
-      '@atcute/client': 4.1.1
+      '@atcute/client': 4.1.2
       '@atcute/identity-resolver': 1.2.1(@atcute/identity@1.1.3)
-      '@atcute/lexicons': 1.2.5
+      '@atcute/lexicons': 1.2.6
       '@atcute/multibase': 1.1.6
       '@atcute/uint8array': 1.0.6
       nanoid: 5.1.6
@@ -1593,24 +1617,35 @@ snapshots:
     dependencies:
       '@atcute/car': 5.0.0
       '@atcute/cbor': 2.2.8
-      '@atcute/cid': 2.2.6
+      '@atcute/cid': 2.3.0
       '@atcute/crypto': 2.3.0
-      '@atcute/lexicons': 1.2.5
-      '@atcute/mst': 0.1.0
+      '@atcute/lexicons': 1.2.6
+      '@atcute/mst': 0.1.1
       '@atcute/uint8array': 1.0.6
 
   '@atcute/tangled@1.0.13':
     dependencies:
       '@atcute/atproto': 3.1.9
-      '@atcute/lexicons': 1.2.5
+      '@atcute/lexicons': 1.2.6
 
-  '@atcute/tid@1.0.3': {}
+  '@atcute/tid@1.1.0':
+    dependencies:
+      '@atcute/time-ms': 1.0.0
+
+  '@atcute/time-ms@1.0.0':
+    dependencies:
+      '@types/node': 22.19.3
+      node-gyp-build: 4.8.4
 
   '@atcute/uint8array@1.0.6': {}
 
   '@atcute/util-fetch@1.0.4':
     dependencies:
       '@badrap/valita': 0.4.6
+
+  '@atcute/util-text@0.0.1':
+    dependencies:
+      unicode-segmenter: 0.14.4
 
   '@atcute/varint@1.0.3': {}
 
@@ -2189,6 +2224,10 @@ snapshots:
 
   '@types/estree@1.0.8': {}
 
+  '@types/node@22.19.3':
+    dependencies:
+      undici-types: 6.21.0
+
   '@types/node@24.10.1':
     dependencies:
       undici-types: 7.16.0
@@ -2478,6 +2517,8 @@ snapshots:
 
   nanoid@5.1.6: {}
 
+  node-gyp-build@4.8.4: {}
+
   node-releases@2.0.27: {}
 
   nth-check@2.1.1:
@@ -2614,8 +2655,12 @@ snapshots:
 
   ufo@1.6.1: {}
 
+  undici-types@6.21.0: {}
+
   undici-types@7.16.0:
     optional: true
+
+  unicode-segmenter@0.14.4: {}
 
   update-browserslist-db@1.2.3(browserslist@4.28.1):
     dependencies:
