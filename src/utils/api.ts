@@ -133,12 +133,6 @@ type LinksWithRecords = {
   linking_records: Array<{ did: string; collection: string; rkey: string }>;
 };
 
-type LinksWithDids = {
-  cursor: string;
-  total: number;
-  linking_dids: Array<string>;
-};
-
 const getConstellation = async (
   endpoint: string,
   target: string,
@@ -175,19 +169,9 @@ const getRecordBacklinks = (
 ): Promise<LinksWithRecords> =>
   getConstellation("/links", target, collection, path, cursor, limit || 100);
 
-const getDidBacklinks = (
-  target: string,
-  collection: string,
-  path: string,
-  cursor?: string,
-  limit?: number,
-): Promise<LinksWithDids> =>
-  getConstellation("/links/distinct-dids", target, collection, path, cursor, limit || 100);
-
 export {
   didDocCache,
   getAllBacklinks,
-  getDidBacklinks,
   getPDS,
   getRecordBacklinks,
   labelerCache,
@@ -198,6 +182,5 @@ export {
   resolvePDS,
   validateHandle,
   type LinkData,
-  type LinksWithDids,
   type LinksWithRecords,
 };
