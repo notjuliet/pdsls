@@ -51,7 +51,7 @@ const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
           return (
             <a
               href={`/at://${did}/${collection}/${rkey}`}
-              class="grid grid-cols-[auto_1fr_auto] items-center gap-x-1 px-2 py-1.5 font-mono text-xs hover:bg-neutral-200/50 active:bg-neutral-200/50 sm:gap-x-3 sm:px-3 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700/50"
+              class="grid grid-cols-[auto_1fr_auto] items-center gap-x-1 px-2 py-1.5 font-mono text-xs select-none hover:bg-neutral-200/50 active:bg-neutral-200/50 sm:gap-x-3 sm:px-3 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700/50"
             >
               <span class="text-blue-500 dark:text-blue-400">{rkey}</span>
               <span class="truncate text-neutral-700 dark:text-neutral-300" title={did}>

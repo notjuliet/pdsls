@@ -350,7 +350,7 @@ const CollectionView = () => {
                   </label>
                 </Show>
                 <Show when={!batchDelete()}>
-                  <A href={`/at://${did}/${params.collection}/${record.rkey}`}>
+                  <A href={`/at://${did}/${params.collection}/${record.rkey}`} class="select-none">
                     <RecordLink record={record} />
                   </A>
                 </Show>
