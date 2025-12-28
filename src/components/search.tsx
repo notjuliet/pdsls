@@ -188,7 +188,7 @@ const Search = () => {
       <label for="input" class="hidden">
         PDS URL, AT URI, NSID, DID, or handle
       </label>
-      <div class="dark:bg-dark-100 dark:inset-shadow-dark-200 flex items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 inset-shadow-xs focus-within:outline-[1px] focus-within:outline-neutral-600 dark:border-neutral-600 dark:focus-within:outline-neutral-400">
+      <div class="dark:bg-dark-100 flex items-center gap-2 rounded-lg bg-white px-2 outline-1 outline-neutral-200 focus-within:outline-[1.5px] focus-within:outline-neutral-600 dark:outline-neutral-600 dark:focus-within:outline-neutral-400">
         <label
           for="input"
           class="iconify lucide--search text-neutral-500 dark:text-neutral-400"
