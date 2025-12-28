@@ -43,13 +43,13 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
 
   return (
     <span
-      class="relative flex w-full min-w-0 items-baseline rounded px-0.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      class="relative flex w-full min-w-0 items-baseline rounded p-0.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
       ref={rkeyRef}
       onmouseover={() => !isTouchDevice && setHover(true)}
       onmouseleave={() => !isTouchDevice && setHover(false)}
     >
       <span class="flex items-baseline truncate">
-        <span class="shrink-0 text-sm text-blue-400 sm:text-base">{props.record.rkey}</span>
+        <span class="shrink-0 text-sm text-blue-400">{props.record.rkey}</span>
         <span class="ml-1 truncate text-xs text-neutral-500 dark:text-neutral-400" dir="rtl">
           {props.record.cid}
         </span>
