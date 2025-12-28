@@ -30,15 +30,16 @@ const BlobView = (props: { pds: string; repo: string }) => {
   return (
     <div class="flex flex-col items-center gap-2">
       <Show when={blobs() || response()}>
-        <div class="flex w-full flex-col gap-0.5 font-mono text-xs wrap-anywhere">
+        <div class="flex w-full flex-col gap-0.5 font-mono text-xs sm:text-sm">
           <For each={blobs()}>
             {(cid) => (
               <a
                 href={`${props.pds}/xrpc/com.atproto.sync.getBlob?did=${props.repo}&cid=${cid}`}
                 target="_blank"
-                class="w-fit rounded px-0.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                class="truncate rounded px-0.5 text-left text-blue-400 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                dir="rtl"
               >
-                <span class="text-blue-400">{cid}</span>
+                {cid}
               </a>
             )}
           </For>
