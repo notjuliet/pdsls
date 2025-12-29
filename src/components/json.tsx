@@ -1,11 +1,29 @@
 import { isCid, isDid, isNsid, isResourceUri, Nsid } from "@atcute/lexicons/syntax";
 import { A, useNavigate, useParams } from "@solidjs/router";
-import { createEffect, createSignal, ErrorBoundary, For, on, Show } from "solid-js";
+import {
+  createContext,
+  createEffect,
+  createSignal,
+  ErrorBoundary,
+  For,
+  on,
+  Show,
+  useContext,
+} from "solid-js";
 import { resolveLexiconAuthority } from "../utils/api";
 import { hideMedia } from "../views/settings";
 import { pds } from "./navbar";
 import { addNotification, removeNotification } from "./notification";
 import VideoPlayer from "./video-player";
+
+interface JSONContext {
+  repo: string;
+  truncate?: boolean;
+  parentIsBlob?: boolean;
+}
+
+const JSONCtx = createContext<JSONContext>();
+const useJSONCtx = () => useContext(JSONCtx)!;
 
 interface AtBlob {
   $type: string;
@@ -13,25 +31,21 @@ interface AtBlob {
   mimeType: string;
 }
 
-const JSONString = (props: {
-  data: string;
-  isType?: boolean;
-  isLink?: boolean;
-  parentIsBlob?: boolean;
-}) => {
+const isURL =
+  URL.canParse ??
+  ((url, base) => {
+    try {
+      new URL(url, base);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+
+const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean }) => {
+  const ctx = useJSONCtx();
   const navigate = useNavigate();
   const params = useParams();
-
-  const isURL =
-    URL.canParse ??
-    ((url, base) => {
-      try {
-        new URL(url, base);
-        return true;
-      } catch {
-        return false;
-      }
-    });
 
   const handleClick = async (lex: string) => {
     try {
@@ -50,10 +64,15 @@ const JSONString = (props: {
     }
   };
 
+  const MAX_LENGTH = 200;
+  const isTruncated = () => ctx.truncate && props.data.length > MAX_LENGTH;
+  const displayData = () => (isTruncated() ? props.data.slice(0, MAX_LENGTH) : props.data);
+  const remainingChars = () => props.data.length - MAX_LENGTH;
+
   return (
     <span>
       "
-      <For each={props.data.split(/(\s)/)}>
+      <For each={displayData().split(/(\s)/)}>
         {(part) => (
           <>
             {isResourceUri(part) ?
@@ -72,7 +91,7 @@ const JSONString = (props: {
               >
                 {part}
               </button>
-            : isCid(part) && props.isLink && props.parentIsBlob && params.repo ?
+            : isCid(part) && props.isLink && ctx.parentIsBlob && params.repo ?
               <A
                 class="text-blue-400 hover:underline active:underline"
                 rel="noopener"
@@ -93,7 +112,15 @@ const JSONString = (props: {
           </>
         )}
       </For>
+      <Show when={isTruncated()}>
+        <span>…</span>
+      </Show>
       "
+      <Show when={isTruncated()}>
+        <span class="ml-1 text-neutral-500 dark:text-neutral-400">
+          (+{remainingChars().toLocaleString()})
+        </span>
+      </Show>
     </span>
   );
 };
@@ -110,11 +137,8 @@ const JSONNull = () => {
   return <span>null</span>;
 };
 
-const JSONObject = (props: {
-  data: { [x: string]: JSONType };
-  repo: string;
-  parentIsBlob?: boolean;
-}) => {
+const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
+  const ctx = useJSONCtx();
   const params = useParams();
   const [hide, setHide] = createSignal(
     localStorage.hideMedia === "true" || params.rkey === undefined,
@@ -136,7 +160,7 @@ const JSONObject = (props: {
   );
 
   const isBlob = props.data.$type === "blob";
-  const isBlobContext = isBlob || props.parentIsBlob;
+  const isBlobContext = isBlob || ctx.parentIsBlob;
 
   const Obj = ({ key, value }: { key: string; value: JSONType }) => {
     const [show, setShow] = createSignal(true);
@@ -172,13 +196,9 @@ const JSONObject = (props: {
             "invisible h-0": !show(),
           }}
         >
-          <JSONValue
-            data={value}
-            repo={props.repo}
-            isType={key === "$type"}
-            isLink={key === "$link"}
-            parentIsBlob={isBlobContext}
-          />
+          <JSONCtx.Provider value={{ ...ctx, parentIsBlob: isBlobContext }}>
+            <JSONValueInner data={value} isType={key === "$type"} isLink={key === "$link"} />
+          </JSONCtx.Provider>
         </span>
       </span>
     );
@@ -200,14 +220,14 @@ const JSONObject = (props: {
                 <Show when={blob.mimeType.startsWith("image/")}>
                   <img
                     class="h-auto max-h-48 max-w-48 object-contain sm:max-h-64 sm:max-w-64"
-                    src={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${props.repo}&cid=${blob.ref.$link}`}
+                    src={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${ctx.repo}&cid=${blob.ref.$link}`}
                     onLoad={() => setMediaLoaded(true)}
                   />
                 </Show>
                 <Show when={blob.mimeType === "video/mp4"}>
                   <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
                     <VideoPlayer
-                      did={props.repo}
+                      did={ctx.repo}
                       cid={blob.ref.$link}
                       onLoad={() => setMediaLoaded(true)}
                     />
@@ -241,7 +261,7 @@ const JSONObject = (props: {
   return rawObj;
 };
 
-const JSONArray = (props: { data: JSONType[]; repo: string; parentIsBlob?: boolean }) => {
+const JSONArray = (props: { data: JSONType[] }) => {
   return (
     <For each={props.data}>
       {(value, index) => (
@@ -252,7 +272,7 @@ const JSONArray = (props: { data: JSONType[]; repo: string; parentIsBlob?: boole
           }}
         >
           <span class="ml-[1ch] w-full">
-            <JSONValue data={value} repo={props.repo} parentIsBlob={props.parentIsBlob} />
+            <JSONValueInner data={value} />
           </span>
         </span>
       )}
@@ -260,29 +280,23 @@ const JSONArray = (props: { data: JSONType[]; repo: string; parentIsBlob?: boole
   );
 };
 
-export const JSONValue = (props: {
-  data: JSONType;
-  repo: string;
-  isType?: boolean;
-  isLink?: boolean;
-  parentIsBlob?: boolean;
-}) => {
+const JSONValueInner = (props: { data: JSONType; isType?: boolean; isLink?: boolean }) => {
   const data = props.data;
   if (typeof data === "string")
-    return (
-      <JSONString
-        data={data}
-        isType={props.isType}
-        isLink={props.isLink}
-        parentIsBlob={props.parentIsBlob}
-      />
-    );
+    return <JSONString data={data} isType={props.isType} isLink={props.isLink} />;
   if (typeof data === "number") return <JSONNumber data={data} />;
   if (typeof data === "boolean") return <JSONBoolean data={data} />;
   if (data === null) return <JSONNull />;
-  if (Array.isArray(data))
-    return <JSONArray data={data} repo={props.repo} parentIsBlob={props.parentIsBlob} />;
-  return <JSONObject data={data} repo={props.repo} parentIsBlob={props.parentIsBlob} />;
+  if (Array.isArray(data)) return <JSONArray data={data} />;
+  return <JSONObject data={data} />;
+};
+
+export const JSONValue = (props: { data: JSONType; repo: string; truncate?: boolean }) => {
+  return (
+    <JSONCtx.Provider value={{ repo: props.repo, truncate: props.truncate }}>
+      <JSONValueInner data={props.data} />
+    </JSONCtx.Provider>
+  );
 };
 
 export type JSONType = string | number | boolean | null | { [x: string]: JSONType } | JSONType[];
