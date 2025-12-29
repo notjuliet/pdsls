@@ -143,7 +143,7 @@ const StreamView = () => {
 
   return (
     <div class="flex w-full flex-col items-center">
-      <div class="flex gap-2 text-sm">
+      <div class="flex gap-3">
         <A
           class="flex items-center gap-1 border-b-2 p-1"
           inactiveClass="border-transparent hover:border-neutral-400 dark:hover:border-neutral-600"
@@ -160,7 +160,7 @@ const StreamView = () => {
         </A>
       </div>
       <StickyOverlay>
-        <form ref={formRef} class="flex w-full flex-col gap-1 text-sm">
+        <form ref={formRef} class="flex w-full flex-col gap-1.5 text-sm">
           <Show when={!connected()}>
             <label class="flex items-center justify-end gap-x-1">
               <span class="min-w-20">Instance</span>

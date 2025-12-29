@@ -154,13 +154,13 @@ const PdsView = () => {
   return (
     <Show when={repos() || response()}>
       <div class="flex w-full flex-col">
-        <div class="dark:shadow-dark-700 dark:bg-dark-300 mb-2 flex w-full justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-sm shadow-xs dark:border-neutral-700">
-          <div class="ml-1 flex items-center gap-3">
+        <div class="mb-3 flex w-full justify-between px-2 text-sm sm:text-base">
+          <div class="flex items-center gap-3">
             <Tab tab="repos" label="Repositories" />
             <Tab tab="info" label="Info" />
           </div>
           <MenuProvider>
-            <DropdownMenu icon="lucide--ellipsis-vertical" buttonClass="rounded-sm p-1.5">
+            <DropdownMenu icon="lucide--ellipsis-vertical" buttonClass="rounded-md p-1.5">
               <CopyMenu content={params.pds!} label="Copy PDS" icon="lucide--copy" />
               <NavMenu
                 href={`/firehose?instance=wss://${params.pds}`}
