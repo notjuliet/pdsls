@@ -364,7 +364,7 @@ export const RecordView = () => {
         <A
           classList={{
             "border-b-2": true,
-            "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
+            "border-transparent text-neutral-600 dark:text-neutral-400 hover:border-neutral-600 dark:hover:border-neutral-400":
               !isActive(),
           }}
           href={`/at://${did}/${params.collection}/${params.rkey}#${props.tab}`}
@@ -381,8 +381,8 @@ export const RecordView = () => {
   return (
     <Show when={record()} keyed>
       <div class="flex w-full flex-col items-center">
-        <div class="dark:shadow-dark-700 dark:bg-dark-300 mb-3 flex w-full justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-sm shadow-xs dark:border-neutral-700">
-          <div class="ml-1 flex items-center gap-3">
+        <div class="mb-3 flex w-full justify-between px-2 text-sm sm:text-base">
+          <div class="flex items-center gap-4">
             <RecordTab tab="record" label="Record" />
             <RecordTab tab="schema" label="Schema" />
             <RecordTab tab="backlinks" label="Backlinks" />

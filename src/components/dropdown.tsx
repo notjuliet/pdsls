@@ -75,11 +75,16 @@ export const NavMenu = (props: {
 export const ActionMenu = (props: {
   label: string;
   icon: string;
-  onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
+  onClick: () => void;
 }) => {
+  const ctx = useContext(MenuContext);
+
   return (
     <button
-      onClick={props.onClick}
+      onClick={() => {
+        props.onClick();
+        ctx?.setShowMenu(false);
+      }}
       class="flex items-center gap-2 rounded-md p-1.5 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
     >
       <Show when={props.icon}>

@@ -89,7 +89,8 @@ export const RepoView = () => {
       <A
         classList={{
           "border-b-2": true,
-          "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600": !isActive(),
+          "border-transparent text-neutral-600 dark:text-neutral-400 hover:border-neutral-600 dark:hover:border-neutral-400":
+            !isActive(),
         }}
         href={`/at://${params.repo}#${props.tab}`}
       >
@@ -275,8 +276,8 @@ export const RepoView = () => {
   return (
     <Show when={repo()}>
       <div class="flex w-full flex-col gap-3 wrap-break-word">
-        <div class="dark:shadow-dark-700 dark:bg-dark-300 flex justify-between rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-sm shadow-xs dark:border-neutral-700">
-          <div class="ml-1 flex items-center gap-2 text-xs sm:gap-4 sm:text-sm">
+        <div class="flex justify-between px-2 text-sm sm:text-base">
+          <div class="flex items-center gap-3 sm:gap-4">
             <Show when={!error()}>
               <RepoTab tab="collections" label="Collections" />
             </Show>
@@ -289,25 +290,24 @@ export const RepoView = () => {
             </Show>
             <RepoTab tab="backlinks" label="Backlinks" />
           </div>
-          <div class="flex gap-0.5">
+          <div class="flex gap-1">
             <Show when={error() && error() !== "Missing PDS"}>
               <div class="flex items-center gap-1 text-red-500 dark:text-red-400">
                 <span class="iconify lucide--alert-triangle"></span>
                 <span>{error()}</span>
               </div>
             </Show>
-            <Show when={!error() && (!location.hash || location.hash.startsWith("#collections"))}>
-              <Tooltip text="Filter collections">
-                <button
-                  class="flex items-center rounded-sm p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                  onClick={() => setShowFilter(!showFilter())}
-                >
-                  <span class="iconify lucide--filter"></span>
-                </button>
-              </Tooltip>
-            </Show>
             <MenuProvider>
               <DropdownMenu icon="lucide--ellipsis-vertical" buttonClass="rounded-sm p-1.5">
+                <Show
+                  when={!error() && (!location.hash || location.hash.startsWith("#collections"))}
+                >
+                  <ActionMenu
+                    label="Filter collections"
+                    icon="lucide--filter"
+                    onClick={() => setShowFilter(!showFilter())}
+                  />
+                </Show>
                 <CopyMenu content={params.repo!} label="Copy DID" icon="lucide--copy" />
                 <NavMenu
                   href={`/jetstream?dids=${params.repo}`}
@@ -323,7 +323,7 @@ export const RepoView = () => {
                 </Show>
                 <Show when={error()?.length === 0 || error() === undefined}>
                   <ActionMenu
-                    label="Export Repo"
+                    label="Export repo"
                     icon={downloading() ? "lucide--loader-circle animate-spin" : "lucide--download"}
                     onClick={() => downloadRepo()}
                   />
@@ -336,14 +336,14 @@ export const RepoView = () => {
                     : `https://${did.split("did:web:")[1]}/.well-known/did.json`
                   }
                   newTab
-                  label="DID Document"
+                  label="DID document"
                   icon="lucide--external-link"
                 />
                 <Show when={did.startsWith("did:plc")}>
                   <NavMenu
                     href={`${localStorage.plcDirectory ?? "https://plc.directory"}/${did}/log/audit`}
                     newTab
-                    label="Audit Log"
+                    label="Audit log"
                     icon="lucide--external-link"
                   />
                 </Show>
