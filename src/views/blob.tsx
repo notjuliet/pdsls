@@ -30,7 +30,7 @@ const BlobView = (props: { pds: string; repo: string }) => {
   return (
     <div class="flex flex-col items-center gap-2">
       <Show when={blobs() || response()}>
-        <div class="flex w-full flex-col gap-0.5 font-mono text-xs sm:text-sm">
+        <div class="flex w-full flex-col gap-0.5 pb-20 font-mono text-xs sm:text-sm">
           <For each={blobs()}>
             {(cid) => (
               <a

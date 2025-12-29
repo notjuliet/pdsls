@@ -164,7 +164,7 @@ const PdsView = () => {
         </div>
         <div class="flex flex-col gap-1 px-2">
           <Show when={!location.hash || location.hash === "#repos"}>
-            <div class="flex flex-col divide-y-[0.5px] divide-neutral-300 dark:divide-neutral-700">
+            <div class="flex flex-col divide-y-[0.5px] divide-neutral-300 pb-20 dark:divide-neutral-700">
               <For each={repos()}>{(repo) => <RepoCard {...repo} />}</For>
             </div>
           </Show>
