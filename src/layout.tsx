@@ -118,7 +118,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
   });
 
   return (
-    <div id="main" class="mx-auto mb-8 flex max-w-lg flex-col items-center p-4">
+    <div id="main" class="mx-auto mb-8 flex max-w-lg flex-col items-center p-3">
       <MetaProvider>
         <Show when={location.pathname !== "/"}>
           <Meta name="robots" content="noindex, nofollow" />
