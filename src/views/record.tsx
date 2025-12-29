@@ -363,7 +363,7 @@ export const RecordView = () => {
       <div class="flex items-center gap-0.5">
         <A
           classList={{
-            "border-b-2": true,
+            "border-b-2 font-medium": true,
             "border-transparent text-neutral-600 dark:text-neutral-400 hover:border-neutral-600 dark:hover:border-neutral-400":
               !isActive(),
           }}

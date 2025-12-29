@@ -143,7 +143,7 @@ const StreamView = () => {
 
   return (
     <div class="flex w-full flex-col items-center">
-      <div class="mb-1 flex gap-4">
+      <div class="mb-1 flex gap-4 font-medium">
         <A
           class="flex items-center gap-1 border-b-2"
           inactiveClass="border-transparent text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"

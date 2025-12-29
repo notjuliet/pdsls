@@ -139,7 +139,7 @@ const PdsView = () => {
   const Tab = (props: { tab: "repos" | "info" | "firehose"; label: string }) => (
     <A
       classList={{
-        "border-b-2": true,
+        "border-b-2 font-medium": true,
         "border-transparent dark:text-neutral-400 text-neutral-600 hover:border-neutral-600 dark:hover:border-neutral-400":
           (!!location.hash && location.hash !== `#${props.tab}`) ||
           (!location.hash && props.tab !== "repos"),
