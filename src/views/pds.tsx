@@ -140,7 +140,7 @@ const PdsView = () => {
     <A
       classList={{
         "border-b-2": true,
-        "border-transparent hover:border-neutral-400 dark:hover:border-neutral-600":
+        "border-transparent dark:text-neutral-400 text-neutral-600 hover:border-neutral-600 dark:hover:border-neutral-400":
           (!!location.hash && location.hash !== `#${props.tab}`) ||
           (!location.hash && props.tab !== "repos"),
       }}
@@ -157,7 +157,7 @@ const PdsView = () => {
   return (
     <Show when={repos() || response()}>
       <div class="flex w-full flex-col">
-        <div class="mb-3 flex gap-3 px-2 text-sm sm:text-base">
+        <div class="mb-3 flex gap-4 px-2 text-sm sm:text-base">
           <Tab tab="repos" label="Repositories" />
           <Tab tab="info" label="Info" />
           <Tab tab="firehose" label="Firehose" />
