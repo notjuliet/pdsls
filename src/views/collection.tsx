@@ -2,8 +2,16 @@ import { ComAtprotoRepoApplyWrites, ComAtprotoRepoGetRecord } from "@atcute/atpr
 import { Client, simpleFetchHandler } from "@atcute/client";
 import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
-import { A, useParams } from "@solidjs/router";
-import { createEffect, createMemo, createResource, createSignal, For, Show } from "solid-js";
+import { A, useBeforeLeave, useParams } from "@solidjs/router";
+import {
+  createEffect,
+  createMemo,
+  createResource,
+  createSignal,
+  For,
+  onMount,
+  Show,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 import { hasUserScope } from "../auth/scope-utils";
 import { agent } from "../auth/state";
@@ -17,6 +25,11 @@ import Tooltip from "../components/tooltip.jsx";
 import { isTouchDevice } from "../layout.jsx";
 import { resolvePDS } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
+import {
+  clearCollectionCache,
+  getCollectionCache,
+  setCollectionCache,
+} from "../utils/route-cache.js";
 
 interface AtprotoRecord {
   rkey: string;
@@ -85,11 +98,49 @@ const CollectionView = () => {
   const [reverse, setReverse] = createSignal(false);
   const [recreate, setRecreate] = createSignal(false);
   const [openDelete, setOpenDelete] = createSignal(false);
+  const [restoredFromCache, setRestoredFromCache] = createSignal(false);
   const did = params.repo;
   let pds: string;
   let rpc: Client;
 
+  const cacheKey = () => `${params.pds}/${params.repo}/${params.collection}`;
+
+  onMount(() => {
+    const cached = getCollectionCache(cacheKey());
+    if (cached) {
+      setRecords(cached.records as AtprotoRecord[]);
+      setCursor(cached.cursor);
+      setReverse(cached.reverse);
+      setRestoredFromCache(true);
+      requestAnimationFrame(() => {
+        window.scrollTo(0, cached.scrollY);
+      });
+    }
+  });
+
+  useBeforeLeave((e) => {
+    const recordPathPrefix = `/at://${did}/${params.collection}/`;
+    const isNavigatingToRecord = typeof e.to === "string" && e.to.startsWith(recordPathPrefix);
+
+    if (isNavigatingToRecord && records.length > 0) {
+      setCollectionCache(cacheKey(), {
+        records: [...records],
+        cursor: cursor(),
+        scrollY: window.scrollY,
+        reverse: reverse(),
+      });
+    } else {
+      clearCollectionCache(cacheKey());
+    }
+  });
+
   const fetchRecords = async () => {
+    if (restoredFromCache() && records.length > 0 && !cursor()) {
+      setRestoredFromCache(false);
+      return records;
+    }
+    if (restoredFromCache()) setRestoredFromCache(false);
+
     if (!pds) pds = await resolvePDS(did!);
     if (!rpc) rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
     const res = await rpc.get("com.atproto.repo.listRecords", {
@@ -168,6 +219,7 @@ const CollectionView = () => {
     setCursor(undefined);
     setOpenDelete(false);
     setRecreate(false);
+    clearCollectionCache(cacheKey());
     refetch();
   };
 
@@ -304,6 +356,7 @@ const CollectionView = () => {
                     setReverse(!reverse());
                     setRecords([]);
                     setCursor(undefined);
+                    clearCollectionCache(cacheKey());
                     refetch();
                   }}
                 >
