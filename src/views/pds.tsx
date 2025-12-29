@@ -5,7 +5,6 @@ import * as TID from "@atcute/tid";
 import { A, useLocation, useParams } from "@solidjs/router";
 import { createResource, createSignal, For, Show } from "solid-js";
 import { Button } from "../components/button";
-import { CopyMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown";
 import { Modal } from "../components/modal";
 import { setPDS } from "../components/navbar";
 import Tooltip from "../components/tooltip";
@@ -137,7 +136,7 @@ const PdsView = () => {
     );
   };
 
-  const Tab = (props: { tab: "repos" | "info"; label: string }) => (
+  const Tab = (props: { tab: "repos" | "info" | "firehose"; label: string }) => (
     <A
       classList={{
         "border-b-2": true,
@@ -145,7 +144,11 @@ const PdsView = () => {
           (!!location.hash && location.hash !== `#${props.tab}`) ||
           (!location.hash && props.tab !== "repos"),
       }}
-      href={`/${params.pds}#${props.tab}`}
+      href={
+        props.tab === "firehose" ?
+          `/firehose?instance=wss://${params.pds}`
+        : `/${params.pds}#${props.tab}`
+      }
     >
       {props.label}
     </A>
@@ -154,21 +157,10 @@ const PdsView = () => {
   return (
     <Show when={repos() || response()}>
       <div class="flex w-full flex-col">
-        <div class="mb-3 flex w-full justify-between px-2 text-sm sm:text-base">
-          <div class="flex items-center gap-3">
-            <Tab tab="repos" label="Repositories" />
-            <Tab tab="info" label="Info" />
-          </div>
-          <MenuProvider>
-            <DropdownMenu icon="lucide--ellipsis-vertical" buttonClass="rounded-md p-1.5">
-              <CopyMenu content={params.pds!} label="Copy PDS" icon="lucide--copy" />
-              <NavMenu
-                href={`/firehose?instance=wss://${params.pds}`}
-                label="Firehose"
-                icon="lucide--radio-tower"
-              />
-            </DropdownMenu>
-          </MenuProvider>
+        <div class="mb-3 flex gap-3 px-2 text-sm sm:text-base">
+          <Tab tab="repos" label="Repositories" />
+          <Tab tab="info" label="Info" />
+          <Tab tab="firehose" label="Firehose" />
         </div>
         <div class="flex flex-col gap-1 px-2">
           <Show when={!location.hash || location.hash === "#repos"}>
