@@ -272,11 +272,11 @@ export const PlcLogView = (props: { did: string }) => {
       </div>
       <div class="flex items-center gap-1.5 text-sm font-medium">
         <Show when={validLog() === true}>
-          <span class="iconify lucide--check-circle-2 text-green-600 dark:text-green-400"></span>
+          <span class="iconify lucide--check text-green-600 dark:text-green-400"></span>
           <span>Valid log</span>
         </Show>
         <Show when={validLog() === false}>
-          <span class="iconify lucide--x-circle text-red-500 dark:text-red-400"></span>
+          <span class="iconify lucide--x text-red-500 dark:text-red-400"></span>
           <span>Log validation failed</span>
         </Show>
         <Show when={validLog() === undefined}>
