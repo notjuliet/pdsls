@@ -490,18 +490,12 @@ export const RecordView = () => {
         <Show when={location.hash === "#info"}>
           <div class="flex w-full flex-col gap-2 px-2 text-sm">
             <div>
-              <div class="flex items-center gap-1">
-                <span class="iconify lucide--at-sign"></span>
-                <p class="font-semibold">AT URI</p>
-              </div>
+              <p class="font-semibold">AT URI</p>
               <div class="truncate text-xs">{record()?.uri}</div>
             </div>
             <Show when={record()?.cid}>
               <div>
-                <div class="flex items-center gap-1">
-                  <span class="iconify lucide--box"></span>
-                  <p class="font-semibold">CID</p>
-                </div>
+                <p class="font-semibold">CID</p>
                 <div class="truncate text-left text-xs" dir="rtl">
                   {record()?.cid}
                 </div>
@@ -509,7 +503,6 @@ export const RecordView = () => {
             </Show>
             <div>
               <div class="flex items-center gap-1">
-                <span class="iconify lucide--lock-keyhole"></span>
                 <p class="font-semibold">Record verification</p>
                 <span
                   classList={{
@@ -526,7 +519,6 @@ export const RecordView = () => {
             </div>
             <div>
               <div class="flex items-center gap-1">
-                <span class="iconify lucide--file-check"></span>
                 <p class="font-semibold">Schema validation</p>
                 <span
                   classList={{
@@ -556,10 +548,7 @@ export const RecordView = () => {
             </div>
             <Show when={lexiconUri()}>
               <div>
-                <div class="flex items-center gap-1">
-                  <span class="iconify lucide--scroll-text"></span>
-                  <p class="font-semibold">Lexicon schema</p>
-                </div>
+                <p class="font-semibold">Lexicon schema</p>
                 <div class="truncate text-xs">
                   <A
                     href={`/${lexiconUri()}`}
