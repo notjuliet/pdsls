@@ -364,7 +364,7 @@ export const RecordView = () => {
         <A
           classList={{
             "border-b-2 font-medium": true,
-            "border-transparent text-neutral-600 dark:text-neutral-400 hover:border-neutral-600 dark:hover:border-neutral-400":
+            "border-transparent text-neutral-600 dark:text-neutral-300/80 hover:border-neutral-600 dark:hover:border-neutral-300/80":
               !isActive(),
           }}
           href={`/at://${did}/${params.collection}/${params.rkey}#${props.tab}`}
