@@ -140,7 +140,7 @@ export const AccountManager = () => {
                     >
                       <span class="truncate">{sessions[did]?.handle || did}</span>
                       <Show when={did === agent()?.sub && sessions[did].signedIn}>
-                        <span class="iconify lucide--check shrink-0 text-green-500 dark:text-green-400"></span>
+                        <span class="iconify lucide--circle-check shrink-0 text-blue-500 dark:text-blue-400"></span>
                       </Show>
                       <Show when={!sessions[did].signedIn}>
                         <span class="iconify lucide--circle-alert shrink-0 text-red-500 dark:text-red-400"></span>
