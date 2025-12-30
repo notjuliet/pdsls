@@ -156,39 +156,50 @@ const PdsView = () => {
 
   return (
     <Show when={repos() || response()}>
-      <div class="flex w-full flex-col">
-        <div class="mb-3 flex gap-4 px-2 text-sm sm:text-base">
+      <div class="flex w-full flex-col px-2">
+        <div class="mb-3 flex gap-4 text-sm sm:text-base">
           <Tab tab="repos" label="Repositories" />
           <Tab tab="info" label="Info" />
           <Tab tab="firehose" label="Firehose" />
         </div>
-        <div class="flex flex-col gap-1 px-2">
-          <Show when={!location.hash || location.hash === "#repos"}>
-            <div class="flex flex-col divide-y-[0.5px] divide-neutral-300 pb-20 dark:divide-neutral-700">
-              <For each={repos()}>{(repo) => <RepoCard {...repo} />}</For>
-            </div>
-          </Show>
+        <Show when={!location.hash || location.hash === "#repos"}>
+          <div class="flex flex-col divide-y-[0.5px] divide-neutral-300 pb-20 dark:divide-neutral-700">
+            <For each={repos()}>{(repo) => <RepoCard {...repo} />}</For>
+          </div>
+        </Show>
+        <div class="flex flex-col gap-2">
           <Show when={location.hash === "#info"}>
             <Show when={version()}>
               {(version) => (
-                <div class="flex items-baseline gap-x-1">
+                <div class="flex flex-col">
                   <span class="font-semibold">Version</span>
-                  <span class="truncate text-sm">{version()}</span>
+                  <span class="text-sm text-neutral-700 dark:text-neutral-300">{version()}</span>
                 </div>
               )}
             </Show>
             <Show when={serverInfos()}>
               {(server) => (
                 <>
-                  <div class="flex items-baseline gap-x-1">
+                  <div class="flex flex-col">
                     <span class="font-semibold">DID</span>
-                    <span class="truncate text-sm">{server().did}</span>
+                    <span class="text-sm">{server().did}</span>
                   </div>
-                  <Show when={server().inviteCodeRequired}>
+                  <div class="flex items-center gap-1">
                     <span class="font-semibold">Invite Code Required</span>
-                  </Show>
+                    <span
+                      classList={{
+                        "iconify lucide--check text-green-500 dark:text-green-400":
+                          server().inviteCodeRequired === true,
+                        "iconify lucide--x text-red-500 dark:text-red-400":
+                          !server().inviteCodeRequired,
+                      }}
+                    ></span>
+                  </div>
                   <Show when={server().phoneVerificationRequired}>
-                    <span class="font-semibold">Phone Verification Required</span>
+                    <div class="flex items-center gap-1">
+                      <span class="font-semibold">Phone Verification Required</span>
+                      <span class="iconify lucide--check text-green-500 dark:text-green-400"></span>
+                    </div>
                   </Show>
                   <Show when={server().availableUserDomains.length}>
                     <div class="flex flex-col">
