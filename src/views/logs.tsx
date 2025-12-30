@@ -55,22 +55,21 @@ export const PlcLogView = (props: { did: string }) => {
     }
   });
 
-  const FilterButton = (props: { icon: string; event: PlcEvent; label: string }) => {
+  const FilterButton = (props: { event: PlcEvent; label: string }) => {
     const isActive = () => activePlcEvent() === props.event;
     const toggleFilter = () => setActivePlcEvent(isActive() ? undefined : props.event);
 
     return (
       <button
         classList={{
-          "flex items-center gap-1 sm:gap-1.5 rounded-lg px-3 py-2 sm:px-2 sm:py-1.5 text-base sm:text-sm transition-colors": true,
-          "bg-neutral-700 text-white dark:bg-neutral-200 dark:text-neutral-900": isActive(),
+          "font-medium rounded-lg px-2 py-1.5 text-xs sm:text-sm transition-colors": true,
+          "bg-neutral-700 text-white dark:bg-neutral-300 dark:text-neutral-900": isActive(),
           "bg-neutral-200 text-neutral-700 hover:bg-neutral-300 dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-600":
             !isActive(),
         }}
         onclick={toggleFilter}
       >
-        <span class={props.icon}></span>
-        <span class="hidden font-medium sm:inline">{props.label}</span>
+        {props.label}
       </button>
     );
   };
@@ -255,19 +254,11 @@ export const PlcLogView = (props: { did: string }) => {
           <div class="iconify lucide--filter" />
           <p class="font-medium">Filter by type</p>
         </div>
-        <div class="flex flex-wrap gap-1 sm:gap-2">
-          <FilterButton icon="iconify lucide--at-sign" event="handle" label="Alias" />
-          <FilterButton icon="iconify lucide--hard-drive" event="service" label="Service" />
-          <FilterButton
-            icon="iconify lucide--shield-check"
-            event="verification_method"
-            label="Verification"
-          />
-          <FilterButton
-            icon="iconify lucide--key-round"
-            event="rotation_key"
-            label="Rotation Key"
-          />
+        <div class="flex flex-wrap gap-1">
+          <FilterButton event="handle" label="Alias" />
+          <FilterButton event="service" label="Service" />
+          <FilterButton event="verification_method" label="Verification" />
+          <FilterButton event="rotation_key" label="Rotation Key" />
         </div>
       </div>
       <div class="flex items-center gap-1.5 text-sm font-medium">
