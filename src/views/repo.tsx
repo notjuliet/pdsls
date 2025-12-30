@@ -486,66 +486,57 @@ export const RepoView = () => {
                 <div class="flex flex-col gap-3 wrap-anywhere">
                   {/* ID Section */}
                   <div>
-                    <div class="flex items-center gap-1">
-                      <div class="iconify lucide--id-card" />
-                      <p class="font-semibold">ID</p>
+                    <div class="font-semibold">DID</div>
+                    <div class="text-sm text-neutral-700 dark:text-neutral-300">
+                      {didDocument().id}
                     </div>
-                    <div class="text-sm">{didDocument().id}</div>
                   </div>
 
                   {/* Aliases Section */}
                   <div>
-                    <div class="flex items-center gap-1">
-                      <div class="iconify lucide--at-sign" />
-                      <p class="font-semibold">Aliases</p>
-                    </div>
-                    <div class="flex flex-col gap-0.5">
-                      <For each={didDocument().alsoKnownAs}>
-                        {(alias) => (
-                          <div class="flex items-center gap-1 text-sm">
-                            <span>{alias}</span>
-                            <Show when={alias.startsWith("at://")}>
-                              <Tooltip
-                                text={
-                                  validHandles[alias] === true ? "Valid handle"
-                                  : validHandles[alias] === undefined ?
-                                    "Validating"
-                                  : "Invalid handle"
-                                }
-                              >
-                                <span
-                                  classList={{
-                                    "iconify lucide--circle-check text-green-600 dark:text-green-400":
-                                      validHandles[alias] === true,
-                                    "iconify lucide--circle-x text-red-500 dark:text-red-400":
-                                      validHandles[alias] === false,
-                                    "iconify lucide--loader-circle animate-spin":
-                                      validHandles[alias] === undefined,
-                                  }}
-                                ></span>
-                              </Tooltip>
-                            </Show>
-                          </div>
-                        )}
-                      </For>
-                    </div>
+                    <p class="font-semibold">Aliases</p>
+                    <For each={didDocument().alsoKnownAs}>
+                      {(alias) => (
+                        <div class="flex items-center gap-1 text-sm text-neutral-700 dark:text-neutral-300">
+                          <span>{alias}</span>
+                          <Show when={alias.startsWith("at://")}>
+                            <Tooltip
+                              text={
+                                validHandles[alias] === true ? "Valid handle"
+                                : validHandles[alias] === undefined ?
+                                  "Validating"
+                                : "Invalid handle"
+                              }
+                            >
+                              <span
+                                classList={{
+                                  "iconify lucide--check text-green-600 dark:text-green-400":
+                                    validHandles[alias] === true,
+                                  "iconify lucide--x text-red-500 dark:text-red-400":
+                                    validHandles[alias] === false,
+                                  "iconify lucide--loader-circle animate-spin":
+                                    validHandles[alias] === undefined,
+                                }}
+                              ></span>
+                            </Tooltip>
+                          </Show>
+                        </div>
+                      )}
+                    </For>
                   </div>
 
                   {/* Services Section */}
                   <div>
-                    <div class="flex items-center gap-1">
-                      <div class="iconify lucide--hard-drive" />
-                      <p class="font-semibold">Services</p>
-                    </div>
-                    <div class="flex flex-col gap-0.5">
+                    <p class="font-semibold">Services</p>
+                    <div class="flex flex-col gap-1">
                       <For each={didDocument().service}>
                         {(service) => (
-                          <div class="text-sm">
-                            <div class="font-medium text-neutral-700 dark:text-neutral-300">
-                              #{service.id.split("#")[1]}
-                            </div>
+                          <div class="grid grid-cols-[auto_1fr] items-center gap-x-1 text-sm text-neutral-700 dark:text-neutral-300">
+                            <span class="iconify lucide--hash"></span>
+                            <span>{service.id.split("#")[1]}</span>
+                            <span></span>
                             <a
-                              class="underline hover:text-blue-400"
+                              class="w-fit underline hover:text-blue-400"
                               href={service.serviceEndpoint.toString()}
                               target="_blank"
                               rel="noopener"
@@ -560,24 +551,18 @@ export const RepoView = () => {
 
                   {/* Verification Methods Section */}
                   <div>
-                    <div class="flex items-center gap-1">
-                      <div class="iconify lucide--shield-check" />
-                      <p class="font-semibold">Verification Methods</p>
-                    </div>
-                    <div class="flex flex-col gap-0.5">
+                    <p class="font-semibold">Verification Methods</p>
+                    <div class="flex flex-col gap-1">
                       <For each={didDocument().verificationMethod}>
                         {(verif) => (
                           <Show when={verif.publicKeyMultibase}>
                             {(key) => (
-                              <div class="text-sm">
-                                <div class="flex items-baseline gap-1">
-                                  <span class="font-medium text-neutral-700 dark:text-neutral-300">
-                                    #{verif.id.split("#")[1]}
-                                  </span>
-                                  <span class="rounded bg-neutral-200 px-1 py-0.5 text-xs text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300">
-                                    {detectKeyType(key())}
-                                  </span>
-                                </div>
+                              <div class="grid grid-cols-[auto_1fr] items-center gap-x-1 text-sm text-neutral-700 dark:text-neutral-300">
+                                <span class="iconify lucide--hash"></span>
+                                <span>{verif.id.split("#")[1]}</span>
+                                <span class="iconify lucide--key-round"></span>
+                                <span>{detectKeyType(key())}</span>
+                                <span></span>
                                 <div class="font-mono break-all">{key()}</div>
                               </div>
                             )}
@@ -590,17 +575,14 @@ export const RepoView = () => {
                   {/* Rotation Keys Section */}
                   <Show when={rotationKeys().length > 0}>
                     <div>
-                      <div class="flex items-center gap-1">
-                        <div class="iconify lucide--key-round" />
-                        <p class="font-semibold">Rotation Keys</p>
-                      </div>
-                      <div class="flex flex-col gap-0.5">
+                      <p class="font-semibold">Rotation Keys</p>
+                      <div class="flex flex-col gap-1">
                         <For each={rotationKeys()}>
                           {(key) => (
-                            <div class="text-sm">
-                              <span class="rounded bg-neutral-200 px-1 py-0.5 text-xs text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300">
-                                {detectDidKeyType(key)}
-                              </span>
+                            <div class="grid grid-cols-[auto_1fr] items-center gap-x-1 text-sm text-neutral-700 dark:text-neutral-300">
+                              <span class="iconify lucide--key-round"></span>
+                              <span>{detectDidKeyType(key)}</span>
+                              <span></span>
                               <div class="font-mono break-all">{key.replace("did:key:", "")}</div>
                             </div>
                           )}
