@@ -312,11 +312,11 @@ const Search = () => {
                     src={actor.avatar?.replace("img/avatar/", "img/avatar_thumbnail/")}
                     class="size-9 rounded-full"
                   />
-                  <div class="flex flex-col">
+                  <div class="flex min-w-0 flex-col">
                     <Show when={actor.displayName}>
-                      <span class="text-sm font-medium">{actor.displayName}</span>
+                      <span class="truncate text-sm font-medium">{actor.displayName}</span>
                     </Show>
-                    <span class="text-xs text-neutral-600 dark:text-neutral-400">
+                    <span class="truncate text-xs text-neutral-600 dark:text-neutral-400">
                       @{actor.handle}
                     </span>
                   </div>
