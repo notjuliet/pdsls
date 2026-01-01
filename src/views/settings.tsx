@@ -6,12 +6,10 @@ export const [hideMedia, setHideMedia] = createSignal(localStorage.hideMedia ===
 
 const Settings = () => {
   return (
-    <div class="flex w-full flex-col gap-3 px-2">
-      <div class="flex items-center gap-1 font-semibold">
-        <span>Settings</span>
-      </div>
+    <div class="flex w-full flex-col gap-2 px-2">
+      <div class="text-lg font-semibold">Settings</div>
       <div class="flex flex-col gap-3">
-        <div class="flex flex-col gap-0.5">
+        <div class="flex flex-col gap-1">
           <label for="plcDirectory" class="select-none">
             PLC Directory
           </label>
@@ -26,20 +24,39 @@ const Settings = () => {
           />
         </div>
         <ThemeSelection />
-        <div class="flex justify-between">
-          <div class="flex items-center gap-1">
-            <input
-              id="disableMedia"
-              type="checkbox"
-              checked={localStorage.hideMedia === "true"}
-              onChange={(e) => {
-                localStorage.hideMedia = e.currentTarget.checked;
-                setHideMedia(e.currentTarget.checked);
+        <div class="flex flex-col gap-1">
+          <label class="select-none">Blob media preview</label>
+          <div class="flex gap-2">
+            <button
+              classList={{
+                "flex min-w-21 items-center justify-center gap-1 rounded-xl border px-3 py-2": true,
+                "border-neutral-300 bg-neutral-200/60 dark:border-neutral-500 dark:bg-neutral-700":
+                  !hideMedia(),
+                "border-neutral-200 hover:bg-neutral-200/30 dark:border-neutral-600 dark:hover:bg-neutral-800":
+                  hideMedia(),
               }}
-            />
-            <label for="disableMedia" class="select-none">
-              Hide media embeds
-            </label>
+              onClick={() => {
+                localStorage.hideMedia = "false";
+                setHideMedia(false);
+              }}
+            >
+              Show
+            </button>
+            <button
+              classList={{
+                "flex min-w-21 items-center justify-center gap-1 rounded-xl border px-3 py-2": true,
+                "border-neutral-300 bg-neutral-200/60 dark:border-neutral-500 dark:bg-neutral-700":
+                  hideMedia(),
+                "border-neutral-200 hover:bg-neutral-200/30 dark:border-neutral-600 dark:hover:bg-neutral-800":
+                  !hideMedia(),
+              }}
+              onClick={() => {
+                localStorage.hideMedia = "true";
+                setHideMedia(true);
+              }}
+            >
+              Hide
+            </button>
           </div>
         </div>
       </div>
