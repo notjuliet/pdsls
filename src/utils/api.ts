@@ -37,7 +37,7 @@ export const handleResolver = new CompositeHandleResolver({
 });
 
 const authorityResolver = new DohJsonLexiconAuthorityResolver({
-  dohUrl: "https://mozilla.cloudflare-dns.com/dns-query",
+  dohUrl: "https://dns.google/resolve?",
 });
 
 const schemaResolver = new LexiconSchemaResolver({
