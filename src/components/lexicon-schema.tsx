@@ -268,7 +268,9 @@ const PropertyRow = (props: {
         <ConstraintsList property={props.property.items!} />
       </Show>
       <Show when={props.property.description && !props.hideNameType}>
-        <p class="text-sm text-neutral-700 dark:text-neutral-300">{props.property.description}</p>
+        <p class="text-sm wrap-break-word text-neutral-700 dark:text-neutral-300">
+          {props.property.description}
+        </p>
       </Show>
     </div>
   );
