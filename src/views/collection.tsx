@@ -56,7 +56,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
 
   return (
     <span
-      class="relative flex w-full min-w-0 items-baseline rounded p-0.5"
+      class="relative flex w-full min-w-0 items-baseline rounded px-1 py-0.5"
       ref={rkeyRef}
       onmouseover={() => !isTouchDevice && setHover(true)}
       onmouseleave={() => !isTouchDevice && setHover(false)}
