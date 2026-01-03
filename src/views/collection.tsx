@@ -56,7 +56,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
 
   return (
     <span
-      class="relative flex w-full min-w-0 items-baseline rounded p-0.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      class="relative flex w-full min-w-0 items-baseline rounded p-0.5"
       ref={rkeyRef}
       onmouseover={() => !isTouchDevice && setHover(true)}
       onmouseleave={() => !isTouchDevice && setHover(false)}
@@ -361,7 +361,7 @@ const CollectionView = () => {
                   }}
                 >
                   <span
-                    class={`iconify ${reverse() ? "lucide--rotate-ccw" : "lucide--rotate-cw"}`}
+                    class={`iconify ${reverse() ? "lucide--clock-arrow-down" : "lucide--clock-arrow-up"}`}
                   ></span>
                   Reverse
                 </Button>
@@ -388,28 +388,41 @@ const CollectionView = () => {
         </StickyOverlay>
         <div class="flex max-w-full flex-col px-2 font-mono">
           <For each={filteredRecords()}>
-            {(record, index) => (
-              <>
-                <Show when={batchDelete()}>
-                  <label
-                    class="flex items-center gap-1 select-none"
-                    onclick={(e) => handleSelectionClick(e, index())}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={record.toDelete}
-                      onchange={(e) => setRecords(index(), "toDelete", e.currentTarget.checked)}
-                    />
-                    <RecordLink record={record} />
-                  </label>
-                </Show>
-                <Show when={!batchDelete()}>
-                  <A href={`/at://${did}/${params.collection}/${record.rkey}`} class="select-none">
-                    <RecordLink record={record} />
-                  </A>
-                </Show>
-              </>
-            )}
+            {(record, index) => {
+              const rounding = () => {
+                const recs = filteredRecords();
+                const prevSelected = recs[index() - 1]?.toDelete;
+                const nextSelected = recs[index() + 1]?.toDelete;
+                return `${!prevSelected ? "rounded-t" : ""} ${!nextSelected ? "rounded-b" : ""}`;
+              };
+              return (
+                <>
+                  <Show when={batchDelete()}>
+                    <div
+                      class={`select-none ${
+                        record.toDelete ?
+                          `bg-blue-200 hover:bg-blue-300/80 active:bg-blue-300 dark:bg-blue-700/30 dark:hover:bg-blue-700/50 dark:active:bg-blue-700/70 ${rounding()}`
+                        : "rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                      }`}
+                      onclick={(e) => {
+                        handleSelectionClick(e, index());
+                        setRecords(index(), "toDelete", !record.toDelete);
+                      }}
+                    >
+                      <RecordLink record={record} />
+                    </div>
+                  </Show>
+                  <Show when={!batchDelete()}>
+                    <A
+                      href={`/at://${did}/${params.collection}/${record.rkey}`}
+                      class="rounded select-none hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                    >
+                      <RecordLink record={record} />
+                    </A>
+                  </Show>
+                </>
+              );
+            }}
           </For>
         </div>
       </div>
