@@ -141,6 +141,12 @@ const Search = () => {
     input = input.trim().replace(/^@/, "");
     if (!input.length) return;
 
+    if (input.includes("%")) {
+      try {
+        input = decodeURIComponent(input);
+      } catch {}
+    }
+
     setShowSearch(false);
     setInput(undefined);
     setSelectedIndex(-1);
