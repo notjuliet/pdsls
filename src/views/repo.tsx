@@ -298,7 +298,7 @@ export const RepoView = () => {
               </div>
             </Show>
             <MenuProvider>
-              <DropdownMenu icon="lucide--ellipsis-vertical" buttonClass="rounded-sm p-1.5">
+              <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
                 <Show
                   when={!error() && (!location.hash || location.hash.startsWith("#collections"))}
                 >
