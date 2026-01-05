@@ -209,49 +209,55 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
   );
 
   const blob: AtBlob = props.data as any;
+  const canShowMedia = () =>
+    pds() && params.rkey && (blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4");
+
+  const MediaDisplay = () => (
+    <div>
+      <span class="group/media relative flex w-fit">
+        <Show when={!hide()}>
+          <Show when={blob.mimeType.startsWith("image/")}>
+            <img
+              class="h-auto max-h-48 max-w-48 object-contain sm:max-h-64 sm:max-w-64"
+              src={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${ctx.repo}&cid=${blob.ref.$link}`}
+              onLoad={() => setMediaLoaded(true)}
+            />
+          </Show>
+          <Show when={blob.mimeType === "video/mp4"}>
+            <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
+              <VideoPlayer
+                did={ctx.repo}
+                cid={blob.ref.$link}
+                onLoad={() => setMediaLoaded(true)}
+              />
+            </ErrorBoundary>
+          </Show>
+          <Show when={mediaLoaded()}>
+            <button
+              onclick={() => setHide(true)}
+              class="absolute top-1 right-1 flex items-center rounded-lg bg-neutral-900/70 p-1.5 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover/media:opacity-100 hover:bg-neutral-900/80 active:bg-neutral-900/90 dark:bg-neutral-100/70 dark:text-neutral-900 dark:hover:bg-neutral-100/80 dark:active:bg-neutral-100/90"
+            >
+              <span class="iconify lucide--eye-off text-base"></span>
+            </button>
+          </Show>
+        </Show>
+        <Show when={hide()}>
+          <button
+            onclick={() => setHide(false)}
+            class="flex items-center rounded-lg bg-neutral-200 p-1.5 transition-colors hover:bg-neutral-300 active:bg-neutral-400 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
+          >
+            <span class="iconify lucide--eye text-base"></span>
+          </button>
+        </Show>
+      </span>
+    </div>
+  );
 
   if (blob.$type === "blob") {
     return (
       <>
-        <Show when={pds() && params.rkey}>
-          <Show when={blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4"}>
-            <span class="group/media relative flex w-fit">
-              <Show when={!hide()}>
-                <Show when={blob.mimeType.startsWith("image/")}>
-                  <img
-                    class="h-auto max-h-48 max-w-48 object-contain sm:max-h-64 sm:max-w-64"
-                    src={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${ctx.repo}&cid=${blob.ref.$link}`}
-                    onLoad={() => setMediaLoaded(true)}
-                  />
-                </Show>
-                <Show when={blob.mimeType === "video/mp4"}>
-                  <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
-                    <VideoPlayer
-                      did={ctx.repo}
-                      cid={blob.ref.$link}
-                      onLoad={() => setMediaLoaded(true)}
-                    />
-                  </ErrorBoundary>
-                </Show>
-                <Show when={mediaLoaded()}>
-                  <button
-                    onclick={() => setHide(true)}
-                    class="absolute top-1 right-1 flex items-center rounded-lg bg-neutral-900/70 p-1.5 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover/media:opacity-100 hover:bg-neutral-900/80 active:bg-neutral-900/90 dark:bg-neutral-100/70 dark:text-neutral-900 dark:hover:bg-neutral-100/80 dark:active:bg-neutral-100/90"
-                  >
-                    <span class="iconify lucide--eye-off text-base"></span>
-                  </button>
-                </Show>
-              </Show>
-              <Show when={hide()}>
-                <button
-                  onclick={() => setHide(false)}
-                  class="flex items-center rounded-lg bg-neutral-200 p-1.5 transition-colors hover:bg-neutral-300 active:bg-neutral-400 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
-                >
-                  <span class="iconify lucide--eye text-base"></span>
-                </button>
-              </Show>
-            </span>
-          </Show>
+        <Show when={canShowMedia()}>
+          <MediaDisplay />
         </Show>
         {rawObj}
       </>
