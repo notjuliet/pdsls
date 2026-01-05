@@ -2,6 +2,7 @@ import { ComAtprotoLabelDefs } from "@atcute/atproto";
 import { Client, simpleFetchHandler } from "@atcute/client";
 import { isAtprotoDid } from "@atcute/identity";
 import { Handle } from "@atcute/lexicons";
+import { Title } from "@solidjs/meta";
 import { A, useSearchParams } from "@solidjs/router";
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { Button } from "../components/button.jsx";
@@ -194,129 +195,132 @@ export const LabelView = () => {
   };
 
   return (
-    <div class="flex w-full flex-col items-center">
-      <form
-        ref={formRef}
-        class="flex w-full max-w-3xl flex-col gap-y-2 px-3 pb-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSearch();
-        }}
-      >
-        <div class="flex flex-col gap-y-1.5">
-          <label class="flex w-full flex-col gap-y-1">
-            <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              Labeler DID/Handle
-            </span>
-            <TextInput
-              name="did"
-              value={didInput()}
-              onInput={(e) => setDidInput(e.currentTarget.value)}
-              placeholder="did:plc:..."
-              class="w-full"
-            />
-          </label>
-
-          <label class="flex w-full flex-col gap-y-1">
-            <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              URI Patterns (comma-separated)
-            </span>
-            <textarea
-              id="uriPatterns"
-              name="uriPatterns"
-              spellcheck={false}
-              rows={2}
-              value={searchParams.uriPatterns ?? "*"}
-              placeholder="at://did:web:example.com/app.bsky.feed.post/*"
-              class="dark:bg-dark-100 grow rounded-lg bg-white px-2 py-1.5 text-sm outline-1 outline-neutral-200 focus:outline-[1.5px] focus:outline-neutral-600 dark:outline-neutral-600 dark:focus:outline-neutral-400"
-            />
-          </label>
-        </div>
-
-        <Button
-          type="submit"
-          disabled={loading()}
-          class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 w-fit items-center justify-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+    <>
+      <Title>Labels - PDSls</Title>
+      <div class="flex w-full flex-col items-center">
+        <form
+          ref={formRef}
+          class="flex w-full max-w-3xl flex-col gap-y-2 px-3 pb-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSearch();
+          }}
         >
-          <span class="iconify lucide--search" />
-          <span>Search Labels</span>
-        </Button>
+          <div class="flex flex-col gap-y-1.5">
+            <label class="flex w-full flex-col gap-y-1">
+              <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                Labeler DID/Handle
+              </span>
+              <TextInput
+                name="did"
+                value={didInput()}
+                onInput={(e) => setDidInput(e.currentTarget.value)}
+                placeholder="did:plc:..."
+                class="w-full"
+              />
+            </label>
 
-        <Show when={error()}>
-          <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
-            {error()}
+            <label class="flex w-full flex-col gap-y-1">
+              <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                URI Patterns (comma-separated)
+              </span>
+              <textarea
+                id="uriPatterns"
+                name="uriPatterns"
+                spellcheck={false}
+                rows={2}
+                value={searchParams.uriPatterns ?? "*"}
+                placeholder="at://did:web:example.com/app.bsky.feed.post/*"
+                class="dark:bg-dark-100 grow rounded-lg bg-white px-2 py-1.5 text-sm outline-1 outline-neutral-200 focus:outline-[1.5px] focus:outline-neutral-600 dark:outline-neutral-600 dark:focus:outline-neutral-400"
+              />
+            </label>
+          </div>
+
+          <Button
+            type="submit"
+            disabled={loading()}
+            class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 w-fit items-center justify-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+          >
+            <span class="iconify lucide--search" />
+            <span>Search Labels</span>
+          </Button>
+
+          <Show when={error()}>
+            <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
+              {error()}
+            </div>
+          </Show>
+        </form>
+
+        <Show when={hasSearched()}>
+          <StickyOverlay>
+            <div class="flex w-full items-center gap-x-2">
+              <TextInput
+                placeholder="Filter labels (* for partial, -exclude)"
+                name="filter"
+                value={filter()}
+                onInput={(e) => setFilter(e.currentTarget.value)}
+                class="min-w-0 grow text-sm placeholder:text-xs"
+              />
+              <div class="flex shrink-0 items-center gap-x-2 text-sm">
+                <Show when={labels().length > 0}>
+                  <span class="whitespace-nowrap text-neutral-600 dark:text-neutral-400">
+                    {filteredLabels().length}/{labels().length}
+                  </span>
+                </Show>
+
+                <Show when={cursor()}>
+                  <Button
+                    onClick={handleLoadMore}
+                    disabled={loading()}
+                    class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 w-20 items-center justify-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+                  >
+                    <Show
+                      when={!loading()}
+                      fallback={<span class="iconify lucide--loader-circle animate-spin" />}
+                    >
+                      Load More
+                    </Show>
+                  </Button>
+                </Show>
+              </div>
+            </div>
+          </StickyOverlay>
+
+          <div class="w-full max-w-3xl px-3 py-2">
+            <Show when={loading() && labels().length === 0}>
+              <div class="flex flex-col items-center justify-center py-12 text-center">
+                <span class="iconify lucide--loader-circle mb-3 animate-spin text-4xl text-neutral-400" />
+                <p class="text-sm text-neutral-600 dark:text-neutral-400">Loading labels...</p>
+              </div>
+            </Show>
+
+            <Show when={!loading() || labels().length > 0}>
+              <Show when={filteredLabels().length > 0}>
+                <div class="grid gap-2">
+                  <For each={filteredLabels()}>{(label) => <LabelCard label={label} />}</For>
+                </div>
+              </Show>
+
+              <Show when={labels().length > 0 && filteredLabels().length === 0}>
+                <div class="flex flex-col items-center justify-center py-8 text-center">
+                  <span class="iconify lucide--search-x mb-2 text-3xl text-neutral-400" />
+                  <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                    No labels match your filter
+                  </p>
+                </div>
+              </Show>
+
+              <Show when={labels().length === 0 && !loading()}>
+                <div class="flex flex-col items-center justify-center py-8 text-center">
+                  <span class="iconify lucide--tags mb-2 text-3xl text-neutral-400" />
+                  <p class="text-sm text-neutral-600 dark:text-neutral-400">No labels found</p>
+                </div>
+              </Show>
+            </Show>
           </div>
         </Show>
-      </form>
-
-      <Show when={hasSearched()}>
-        <StickyOverlay>
-          <div class="flex w-full items-center gap-x-2">
-            <TextInput
-              placeholder="Filter labels (* for partial, -exclude)"
-              name="filter"
-              value={filter()}
-              onInput={(e) => setFilter(e.currentTarget.value)}
-              class="min-w-0 grow text-sm placeholder:text-xs"
-            />
-            <div class="flex shrink-0 items-center gap-x-2 text-sm">
-              <Show when={labels().length > 0}>
-                <span class="whitespace-nowrap text-neutral-600 dark:text-neutral-400">
-                  {filteredLabels().length}/{labels().length}
-                </span>
-              </Show>
-
-              <Show when={cursor()}>
-                <Button
-                  onClick={handleLoadMore}
-                  disabled={loading()}
-                  class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 w-20 items-center justify-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
-                >
-                  <Show
-                    when={!loading()}
-                    fallback={<span class="iconify lucide--loader-circle animate-spin" />}
-                  >
-                    Load More
-                  </Show>
-                </Button>
-              </Show>
-            </div>
-          </div>
-        </StickyOverlay>
-
-        <div class="w-full max-w-3xl px-3 py-2">
-          <Show when={loading() && labels().length === 0}>
-            <div class="flex flex-col items-center justify-center py-12 text-center">
-              <span class="iconify lucide--loader-circle mb-3 animate-spin text-4xl text-neutral-400" />
-              <p class="text-sm text-neutral-600 dark:text-neutral-400">Loading labels...</p>
-            </div>
-          </Show>
-
-          <Show when={!loading() || labels().length > 0}>
-            <Show when={filteredLabels().length > 0}>
-              <div class="grid gap-2">
-                <For each={filteredLabels()}>{(label) => <LabelCard label={label} />}</For>
-              </div>
-            </Show>
-
-            <Show when={labels().length > 0 && filteredLabels().length === 0}>
-              <div class="flex flex-col items-center justify-center py-8 text-center">
-                <span class="iconify lucide--search-x mb-2 text-3xl text-neutral-400" />
-                <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                  No labels match your filter
-                </p>
-              </div>
-            </Show>
-
-            <Show when={labels().length === 0 && !loading()}>
-              <div class="flex flex-col items-center justify-center py-8 text-center">
-                <span class="iconify lucide--tags mb-2 text-3xl text-neutral-400" />
-                <p class="text-sm text-neutral-600 dark:text-neutral-400">No labels found</p>
-              </div>
-            </Show>
-          </Show>
-        </div>
-      </Show>
-    </div>
+      </div>
+    </>
   );
 };

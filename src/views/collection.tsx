@@ -2,6 +2,7 @@ import { ComAtprotoRepoApplyWrites, ComAtprotoRepoGetRecord } from "@atcute/atpr
 import { Client, simpleFetchHandler } from "@atcute/client";
 import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
+import { Title } from "@solidjs/meta";
 import { A, useBeforeLeave, useParams } from "@solidjs/router";
 import {
   createEffect,
@@ -250,188 +251,191 @@ const CollectionView = () => {
     );
 
   return (
-    <Show when={records.length || response()}>
-      <div class="-mt-2 flex w-full flex-col items-center">
-        <StickyOverlay>
-          <div class="flex w-full flex-col gap-2">
-            <div class="flex items-center gap-1.5">
-              <Show when={agent() && agent()?.sub === did && hasUserScope("delete")}>
-                <div class="flex items-center">
-                  <Tooltip
-                    text={batchDelete() ? "Cancel" : "Delete"}
-                    children={
-                      <button
-                        onclick={() => {
-                          setRecords({ from: 0, to: records.length - 1 }, "toDelete", false);
-                          setLastSelected(undefined);
-                          setBatchDelete(!batchDelete());
-                        }}
-                        class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                      >
-                        <span
-                          class={`iconify ${batchDelete() ? "lucide--circle-x" : "lucide--trash-2"} `}
-                        ></span>
-                      </button>
-                    }
-                  />
-                  <Show when={batchDelete()}>
+    <>
+      <Title>{params.collection} - PDSls</Title>
+      <Show when={records.length || response()}>
+        <div class="-mt-2 flex w-full flex-col items-center">
+          <StickyOverlay>
+            <div class="flex w-full flex-col gap-2">
+              <div class="flex items-center gap-1.5">
+                <Show when={agent() && agent()?.sub === did && hasUserScope("delete")}>
+                  <div class="flex items-center">
                     <Tooltip
-                      text="Select all"
+                      text={batchDelete() ? "Cancel" : "Delete"}
                       children={
                         <button
-                          onclick={() => selectAll()}
+                          onclick={() => {
+                            setRecords({ from: 0, to: records.length - 1 }, "toDelete", false);
+                            setLastSelected(undefined);
+                            setBatchDelete(!batchDelete());
+                          }}
                           class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                         >
-                          <span class="iconify lucide--copy-check"></span>
+                          <span
+                            class={`iconify ${batchDelete() ? "lucide--circle-x" : "lucide--trash-2"} `}
+                          ></span>
                         </button>
                       }
                     />
-                    <Show when={hasUserScope("create")}>
+                    <Show when={batchDelete()}>
                       <Tooltip
-                        text="Recreate"
+                        text="Select all"
+                        children={
+                          <button
+                            onclick={() => selectAll()}
+                            class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                          >
+                            <span class="iconify lucide--copy-check"></span>
+                          </button>
+                        }
+                      />
+                      <Show when={hasUserScope("create")}>
+                        <Tooltip
+                          text="Recreate"
+                          children={
+                            <button
+                              onclick={() => {
+                                setRecreate(true);
+                                setOpenDelete(true);
+                              }}
+                              class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                            >
+                              <span class="iconify lucide--recycle text-green-500 dark:text-green-400"></span>
+                            </button>
+                          }
+                        />
+                      </Show>
+                      <Tooltip
+                        text="Delete"
                         children={
                           <button
                             onclick={() => {
-                              setRecreate(true);
+                              setRecreate(false);
                               setOpenDelete(true);
                             }}
                             class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                           >
-                            <span class="iconify lucide--recycle text-green-500 dark:text-green-400"></span>
+                            <span class="iconify lucide--trash-2 text-red-500 dark:text-red-400"></span>
                           </button>
                         }
                       />
                     </Show>
-                    <Tooltip
-                      text="Delete"
-                      children={
-                        <button
-                          onclick={() => {
-                            setRecreate(false);
-                            setOpenDelete(true);
-                          }}
-                          class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                        >
-                          <span class="iconify lucide--trash-2 text-red-500 dark:text-red-400"></span>
-                        </button>
-                      }
-                    />
-                  </Show>
-                </div>
-                <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
-                  <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
-                    <h2 class="mb-2 font-semibold">
-                      {recreate() ? "Recreate" : "Delete"}{" "}
-                      {records.filter((r) => r.toDelete).length} records?
-                    </h2>
-                    <div class="flex justify-end gap-2">
-                      <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
-                      <Button
-                        onClick={deleteRecords}
-                        class={`dark:shadow-dark-700 rounded-lg px-2 py-1.5 text-xs text-white shadow-xs select-none ${recreate() ? "bg-green-500 hover:bg-green-400 dark:bg-green-600 dark:hover:bg-green-500" : "bg-red-500 hover:bg-red-400 active:bg-red-400"}`}
-                      >
-                        {recreate() ? "Recreate" : "Delete"}
-                      </Button>
-                    </div>
                   </div>
-                </Modal>
-              </Show>
-              <TextInput
-                name="Filter"
-                placeholder="Filter by substring"
-                onInput={(e) => setFilter(e.currentTarget.value)}
-                class="grow"
-              />
-              <Tooltip text="Jetstream">
-                <A
-                  href={`/jetstream?collections=${params.collection}&dids=${params.repo}`}
-                  class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                >
-                  <span class="iconify lucide--radio-tower"></span>
-                </A>
-              </Tooltip>
-            </div>
-            <Show when={records.length > 1}>
-              <div class="flex items-center justify-between gap-x-2">
-                <Button
-                  onClick={() => {
-                    setReverse(!reverse());
-                    setCursor(undefined);
-                    clearCollectionCache(cacheKey());
-                    refetch();
-                  }}
-                  classList={{
-                    "text-blue-500! dark:text-blue-400! border-blue-500! dark:border-blue-400!":
-                      reverse(),
-                  }}
-                >
-                  <span
-                    class={`iconify ${reverse() ? "lucide--arrow-down-wide-narrow" : "lucide--arrow-up-narrow-wide"}`}
-                  ></span>
-                  Reverse
-                </Button>
-                <div>
-                  <Show when={batchDelete()}>
-                    <span>{records.filter((rec) => rec.toDelete).length}</span>
-                    <span>/</span>
-                  </Show>
-                  <span>{filter() ? filteredRecords().length : records.length} records</span>
-                </div>
-                <div class="flex w-20 items-center justify-end">
-                  <Show when={cursor()}>
-                    <Show when={!response.loading}>
-                      <Button onClick={() => refetch()}>Load More</Button>
-                    </Show>
-                    <Show when={response.loading}>
-                      <div class="iconify lucide--loader-circle w-20 animate-spin text-xl" />
-                    </Show>
-                  </Show>
-                </div>
-              </div>
-            </Show>
-          </div>
-        </StickyOverlay>
-        <div class="flex max-w-full flex-col px-2 font-mono">
-          <For each={filteredRecords()}>
-            {(record, index) => {
-              const rounding = () => {
-                const recs = filteredRecords();
-                const prevSelected = recs[index() - 1]?.toDelete;
-                const nextSelected = recs[index() + 1]?.toDelete;
-                return `${!prevSelected ? "rounded-t" : ""} ${!nextSelected ? "rounded-b" : ""}`;
-              };
-              return (
-                <>
-                  <Show when={batchDelete()}>
-                    <div
-                      class={`select-none ${
-                        record.toDelete ?
-                          `bg-blue-200 hover:bg-blue-300/80 active:bg-blue-300 dark:bg-blue-700/30 dark:hover:bg-blue-700/50 dark:active:bg-blue-700/70 ${rounding()}`
-                        : "rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                      }`}
-                      onclick={(e) => {
-                        handleSelectionClick(e, index());
-                        setRecords(index(), "toDelete", !record.toDelete);
-                      }}
-                    >
-                      <RecordLink record={record} />
+                  <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
+                    <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
+                      <h2 class="mb-2 font-semibold">
+                        {recreate() ? "Recreate" : "Delete"}{" "}
+                        {records.filter((r) => r.toDelete).length} records?
+                      </h2>
+                      <div class="flex justify-end gap-2">
+                        <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
+                        <Button
+                          onClick={deleteRecords}
+                          class={`dark:shadow-dark-700 rounded-lg px-2 py-1.5 text-xs text-white shadow-xs select-none ${recreate() ? "bg-green-500 hover:bg-green-400 dark:bg-green-600 dark:hover:bg-green-500" : "bg-red-500 hover:bg-red-400 active:bg-red-400"}`}
+                        >
+                          {recreate() ? "Recreate" : "Delete"}
+                        </Button>
+                      </div>
                     </div>
-                  </Show>
-                  <Show when={!batchDelete()}>
-                    <A
-                      href={`/at://${did}/${params.collection}/${record.rkey}`}
-                      class="rounded select-none hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                    >
-                      <RecordLink record={record} />
-                    </A>
-                  </Show>
-                </>
-              );
-            }}
-          </For>
+                  </Modal>
+                </Show>
+                <TextInput
+                  name="Filter"
+                  placeholder="Filter by substring"
+                  onInput={(e) => setFilter(e.currentTarget.value)}
+                  class="grow"
+                />
+                <Tooltip text="Jetstream">
+                  <A
+                    href={`/jetstream?collections=${params.collection}&dids=${params.repo}`}
+                    class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                  >
+                    <span class="iconify lucide--radio-tower"></span>
+                  </A>
+                </Tooltip>
+              </div>
+              <Show when={records.length > 1}>
+                <div class="flex items-center justify-between gap-x-2">
+                  <Button
+                    onClick={() => {
+                      setReverse(!reverse());
+                      setCursor(undefined);
+                      clearCollectionCache(cacheKey());
+                      refetch();
+                    }}
+                    classList={{
+                      "text-blue-500! dark:text-blue-400! border-blue-500! dark:border-blue-400!":
+                        reverse(),
+                    }}
+                  >
+                    <span
+                      class={`iconify ${reverse() ? "lucide--arrow-down-wide-narrow" : "lucide--arrow-up-narrow-wide"}`}
+                    ></span>
+                    Reverse
+                  </Button>
+                  <div>
+                    <Show when={batchDelete()}>
+                      <span>{records.filter((rec) => rec.toDelete).length}</span>
+                      <span>/</span>
+                    </Show>
+                    <span>{filter() ? filteredRecords().length : records.length} records</span>
+                  </div>
+                  <div class="flex w-20 items-center justify-end">
+                    <Show when={cursor()}>
+                      <Show when={!response.loading}>
+                        <Button onClick={() => refetch()}>Load More</Button>
+                      </Show>
+                      <Show when={response.loading}>
+                        <div class="iconify lucide--loader-circle w-20 animate-spin text-xl" />
+                      </Show>
+                    </Show>
+                  </div>
+                </div>
+              </Show>
+            </div>
+          </StickyOverlay>
+          <div class="flex max-w-full flex-col px-2 font-mono">
+            <For each={filteredRecords()}>
+              {(record, index) => {
+                const rounding = () => {
+                  const recs = filteredRecords();
+                  const prevSelected = recs[index() - 1]?.toDelete;
+                  const nextSelected = recs[index() + 1]?.toDelete;
+                  return `${!prevSelected ? "rounded-t" : ""} ${!nextSelected ? "rounded-b" : ""}`;
+                };
+                return (
+                  <>
+                    <Show when={batchDelete()}>
+                      <div
+                        class={`select-none ${
+                          record.toDelete ?
+                            `bg-blue-200 hover:bg-blue-300/80 active:bg-blue-300 dark:bg-blue-700/30 dark:hover:bg-blue-700/50 dark:active:bg-blue-700/70 ${rounding()}`
+                          : "rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                        }`}
+                        onclick={(e) => {
+                          handleSelectionClick(e, index());
+                          setRecords(index(), "toDelete", !record.toDelete);
+                        }}
+                      >
+                        <RecordLink record={record} />
+                      </div>
+                    </Show>
+                    <Show when={!batchDelete()}>
+                      <A
+                        href={`/at://${did}/${params.collection}/${record.rkey}`}
+                        class="rounded select-none hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                      >
+                        <RecordLink record={record} />
+                      </A>
+                    </Show>
+                  </>
+                );
+              }}
+            </For>
+          </div>
         </div>
-      </div>
-    </Show>
+      </Show>
+    </>
   );
 };
 

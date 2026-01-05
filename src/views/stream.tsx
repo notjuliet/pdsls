@@ -1,4 +1,5 @@
 import { Firehose } from "@skyware/firehose";
+import { Title } from "@solidjs/meta";
 import { A, useLocation, useSearchParams } from "@solidjs/router";
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { Button } from "../components/button";
@@ -169,136 +170,139 @@ const StreamView = () => {
   });
 
   return (
-    <div class="flex w-full flex-col items-center">
-      <div class="mb-1 flex gap-4 font-medium">
-        <A
-          class="flex items-center gap-1 border-b-2"
-          inactiveClass="border-transparent text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
-          href="/jetstream"
-        >
-          Jetstream
-        </A>
-        <A
-          class="flex items-center gap-1 border-b-2"
-          inactiveClass="border-transparent text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
-          href="/firehose"
-        >
-          Firehose
-        </A>
-      </div>
-      <StickyOverlay>
-        <form ref={formRef} class="flex w-full flex-col gap-1.5 text-sm">
-          <Show when={!connected()}>
-            <label class="flex items-center justify-end gap-x-1">
-              <span class="min-w-20">Instance</span>
-              <TextInput
-                name="instance"
-                value={
-                  searchParams.instance ??
-                  (streamType === "jetstream" ?
-                    "wss://jetstream1.us-east.bsky.network/subscribe"
-                  : "wss://bsky.network")
-                }
-                class="grow"
-              />
-            </label>
-            <Show when={streamType === "jetstream"}>
+    <>
+      <Title>{streamType === "firehose" ? "Firehose" : "Jetstream"} - PDSls</Title>
+      <div class="flex w-full flex-col items-center">
+        <div class="mb-1 flex gap-4 font-medium">
+          <A
+            class="flex items-center gap-1 border-b-2"
+            inactiveClass="border-transparent text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
+            href="/jetstream"
+          >
+            Jetstream
+          </A>
+          <A
+            class="flex items-center gap-1 border-b-2"
+            inactiveClass="border-transparent text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
+            href="/firehose"
+          >
+            Firehose
+          </A>
+        </div>
+        <StickyOverlay>
+          <form ref={formRef} class="flex w-full flex-col gap-1.5 text-sm">
+            <Show when={!connected()}>
               <label class="flex items-center justify-end gap-x-1">
-                <span class="min-w-20">Collections</span>
-                <textarea
-                  name="collections"
-                  spellcheck={false}
-                  placeholder="Comma-separated list of collections"
-                  value={searchParams.collections ?? ""}
-                  class="dark:bg-dark-100 grow rounded-lg bg-white px-2 py-1 outline-1 outline-neutral-200 focus:outline-[1.5px] focus:outline-neutral-600 dark:outline-neutral-600 dark:focus:outline-neutral-400"
+                <span class="min-w-20">Instance</span>
+                <TextInput
+                  name="instance"
+                  value={
+                    searchParams.instance ??
+                    (streamType === "jetstream" ?
+                      "wss://jetstream1.us-east.bsky.network/subscribe"
+                    : "wss://bsky.network")
+                  }
+                  class="grow"
                 />
               </label>
-            </Show>
-            <Show when={streamType === "jetstream"}>
-              <label class="flex items-center justify-end gap-x-1">
-                <span class="min-w-20">DIDs</span>
-                <textarea
-                  name="dids"
-                  spellcheck={false}
-                  placeholder="Comma-separated list of DIDs"
-                  value={searchParams.dids ?? ""}
-                  class="dark:bg-dark-100 grow rounded-lg bg-white px-2 py-1 outline-1 outline-neutral-200 focus:outline-[1.5px] focus:outline-neutral-600 dark:outline-neutral-600 dark:focus:outline-neutral-400"
-                />
-              </label>
-            </Show>
-            <label class="flex items-center justify-end gap-x-1">
-              <span class="min-w-20">Cursor</span>
-              <TextInput
-                name="cursor"
-                placeholder="Leave empty for live-tail"
-                value={searchParams.cursor ?? ""}
-                class="grow"
-              />
-            </label>
-            <Show when={streamType === "jetstream"}>
-              <div class="flex items-center justify-end gap-x-1">
-                <input
-                  type="checkbox"
-                  name="allEvents"
-                  id="allEvents"
-                  checked={searchParams.allEvents === "on" ? true : false}
-                />
-                <label for="allEvents" class="select-none">
-                  Show account and identity events
+              <Show when={streamType === "jetstream"}>
+                <label class="flex items-center justify-end gap-x-1">
+                  <span class="min-w-20">Collections</span>
+                  <textarea
+                    name="collections"
+                    spellcheck={false}
+                    placeholder="Comma-separated list of collections"
+                    value={searchParams.collections ?? ""}
+                    class="dark:bg-dark-100 grow rounded-lg bg-white px-2 py-1 outline-1 outline-neutral-200 focus:outline-[1.5px] focus:outline-neutral-600 dark:outline-neutral-600 dark:focus:outline-neutral-400"
+                  />
                 </label>
+              </Show>
+              <Show when={streamType === "jetstream"}>
+                <label class="flex items-center justify-end gap-x-1">
+                  <span class="min-w-20">DIDs</span>
+                  <textarea
+                    name="dids"
+                    spellcheck={false}
+                    placeholder="Comma-separated list of DIDs"
+                    value={searchParams.dids ?? ""}
+                    class="dark:bg-dark-100 grow rounded-lg bg-white px-2 py-1 outline-1 outline-neutral-200 focus:outline-[1.5px] focus:outline-neutral-600 dark:outline-neutral-600 dark:focus:outline-neutral-400"
+                  />
+                </label>
+              </Show>
+              <label class="flex items-center justify-end gap-x-1">
+                <span class="min-w-20">Cursor</span>
+                <TextInput
+                  name="cursor"
+                  placeholder="Leave empty for live-tail"
+                  value={searchParams.cursor ?? ""}
+                  class="grow"
+                />
+              </label>
+              <Show when={streamType === "jetstream"}>
+                <div class="flex items-center justify-end gap-x-1">
+                  <input
+                    type="checkbox"
+                    name="allEvents"
+                    id="allEvents"
+                    checked={searchParams.allEvents === "on" ? true : false}
+                  />
+                  <label for="allEvents" class="select-none">
+                    Show account and identity events
+                  </label>
+                </div>
+              </Show>
+            </Show>
+            <Show when={connected()}>
+              <div class="flex flex-col gap-1 wrap-anywhere">
+                <For each={parameters()}>
+                  {(param) => (
+                    <Show when={param.param}>
+                      <div class="flex">
+                        <div class="min-w-24 font-semibold">{param.name}</div>
+                        {param.param}
+                      </div>
+                    </Show>
+                  )}
+                </For>
               </div>
             </Show>
-          </Show>
-          <Show when={connected()}>
-            <div class="flex flex-col gap-1 wrap-anywhere">
-              <For each={parameters()}>
-                {(param) => (
-                  <Show when={param.param}>
-                    <div class="flex">
-                      <div class="min-w-24 font-semibold">{param.name}</div>
-                      {param.param}
-                    </div>
-                  </Show>
-                )}
-              </For>
+            <div class="flex justify-end">
+              <Show when={connected()}>
+                <button
+                  type="button"
+                  onmousedown={(e) => {
+                    e.preventDefault();
+                    disconnect();
+                  }}
+                  ontouchstart={(e) => {
+                    e.preventDefault();
+                    disconnect();
+                  }}
+                  class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+                >
+                  Disconnect
+                </button>
+              </Show>
+              <Show when={!connected()}>
+                <Button onClick={() => connectSocket(new FormData(formRef))}>Connect</Button>
+              </Show>
             </div>
-          </Show>
-          <div class="flex justify-end">
-            <Show when={connected()}>
-              <button
-                type="button"
-                onmousedown={(e) => {
-                  e.preventDefault();
-                  disconnect();
-                }}
-                ontouchstart={(e) => {
-                  e.preventDefault();
-                  disconnect();
-                }}
-                class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
-              >
-                Disconnect
-              </button>
-            </Show>
-            <Show when={!connected()}>
-              <Button onClick={() => connectSocket(new FormData(formRef))}>Connect</Button>
-            </Show>
-          </div>
-        </form>
-      </StickyOverlay>
-      <Show when={notice().length}>
-        <div class="text-red-500 dark:text-red-400">{notice()}</div>
-      </Show>
-      <div class="flex w-full flex-col gap-2 divide-y-[0.5px] divide-neutral-500 font-mono text-sm wrap-anywhere whitespace-pre-wrap md:w-3xl">
-        <For each={records().toReversed()}>
-          {(rec) => (
-            <div class="pb-2">
-              <JSONValue data={rec} repo={rec.did ?? rec.repo} />
-            </div>
-          )}
-        </For>
+          </form>
+        </StickyOverlay>
+        <Show when={notice().length}>
+          <div class="text-red-500 dark:text-red-400">{notice()}</div>
+        </Show>
+        <div class="flex w-full flex-col gap-2 divide-y-[0.5px] divide-neutral-500 font-mono text-sm wrap-anywhere whitespace-pre-wrap md:w-3xl">
+          <For each={records().toReversed()}>
+            {(rec) => (
+              <div class="pb-2">
+                <JSONValue data={rec} repo={rec.did ?? rec.repo} />
+              </div>
+            )}
+          </For>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

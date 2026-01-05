@@ -2,6 +2,7 @@ import { ComAtprotoServerDescribeServer, ComAtprotoSyncListRepos } from "@atcute
 import { Client, simpleFetchHandler } from "@atcute/client";
 import { InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
+import { Title } from "@solidjs/meta";
 import { A, useLocation, useParams } from "@solidjs/router";
 import { createResource, createSignal, For, Show } from "solid-js";
 import { Button } from "../components/button";
@@ -155,114 +156,120 @@ const PdsView = () => {
   );
 
   return (
-    <Show when={repos() || response()}>
-      <div class="flex w-full flex-col px-2">
-        <div class="mb-3 flex gap-4 text-sm sm:text-base">
-          <Tab tab="repos" label="Repositories" />
-          <Tab tab="info" label="Info" />
-          <Tab tab="firehose" label="Firehose" />
+    <>
+      <Title>{params.pds} - PDSls</Title>
+      <Show when={repos() || response()}>
+        <div class="flex w-full flex-col px-2">
+          <div class="mb-3 flex gap-4 text-sm sm:text-base">
+            <Tab tab="repos" label="Repositories" />
+            <Tab tab="info" label="Info" />
+            <Tab tab="firehose" label="Firehose" />
+          </div>
+          <Show when={!location.hash || location.hash === "#repos"}>
+            <div class="flex flex-col divide-y-[0.5px] divide-neutral-300 pb-20 dark:divide-neutral-700">
+              <For each={repos()}>{(repo) => <RepoCard {...repo} />}</For>
+            </div>
+          </Show>
+          <div class="flex flex-col gap-2">
+            <Show when={location.hash === "#info"}>
+              <Show when={version()}>
+                {(version) => (
+                  <div class="flex flex-col">
+                    <span class="font-semibold">Version</span>
+                    <span class="text-sm text-neutral-700 dark:text-neutral-300">{version()}</span>
+                  </div>
+                )}
+              </Show>
+              <Show when={serverInfos()}>
+                {(server) => (
+                  <>
+                    <div class="flex flex-col">
+                      <span class="font-semibold">DID</span>
+                      <span class="text-sm">{server().did}</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <span class="font-semibold">Invite Code Required</span>
+                      <span
+                        classList={{
+                          "iconify lucide--check text-green-500 dark:text-green-400":
+                            server().inviteCodeRequired === true,
+                          "iconify lucide--x text-red-500 dark:text-red-400":
+                            !server().inviteCodeRequired,
+                        }}
+                      ></span>
+                    </div>
+                    <Show when={server().phoneVerificationRequired}>
+                      <div class="flex items-center gap-1">
+                        <span class="font-semibold">Phone Verification Required</span>
+                        <span class="iconify lucide--check text-green-500 dark:text-green-400"></span>
+                      </div>
+                    </Show>
+                    <Show when={server().availableUserDomains.length}>
+                      <div class="flex flex-col">
+                        <span class="font-semibold">Available User Domains</span>
+                        <For each={server().availableUserDomains}>
+                          {(domain) => <span class="text-sm wrap-anywhere">{domain}</span>}
+                        </For>
+                      </div>
+                    </Show>
+                    <Show when={server().links?.privacyPolicy}>
+                      <div class="flex flex-col">
+                        <span class="font-semibold">Privacy Policy</span>
+                        <a
+                          href={server().links?.privacyPolicy}
+                          class="text-sm hover:underline"
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          {server().links?.privacyPolicy}
+                        </a>
+                      </div>
+                    </Show>
+                    <Show when={server().links?.termsOfService}>
+                      <div class="flex flex-col">
+                        <span class="font-semibold">Terms of Service</span>
+                        <a
+                          href={server().links?.termsOfService}
+                          class="text-sm hover:underline"
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          {server().links?.termsOfService}
+                        </a>
+                      </div>
+                    </Show>
+                    <Show when={server().contact?.email}>
+                      <div class="flex flex-col">
+                        <span class="font-semibold">Contact</span>
+                        <a
+                          href={`mailto:${server().contact?.email}`}
+                          class="text-sm hover:underline"
+                        >
+                          {server().contact?.email}
+                        </a>
+                      </div>
+                    </Show>
+                  </>
+                )}
+              </Show>
+            </Show>
+          </div>
         </div>
         <Show when={!location.hash || location.hash === "#repos"}>
-          <div class="flex flex-col divide-y-[0.5px] divide-neutral-300 pb-20 dark:divide-neutral-700">
-            <For each={repos()}>{(repo) => <RepoCard {...repo} />}</For>
+          <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 pt-2 pb-4">
+            <div class="flex flex-col items-center gap-1 pb-2">
+              <p>{repos()?.length} loaded</p>
+              <Show when={!response.loading && cursor()}>
+                <Button onClick={() => refetch()}>Load More</Button>
+              </Show>
+              <Show when={response.loading}>
+                <span class="iconify lucide--loader-circle animate-spin py-3.5 text-xl"></span>
+              </Show>
+            </div>
           </div>
         </Show>
-        <div class="flex flex-col gap-2">
-          <Show when={location.hash === "#info"}>
-            <Show when={version()}>
-              {(version) => (
-                <div class="flex flex-col">
-                  <span class="font-semibold">Version</span>
-                  <span class="text-sm text-neutral-700 dark:text-neutral-300">{version()}</span>
-                </div>
-              )}
-            </Show>
-            <Show when={serverInfos()}>
-              {(server) => (
-                <>
-                  <div class="flex flex-col">
-                    <span class="font-semibold">DID</span>
-                    <span class="text-sm">{server().did}</span>
-                  </div>
-                  <div class="flex items-center gap-1">
-                    <span class="font-semibold">Invite Code Required</span>
-                    <span
-                      classList={{
-                        "iconify lucide--check text-green-500 dark:text-green-400":
-                          server().inviteCodeRequired === true,
-                        "iconify lucide--x text-red-500 dark:text-red-400":
-                          !server().inviteCodeRequired,
-                      }}
-                    ></span>
-                  </div>
-                  <Show when={server().phoneVerificationRequired}>
-                    <div class="flex items-center gap-1">
-                      <span class="font-semibold">Phone Verification Required</span>
-                      <span class="iconify lucide--check text-green-500 dark:text-green-400"></span>
-                    </div>
-                  </Show>
-                  <Show when={server().availableUserDomains.length}>
-                    <div class="flex flex-col">
-                      <span class="font-semibold">Available User Domains</span>
-                      <For each={server().availableUserDomains}>
-                        {(domain) => <span class="text-sm wrap-anywhere">{domain}</span>}
-                      </For>
-                    </div>
-                  </Show>
-                  <Show when={server().links?.privacyPolicy}>
-                    <div class="flex flex-col">
-                      <span class="font-semibold">Privacy Policy</span>
-                      <a
-                        href={server().links?.privacyPolicy}
-                        class="text-sm hover:underline"
-                        target="_blank"
-                        rel="noopener"
-                      >
-                        {server().links?.privacyPolicy}
-                      </a>
-                    </div>
-                  </Show>
-                  <Show when={server().links?.termsOfService}>
-                    <div class="flex flex-col">
-                      <span class="font-semibold">Terms of Service</span>
-                      <a
-                        href={server().links?.termsOfService}
-                        class="text-sm hover:underline"
-                        target="_blank"
-                        rel="noopener"
-                      >
-                        {server().links?.termsOfService}
-                      </a>
-                    </div>
-                  </Show>
-                  <Show when={server().contact?.email}>
-                    <div class="flex flex-col">
-                      <span class="font-semibold">Contact</span>
-                      <a href={`mailto:${server().contact?.email}`} class="text-sm hover:underline">
-                        {server().contact?.email}
-                      </a>
-                    </div>
-                  </Show>
-                </>
-              )}
-            </Show>
-          </Show>
-        </div>
-      </div>
-      <Show when={!location.hash || location.hash === "#repos"}>
-        <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 pt-2 pb-4">
-          <div class="flex flex-col items-center gap-1 pb-2">
-            <p>{repos()?.length} loaded</p>
-            <Show when={!response.loading && cursor()}>
-              <Button onClick={() => refetch()}>Load More</Button>
-            </Show>
-            <Show when={response.loading}>
-              <span class="iconify lucide--loader-circle animate-spin py-3.5 text-xl"></span>
-            </Show>
-          </div>
-        </div>
       </Show>
-    </Show>
+    </>
   );
 };
 
