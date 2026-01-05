@@ -252,7 +252,7 @@ const CollectionView = () => {
       <div class="-mt-2 flex w-full flex-col items-center">
         <StickyOverlay>
           <div class="flex w-full flex-col gap-2">
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1.5">
               <Show when={agent() && agent()?.sub === did && hasUserScope("delete")}>
                 <div class="flex items-center">
                   <Tooltip
