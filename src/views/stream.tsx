@@ -33,17 +33,21 @@ const StreamView = () => {
     }
   };
 
+  const disconnect = () => {
+    if (streamType === "jetstream") socket?.close();
+    else firehose?.close();
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+    pendingRecords = [];
+    setConnected(false);
+  };
+
   const connectSocket = async (formData: FormData) => {
     setNotice("");
     if (connected()) {
-      if (streamType === "jetstream") socket?.close();
-      else firehose?.close();
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      }
-      pendingRecords = [];
-      setConnected(false);
+      disconnect();
       return;
     }
     setRecords([]);
@@ -260,9 +264,25 @@ const StreamView = () => {
             </div>
           </Show>
           <div class="flex justify-end">
-            <Button onClick={() => connectSocket(new FormData(formRef))}>
-              {connected() ? "Disconnect" : "Connect"}
-            </Button>
+            <Show when={connected()}>
+              <button
+                type="button"
+                onmousedown={(e) => {
+                  e.preventDefault();
+                  disconnect();
+                }}
+                ontouchstart={(e) => {
+                  e.preventDefault();
+                  disconnect();
+                }}
+                class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+              >
+                Disconnect
+              </button>
+            </Show>
+            <Show when={!connected()}>
+              <Button onClick={() => connectSocket(new FormData(formRef))}>Connect</Button>
+            </Show>
           </div>
         </form>
       </StickyOverlay>
