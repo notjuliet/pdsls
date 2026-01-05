@@ -384,190 +384,201 @@ export const RecordView = () => {
       <Title>
         {params.collection}/{params.rkey} - PDSls
       </Title>
-      <Show when={record()} keyed>
-        <div class="flex w-full flex-col items-center">
-          <div class="mb-3 flex w-full justify-between px-2 text-sm sm:text-base">
-            <div class="flex items-center gap-4">
-              <RecordTab tab="record" label="Record" />
-              <RecordTab tab="schema" label="Schema" />
-              <RecordTab tab="backlinks" label="Backlinks" />
-              <RecordTab tab="info" label="Info" error />
-            </div>
-            <div class="flex gap-0.5">
-              <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
-                <Show when={hasUserScope("update")}>
-                  <RecordEditor create={false} record={record()?.value} refetch={refetch} />
-                </Show>
-                <Show when={hasUserScope("delete")}>
-                  <Tooltip text="Delete">
-                    <button
-                      class="flex items-center rounded-sm p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                      onclick={() => setOpenDelete(true)}
-                    >
-                      <span class="iconify lucide--trash-2"></span>
-                    </button>
-                  </Tooltip>
-                  <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
-                    <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
-                      <h2 class="mb-2 font-semibold">Delete this record?</h2>
-                      <div class="flex justify-end gap-2">
-                        <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
-                        <Button
-                          onClick={deleteRecord}
-                          class="dark:shadow-dark-700 rounded-lg bg-red-500 px-2 py-1.5 text-xs text-white shadow-xs select-none hover:bg-red-400 active:bg-red-400"
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
-                  </Modal>
-                </Show>
-              </Show>
-              <MenuProvider>
-                <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
-                  <CopyMenu
-                    content={JSON.stringify(record()?.value, null, 2)}
-                    label="Copy record"
-                    icon="lucide--copy"
-                  />
-                  <CopyMenu
-                    content={`at://${params.repo}/${params.collection}/${params.rkey}`}
-                    label="Copy AT URI"
-                    icon="lucide--copy"
-                  />
-                  <Show when={record()?.cid}>
-                    {(cid) => <CopyMenu content={cid()} label="Copy CID" icon="lucide--copy" />}
-                  </Show>
-                  <MenuSeparator />
-                  <Show when={externalLink()}>
-                    {(externalLink) => (
-                      <NavMenu
-                        href={externalLink()?.link}
-                        icon={`${externalLink().icon ?? "lucide--app-window"}`}
-                        label={`Open on ${externalLink().label}`}
-                        newTab
-                      />
-                    )}
-                  </Show>
-                  <NavMenu
-                    href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
-                    icon="lucide--external-link"
-                    label="Record on PDS"
-                    newTab
-                  />
-                </DropdownMenu>
-              </MenuProvider>
+      <ErrorBoundary
+        fallback={(err) => (
+          <div class="flex w-full flex-col items-center gap-1 px-2 py-4">
+            <span class="font-semibold text-red-500 dark:text-red-400">Error loading record</span>
+            <div class="max-w-md text-sm wrap-break-word text-neutral-600 dark:text-neutral-400">
+              {err.message}
             </div>
           </div>
-          <Show when={!location.hash || location.hash === "#record"}>
-            <div class="w-max max-w-screen min-w-full px-4 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:px-2 sm:text-sm md:max-w-3xl">
-              <JSONValue data={record()?.value as any} repo={record()!.uri.split("/")[2]} />
+        )}
+      >
+        <Show when={record()} keyed>
+          <div class="flex w-full flex-col items-center">
+            <div class="mb-3 flex w-full justify-between px-2 text-sm sm:text-base">
+              <div class="flex items-center gap-4">
+                <RecordTab tab="record" label="Record" />
+                <RecordTab tab="schema" label="Schema" />
+                <RecordTab tab="backlinks" label="Backlinks" />
+                <RecordTab tab="info" label="Info" error />
+              </div>
+              <div class="flex gap-0.5">
+                <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
+                  <Show when={hasUserScope("update")}>
+                    <RecordEditor create={false} record={record()?.value} refetch={refetch} />
+                  </Show>
+                  <Show when={hasUserScope("delete")}>
+                    <Tooltip text="Delete">
+                      <button
+                        class="flex items-center rounded-sm p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                        onclick={() => setOpenDelete(true)}
+                      >
+                        <span class="iconify lucide--trash-2"></span>
+                      </button>
+                    </Tooltip>
+                    <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
+                      <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
+                        <h2 class="mb-2 font-semibold">Delete this record?</h2>
+                        <div class="flex justify-end gap-2">
+                          <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
+                          <Button
+                            onClick={deleteRecord}
+                            class="dark:shadow-dark-700 rounded-lg bg-red-500 px-2 py-1.5 text-xs text-white shadow-xs select-none hover:bg-red-400 active:bg-red-400"
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    </Modal>
+                  </Show>
+                </Show>
+                <MenuProvider>
+                  <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
+                    <CopyMenu
+                      content={JSON.stringify(record()?.value, null, 2)}
+                      label="Copy record"
+                      icon="lucide--copy"
+                    />
+                    <CopyMenu
+                      content={`at://${params.repo}/${params.collection}/${params.rkey}`}
+                      label="Copy AT URI"
+                      icon="lucide--copy"
+                    />
+                    <Show when={record()?.cid}>
+                      {(cid) => <CopyMenu content={cid()} label="Copy CID" icon="lucide--copy" />}
+                    </Show>
+                    <MenuSeparator />
+                    <Show when={externalLink()}>
+                      {(externalLink) => (
+                        <NavMenu
+                          href={externalLink()?.link}
+                          icon={`${externalLink().icon ?? "lucide--app-window"}`}
+                          label={`Open on ${externalLink().label}`}
+                          newTab
+                        />
+                      )}
+                    </Show>
+                    <NavMenu
+                      href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
+                      icon="lucide--external-link"
+                      label="Record on PDS"
+                      newTab
+                    />
+                  </DropdownMenu>
+                </MenuProvider>
+              </div>
             </div>
-          </Show>
-          <Show when={location.hash === "#schema" || location.hash.startsWith("#schema:")}>
-            <Show when={lexiconNotFound() === true}>
-              <span class="w-full px-2 text-sm">Lexicon schema could not be resolved.</span>
-            </Show>
-            <Show when={lexiconNotFound() === undefined}>
-              <span class="w-full px-2 text-sm">Resolving lexicon schema...</span>
-            </Show>
-            <Show when={schema() || params.collection === "com.atproto.lexicon.schema"}>
-              <ErrorBoundary fallback={(err) => <div>Error: {err.message}</div>}>
-                <LexiconSchemaView schema={schema()?.rawSchema ?? (record()?.value as any)} />
-              </ErrorBoundary>
-            </Show>
-          </Show>
-          <Show when={location.hash === "#backlinks"}>
-            <ErrorBoundary
-              fallback={(err) => <div class="wrap-break-word">Error: {err.message}</div>}
-            >
-              <Suspense
-                fallback={
-                  <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
-                }
-              >
-                <div class="w-full px-2">
-                  <Backlinks target={`at://${did}/${params.collection}/${params.rkey}`} />
-                </div>
-              </Suspense>
-            </ErrorBoundary>
-          </Show>
-          <Show when={location.hash === "#info"}>
-            <div class="flex w-full flex-col gap-2 px-2 text-sm">
-              <div>
-                <p class="font-semibold">AT URI</p>
-                <div class="truncate text-xs">{record()?.uri}</div>
+            <Show when={!location.hash || location.hash === "#record"}>
+              <div class="w-max max-w-screen min-w-full px-4 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:px-2 sm:text-sm md:max-w-3xl">
+                <JSONValue data={record()?.value as any} repo={record()!.uri.split("/")[2]} />
               </div>
-              <Show when={record()?.cid}>
-                <div>
-                  <p class="font-semibold">CID</p>
-                  <div class="truncate text-left text-xs" dir="rtl">
-                    {record()?.cid}
-                  </div>
-                </div>
+            </Show>
+            <Show when={location.hash === "#schema" || location.hash.startsWith("#schema:")}>
+              <Show when={lexiconNotFound() === true}>
+                <span class="w-full px-2 text-sm">Lexicon schema could not be resolved.</span>
               </Show>
-              <div>
-                <div class="flex items-center gap-1">
-                  <p class="font-semibold">Record verification</p>
-                  <span
-                    classList={{
-                      "iconify lucide--check text-green-500 dark:text-green-400":
-                        validRecord() === true,
-                      "iconify lucide--x text-red-500 dark:text-red-400": validRecord() === false,
-                      "iconify lucide--loader-circle animate-spin": validRecord() === undefined,
-                    }}
-                  ></span>
-                </div>
-                <Show when={validRecord() === false}>
-                  <div class="text-xs wrap-break-word">{verifyError()}</div>
-                </Show>
-              </div>
-              <div>
-                <div class="flex items-center gap-1">
-                  <p class="font-semibold">Schema validation</p>
-                  <span
-                    classList={{
-                      "iconify lucide--check text-green-500 dark:text-green-400":
-                        validSchema() === true,
-                      "iconify lucide--x text-red-500 dark:text-red-400": validSchema() === false,
-                      "iconify lucide--loader-circle animate-spin":
-                        validSchema() === undefined && remoteValidation(),
-                    }}
-                  ></span>
-                </div>
-                <Show when={validSchema() === false}>
-                  <div class="text-xs wrap-break-word">{validationError()}</div>
-                </Show>
-                <Show
-                  when={
-                    !remoteValidation() &&
-                    validSchema() === undefined &&
-                    params.collection &&
-                    !(params.collection in lexicons)
+              <Show when={lexiconNotFound() === undefined}>
+                <span class="w-full px-2 text-sm">Resolving lexicon schema...</span>
+              </Show>
+              <Show when={schema() || params.collection === "com.atproto.lexicon.schema"}>
+                <ErrorBoundary fallback={(err) => <div>Error: {err.message}</div>}>
+                  <LexiconSchemaView schema={schema()?.rawSchema ?? (record()?.value as any)} />
+                </ErrorBoundary>
+              </Show>
+            </Show>
+            <Show when={location.hash === "#backlinks"}>
+              <ErrorBoundary
+                fallback={(err) => <div class="wrap-break-word">Error: {err.message}</div>}
+              >
+                <Suspense
+                  fallback={
+                    <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
                   }
                 >
-                  <Button onClick={() => validateRemoteSchema(record()!.value)}>
-                    Validate via resolution
-                  </Button>
+                  <div class="w-full px-2">
+                    <Backlinks target={`at://${did}/${params.collection}/${params.rkey}`} />
+                  </div>
+                </Suspense>
+              </ErrorBoundary>
+            </Show>
+            <Show when={location.hash === "#info"}>
+              <div class="flex w-full flex-col gap-2 px-2 text-sm">
+                <div>
+                  <p class="font-semibold">AT URI</p>
+                  <div class="truncate text-xs">{record()?.uri}</div>
+                </div>
+                <Show when={record()?.cid}>
+                  <div>
+                    <p class="font-semibold">CID</p>
+                    <div class="truncate text-left text-xs" dir="rtl">
+                      {record()?.cid}
+                    </div>
+                  </div>
+                </Show>
+                <div>
+                  <div class="flex items-center gap-1">
+                    <p class="font-semibold">Record verification</p>
+                    <span
+                      classList={{
+                        "iconify lucide--check text-green-500 dark:text-green-400":
+                          validRecord() === true,
+                        "iconify lucide--x text-red-500 dark:text-red-400": validRecord() === false,
+                        "iconify lucide--loader-circle animate-spin": validRecord() === undefined,
+                      }}
+                    ></span>
+                  </div>
+                  <Show when={validRecord() === false}>
+                    <div class="text-xs wrap-break-word">{verifyError()}</div>
+                  </Show>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1">
+                    <p class="font-semibold">Schema validation</p>
+                    <span
+                      classList={{
+                        "iconify lucide--check text-green-500 dark:text-green-400":
+                          validSchema() === true,
+                        "iconify lucide--x text-red-500 dark:text-red-400": validSchema() === false,
+                        "iconify lucide--loader-circle animate-spin":
+                          validSchema() === undefined && remoteValidation(),
+                      }}
+                    ></span>
+                  </div>
+                  <Show when={validSchema() === false}>
+                    <div class="text-xs wrap-break-word">{validationError()}</div>
+                  </Show>
+                  <Show
+                    when={
+                      !remoteValidation() &&
+                      validSchema() === undefined &&
+                      params.collection &&
+                      !(params.collection in lexicons)
+                    }
+                  >
+                    <Button onClick={() => validateRemoteSchema(record()!.value)}>
+                      Validate via resolution
+                    </Button>
+                  </Show>
+                </div>
+                <Show when={lexiconUri()}>
+                  <div>
+                    <p class="font-semibold">Lexicon schema</p>
+                    <div class="truncate text-xs">
+                      <A
+                        href={`/${lexiconUri()}`}
+                        class="text-blue-400 hover:underline active:underline"
+                      >
+                        {lexiconUri()}
+                      </A>
+                    </div>
+                  </div>
                 </Show>
               </div>
-              <Show when={lexiconUri()}>
-                <div>
-                  <p class="font-semibold">Lexicon schema</p>
-                  <div class="truncate text-xs">
-                    <A
-                      href={`/${lexiconUri()}`}
-                      class="text-blue-400 hover:underline active:underline"
-                    >
-                      {lexiconUri()}
-                    </A>
-                  </div>
-                </div>
-              </Show>
-            </div>
-          </Show>
-        </div>
-      </Show>
+            </Show>
+          </div>
+        </Show>
+      </ErrorBoundary>
     </>
   );
 };
