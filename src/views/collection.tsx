@@ -141,6 +141,8 @@ const CollectionView = () => {
     }
     if (restoredFromCache()) setRestoredFromCache(false);
 
+    const isLoadMore = cursor() !== undefined;
+
     if (!pds) pds = await resolvePDS(did!);
     if (!rpc) rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
     const res = await rpc.get("com.atproto.repo.listRecords", {
@@ -165,7 +167,7 @@ const CollectionView = () => {
         toDelete: false,
       });
     });
-    setRecords(records.concat(tmpRecords) ?? tmpRecords);
+    setRecords(isLoadMore ? records.concat(tmpRecords) : tmpRecords);
     return res.data.records;
   };
 
@@ -354,14 +356,17 @@ const CollectionView = () => {
                 <Button
                   onClick={() => {
                     setReverse(!reverse());
-                    setRecords([]);
                     setCursor(undefined);
                     clearCollectionCache(cacheKey());
                     refetch();
                   }}
+                  classList={{
+                    "text-blue-500! dark:text-blue-400! border-blue-500! dark:border-blue-400!":
+                      reverse(),
+                  }}
                 >
                   <span
-                    class={`iconify ${reverse() ? "lucide--clock-arrow-down" : "lucide--clock-arrow-up"}`}
+                    class={`iconify ${reverse() ? "lucide--arrow-down-wide-narrow" : "lucide--arrow-up-narrow-wide"}`}
                   ></span>
                   Reverse
                 </Button>
