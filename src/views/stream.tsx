@@ -19,12 +19,30 @@ const StreamView = () => {
   let socket: WebSocket;
   let firehose: Firehose;
   let formRef!: HTMLFormElement;
+  let pendingRecords: any[] = [];
+  let rafId: number | null = null;
+
+  const addRecord = (record: any) => {
+    pendingRecords.push(record);
+    if (rafId === null) {
+      rafId = requestAnimationFrame(() => {
+        setRecords(records().concat(pendingRecords).slice(-LIMIT));
+        pendingRecords = [];
+        rafId = null;
+      });
+    }
+  };
 
   const connectSocket = async (formData: FormData) => {
     setNotice("");
     if (connected()) {
       if (streamType === "jetstream") socket?.close();
       else firehose?.close();
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      pendingRecords = [];
       setConnected(false);
       return;
     }
@@ -79,7 +97,7 @@ const StreamView = () => {
       socket.addEventListener("message", (event) => {
         const rec = JSON.parse(event.data);
         if (searchParams.allEvents === "on" || (rec.kind !== "account" && rec.kind !== "identity"))
-          setRecords(records().concat(rec).slice(-LIMIT));
+          addRecord(rec);
       });
       socket.addEventListener("error", () => {
         setNotice("Connection error");
@@ -105,14 +123,14 @@ const StreamView = () => {
             since: commit.since,
             op: op,
           };
-          setRecords(records().concat(record).slice(-LIMIT));
+          addRecord(record);
         }
       });
       firehose.on("identity", (identity) => {
-        setRecords(records().concat(identity).slice(-LIMIT));
+        addRecord(identity);
       });
       firehose.on("account", (account) => {
-        setRecords(records().concat(account).slice(-LIMIT));
+        addRecord(account);
       });
       firehose.on("sync", (sync) => {
         const event = {
@@ -122,7 +140,7 @@ const StreamView = () => {
           seq: sync.seq,
           time: sync.time,
         };
-        setRecords(records().concat(event).slice(-LIMIT));
+        addRecord(event);
       });
       firehose.start();
     }
@@ -139,7 +157,12 @@ const StreamView = () => {
     if (searchParams.instance) connectSocket(formData);
   });
 
-  onCleanup(() => socket?.close());
+  onCleanup(() => {
+    socket?.close();
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+    }
+  });
 
   return (
     <div class="flex w-full flex-col items-center">
