@@ -157,7 +157,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           <MenuProvider>
             <DropdownMenu icon="lucide--menu text-lg" buttonClass="rounded-lg p-1.5">
               <NavMenu href="/jetstream" label="Jetstream" icon="lucide--radio-tower" />
-              <NavMenu href="/firehose" label="Firehose" icon="lucide--droplet" />
+              <NavMenu href="/firehose" label="Firehose" icon="lucide--antenna" />
               <NavMenu href="/labels" label="Labels" icon="lucide--tag" />
               <NavMenu href="/settings" label="Settings" icon="lucide--settings" />
               <MenuSeparator />
