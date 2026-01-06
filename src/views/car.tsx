@@ -11,6 +11,10 @@ import { TextInput } from "../components/text-input.jsx";
 import { isTouchDevice } from "../layout.jsx";
 import { localDateFromTimestamp } from "../utils/date.js";
 
+const isIOS =
+  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
 // Convert CBOR-decoded objects to JSON-friendly format
 const toJsonValue = (obj: unknown): JSONType => {
   if (obj === null || obj === undefined) return null;
@@ -235,7 +239,7 @@ const WelcomeView = (props: {
           <label class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-8 items-center justify-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800">
             <input
               type="file"
-              accept=".car,application/vnd.ipld.car"
+              accept={isIOS ? undefined : ".car,application/vnd.ipld.car"}
               onChange={props.onFileChange}
               class="hidden"
             />
