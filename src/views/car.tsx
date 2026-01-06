@@ -442,7 +442,7 @@ const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void })
                       props.onRoute({ type: "collection", collection: entry });
                     }
                   }}
-                  class="flex w-full items-center gap-2 rounded p-2 text-left text-sm hover:bg-neutral-200 dark:hover:bg-neutral-800"
+                  class="flex w-full items-center gap-2 rounded p-2 text-left text-sm hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
                 >
                   <span
                     class="truncate font-medium"
