@@ -7,6 +7,10 @@ import { createSignal, onCleanup, Show } from "solid-js";
 import { createLogger, LoggerView } from "./logger.jsx";
 import { isIOS, toJsonValue } from "./shared.jsx";
 
+// HACK: Disable compression on WebKit due to an error being thrown
+const isWebKit =
+  isIOS || (/AppleWebKit/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent));
+
 const INVALID_CHAR_RE = /[<>:"/\\|?*\x00-\x1F]/g;
 const filenamify = (name: string) => {
   return name.replace(INVALID_CHAR_RE, "~");
@@ -88,7 +92,7 @@ export const UnpackToolView = () => {
               const filename = `${entry.collection}/${filenamify(entry.rkey)}.json`;
               const data = JSON.stringify(record, null, 2);
 
-              yield { filename, data, compress: "deflate" };
+              yield { filename, data, compress: isWebKit ? false : "deflate" };
               count++;
               progress.update(`Unpacking records (${count} entries)`);
             } catch {
