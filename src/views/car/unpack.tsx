@@ -41,54 +41,62 @@ export const UnpackToolView = () => {
 
       // Create async generator that yields ZipEntry as we read from CAR
       const entryGenerator = async function* (): AsyncGenerator<ZipEntry> {
-        using progress = logger.progress(`Unpacking records (0 entries)`);
+        const progress = logger.progress(`Unpacking records (0 entries)`);
 
-        for await (const entry of repo) {
-          if (signal.aborted) return;
+        try {
+          for await (const entry of repo) {
+            if (signal.aborted) return;
 
-          // Prompt for save location on first record
-          if (writable === undefined) {
-            using _waiting = logger.progress(`Waiting for user...`);
-
-            const fd = await showSaveFilePicker({
-              suggestedName: `${file.name.replace(/\.car$/, "")}.zip`,
-              // @ts-expect-error: ponyfill doesn't have full typings
-              id: "car-unpack",
-              startIn: "downloads",
-              types: [
-                {
-                  description: "ZIP archive",
-                  accept: { "application/zip": [".zip"] },
-                },
-              ],
-            }).catch((err) => {
-              if (err instanceof DOMException && err.name === "AbortError") {
-                logger.warn(`File picker was cancelled`);
-              } else {
-                console.warn(err);
-                logger.warn(`Something went wrong when opening the file picker`);
-              }
-              return undefined;
-            });
-
-            writable = await fd?.createWritable();
-
+            // Prompt for save location on first record
             if (writable === undefined) {
-              return;
+              const waiting = logger.progress(`Waiting for user...`);
+
+              try {
+                const fd = await showSaveFilePicker({
+                  suggestedName: `${file.name.replace(/\.car$/, "")}.zip`,
+                  // @ts-expect-error: ponyfill doesn't have full typings
+                  id: "car-unpack",
+                  startIn: "downloads",
+                  types: [
+                    {
+                      description: "ZIP archive",
+                      accept: { "application/zip": [".zip"] },
+                    },
+                  ],
+                }).catch((err) => {
+                  if (err instanceof DOMException && err.name === "AbortError") {
+                    logger.warn(`File picker was cancelled`);
+                  } else {
+                    console.warn(err);
+                    logger.warn(`Something went wrong when opening the file picker`);
+                  }
+                  return undefined;
+                });
+
+                writable = await fd?.createWritable();
+
+                if (writable === undefined) {
+                  return;
+                }
+              } finally {
+                waiting[Symbol.dispose]?.();
+              }
+            }
+
+            try {
+              const record = toJsonValue(entry.record);
+              const filename = `${entry.collection}/${filenamify(entry.rkey)}.json`;
+              const data = JSON.stringify(record, null, 2);
+
+              yield { filename, data, compress: "deflate" };
+              count++;
+              progress.update(`Unpacking records (${count} entries)`);
+            } catch {
+              // Skip entries with invalid data
             }
           }
-
-          try {
-            const record = toJsonValue(entry.record);
-            const filename = `${entry.collection}/${filenamify(entry.rkey)}.json`;
-            const data = JSON.stringify(record, null, 2);
-
-            yield { filename, data, compress: "deflate" };
-            count++;
-            progress.update(`Unpacking records (${count} entries)`);
-          } catch {
-            // Skip entries with invalid data
-          }
+        } finally {
+          progress[Symbol.dispose]?.();
         }
       };
 
@@ -123,8 +131,12 @@ export const UnpackToolView = () => {
       logger.log(`${count} records extracted`);
 
       {
-        using _progress = logger.progress(`Flushing writes...`);
-        await writable.close();
+        const flushProgress = logger.progress(`Flushing writes...`);
+        try {
+          await writable.close();
+        } finally {
+          flushProgress[Symbol.dispose]?.();
+        }
       }
 
       logger.log(`Finished!`);
