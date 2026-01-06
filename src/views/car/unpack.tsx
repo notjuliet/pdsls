@@ -3,8 +3,12 @@ import { zip, type ZipEntry } from "@mary/zip";
 import { Title } from "@solidjs/meta";
 import { FileSystemWritableFileStream, showSaveFilePicker } from "native-file-system-adapter";
 import { createSignal, onCleanup } from "solid-js";
+import { createDropHandler, createFileChangeHandler, handleDragOver } from "./file-handlers.js";
 import { createLogger, LoggerView } from "./logger.jsx";
 import { isIOS, toJsonValue, WelcomeView } from "./shared.jsx";
+
+// Check if browser natively supports File System Access API
+const hasNativeFileSystemAccess = "showSaveFilePicker" in window;
 
 // HACK: Disable compression on WebKit due to an error being thrown
 const isWebKit =
@@ -40,6 +44,61 @@ export const UnpackToolView = () => {
 
     try {
       let count = 0;
+
+      // On Safari/browsers without native File System Access API, use blob download
+      if (!hasNativeFileSystemAccess) {
+        const chunks: BlobPart[] = [];
+
+        const entryGenerator = async function* (): AsyncGenerator<ZipEntry> {
+          const progress = logger.progress(`Unpacking records (0 entries)`);
+
+          try {
+            for await (const entry of repo) {
+              if (signal.aborted) return;
+
+              try {
+                const record = toJsonValue(entry.record);
+                const filename = `${entry.collection}/${filenamify(entry.rkey)}.json`;
+                const data = JSON.stringify(record, null, 2);
+
+                yield { filename, data, compress: isWebKit ? false : "deflate" };
+                count++;
+                progress.update(`Unpacking records (${count} entries)`);
+              } catch {
+                // Skip entries with invalid data
+              }
+            }
+          } finally {
+            progress[Symbol.dispose]?.();
+          }
+        };
+
+        for await (const chunk of zip(entryGenerator())) {
+          if (signal.aborted) return;
+          chunks.push(chunk as BlobPart);
+        }
+
+        if (signal.aborted) return;
+
+        logger.log(`${count} records extracted`);
+        logger.log(`Creating download...`);
+
+        const blob = new Blob(chunks, { type: "application/zip" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${file.name.replace(/\.car$/, "")}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        logger.log(`Finished! Download started.`);
+        setPending(false);
+        return;
+      }
+
+      // Native File System Access API path
       let writable: FileSystemWritableFileStream | undefined;
 
       // Create async generator that yields ZipEntry as we read from CAR
@@ -70,15 +129,20 @@ export const UnpackToolView = () => {
                   if (err instanceof DOMException && err.name === "AbortError") {
                     logger.warn(`File picker was cancelled`);
                   } else {
-                    console.warn(err);
                     logger.warn(`Something went wrong when opening the file picker`);
                   }
                   return undefined;
                 });
 
-                writable = await fd?.createWritable();
+                if (!fd) {
+                  logger.warn(`No file handle obtained`);
+                  return;
+                }
+
+                writable = await fd.createWritable();
 
                 if (writable === undefined) {
+                  logger.warn(`Failed to create writable stream`);
                   return;
                 }
               } finally {
@@ -116,10 +180,11 @@ export const UnpackToolView = () => {
           return;
         }
         writeCount++;
-        if (writeCount % 100 !== 0) {
-          writable.write(chunk); // Fire and forget
+        // Await every 100th write to apply backpressure
+        if (writeCount % 100 === 0) {
+          await writable.write(chunk);
         } else {
-          await writable.write(chunk); // Await periodically to apply backpressure
+          writable.write(chunk); // Fire and forget
         }
       }
 
@@ -137,15 +202,16 @@ export const UnpackToolView = () => {
         const flushProgress = logger.progress(`Flushing writes...`);
         try {
           await writable.close();
+          logger.log(`Finished! File saved successfully.`);
+        } catch (err) {
+          logger.error(`Failed to save file: ${err}`);
+          throw err; // Re-throw to be caught by outer catch
         } finally {
           flushProgress[Symbol.dispose]?.();
         }
       }
-
-      logger.log(`Finished!`);
     } catch (err) {
       if (signal.aborted) return;
-      console.error("Failed to unpack CAR file:", err);
       logger.error(`Error: ${err}\nFile might be malformed, or might not be a CAR archive`);
     } finally {
       await repo?.dispose();
@@ -155,26 +221,13 @@ export const UnpackToolView = () => {
     }
   };
 
-  const handleFileChange = (e: Event) => {
-    const input = e.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) {
-      unpackToZip(file);
-    }
-    input.value = "";
-  };
+  const handleFileChange = createFileChangeHandler(unpackToZip);
 
+  // Wrap handleDrop to prevent multiple simultaneous uploads
+  const baseDrop = createDropHandler(unpackToZip);
   const handleDrop = (e: DragEvent) => {
-    e.preventDefault();
     if (pending()) return;
-    const file = e.dataTransfer?.files?.[0];
-    if (file && (file.name.endsWith(".car") || file.type === "application/vnd.ipld.car")) {
-      unpackToZip(file);
-    }
-  };
-
-  const handleDragOver = (e: DragEvent) => {
-    e.preventDefault();
+    baseDrop(e);
   };
 
   return (

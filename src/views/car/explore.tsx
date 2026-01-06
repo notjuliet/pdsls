@@ -10,6 +10,7 @@ import { JSONValue } from "../../components/json.jsx";
 import { TextInput } from "../../components/text-input.jsx";
 import { isTouchDevice } from "../../layout.jsx";
 import { localDateFromTimestamp } from "../../utils/date.js";
+import { createDropHandler, createFileChangeHandler, handleDragOver } from "./file-handlers.js";
 import {
   type Archive,
   type CollectionEntry,
@@ -98,25 +99,8 @@ export const ExploreToolView = () => {
     }
   };
 
-  const handleFileChange = (e: Event) => {
-    const input = e.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) {
-      parseCarFile(file);
-    }
-  };
-
-  const handleDrop = (e: DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer?.files?.[0];
-    if (file && (file.name.endsWith(".car") || file.type === "application/vnd.ipld.car")) {
-      parseCarFile(file);
-    }
-  };
-
-  const handleDragOver = (e: DragEvent) => {
-    e.preventDefault();
-  };
+  const handleFileChange = createFileChangeHandler(parseCarFile);
+  const handleDrop = createDropHandler(parseCarFile);
 
   const reset = () => {
     setArchive(null);
