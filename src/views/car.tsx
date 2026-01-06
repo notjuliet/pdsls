@@ -448,7 +448,7 @@ const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void })
                     class="truncate font-medium"
                     classList={{
                       "text-neutral-700 dark:text-neutral-300": hasSingleEntry,
-                      "text-blue-500 dark:text-blue-400": !hasSingleEntry,
+                      "text-blue-400": !hasSingleEntry,
                     }}
                   >
                     {entry.name}
@@ -456,9 +456,7 @@ const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void })
 
                   <Show when={hasSingleEntry}>
                     <span class="iconify lucide--chevron-right shrink-0 text-xs text-neutral-500" />
-                    <span class="truncate font-medium text-blue-500 dark:text-blue-400">
-                      {entry.entries[0].key}
-                    </span>
+                    <span class="truncate font-medium text-blue-400">{entry.entries[0].key}</span>
                   </Show>
 
                   <Show when={!hasSingleEntry}>
