@@ -7,6 +7,7 @@ export type Notification = {
   progress?: number;
   total?: number;
   type?: "info" | "success" | "error";
+  onCancel?: () => void;
 };
 
 const [notifications, setNotifications] = createStore<Notification[]>([]);
@@ -48,7 +49,9 @@ export const NotificationContainer = () => {
               "animate-[slideIn_0.25s_ease-in]": !removingIds().has(notification.id),
               "animate-[slideOut_0.25s_ease-in]": removingIds().has(notification.id),
             }}
-            onClick={() => removeNotification(notification.id)}
+            onClick={() =>
+              notification.progress === undefined && removeNotification(notification.id)
+            }
           >
             <div class="flex items-center gap-2 text-sm">
               <Show when={notification.progress !== undefined}>
@@ -81,6 +84,17 @@ export const NotificationContainer = () => {
                   <div class="text-xs text-neutral-600 dark:text-neutral-400">
                     {notification.progress}%
                   </div>
+                </Show>
+                <Show when={notification.onCancel}>
+                  <button
+                    class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 mt-1 rounded border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      notification.onCancel?.();
+                    }}
+                  >
+                    Cancel
+                  </button>
                 </Show>
               </div>
             </Show>

@@ -193,6 +193,7 @@ export const RepoView = () => {
 
   const downloadRepo = async () => {
     let notificationId: string | null = null;
+    const abortController = new AbortController();
 
     try {
       setDownloading(true);
@@ -201,9 +202,17 @@ export const RepoView = () => {
         progress: 0,
         total: 0,
         type: "info",
+        onCancel: () => {
+          abortController.abort();
+          if (notificationId) {
+            removeNotification(notificationId);
+          }
+        },
       });
 
-      const response = await fetch(`${pds}/xrpc/com.atproto.sync.getRepo?did=${did}`);
+      const response = await fetch(`${pds}/xrpc/com.atproto.sync.getRepo?did=${did}`, {
+        signal: abortController.signal,
+      });
       if (!response.ok) {
         throw new Error(`HTTP error status: ${response.status}`);
       }
@@ -254,21 +263,25 @@ export const RepoView = () => {
         message: "Repository downloaded successfully",
         type: "success",
         progress: undefined,
+        onCancel: undefined,
       });
       setTimeout(() => {
         if (notificationId) removeNotification(notificationId);
       }, 3000);
     } catch (error) {
-      console.error("Download failed:", error);
-      if (notificationId) {
-        updateNotification(notificationId, {
-          message: "Download failed",
-          type: "error",
-          progress: undefined,
-        });
-        setTimeout(() => {
-          if (notificationId) removeNotification(notificationId);
-        }, 5000);
+      if (!(error instanceof Error && error.name === "AbortError")) {
+        console.error("Download failed:", error);
+        if (notificationId) {
+          updateNotification(notificationId, {
+            message: "Download failed",
+            type: "error",
+            progress: undefined,
+            onCancel: undefined,
+          });
+          setTimeout(() => {
+            if (notificationId) removeNotification(notificationId);
+          }, 5000);
+        }
       }
     }
     setDownloading(false);
