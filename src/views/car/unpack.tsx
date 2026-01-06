@@ -1,11 +1,10 @@
 import { fromStream } from "@atcute/repo";
 import { zip, type ZipEntry } from "@mary/zip";
 import { Title } from "@solidjs/meta";
-import { A } from "@solidjs/router";
 import { FileSystemWritableFileStream, showSaveFilePicker } from "native-file-system-adapter";
-import { createSignal, onCleanup, Show } from "solid-js";
+import { createSignal, onCleanup } from "solid-js";
 import { createLogger, LoggerView } from "./logger.jsx";
-import { isIOS, toJsonValue } from "./shared.jsx";
+import { isIOS, toJsonValue, WelcomeView } from "./shared.jsx";
 
 // HACK: Disable compression on WebKit due to an error being thrown
 const isWebKit =
@@ -179,60 +178,19 @@ export const UnpackToolView = () => {
   };
 
   return (
-    <div class="flex w-full max-w-3xl flex-col gap-y-4 px-2">
+    <>
       <Title>Unpack archive - PDSls</Title>
-      <div class="flex flex-col gap-y-1">
-        <div class="flex items-center gap-2 text-lg">
-          <A
-            href="/car"
-            class="flex size-7 items-center justify-center rounded text-neutral-500 transition-colors hover:bg-neutral-200 hover:text-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200"
-          >
-            <span class="iconify lucide--arrow-left" />
-          </A>
-          <h1 class="font-semibold">Unpack archive</h1>
-        </div>
-        <p class="text-sm text-neutral-600 dark:text-neutral-400">
-          Upload a CAR file to extract all records into a ZIP archive.
-        </p>
-      </div>
-
-      <div
-        class="dark:bg-dark-300 flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-neutral-300 bg-neutral-50 p-8 transition-colors hover:border-neutral-400 dark:border-neutral-600 dark:hover:border-neutral-500"
+      <WelcomeView
+        title="Unpack archive"
+        subtitle="Upload a CAR file to extract all records into a ZIP archive."
+        loading={pending()}
+        onFileChange={handleFileChange}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
-      >
-        <Show
-          when={!pending()}
-          fallback={
-            <div class="flex flex-col items-center gap-2">
-              <span class="iconify lucide--loader-circle animate-spin text-3xl text-neutral-400" />
-              <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-                Processing...
-              </span>
-            </div>
-          }
-        >
-          <span class="iconify lucide--folder-archive text-3xl text-neutral-400" />
-          <div class="text-center">
-            <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              Drag and drop a CAR file here
-            </p>
-            <p class="text-xs text-neutral-500 dark:text-neutral-400">or</p>
-          </div>
-          <label class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-8 cursor-pointer items-center justify-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800">
-            <input
-              type="file"
-              accept={isIOS ? undefined : ".car,application/vnd.ipld.car"}
-              onChange={handleFileChange}
-              class="hidden"
-            />
-            <span class="iconify lucide--upload text-sm" />
-            Choose file
-          </label>
-        </Show>
+      />
+      <div class="w-full max-w-3xl px-2">
+        <LoggerView logger={logger} />
       </div>
-
-      <LoggerView logger={logger} />
-    </div>
+    </>
   );
 };

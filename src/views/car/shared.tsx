@@ -75,7 +75,6 @@ export const WelcomeView = (props: {
   subtitle: string;
   loading: boolean;
   error?: string;
-  progress?: string;
   onFileChange: (e: Event) => void;
   onDrop: (e: DragEvent) => void;
   onDragOver: (e: DragEvent) => void;
@@ -106,7 +105,7 @@ export const WelcomeView = (props: {
             <div class="flex flex-col items-center gap-2">
               <span class="iconify lucide--loader-circle animate-spin text-3xl text-neutral-400" />
               <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-                {props.progress ?? "Reading CAR file..."}
+                Reading CAR file...
               </span>
             </div>
           }
@@ -130,13 +129,6 @@ export const WelcomeView = (props: {
           </label>
         </Show>
       </div>
-
-      <Show when={props.progress && !props.loading}>
-        <div class="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300">
-          <span class="iconify lucide--check shrink-0" />
-          {props.progress}
-        </div>
-      </Show>
 
       <Show when={props.error}>
         <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
