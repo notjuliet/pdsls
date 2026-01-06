@@ -159,7 +159,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
                 <NavMenu href="/jetstream" label="Jetstream" icon="lucide--radio-tower" />
                 <NavMenu href="/firehose" label="Firehose" icon="lucide--antenna" />
                 <NavMenu href="/labels" label="Labels" icon="lucide--tag" />
-                <NavMenu href="/car" label="CAR explorer" icon="lucide--folder-archive" />
+                <NavMenu href="/car" label="CAR tools" icon="lucide--folder-archive" />
                 <NavMenu href="/settings" label="Settings" icon="lucide--settings" />
                 <MenuSeparator />
                 <NavMenu

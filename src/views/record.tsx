@@ -263,7 +263,6 @@ export const RecordView = () => {
       }
 
       const lexiconDocs = Object.fromEntries(resolved);
-      console.log(lexiconDocs);
 
       const validator = new RecordValidator(lexiconDocs, params.collection as Nsid);
       validator.parse({

@@ -5,79 +5,21 @@ import { fromStream, isCommit } from "@atcute/repo";
 import * as TID from "@atcute/tid";
 import { Title } from "@solidjs/meta";
 import { createEffect, createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
-import { Button } from "../components/button.jsx";
-import { JSONValue, type JSONType } from "../components/json.jsx";
-import { TextInput } from "../components/text-input.jsx";
-import { isTouchDevice } from "../layout.jsx";
-import { localDateFromTimestamp } from "../utils/date.js";
+import { Button } from "../../components/button.jsx";
+import { JSONValue } from "../../components/json.jsx";
+import { TextInput } from "../../components/text-input.jsx";
+import { isTouchDevice } from "../../layout.jsx";
+import { localDateFromTimestamp } from "../../utils/date.js";
+import {
+  type Archive,
+  type CollectionEntry,
+  type RecordEntry,
+  type View,
+  toJsonValue,
+  WelcomeView,
+} from "./shared.jsx";
 
-const isIOS =
-  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
-// Convert CBOR-decoded objects to JSON-friendly format
-const toJsonValue = (obj: unknown): JSONType => {
-  if (obj === null || obj === undefined) return null;
-
-  if (CID.isCidLink(obj)) {
-    return { $link: obj.$link };
-  }
-
-  if (
-    obj &&
-    typeof obj === "object" &&
-    "version" in obj &&
-    "codec" in obj &&
-    "digest" in obj &&
-    "bytes" in obj
-  ) {
-    try {
-      return { $link: CID.toString(obj as CID.Cid) };
-    } catch {}
-  }
-
-  if (CBOR.isBytes(obj)) {
-    return { $bytes: obj.$bytes };
-  }
-
-  if (Array.isArray(obj)) {
-    return obj.map(toJsonValue);
-  }
-
-  if (typeof obj === "object") {
-    const result: Record<string, JSONType> = {};
-    for (const [key, value] of Object.entries(obj)) {
-      result[key] = toJsonValue(value);
-    }
-    return result;
-  }
-
-  return obj as JSONType;
-};
-
-interface Archive {
-  file: File;
-  did: string;
-  entries: CollectionEntry[];
-}
-
-interface CollectionEntry {
-  name: string;
-  entries: RecordEntry[];
-}
-
-interface RecordEntry {
-  key: string;
-  cid: string;
-  record: JSONType;
-}
-
-type View =
-  | { type: "repo" }
-  | { type: "collection"; collection: CollectionEntry }
-  | { type: "record"; collection: CollectionEntry; record: RecordEntry };
-
-export const CarView = () => {
+export const ExploreToolView = () => {
   const [archive, setArchive] = createSignal<Archive | null>(null);
   const [loading, setLoading] = createSignal(false);
   const [error, setError] = createSignal<string>();
@@ -97,12 +39,16 @@ export const CarView = () => {
       const rootCid = car.roots[0]?.$link;
       if (rootCid) {
         for (const entry of car) {
-          if (CID.toString(entry.cid) === rootCid) {
-            const commit = CBOR.decode(entry.bytes);
-            if (isCommit(commit)) {
-              did = commit.did;
+          try {
+            if (CID.toString(entry.cid) === rootCid) {
+              const commit = CBOR.decode(entry.bytes);
+              if (isCommit(commit)) {
+                did = commit.did;
+              }
+              break;
             }
-            break;
+          } catch {
+            // Skip entries with invalid CIDs
           }
         }
       }
@@ -118,21 +64,25 @@ export const CarView = () => {
       const repo = fromStream(stream);
       try {
         for await (const entry of repo) {
-          let list = collections.get(entry.collection);
-          if (list === undefined) {
-            collections.set(entry.collection, (list = []));
-            result.entries.push({
-              name: entry.collection,
-              entries: list,
-            });
-          }
+          try {
+            let list = collections.get(entry.collection);
+            if (list === undefined) {
+              collections.set(entry.collection, (list = []));
+              result.entries.push({
+                name: entry.collection,
+                entries: list,
+              });
+            }
 
-          const record = toJsonValue(entry.record);
-          list.push({
-            key: entry.rkey,
-            cid: entry.cid.$link,
-            record,
-          });
+            const record = toJsonValue(entry.record);
+            list.push({
+              key: entry.rkey,
+              cid: entry.cid.$link,
+              record,
+            });
+          } catch {
+            // Skip entries with invalid data
+          }
         }
       } finally {
         await repo.dispose();
@@ -176,85 +126,24 @@ export const CarView = () => {
 
   return (
     <>
-      <Title>CAR explorer - PDSls</Title>
-      <div class="flex w-full flex-col items-center">
-        <Show
-          when={archive()}
-          fallback={
-            <WelcomeView
-              loading={loading()}
-              error={error()}
-              onFileChange={handleFileChange}
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-            />
-          }
-        >
-          {(arch) => <ExploreView archive={arch()} view={view} setView={setView} onClose={reset} />}
-        </Show>
-      </div>
-    </>
-  );
-};
-
-const WelcomeView = (props: {
-  loading: boolean;
-  error?: string;
-  onFileChange: (e: Event) => void;
-  onDrop: (e: DragEvent) => void;
-  onDragOver: (e: DragEvent) => void;
-}) => {
-  return (
-    <div class="flex w-full max-w-3xl flex-col gap-y-4 px-2">
-      <div class="flex flex-col gap-y-1">
-        <h1 class="text-lg font-semibold">CAR explorer</h1>
-        <p class="text-sm text-neutral-600 dark:text-neutral-400">
-          Upload a CAR (Content Addressable aRchive) file to explore its contents.
-        </p>
-      </div>
-
-      <div
-        class="dark:bg-dark-300 flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-neutral-300 bg-neutral-50 p-8 transition-colors hover:border-neutral-400 dark:border-neutral-600 dark:hover:border-neutral-500"
-        onDrop={props.onDrop}
-        onDragOver={props.onDragOver}
+      <Title>Explore archive - PDSls</Title>
+      <Show
+        when={archive()}
+        fallback={
+          <WelcomeView
+            title="Explore archive"
+            subtitle="Upload a CAR file to explore its contents."
+            loading={loading()}
+            error={error()}
+            onFileChange={handleFileChange}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+          />
+        }
       >
-        <Show
-          when={!props.loading}
-          fallback={
-            <div class="flex flex-col items-center gap-2">
-              <span class="iconify lucide--loader-circle animate-spin text-3xl text-neutral-400" />
-              <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-                Reading CAR file...
-              </span>
-            </div>
-          }
-        >
-          <span class="iconify lucide--folder-archive text-3xl text-neutral-400" />
-          <div class="text-center">
-            <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              Drag and drop a CAR file here
-            </p>
-            <p class="text-xs text-neutral-500 dark:text-neutral-400">or</p>
-          </div>
-          <label class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-8 items-center justify-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800">
-            <input
-              type="file"
-              accept={isIOS ? undefined : ".car,application/vnd.ipld.car"}
-              onChange={props.onFileChange}
-              class="hidden"
-            />
-            <span class="iconify lucide--upload text-sm" />
-            Choose file
-          </label>
-        </Show>
-      </div>
-
-      <Show when={props.error}>
-        <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
-          {props.error}
-        </div>
+        {(arch) => <ExploreView archive={arch()} view={view} setView={setView} onClose={reset} />}
       </Show>
-    </div>
+    </>
   );
 };
 
@@ -411,9 +300,9 @@ const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void })
   return (
     <div class="flex flex-col gap-3">
       <div class="text-sm text-neutral-600 dark:text-neutral-400">
-        {props.archive.entries.length} collection{props.archive.entries.length > 1 ? "s" : ""}
+        {props.archive.entries.length} collection{props.archive.entries.length !== 1 ? "s" : ""}
         <span class="text-neutral-400 dark:text-neutral-600"> · </span>
-        {totalRecords()} record{totalRecords() > 1 ? "s" : ""}
+        {totalRecords()} record{totalRecords() !== 1 ? "s" : ""}
       </div>
 
       <TextInput
@@ -527,7 +416,7 @@ const CollectionSubview = (props: {
   return (
     <div class="flex flex-col gap-3">
       <span class="text-sm text-neutral-600 dark:text-neutral-400">
-        {filteredEntries().length} record{filteredEntries().length > 1 ? "s" : ""}
+        {filteredEntries().length} record{filteredEntries().length !== 1 ? "s" : ""}
         {filter() && filteredEntries().length !== props.collection.entries.length && (
           <span class="text-neutral-400 dark:text-neutral-500">
             {" "}
