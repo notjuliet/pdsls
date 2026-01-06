@@ -34,7 +34,7 @@ export const CarView = () => {
           <div class="flex flex-col gap-1">
             <span class="font-medium">Unpack archive</span>
             <span class="text-sm text-neutral-600 dark:text-neutral-400">
-              Extract all records from an archive into a ZIP file
+              Extract records from an archive into a ZIP file
             </span>
           </div>
         </A>
