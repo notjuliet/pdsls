@@ -3,6 +3,7 @@ import { Route, Router } from "@solidjs/router";
 import { render } from "solid-js/web";
 import { Layout } from "./layout.tsx";
 import "./styles/index.css";
+import { CarView } from "./views/car.tsx";
 import { CollectionView } from "./views/collection.tsx";
 import { Home } from "./views/home.tsx";
 import { LabelView } from "./views/labels.tsx";
@@ -18,6 +19,7 @@ render(
       <Route path="/" component={Home} />
       <Route path={["/jetstream", "/firehose"]} component={StreamView} />
       <Route path="/labels" component={LabelView} />
+      <Route path="/car" component={CarView} />
       <Route path="/settings" component={Settings} />
       <Route path="/:pds" component={PdsView} />
       <Route path="/:pds/:repo" component={RepoView} />

@@ -23,6 +23,9 @@
   "dependencies": {
     "@atcute/atproto": "^3.1.10",
     "@atcute/bluesky": "^3.2.14",
+    "@atcute/car": "^5.0.0",
+    "@atcute/cbor": "^2.2.8",
+    "@atcute/cid": "^2.3.0",
     "@atcute/client": "^4.2.0",
     "@atcute/crypto": "^2.3.0",
     "@atcute/did-plc": "^0.3.1",

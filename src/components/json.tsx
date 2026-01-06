@@ -20,6 +20,7 @@ interface JSONContext {
   repo: string;
   truncate?: boolean;
   parentIsBlob?: boolean;
+  newTab?: boolean;
 }
 
 const JSONCtx = createContext<JSONContext>();
@@ -53,7 +54,9 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
       const authority = await resolveLexiconAuthority(nsid as Nsid);
 
       const hash = anchor ? `#schema:${anchor}` : "#schema";
-      navigate(`/at://${authority}/com.atproto.lexicon.schema/${nsid}${hash}`);
+      if (ctx.newTab)
+        window.open(`/at://${authority}/com.atproto.lexicon.schema/${nsid}${hash}`, "_blank");
+      else navigate(`/at://${authority}/com.atproto.lexicon.schema/${nsid}${hash}`);
     } catch (err) {
       console.error("Failed to resolve lexicon authority:", err);
       const id = addNotification({
@@ -76,11 +79,19 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
         {(part) => (
           <>
             {isResourceUri(part) ?
-              <A class="text-blue-400 hover:underline active:underline" href={`/${part}`}>
+              <A
+                class="text-blue-400 hover:underline active:underline"
+                href={`/${part}`}
+                target={ctx.newTab ? "_blank" : "_self"}
+              >
                 {part}
               </A>
             : isDid(part) ?
-              <A class="text-blue-400 hover:underline active:underline" href={`/at://${part}`}>
+              <A
+                class="text-blue-400 hover:underline active:underline"
+                href={`/at://${part}`}
+                target={ctx.newTab ? "_blank" : "_self"}
+              >
                 {part}
               </A>
             : isNsid(part.split("#")[0]) && props.isType ?
@@ -297,9 +308,14 @@ const JSONValueInner = (props: { data: JSONType; isType?: boolean; isLink?: bool
   return <JSONObject data={data} />;
 };
 
-export const JSONValue = (props: { data: JSONType; repo: string; truncate?: boolean }) => {
+export const JSONValue = (props: {
+  data: JSONType;
+  repo: string;
+  truncate?: boolean;
+  newTab?: boolean;
+}) => {
   return (
-    <JSONCtx.Provider value={{ repo: props.repo, truncate: props.truncate }}>
+    <JSONCtx.Provider value={{ repo: props.repo, truncate: props.truncate, newTab: props.newTab }}>
       <JSONValueInner data={props.data} />
     </JSONCtx.Provider>
   );
