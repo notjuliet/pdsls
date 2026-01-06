@@ -103,10 +103,6 @@ export const CarView = () => {
         }
       }
 
-      // Now parse records using fromStream
-      const stream = file.stream();
-      await using repo = fromStream(stream);
-
       const collections = new Map<string, RecordEntry[]>();
       const result: Archive = {
         file,
@@ -114,22 +110,28 @@ export const CarView = () => {
         entries: [],
       };
 
-      for await (const entry of repo) {
-        let list = collections.get(entry.collection);
-        if (list === undefined) {
-          collections.set(entry.collection, (list = []));
-          result.entries.push({
-            name: entry.collection,
-            entries: list,
+      const stream = file.stream();
+      const repo = fromStream(stream);
+      try {
+        for await (const entry of repo) {
+          let list = collections.get(entry.collection);
+          if (list === undefined) {
+            collections.set(entry.collection, (list = []));
+            result.entries.push({
+              name: entry.collection,
+              entries: list,
+            });
+          }
+
+          const record = toJsonValue(entry.record);
+          list.push({
+            key: entry.rkey,
+            cid: entry.cid.$link,
+            record,
           });
         }
-
-        const record = toJsonValue(entry.record);
-        list.push({
-          key: entry.rkey,
-          cid: entry.cid.$link,
-          record,
-        });
+      } finally {
+        await repo.dispose();
       }
 
       setArchive(result);
