@@ -64,6 +64,7 @@ export const ExploreToolView = () => {
       const stream = file.stream();
       const repo = fromStream(stream);
       try {
+        let count = 0;
         for await (const entry of repo) {
           try {
             let list = collections.get(entry.collection);
@@ -81,6 +82,8 @@ export const ExploreToolView = () => {
               cid: entry.cid.$link,
               record,
             });
+
+            if (++count % 10000 === 0) await new Promise((resolve) => setTimeout(resolve, 0));
           } catch {
             // Skip entries with invalid data
           }
