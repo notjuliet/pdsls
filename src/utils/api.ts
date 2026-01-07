@@ -112,6 +112,33 @@ const resolveLexiconAuthority = async (nsid: Nsid) => {
   return await authorityResolver.resolve(nsid);
 };
 
+const resolveLexiconAuthorityDirect = async (authority: string) => {
+  const dohUrl = "https://dns.google/resolve?";
+  const reversedAuthority = authority.split(".").reverse().join(".");
+  const domain = `_lexicon.${reversedAuthority}`;
+  const url = new URL(dohUrl);
+  url.searchParams.set("name", domain);
+  url.searchParams.set("type", "TXT");
+
+  const response = await fetch(url.toString());
+  if (!response.ok) {
+    throw new Error(`Failed to resolve lexicon authority for ${authority}`);
+  }
+
+  const data = await response.json();
+  if (!data.Answer || data.Answer.length === 0) {
+    throw new Error(`No lexicon authority found for ${authority}`);
+  }
+
+  const txtRecord = data.Answer[0].data.replace(/"/g, "");
+
+  if (!txtRecord.startsWith("did=")) {
+    throw new Error(`Invalid lexicon authority record for ${authority}`);
+  }
+
+  return txtRecord.replace("did=", "");
+};
+
 const resolveLexiconSchema = async (authority: AtprotoDid, nsid: Nsid) => {
   return await schemaResolver.resolve(authority, nsid);
 };
@@ -178,6 +205,7 @@ export {
   resolveDidDoc,
   resolveHandle,
   resolveLexiconAuthority,
+  resolveLexiconAuthorityDirect,
   resolveLexiconSchema,
   resolvePDS,
   validateHandle,
