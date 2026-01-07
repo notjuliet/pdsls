@@ -27,7 +27,7 @@ const SEARCH_PREFIXES: { prefix: string; description: string }[] = [
 ];
 
 const parsePrefix = (input: string): { prefix: string | null; query: string } => {
-  const matchedPrefix = SEARCH_PREFIXES.find((p) => input.startsWith(p.prefix));
+  const matchedPrefix = SEARCH_PREFIXES.find((p) => input.toLowerCase().startsWith(p.prefix));
   if (matchedPrefix) {
     return {
       prefix: matchedPrefix.prefix,
