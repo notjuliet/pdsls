@@ -131,7 +131,7 @@ export const RepoView = () => {
       }
     }
     setDidDoc(didDocCache[did] as DidDocument);
-    getRotationKeys();
+    if (did.startsWith("did:plc")) getRotationKeys();
 
     validateHandles();
 
