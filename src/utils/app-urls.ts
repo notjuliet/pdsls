@@ -99,8 +99,8 @@ export const appHandleLink: Record<App, (url: string[]) => string> = {
     return `at://${path[0]}`;
   },
   [App.Pinksea]: (path) => {
-    if (path.length === 2) {
-      return `at://${path[0]}/com.shinolabs.pinksea.oekaki/${path[1]}`;
+    if (path.length === 3) {
+      return `at://${path[0]}/com.shinolabs.pinksea.oekaki/${path[2]}`;
     }
 
     return `at://${path[0]}`;
