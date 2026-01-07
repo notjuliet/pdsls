@@ -4,11 +4,11 @@ import { A } from "@solidjs/router";
 export const CarView = () => {
   return (
     <div class="flex w-full max-w-3xl flex-col gap-y-4 px-2">
-      <Title>CAR tools - PDSls</Title>
+      <Title>Archive tools - PDSls</Title>
       <div class="flex flex-col gap-y-1">
-        <h1 class="text-lg font-semibold">CAR tools</h1>
+        <h1 class="text-lg font-semibold">Archive tools</h1>
         <p class="text-sm text-neutral-600 dark:text-neutral-400">
-          Tools for working with Content Addressable aRchive files.
+          Tools for working with CAR (Content Addressable aRchive) files.
         </p>
       </div>
 
@@ -21,7 +21,7 @@ export const CarView = () => {
           <div class="flex flex-col gap-1">
             <span class="font-medium">Explore archive</span>
             <span class="text-sm text-neutral-600 dark:text-neutral-400">
-              Browse records inside an archive
+              Browse records inside a repository archive
             </span>
           </div>
         </A>
