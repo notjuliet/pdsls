@@ -23,11 +23,13 @@ import {
 export const ExploreToolView = () => {
   const [archive, setArchive] = createSignal<Archive | null>(null);
   const [loading, setLoading] = createSignal(false);
+  const [progress, setProgress] = createSignal(0);
   const [error, setError] = createSignal<string>();
   const [view, setView] = createSignal<View>({ type: "repo" });
 
   const parseCarFile = async (file: File) => {
     setLoading(true);
+    setProgress(0);
     setError(undefined);
 
     try {
@@ -83,7 +85,10 @@ export const ExploreToolView = () => {
               record,
             });
 
-            if (++count % 10000 === 0) await new Promise((resolve) => setTimeout(resolve, 0));
+            if (++count % 10000 === 0) {
+              setProgress(count);
+              await new Promise((resolve) => setTimeout(resolve, 0));
+            }
           } catch {
             // Skip entries with invalid data
           }
@@ -121,6 +126,7 @@ export const ExploreToolView = () => {
             title="Explore archive"
             subtitle="Upload a CAR file to explore its contents."
             loading={loading()}
+            progress={progress()}
             error={error()}
             onFileChange={handleFileChange}
             onDrop={handleDrop}

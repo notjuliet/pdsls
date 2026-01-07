@@ -74,6 +74,7 @@ export const WelcomeView = (props: {
   title: string;
   subtitle: string;
   loading: boolean;
+  progress?: number;
   error?: string;
   onFileChange: (e: Event) => void;
   onDrop: (e: DragEvent) => void;
@@ -107,6 +108,11 @@ export const WelcomeView = (props: {
               <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
                 Reading CAR file...
               </span>
+              <Show when={props.progress && props.progress > 0}>
+                <span class="text-xs text-neutral-500 dark:text-neutral-400">
+                  {props.progress?.toLocaleString()} records processed
+                </span>
+              </Show>
             </div>
           }
         >
