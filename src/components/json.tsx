@@ -116,7 +116,7 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
               ["http:", "https:", "web+at:"].includes(new URL(part).protocol) &&
               part.split("\n").length === 1
             ) ?
-              <a class="underline hover:text-blue-400" href={part} target="_blank" rel="noopener">
+              <a class="underline hover:text-blue-500 dark:hover:text-blue-400" href={part} target="_blank" rel="noopener">
                 {part}
               </a>
             : part}

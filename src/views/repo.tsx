@@ -567,7 +567,7 @@ export const RepoView = () => {
                               <span>{service.id.split("#")[1]}</span>
                               <span></span>
                               <a
-                                class="w-fit underline hover:text-blue-400"
+                                class="w-fit underline hover:text-blue-500 dark:hover:text-blue-400"
                                 href={service.serviceEndpoint.toString()}
                                 target="_blank"
                                 rel="noopener"
