@@ -202,6 +202,7 @@ const Search = () => {
         <input
           type="text"
           spellcheck={false}
+          autocapitalize="off"
           placeholder="Handle, DID, AT URI, NSID, PDS"
           ref={searchInput}
           id="input"
