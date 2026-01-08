@@ -6,7 +6,7 @@ import { AccountManager } from "./auth/account.jsx";
 import { hasUserScope } from "./auth/scope-utils";
 import { agent } from "./auth/state.js";
 import { RecordEditor } from "./components/create";
-import { DropdownMenu, MenuProvider, MenuSeparator, NavMenu } from "./components/dropdown.jsx";
+import { DropdownMenu, MenuProvider, NavMenu } from "./components/dropdown.jsx";
 import { NavBar } from "./components/navbar.jsx";
 import { NotificationContainer } from "./components/notification.jsx";
 import { Search, SearchButton, showSearch } from "./components/search.jsx";
@@ -161,19 +161,6 @@ const Layout = (props: RouteSectionProps<unknown>) => {
                 <NavMenu href="/labels" label="Labels" icon="lucide--tag" />
                 <NavMenu href="/car" label="Archive tools" icon="lucide--folder-archive" />
                 <NavMenu href="/settings" label="Settings" icon="lucide--settings" />
-                <MenuSeparator />
-                <NavMenu
-                  href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz"
-                  label="Bluesky"
-                  icon="simple-icons--bluesky text-[#0085ff]"
-                  newTab
-                />
-                <NavMenu
-                  href="https://tangled.org/@pdsls.dev/pdsls/"
-                  label="Source"
-                  icon="lucide--code"
-                  newTab
-                />
               </DropdownMenu>
             </MenuProvider>
           </div>

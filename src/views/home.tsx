@@ -122,15 +122,33 @@ export const Home = () => {
         </section>
       </div>
 
-      <div class="text-center text-sm text-neutral-700 dark:text-neutral-300">
-        Made by{" "}
+      <div class="flex justify-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
         <a
           href="https://juli.ee"
-          class="font-pecita relative text-rose-400 after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:transition-[width] after:duration-300 after:ease-out hover:after:w-full dark:text-rose-300"
+          target="_blank"
+          class="relative flex items-center gap-1.5 after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:text-rose-400 after:transition-[width] after:duration-300 after:ease-out hover:after:w-full dark:after:text-rose-300"
         >
-          Juliet
-        </a>{" "}
-        with love
+          <span class="iconify lucide--terminal text-rose-400 dark:text-rose-300"></span>
+          <span class="font-pecita">juliet</span>
+        </a>
+        •
+        <a
+          href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz"
+          class="relative flex items-center gap-1.5 after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:text-[#0085ff] after:transition-[width] after:duration-300 after:ease-out hover:after:w-full"
+          target="_blank"
+        >
+          <span class="simple-icons--bluesky iconify text-[#0085ff]"></span>
+          Bluesky
+        </a>
+        •
+        <a
+          href="https://tangled.org/@pdsls.dev/pdsls/"
+          class="relative flex items-center gap-1.5 after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:text-black after:transition-[width] after:duration-300 after:ease-out hover:after:w-full dark:after:text-white"
+          target="_blank"
+        >
+          <span class="iconify i-tangled text-black dark:text-white"></span>
+          Source
+        </a>
       </div>
     </div>
   );
