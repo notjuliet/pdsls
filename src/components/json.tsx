@@ -80,7 +80,7 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
           <>
             {isResourceUri(part) ?
               <A
-                class="text-blue-400 hover:underline active:underline"
+                class="text-blue-500 hover:underline active:underline dark:text-blue-400"
                 href={`/${part}`}
                 target={ctx.newTab ? "_blank" : "_self"}
               >
@@ -88,7 +88,7 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
               </A>
             : isDid(part) ?
               <A
-                class="text-blue-400 hover:underline active:underline"
+                class="text-blue-500 hover:underline active:underline dark:text-blue-400"
                 href={`/at://${part}`}
                 target={ctx.newTab ? "_blank" : "_self"}
               >
@@ -98,13 +98,13 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
               <button
                 type="button"
                 onClick={() => handleClick(part)}
-                class="cursor-pointer text-blue-400 hover:underline active:underline"
+                class="cursor-pointer text-blue-500 hover:underline active:underline dark:text-blue-400"
               >
                 {part}
               </button>
             : isCid(part) && props.isLink && ctx.parentIsBlob && params.repo ?
               <A
-                class="text-blue-400 hover:underline active:underline"
+                class="text-blue-500 hover:underline active:underline dark:text-blue-400"
                 rel="noopener"
                 target="_blank"
                 href={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${params.repo}&cid=${part}`}
@@ -116,7 +116,12 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
               ["http:", "https:", "web+at:"].includes(new URL(part).protocol) &&
               part.split("\n").length === 1
             ) ?
-              <a class="underline hover:text-blue-500 dark:hover:text-blue-400" href={part} target="_blank" rel="noopener">
+              <a
+                class="underline hover:text-blue-500 dark:hover:text-blue-400"
+                href={part}
+                target="_blank"
+                rel="noopener"
+              >
                 {part}
               </a>
             : part}

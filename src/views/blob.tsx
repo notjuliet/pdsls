@@ -36,7 +36,7 @@ const BlobView = (props: { pds: string; repo: string }) => {
               <a
                 href={`${props.pds}/xrpc/com.atproto.sync.getBlob?did=${props.repo}&cid=${cid}`}
                 target="_blank"
-                class="truncate rounded px-0.5 text-left text-blue-400 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                class="truncate rounded px-0.5 text-left text-blue-500 hover:bg-neutral-200 active:bg-neutral-300 dark:text-blue-400 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                 dir="rtl"
               >
                 {cid}

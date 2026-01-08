@@ -67,7 +67,7 @@ export const NavBar = (props: { params: Params }) => {
                   <A
                     end
                     href={pds()!}
-                    inactiveClass="text-blue-400 py-0.5 w-full font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
+                    inactiveClass="text-blue-500 py-0.5 w-full font-medium hover:text-blue-600 transition-colors duration-150 dark:text-blue-400 dark:hover:text-blue-300"
                   >
                     {pds()}
                   </A>
@@ -110,7 +110,7 @@ export const NavBar = (props: { params: Params }) => {
                 <A
                   end
                   href={`/at://${props.params.repo}`}
-                  inactiveClass="flex grow min-w-0 gap-1 py-0.5 font-medium text-blue-400 hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
+                  inactiveClass="flex grow min-w-0 gap-1 py-0.5 font-medium text-blue-500 hover:text-blue-600 transition-colors duration-150 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                   <Show
                     when={handle() !== props.params.repo}
@@ -140,7 +140,7 @@ export const NavBar = (props: { params: Params }) => {
                 <A
                   end
                   href={`/at://${props.params.repo}/${props.params.collection}`}
-                  inactiveClass="text-blue-400 grow py-0.5 font-medium hover:text-blue-500 transition-colors duration-150 dark:hover:text-blue-300"
+                  inactiveClass="text-blue-500 dark:text-blue-400 grow py-0.5 font-medium hover:text-blue-600 transition-colors duration-150 dark:hover:text-blue-300"
                 >
                   {props.params.collection}
                 </A>

@@ -41,7 +41,7 @@ const LabelCard = (props: { label: ComAtprotoLabelDefs.Label }) => {
 
       <A
         href={`/at://${label.uri.replace("at://", "")}`}
-        class="text-sm break-all text-blue-600 hover:underline dark:text-blue-400"
+        class="text-sm break-all text-blue-500 hover:underline dark:text-blue-400"
       >
         {label.uri}
       </A>

@@ -566,7 +566,7 @@ export const RecordView = () => {
                     <div class="truncate text-xs">
                       <A
                         href={`/${lexiconUri()}`}
-                        class="text-blue-400 hover:underline active:underline"
+                        class="text-blue-500 hover:underline active:underline dark:text-blue-400"
                       >
                         {lexiconUri()}
                       </A>

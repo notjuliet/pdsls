@@ -63,7 +63,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
       onmouseleave={() => !isTouchDevice && setHover(false)}
     >
       <span class="flex items-baseline truncate">
-        <span class="shrink-0 text-sm text-blue-400">{props.record.rkey}</span>
+        <span class="shrink-0 text-sm text-blue-500 dark:text-blue-400">{props.record.rkey}</span>
         <span class="ml-1 truncate text-xs text-neutral-500 dark:text-neutral-400" dir="rtl">
           {props.record.cid}
         </span>
