@@ -387,7 +387,7 @@ export const RecordView = () => {
         fallback={(err) => (
           <div class="flex w-full flex-col items-center gap-1 px-2 py-4">
             <span class="font-semibold text-red-500 dark:text-red-400">Error loading record</span>
-            <div class="max-w-md text-sm wrap-break-word text-neutral-600 dark:text-neutral-400">
+            <div class="max-w-full text-sm wrap-break-word text-neutral-600 dark:text-neutral-400">
               {err.message}
             </div>
           </div>
