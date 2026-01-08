@@ -261,7 +261,7 @@ const CollectionView = () => {
                 <Show when={agent() && agent()?.sub === did && hasUserScope("delete")}>
                   <div class="flex items-center">
                     <Tooltip
-                      text={batchDelete() ? "Cancel" : "Delete"}
+                      text={batchDelete() ? "Cancel" : "Manage"}
                       children={
                         <button
                           onclick={() => {
@@ -272,7 +272,7 @@ const CollectionView = () => {
                           class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                         >
                           <span
-                            class={`iconify ${batchDelete() ? "lucide--circle-x" : "lucide--trash-2"} `}
+                            class={`iconify ${batchDelete() ? "lucide--x" : "lucide--trash-2"} `}
                           ></span>
                         </button>
                       }
@@ -285,7 +285,7 @@ const CollectionView = () => {
                             onclick={() => selectAll()}
                             class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                           >
-                            <span class="iconify lucide--copy-check"></span>
+                            <span class="iconify lucide--list-checks"></span>
                           </button>
                         }
                       />
@@ -331,7 +331,7 @@ const CollectionView = () => {
                         <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
                         <Button
                           onClick={deleteRecords}
-                          class={`dark:shadow-dark-700 rounded-lg px-2 py-1.5 text-xs text-white shadow-xs select-none ${recreate() ? "bg-green-500 hover:bg-green-400 dark:bg-green-600 dark:hover:bg-green-500" : "bg-red-500 hover:bg-red-400 active:bg-red-400"}`}
+                          class={`dark:shadow-dark-700 rounded-lg px-2 py-1.5 text-xs text-white shadow-xs select-none ${recreate() ? "bg-green-500 hover:bg-green-600 active:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:active:bg-green-800" : "bg-red-500 hover:bg-red-600 active:bg-red-700"}`}
                         >
                           {recreate() ? "Recreate" : "Delete"}
                         </Button>
