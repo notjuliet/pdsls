@@ -12,7 +12,7 @@ const Settings = () => {
       <div class="text-lg font-semibold">Settings</div>
       <div class="flex flex-col gap-3">
         <div class="flex flex-col gap-1">
-          <label for="plcDirectory" class="select-none">
+          <label for="plcDirectory" class="font-medium select-none">
             PLC Directory
           </label>
           <TextInput
@@ -27,7 +27,7 @@ const Settings = () => {
         </div>
         <ThemeSelection />
         <div class="flex flex-col gap-1">
-          <label class="select-none">Blob media preview</label>
+          <label class="font-medium select-none">Blob media preview</label>
           <div class="flex gap-2">
             <button
               classList={{
@@ -59,6 +59,12 @@ const Settings = () => {
             >
               Hide
             </button>
+          </div>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="font-medium select-none">Version</label>
+          <div class="text-sm text-neutral-600 dark:text-neutral-400">
+            {import.meta.env.VITE_APP_VERSION}
           </div>
         </div>
       </div>

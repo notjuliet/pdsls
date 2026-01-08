@@ -43,7 +43,7 @@ export const ThemeSelection = () => {
 
   return (
     <div class="flex flex-col gap-1">
-      <label class="select-none">Theme</label>
+      <label class="font-medium select-none">Theme</label>
       <div class="flex gap-2">
         <ThemeOption theme="auto" label="Auto" />
         <ThemeOption theme="light" label="Light" />

@@ -130,7 +130,7 @@ export const Home = () => {
         >
           Juliet
         </a>{" "}
-        with love • {import.meta.env.VITE_APP_VERSION}
+        with love
       </div>
     </div>
   );
