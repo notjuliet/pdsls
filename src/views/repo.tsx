@@ -645,10 +645,8 @@ export const RepoView = () => {
                           <For each={rotationKeys()}>
                             {(key) => (
                               <div class="grid grid-cols-[auto_1fr] items-center gap-x-1 text-sm text-neutral-700 dark:text-neutral-300">
-                                <span class="iconify lucide--key-round text-neutral-500 dark:text-neutral-400"></span>
-                                <span class="text-neutral-500 dark:text-neutral-400">
-                                  {detectDidKeyType(key)}
-                                </span>
+                                <span class="iconify lucide--key-round"></span>
+                                <span>{detectDidKeyType(key)}</span>
                                 <span></span>
                                 <div class="font-mono break-all">{key.replace("did:key:", "")}</div>
                               </div>
