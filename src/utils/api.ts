@@ -101,11 +101,16 @@ const validateHandle = async (handle: Handle, did: Did) => {
 };
 
 const resolvePDS = async (did: string) => {
-  setPDS(undefined);
-  const pds = await getPDS(did);
-  if (!pds) throw new Error("No PDS found");
-  setPDS(pds.replace("https://", "").replace("http://", ""));
-  return pds;
+  try {
+    setPDS(undefined);
+    const pds = await getPDS(did);
+    if (!pds) throw new Error("No PDS found");
+    setPDS(pds.replace("https://", "").replace("http://", ""));
+    return pds;
+  } catch (err) {
+    setPDS("Missing PDS");
+    throw err;
+  }
 };
 
 const resolveLexiconAuthority = async (nsid: Nsid) => {

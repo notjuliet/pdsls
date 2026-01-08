@@ -23,7 +23,6 @@ import {
   MenuSeparator,
   NavMenu,
 } from "../components/dropdown.jsx";
-import { setPDS } from "../components/navbar.jsx";
 import {
   addNotification,
   removeNotification,
@@ -144,7 +143,6 @@ export const RepoView = () => {
 
     if (!pds) {
       setError("Missing PDS");
-      setPDS("Missing PDS");
       return {};
     }
 
