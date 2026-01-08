@@ -166,7 +166,7 @@ const ExploreView = (props: {
               class="flex min-h-6 min-w-0 basis-full items-center gap-2 px-2 sm:min-h-7"
             >
               <span class="iconify lucide--book-user shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-              <span class="truncate py-0.5 font-medium text-blue-400 transition-colors duration-150 group-hover:text-blue-500 dark:group-hover:text-blue-300">
+              <span class="truncate py-0.5 font-medium text-blue-500 transition-colors duration-150 group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-300">
                 {props.archive.did || "Repository"}
               </span>
             </button>
@@ -207,7 +207,7 @@ const ExploreView = (props: {
               >
                 <div class="flex min-h-6 min-w-0 basis-full items-center gap-2 sm:min-h-7">
                   <span class="iconify lucide--folder-open shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-                  <span class="truncate py-0.5 font-medium text-blue-400 transition-colors duration-150 group-hover:text-blue-500 dark:group-hover:text-blue-300">
+                  <span class="truncate py-0.5 font-medium text-blue-500 transition-colors duration-150 group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-300">
                     {collection().name}
                   </span>
                 </div>
@@ -330,7 +330,7 @@ const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void })
                     class="truncate font-medium"
                     classList={{
                       "text-neutral-700 dark:text-neutral-300": hasSingleEntry,
-                      "text-blue-400": !hasSingleEntry,
+                      "text-blue-500 dark:text-blue-400": !hasSingleEntry,
                     }}
                   >
                     {entry.name}
@@ -338,7 +338,9 @@ const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void })
 
                   <Show when={hasSingleEntry}>
                     <span class="iconify lucide--chevron-right shrink-0 text-xs text-neutral-500" />
-                    <span class="truncate font-medium text-blue-400">{entry.entries[0].key}</span>
+                    <span class="truncate font-medium text-blue-500 dark:text-blue-400">
+                      {entry.entries[0].key}
+                    </span>
                   </Show>
 
                   <Show when={!hasSingleEntry}>
@@ -469,7 +471,7 @@ const CollectionSubview = (props: {
                 onmouseleave={() => !isTouchDevice && setHover(false)}
                 class="relative flex w-full items-baseline gap-1 rounded px-1 py-0.5 text-left hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
               >
-                <span class="shrink-0 text-sm text-blue-400">{entry.key}</span>
+                <span class="shrink-0 text-sm text-blue-500 dark:text-blue-400">{entry.key}</span>
                 <span class="truncate text-xs text-neutral-500 dark:text-neutral-400" dir="rtl">
                   {entry.cid}
                 </span>
