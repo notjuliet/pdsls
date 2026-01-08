@@ -360,6 +360,7 @@ const CollectionView = () => {
                     onClick={() => {
                       setReverse(!reverse());
                       setCursor(undefined);
+                      setRestoredFromCache(false);
                       clearCollectionCache(cacheKey());
                       refetch();
                     }}
