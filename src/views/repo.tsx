@@ -574,7 +574,26 @@ export const RepoView = () => {
                             {(service) => (
                               <div class="grid grid-cols-[auto_1fr] items-center gap-x-1 text-sm text-neutral-700 dark:text-neutral-300">
                                 <span class="iconify lucide--hash"></span>
-                                <span>{service.id.split("#")[1]}</span>
+                                <div class="flex items-center gap-2">
+                                  <span>{service.id.split("#")[1]}</span>
+                                  <div class="flex items-center gap-1 text-neutral-500 dark:text-neutral-400">
+                                    <span
+                                      class="iconify text-xs"
+                                      classList={{
+                                        "lucide--hard-drive":
+                                          service.type === "AtprotoPersonalDataServer",
+                                        "lucide--tag": service.type === "AtprotoLabeler",
+                                        "lucide--rss": service.type === "BskyFeedGenerator",
+                                        "lucide--wrench": ![
+                                          "AtprotoPersonalDataServer",
+                                          "AtprotoLabeler",
+                                          "BskyFeedGenerator",
+                                        ].includes(service.type.toString()),
+                                      }}
+                                    ></span>
+                                    <span>{service.type}</span>
+                                  </div>
+                                </div>
                                 <span></span>
                                 <a
                                   class="w-fit underline hover:text-blue-500 dark:hover:text-blue-400"
@@ -605,7 +624,7 @@ export const RepoView = () => {
                                     <div class="flex items-center gap-2">
                                       <span>{verif.id.split("#")[1]}</span>
                                       <div class="flex items-center gap-1 text-neutral-500 dark:text-neutral-400">
-                                        <span class="iconify lucide--key-round"></span>
+                                        <span class="iconify lucide--key-round text-xs"></span>
                                         <span>{detectKeyType(key())}</span>
                                       </div>
                                     </div>
