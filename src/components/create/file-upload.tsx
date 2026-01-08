@@ -34,7 +34,7 @@ export const FileUpload = (props: {
 
     if ((document.getElementById("exif-rm") as HTMLInputElement).checked) {
       const exifRemoved = remove(new Uint8Array(await blob.arrayBuffer()));
-      if (exifRemoved !== null) blob = new Blob([exifRemoved], { type: blob.type });
+      if (exifRemoved !== null) blob = new Blob([exifRemoved as BlobPart], { type: blob.type });
     }
 
     const rpc = new Client({ handler: agent()! });
