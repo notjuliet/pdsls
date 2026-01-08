@@ -341,9 +341,9 @@ const CollectionView = () => {
                 </Show>
                 <TextInput
                   name="Filter"
-                  placeholder="Filter by substring"
+                  placeholder="Filter records"
                   onInput={(e) => setFilter(e.currentTarget.value)}
-                  class="grow"
+                  class="grow text-sm"
                 />
                 <Tooltip text="Jetstream">
                   <A
