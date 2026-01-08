@@ -21,7 +21,7 @@ const CopyButton = (props: { content: string; label: string }) => {
           class={`-mr-2 hidden items-center rounded px-2 py-1 text-neutral-500 transition-all duration-200 group-hover:flex hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70`}
           aria-label="Copy to clipboard"
         >
-          <span class="iconify lucide--link"></span>
+          <span class="iconify lucide--copy"></span>
         </button>
       </Tooltip>
     </Show>
