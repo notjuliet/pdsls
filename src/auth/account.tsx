@@ -158,7 +158,7 @@ export const AccountManager = () => {
               onclick={() => setShowingAddAccount(true)}
               class="flex w-full items-center justify-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-100 px-3 py-2 hover:bg-neutral-200 active:bg-neutral-300 dark:border-neutral-600 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
             >
-              <span class="iconify lucide--user-plus"></span>
+              <span class="iconify lucide--plus"></span>
               <span>Add account</span>
             </button>
           </Show>
