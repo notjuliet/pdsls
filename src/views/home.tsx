@@ -2,7 +2,7 @@ import { A } from "@solidjs/router";
 
 export const Home = () => {
   return (
-    <div class="flex w-full flex-col gap-5 px-2 wrap-break-word">
+    <div class="flex w-full flex-col gap-6 px-2 wrap-break-word">
       <div class="flex flex-col gap-3">
         <h1 class="text-xl font-semibold">Atmosphere Explorer</h1>
 
@@ -122,18 +122,15 @@ export const Home = () => {
         </section>
       </div>
 
-      <div class="text-center text-sm text-neutral-600 dark:text-neutral-400">
-        <span class="italic">
-          Made by{" "}
-          <a
-            href="https://juli.ee"
-            class="font-pecita relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:transition-[width] after:duration-300 after:ease-out hover:after:w-full"
-          >
-            Juliet
-          </a>{" "}
-          with love
-        </span>
-        <span> • {import.meta.env.VITE_APP_VERSION}</span>
+      <div class="text-center text-sm text-neutral-700 dark:text-neutral-300">
+        Made by{" "}
+        <a
+          href="https://juli.ee"
+          class="font-pecita relative text-rose-400 after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:transition-[width] after:duration-300 after:ease-out hover:after:w-full dark:text-rose-300"
+        >
+          Juliet
+        </a>{" "}
+        with love • {import.meta.env.VITE_APP_VERSION}
       </div>
     </div>
   );
