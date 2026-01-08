@@ -33,6 +33,7 @@ import {
   resolveLexiconSchema,
   resolvePDS,
 } from "../utils/api.js";
+import { clearCollectionCache } from "../utils/route-cache.js";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 import { lexicons } from "../utils/types/lexicons.js";
 
@@ -334,6 +335,7 @@ export const RecordView = () => {
       type: "success",
     });
     setTimeout(() => removeNotification(id), 3000);
+    clearCollectionCache(`${params.pds}/${params.repo}/${params.collection}`);
     navigate(`/at://${params.repo}/${params.collection}`);
   };
 
