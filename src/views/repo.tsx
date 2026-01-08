@@ -111,8 +111,16 @@ export const RepoView = () => {
   const fetchRepo = async () => {
     try {
       pds = await resolvePDS(did);
+      setDidDoc(didDocCache[did] as DidDocument);
     } catch {
-      if (!did.startsWith("did:")) {
+      // Fallback for feedgens
+      if (did.startsWith("did:web")) {
+        try {
+          const res = await fetch(`https://${did.replace("did:web:", "")}/.well-known/did.json`);
+          const didDoc = await res.json();
+          setDidDoc(didDoc);
+        } catch {}
+      } else if (!did.startsWith("did:")) {
         try {
           const did = await resolveHandle(params.repo as Handle);
           navigate(location.pathname.replace(params.repo!, did), { replace: true });
@@ -130,9 +138,8 @@ export const RepoView = () => {
         }
       }
     }
-    setDidDoc(didDocCache[did] as DidDocument);
-    if (did.startsWith("did:plc")) getRotationKeys();
 
+    if (did.startsWith("did:plc")) getRotationKeys();
     validateHandles();
 
     if (!pds) {
@@ -524,88 +531,94 @@ export const RepoView = () => {
                     </div>
 
                     {/* Aliases Section */}
-                    <div>
-                      <p class="font-semibold">Aliases</p>
-                      <For each={didDocument().alsoKnownAs}>
-                        {(alias) => (
-                          <div class="flex items-center gap-1 text-sm text-neutral-700 dark:text-neutral-300">
-                            <span>{alias}</span>
-                            <Show when={alias.startsWith("at://")}>
-                              <Tooltip
-                                text={
-                                  validHandles[alias] === true ? "Valid handle"
-                                  : validHandles[alias] === undefined ?
-                                    "Validating"
-                                  : "Invalid handle"
-                                }
-                              >
-                                <span
-                                  classList={{
-                                    "iconify lucide--check text-green-600 dark:text-green-400":
-                                      validHandles[alias] === true,
-                                    "iconify lucide--x text-red-500 dark:text-red-400":
-                                      validHandles[alias] === false,
-                                    "iconify lucide--loader-circle animate-spin":
-                                      validHandles[alias] === undefined,
-                                  }}
-                                ></span>
-                              </Tooltip>
-                            </Show>
-                          </div>
-                        )}
-                      </For>
-                    </div>
-
-                    {/* Services Section */}
-                    <div>
-                      <p class="font-semibold">Services</p>
-                      <div class="flex flex-col gap-1">
-                        <For each={didDocument().service}>
-                          {(service) => (
-                            <div class="grid grid-cols-[auto_1fr] items-center gap-x-1 text-sm text-neutral-700 dark:text-neutral-300">
-                              <span class="iconify lucide--hash"></span>
-                              <span>{service.id.split("#")[1]}</span>
-                              <span></span>
-                              <a
-                                class="w-fit underline hover:text-blue-500 dark:hover:text-blue-400"
-                                href={service.serviceEndpoint.toString()}
-                                target="_blank"
-                                rel="noopener"
-                              >
-                                {service.serviceEndpoint.toString()}
-                              </a>
+                    <Show when={didDocument().alsoKnownAs}>
+                      <div>
+                        <p class="font-semibold">Aliases</p>
+                        <For each={didDocument().alsoKnownAs}>
+                          {(alias) => (
+                            <div class="flex items-center gap-1 text-sm text-neutral-700 dark:text-neutral-300">
+                              <span>{alias}</span>
+                              <Show when={alias.startsWith("at://")}>
+                                <Tooltip
+                                  text={
+                                    validHandles[alias] === true ? "Valid handle"
+                                    : validHandles[alias] === undefined ?
+                                      "Validating"
+                                    : "Invalid handle"
+                                  }
+                                >
+                                  <span
+                                    classList={{
+                                      "iconify lucide--check text-green-600 dark:text-green-400":
+                                        validHandles[alias] === true,
+                                      "iconify lucide--x text-red-500 dark:text-red-400":
+                                        validHandles[alias] === false,
+                                      "iconify lucide--loader-circle animate-spin":
+                                        validHandles[alias] === undefined,
+                                    }}
+                                  ></span>
+                                </Tooltip>
+                              </Show>
                             </div>
                           )}
                         </For>
                       </div>
-                    </div>
+                    </Show>
+
+                    {/* Services Section */}
+                    <Show when={didDocument().service}>
+                      <div>
+                        <p class="font-semibold">Services</p>
+                        <div class="flex flex-col gap-1">
+                          <For each={didDocument().service}>
+                            {(service) => (
+                              <div class="grid grid-cols-[auto_1fr] items-center gap-x-1 text-sm text-neutral-700 dark:text-neutral-300">
+                                <span class="iconify lucide--hash"></span>
+                                <span>{service.id.split("#")[1]}</span>
+                                <span></span>
+                                <a
+                                  class="w-fit underline hover:text-blue-500 dark:hover:text-blue-400"
+                                  href={service.serviceEndpoint.toString()}
+                                  target="_blank"
+                                  rel="noopener"
+                                >
+                                  {service.serviceEndpoint.toString()}
+                                </a>
+                              </div>
+                            )}
+                          </For>
+                        </div>
+                      </div>
+                    </Show>
 
                     {/* Verification Methods Section */}
-                    <div>
-                      <p class="font-semibold">Verification Methods</p>
-                      <div class="flex flex-col gap-1">
-                        <For each={didDocument().verificationMethod}>
-                          {(verif) => (
-                            <Show when={verif.publicKeyMultibase}>
-                              {(key) => (
-                                <div class="grid grid-cols-[auto_1fr] items-center gap-x-1 text-sm text-neutral-700 dark:text-neutral-300">
-                                  <span class="iconify lucide--hash"></span>
-                                  <div class="flex items-center gap-2">
-                                    <span>{verif.id.split("#")[1]}</span>
-                                    <div class="flex items-center gap-1 text-neutral-500 dark:text-neutral-400">
-                                      <span class="iconify lucide--key-round"></span>
-                                      <span>{detectKeyType(key())}</span>
+                    <Show when={didDocument().verificationMethod}>
+                      <div>
+                        <p class="font-semibold">Verification Methods</p>
+                        <div class="flex flex-col gap-1">
+                          <For each={didDocument().verificationMethod}>
+                            {(verif) => (
+                              <Show when={verif.publicKeyMultibase}>
+                                {(key) => (
+                                  <div class="grid grid-cols-[auto_1fr] items-center gap-x-1 text-sm text-neutral-700 dark:text-neutral-300">
+                                    <span class="iconify lucide--hash"></span>
+                                    <div class="flex items-center gap-2">
+                                      <span>{verif.id.split("#")[1]}</span>
+                                      <div class="flex items-center gap-1 text-neutral-500 dark:text-neutral-400">
+                                        <span class="iconify lucide--key-round"></span>
+                                        <span>{detectKeyType(key())}</span>
+                                      </div>
                                     </div>
+                                    <span></span>
+                                    <div class="font-mono break-all">{key()}</div>
                                   </div>
-                                  <span></span>
-                                  <div class="font-mono break-all">{key()}</div>
-                                </div>
-                              )}
-                            </Show>
-                          )}
-                        </For>
+                                )}
+                              </Show>
+                            )}
+                          </For>
+                        </div>
                       </div>
-                    </div>
+                    </Show>
 
                     {/* Rotation Keys Section */}
                     <Show when={rotationKeys().length > 0}>
