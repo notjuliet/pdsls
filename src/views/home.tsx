@@ -1,4 +1,5 @@
 import { A } from "@solidjs/router";
+import { setOpenManager } from "../auth/state.js";
 
 export const Home = () => {
   return (
@@ -40,14 +41,19 @@ export const Home = () => {
                 Track links to any record or repository
               </span>
             </a>
-            <div class="grid grid-cols-[auto_1fr] items-center gap-x-2.5 gap-y-0.5">
+            <button
+              onclick={() => setOpenManager(true)}
+              class="group grid cursor-pointer grid-cols-[auto_1fr] items-center gap-x-2.5 gap-y-0.5 text-left hover:text-blue-500 dark:hover:text-blue-400"
+            >
               <div class="iconify lucide--user-round" />
-              <span>Sign in to manage your account</span>
+              <span class="underline decoration-transparent group-hover:decoration-current">
+                Sign in to manage your account
+              </span>
               <div />
               <span class="text-xs text-neutral-500 dark:text-neutral-400">
                 Create, edit, and delete records
               </span>
-            </div>
+            </button>
           </div>
         </section>
 

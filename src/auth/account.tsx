@@ -17,7 +17,7 @@ import {
   retrieveSession,
   saveSessionToStorage,
 } from "./session-manager.js";
-import { agent, sessions, setAgent, setSessions } from "./state.js";
+import { agent, openManager, sessions, setAgent, setOpenManager, setSessions } from "./state.js";
 
 const AccountDropdown = (props: { did: Did; onEditPermissions: (did: Did) => void }) => {
   const removeSession = async (did: Did) => {
@@ -62,7 +62,6 @@ const AccountDropdown = (props: { did: Did; onEditPermissions: (did: Did) => voi
 };
 
 export const AccountManager = () => {
-  const [openManager, setOpenManager] = createSignal(false);
   const [avatars, setAvatars] = createStore<Record<Did, string>>();
   const [showingAddAccount, setShowingAddAccount] = createSignal(false);
 
