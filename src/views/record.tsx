@@ -471,7 +471,7 @@ export const RecordView = () => {
               </div>
             </div>
             <Show when={!location.hash || location.hash === "#record"}>
-              <div class="w-max max-w-screen min-w-full px-4 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:px-2 sm:text-sm md:max-w-3xl">
+              <div class="w-full max-w-screen min-w-full px-2 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-max sm:text-sm md:max-w-3xl">
                 <JSONValue data={record()?.value as any} repo={record()!.uri.split("/")[2]} />
               </div>
             </Show>
