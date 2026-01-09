@@ -321,7 +321,7 @@ export const RepoView = () => {
             </div>
             <div class="flex gap-1">
               <Show when={error() && error() !== "Missing PDS"}>
-                <div class="flex items-center gap-1 text-red-500 dark:text-red-400">
+                <div class="flex items-center gap-1 font-medium text-red-500 dark:text-red-400">
                   <span class="iconify lucide--alert-triangle"></span>
                   <span>{error()}</span>
                 </div>
