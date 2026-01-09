@@ -4,7 +4,7 @@ export const Home = () => {
   return (
     <div class="flex w-full flex-col gap-6 px-2 wrap-break-word">
       <div class="flex flex-col gap-3">
-        <h1 class="text-xl font-semibold">Atmosphere Explorer</h1>
+        <h1 class="text-lg font-semibold">Atmosphere Explorer</h1>
 
         {/* Explore Section */}
         <section class="flex flex-col gap-2">

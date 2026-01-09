@@ -211,7 +211,7 @@ const Search = () => {
           placeholder="Handle, DID, AT URI, NSID, PDS"
           ref={searchInput}
           id="input"
-          class="grow py-1 select-none placeholder:text-sm focus:outline-none"
+          class="grow py-1.5 select-none placeholder:text-sm focus:outline-none"
           value={input() ?? ""}
           onInput={(e) => {
             setInput(e.currentTarget.value);
