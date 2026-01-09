@@ -23,6 +23,7 @@ import {
   MenuSeparator,
   NavMenu,
 } from "../components/dropdown.jsx";
+import { Favicon } from "../components/favicon.jsx";
 import {
   addNotification,
   removeNotification,
@@ -453,9 +454,6 @@ export const RepoView = () => {
                     )}
                   >
                     {(authority) => {
-                      const reversedDomain = authority.split(".").reverse().join(".");
-                      const [faviconLoaded, setFaviconLoaded] = createSignal(false);
-
                       const isHighlighted = () => location.hash === `#collections:${authority}`;
 
                       return (
@@ -467,29 +465,20 @@ export const RepoView = () => {
                             "bg-blue-100 dark:bg-blue-500/25": isHighlighted(),
                           }}
                         >
-                          <a
-                            href={`#collections:${authority}`}
-                            class="relative flex h-5 w-4 shrink-0 items-center justify-center hover:opacity-70"
-                          >
-                            <span class="absolute top-1/2 -left-5 flex -translate-y-1/2 items-center text-base opacity-0 transition-opacity group-hover:opacity-100">
-                              <span class="iconify lucide--link absolute -left-2 w-7"></span>
-                            </span>
-                            <Show when={!faviconLoaded()}>
-                              <span class="iconify lucide--globe size-4 text-neutral-400 dark:text-neutral-500" />
-                            </Show>
-                            <img
-                              src={
-                                ["bsky.app", "bsky.chat"].includes(reversedDomain) ?
-                                  "https://web-cdn.bsky.app/static/apple-touch-icon.png"
-                                : `https://${reversedDomain}/favicon.ico`
-                              }
-                              alt={`${reversedDomain} favicon`}
-                              class="h-4 w-4"
-                              classList={{ hidden: !faviconLoaded() }}
-                              onLoad={() => setFaviconLoaded(true)}
-                              onError={() => setFaviconLoaded(false)}
-                            />
-                          </a>
+                          <Favicon
+                            authority={authority}
+                            wrapper={(children) => (
+                              <a
+                                href={`#collections:${authority}`}
+                                class="relative flex h-5 w-4 shrink-0 items-center justify-center hover:opacity-70"
+                              >
+                                <span class="absolute top-1/2 -left-5 flex -translate-y-1/2 items-center text-base opacity-0 transition-opacity group-hover:opacity-100">
+                                  <span class="iconify lucide--link absolute -left-2 w-7"></span>
+                                </span>
+                                {children}
+                              </a>
+                            )}
+                          />
                           <div class="flex flex-1 flex-col">
                             <For
                               each={nsids()?.[authority].nsids.filter((nsid) =>

@@ -6,6 +6,7 @@ import * as TID from "@atcute/tid";
 import { Title } from "@solidjs/meta";
 import { createEffect, createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
 import { Button } from "../../components/button.jsx";
+import { Favicon } from "../../components/favicon.jsx";
 import { JSONValue } from "../../components/json.jsx";
 import { TextInput } from "../../components/text-input.jsx";
 import { isTouchDevice } from "../../layout.jsx";
@@ -309,6 +310,7 @@ const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void })
         <For each={filteredEntries()}>
           {(entry) => {
             const hasSingleEntry = entry.entries.length === 1;
+            const authority = () => entry.name.split(".").slice(0, 2).join(".");
 
             return (
               <li>
@@ -326,6 +328,7 @@ const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void })
                   }}
                   class="flex w-full items-center gap-2 rounded p-2 text-left text-sm hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
                 >
+                  <Favicon authority={authority()} />
                   <span
                     class="truncate font-medium"
                     classList={{

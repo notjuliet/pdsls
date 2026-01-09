@@ -3,6 +3,7 @@ import { createResource, createSignal, For, onMount, Show } from "solid-js";
 import { getAllBacklinks, getRecordBacklinks, LinksWithRecords } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { Button } from "./button.jsx";
+import { Favicon } from "./favicon.jsx";
 
 type BacklinksProps = {
   target: string;
@@ -122,17 +123,22 @@ const BacklinkSection = (
 ) => {
   const [expanded, setExpanded] = createSignal(false);
 
+  const authority = () => props.collection.split(".").slice(0, 2).join(".");
+
   return (
     <div class="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700">
       <button
         class="flex w-full items-center justify-between gap-3 px-3 py-2 text-left hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
         onClick={() => setExpanded(!expanded())}
       >
-        <div class="flex min-w-0 flex-1 flex-col">
-          <span class="w-full truncate">{props.collection}</span>
-          <span class="w-full text-xs wrap-break-word text-neutral-500 dark:text-neutral-400">
-            {props.path.slice(1)}
-          </span>
+        <div class="flex min-w-0 flex-1 items-center gap-2">
+          <Favicon authority={authority()} />
+          <div class="flex min-w-0 flex-1 flex-col">
+            <span class="w-full truncate">{props.collection}</span>
+            <span class="w-full text-xs wrap-break-word text-neutral-500 dark:text-neutral-400">
+              {props.path.slice(1)}
+            </span>
+          </div>
         </div>
         <div class="flex shrink-0 items-center gap-2 text-neutral-700 dark:text-neutral-300">
           <span class="text-xs">
