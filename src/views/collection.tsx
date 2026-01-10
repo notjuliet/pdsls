@@ -3,7 +3,7 @@ import { Client, simpleFetchHandler } from "@atcute/client";
 import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
 import { Title } from "@solidjs/meta";
-import { A, useBeforeLeave, useParams } from "@solidjs/router";
+import { A, useBeforeLeave, useParams, useSearchParams } from "@solidjs/router";
 import {
   createEffect,
   createMemo,
@@ -91,12 +91,13 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
 
 const CollectionView = () => {
   const params = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [cursor, setCursor] = createSignal<string>();
   const [records, setRecords] = createStore<AtprotoRecord[]>([]);
   const [filter, setFilter] = createSignal<string>();
   const [batchDelete, setBatchDelete] = createSignal(false);
   const [lastSelected, setLastSelected] = createSignal<number>();
-  const [reverse, setReverse] = createSignal(false);
+  const [reverse, setReverse] = createSignal(searchParams.reverse === "true");
   const [recreate, setRecreate] = createSignal(false);
   const [openDelete, setOpenDelete] = createSignal(false);
   const [restoredFromCache, setRestoredFromCache] = createSignal(false);
@@ -112,6 +113,7 @@ const CollectionView = () => {
       setRecords(cached.records as AtprotoRecord[]);
       setCursor(cached.cursor);
       setReverse(cached.reverse);
+      setSearchParams({ reverse: cached.reverse ? "true" : undefined });
       setRestoredFromCache(true);
       requestAnimationFrame(() => {
         window.scrollTo(0, cached.scrollY);
@@ -358,7 +360,9 @@ const CollectionView = () => {
                 <div class="flex items-center justify-between gap-x-2">
                   <Button
                     onClick={() => {
-                      setReverse(!reverse());
+                      const newReverse = !reverse();
+                      setReverse(newReverse);
+                      setSearchParams({ reverse: newReverse ? "true" : undefined });
                       setCursor(undefined);
                       setRestoredFromCache(false);
                       clearCollectionCache(cacheKey());
