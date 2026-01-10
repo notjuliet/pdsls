@@ -45,7 +45,7 @@ export const Home = () => {
               onclick={() => setOpenManager(true)}
               class="group grid cursor-pointer grid-cols-[auto_1fr] items-center gap-x-2.5 gap-y-0.5 text-left hover:text-blue-500 dark:hover:text-blue-400"
             >
-              <div class="iconify lucide--user-round" />
+              <div class="iconify lucide--user-round-pen" />
               <span class="underline decoration-transparent group-hover:decoration-current">
                 Sign in to manage your account
               </span>
