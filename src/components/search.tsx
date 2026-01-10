@@ -92,6 +92,7 @@ const Search = () => {
     const handlePaste = (e: ClipboardEvent) => {
       if (e.target === searchInput) return;
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (document.querySelector("[data-modal]")) return;
 
       const pastedText = e.clipboardData?.getData("text");
       if (pastedText) processInput(pastedText);
