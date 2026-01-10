@@ -8,6 +8,7 @@ import {
 import { createEffect, createResource, createSignal, For, Show } from "solid-js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
+import { plcDirectory } from "./settings.jsx";
 
 type PlcEvent = "handle" | "rotation_key" | "service" | "verification_method";
 
@@ -23,9 +24,7 @@ export const PlcLogView = (props: { did: string }) => {
     !activePlcEvent() || diffs.some((d) => d.type.startsWith(activePlcEvent()!));
 
   const fetchPlcLogs = async () => {
-    const res = await fetch(
-      `${localStorage.plcDirectory ?? "https://plc.directory"}/${props.did}/log/audit`,
-    );
+    const res = await fetch(`${plcDirectory()}/${props.did}/log/audit`);
     const json = await res.json();
     const logs = defs.indexedEntryLog.parse(json);
     setRawLogs(logs);

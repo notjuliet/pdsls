@@ -57,7 +57,7 @@ const resolveSchema = async (authority: AtprotoDid, nsid: Nsid): Promise<unknown
   const schemaPromise = (async () => {
     let didDocPromise = documentCache.get(authority);
     if (!didDocPromise) {
-      didDocPromise = didDocumentResolver.resolve(authority);
+      didDocPromise = didDocumentResolver().resolve(authority);
       documentCache.set(authority, didDocPromise);
     }
 

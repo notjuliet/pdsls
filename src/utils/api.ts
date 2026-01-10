@@ -16,17 +16,22 @@ import {
 import { DohJsonLexiconAuthorityResolver, LexiconSchemaResolver } from "@atcute/lexicon-resolver";
 import { Did, Handle } from "@atcute/lexicons";
 import { AtprotoDid, isHandle, Nsid } from "@atcute/lexicons/syntax";
+import { createMemo } from "solid-js";
 import { createStore } from "solid-js/store";
 import { setPDS } from "../components/navbar";
+import { plcDirectory } from "../views/settings";
 
-export const didDocumentResolver = new CompositeDidDocumentResolver({
-  methods: {
-    plc: new PlcDidDocumentResolver({
-      apiUrl: localStorage.getItem("plcDirectory") ?? "https://plc.directory",
+export const didDocumentResolver = createMemo(
+  () =>
+    new CompositeDidDocumentResolver({
+      methods: {
+        plc: new PlcDidDocumentResolver({
+          apiUrl: plcDirectory(),
+        }),
+        web: new AtprotoWebDidDocumentResolver(),
+      },
     }),
-    web: new AtprotoWebDidDocumentResolver(),
-  },
-});
+);
 
 export const handleResolver = new CompositeHandleResolver({
   strategy: "dns-first",
@@ -40,9 +45,12 @@ const authorityResolver = new DohJsonLexiconAuthorityResolver({
   dohUrl: "https://dns.google/resolve?",
 });
 
-const schemaResolver = new LexiconSchemaResolver({
-  didDocumentResolver: didDocumentResolver,
-});
+const schemaResolver = createMemo(
+  () =>
+    new LexiconSchemaResolver({
+      didDocumentResolver: didDocumentResolver(),
+    }),
+);
 
 const didPDSCache: Record<string, string> = {};
 const [labelerCache, setLabelerCache] = createStore<Record<string, string>>({});
@@ -54,7 +62,7 @@ const getPDS = async (did: string) => {
     throw new Error("Not a valid DID identifier");
   }
 
-  const doc = await didDocumentResolver.resolve(did);
+  const doc = await didDocumentResolver().resolve(did);
   didDocCache[did] = doc;
 
   const pds = getPdsEndpoint(doc);
@@ -83,7 +91,7 @@ const resolveDidDoc = async (did: Did) => {
   if (!isAtprotoDid(did)) {
     throw new Error("Not a valid DID identifier");
   }
-  return await didDocumentResolver.resolve(did);
+  return await didDocumentResolver().resolve(did);
 };
 
 const validateHandle = async (handle: Handle, did: Did) => {
@@ -145,7 +153,7 @@ const resolveLexiconAuthorityDirect = async (authority: string) => {
 };
 
 const resolveLexiconSchema = async (authority: AtprotoDid, nsid: Nsid) => {
-  return await schemaResolver.resolve(authority, nsid);
+  return await schemaResolver().resolve(authority, nsid);
 };
 
 interface LinkData {

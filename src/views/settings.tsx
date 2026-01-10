@@ -4,6 +4,9 @@ import { TextInput } from "../components/text-input.jsx";
 import { ThemeSelection } from "../components/theme.jsx";
 
 export const [hideMedia, setHideMedia] = createSignal(localStorage.hideMedia === "true");
+export const [plcDirectory, setPlcDirectory] = createSignal(
+  localStorage.plcDirectory || "https://plc.directory",
+);
 
 const Settings = () => {
   return (
@@ -17,11 +20,16 @@ const Settings = () => {
           </label>
           <TextInput
             id="plcDirectory"
-            value={localStorage.plcDirectory || "https://plc.directory"}
+            value={plcDirectory()}
             onInput={(e) => {
-              e.currentTarget.value.length ?
-                (localStorage.plcDirectory = e.currentTarget.value)
-              : localStorage.removeItem("plcDirectory");
+              const value = e.currentTarget.value;
+              if (value.length) {
+                localStorage.plcDirectory = value;
+                setPlcDirectory(value);
+              } else {
+                localStorage.removeItem("plcDirectory");
+                setPlcDirectory("https://plc.directory");
+              }
             }}
           />
         </div>

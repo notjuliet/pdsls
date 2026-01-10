@@ -42,6 +42,7 @@ import {
 import { detectDidKeyType, detectKeyType } from "../utils/key.js";
 import { BlobView } from "./blob.jsx";
 import { PlcLogView } from "./logs.jsx";
+import { plcDirectory } from "./settings.jsx";
 
 export const RepoView = () => {
   const params = useParams();
@@ -101,9 +102,7 @@ export const RepoView = () => {
   };
 
   const getRotationKeys = async () => {
-    const res = await fetch(
-      `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}/log/last`,
-    );
+    const res = await fetch(`${plcDirectory()}/${did}/log/last`);
     const json = await res.json();
     setRotationKeys(json.rotationKeys ?? []);
   };
@@ -364,7 +363,7 @@ export const RepoView = () => {
                   <NavMenu
                     href={
                       did.startsWith("did:plc") ?
-                        `${localStorage.plcDirectory ?? "https://plc.directory"}/${did}`
+                        `${plcDirectory()}/${did}`
                       : `https://${did.split("did:web:")[1]}/.well-known/did.json`
                     }
                     newTab
@@ -373,7 +372,7 @@ export const RepoView = () => {
                   />
                   <Show when={did.startsWith("did:plc")}>
                     <NavMenu
-                      href={`${localStorage.plcDirectory ?? "https://plc.directory"}/${did}/log/audit`}
+                      href={`${plcDirectory()}/${did}/log/audit`}
                       newTab
                       label="Audit log"
                       icon="lucide--external-link"

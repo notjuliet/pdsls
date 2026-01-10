@@ -12,6 +12,7 @@ import { NotificationContainer } from "./components/notification.jsx";
 import { Search, SearchButton, showSearch } from "./components/search.jsx";
 import { themeEvent } from "./components/theme.jsx";
 import { resolveHandle } from "./utils/api.js";
+import { plcDirectory } from "./views/settings.jsx";
 
 export const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 1;
 
@@ -187,12 +188,10 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           </Show>
         </div>
         <NotificationContainer />
-        <Show
-          when={localStorage.plcDirectory && localStorage.plcDirectory !== "https://plc.directory"}
-        >
+        <Show when={plcDirectory() !== "https://plc.directory"}>
           <div class="dark:bg-dark-500 fixed right-0 bottom-0 left-0 z-10 flex items-center justify-center bg-neutral-100 px-3 py-1 text-xs">
             <span>
-              PLC directory: <span class="font-medium">{localStorage.plcDirectory}</span>
+              PLC directory: <span class="font-medium">{plcDirectory()}</span>
             </span>
           </div>
         </Show>
