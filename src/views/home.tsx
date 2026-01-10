@@ -80,7 +80,7 @@ export const Home = () => {
               href="/firehose"
               class="group grid grid-cols-[auto_1fr] items-center gap-x-2.5 gap-y-0.5 hover:text-blue-500 dark:hover:text-blue-400"
             >
-              <div class="iconify lucide--antenna" />
+              <div class="iconify lucide--rss" />
               <span class="underline decoration-transparent group-hover:decoration-current">
                 Firehose
               </span>
