@@ -40,7 +40,7 @@ interface AtprotoRecord {
   toDelete: boolean;
 }
 
-const LIMIT = 100;
+const DEFAULT_LIMIT = 100;
 
 const RecordLink = (props: { record: AtprotoRecord }) => {
   const [hover, setHover] = createSignal(false);
@@ -98,6 +98,12 @@ const CollectionView = () => {
   const [batchDelete, setBatchDelete] = createSignal(false);
   const [lastSelected, setLastSelected] = createSignal<number>();
   const [reverse, setReverse] = createSignal(searchParams.reverse === "true");
+  const limit = () => {
+    const limitParam =
+      Array.isArray(searchParams.limit) ? searchParams.limit[0] : searchParams.limit;
+    const paramLimit = parseInt(limitParam || "");
+    return !isNaN(paramLimit) && paramLimit > 0 && paramLimit <= 100 ? paramLimit : DEFAULT_LIMIT;
+  };
   const [recreate, setRecreate] = createSignal(false);
   const [openDelete, setOpenDelete] = createSignal(false);
   const [restoredFromCache, setRestoredFromCache] = createSignal(false);
@@ -113,7 +119,10 @@ const CollectionView = () => {
       setRecords(cached.records as AtprotoRecord[]);
       setCursor(cached.cursor);
       setReverse(cached.reverse);
-      setSearchParams({ reverse: cached.reverse ? "true" : undefined });
+      setSearchParams({
+        reverse: cached.reverse ? "true" : undefined,
+        limit: cached.limit !== DEFAULT_LIMIT ? cached.limit.toString() : undefined,
+      });
       setRestoredFromCache(true);
       requestAnimationFrame(() => {
         window.scrollTo(0, cached.scrollY);
@@ -131,6 +140,7 @@ const CollectionView = () => {
         cursor: cursor(),
         scrollY: window.scrollY,
         reverse: reverse(),
+        limit: limit(),
       });
     } else {
       clearCollectionCache(cacheKey());
@@ -152,13 +162,13 @@ const CollectionView = () => {
       params: {
         repo: did as ActorIdentifier,
         collection: params.collection as `${string}.${string}.${string}`,
-        limit: LIMIT,
+        limit: limit(),
         cursor: cursor(),
         reverse: reverse(),
       },
     });
     if (!res.ok) throw new Error(res.data.error);
-    setCursor(res.data.records.length < LIMIT ? undefined : res.data.cursor);
+    setCursor(res.data.records.length < limit() ? undefined : res.data.cursor);
     const tmpRecords: AtprotoRecord[] = [];
     res.data.records.forEach((record) => {
       const rkey = record.uri.split("/").pop()!;

@@ -5,6 +5,7 @@ export interface CollectionCacheEntry {
   cursor: string | undefined;
   scrollY: number;
   reverse: boolean;
+  limit: number;
 }
 
 type RouteCache = Record<string, CollectionCacheEntry>;
