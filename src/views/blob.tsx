@@ -51,7 +51,7 @@ const BlobView = (props: { pds: string; repo: string }) => {
             {blobs()?.length} blob{(blobs()?.length ?? 0 > 1) ? "s" : ""}
           </p>
           <Show when={!response.loading && cursor()}>
-            <Button onClick={() => refetch()}>Load More</Button>
+            <Button onClick={() => refetch()}>Load more</Button>
           </Show>
           <Show when={response.loading}>
             <span class="iconify lucide--loader-circle animate-spin py-3.5 text-xl"></span>

@@ -398,7 +398,7 @@ const CollectionView = () => {
                   <div class="flex w-20 items-center justify-end">
                     <Show when={cursor()}>
                       <Show when={!response.loading}>
-                        <Button onClick={() => refetch()}>Load More</Button>
+                        <Button onClick={() => refetch()}>Load more</Button>
                       </Show>
                       <Show when={response.loading}>
                         <div class="iconify lucide--loader-circle w-20 animate-spin text-xl" />

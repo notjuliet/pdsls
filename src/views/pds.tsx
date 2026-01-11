@@ -260,7 +260,7 @@ const PdsView = () => {
             <div class="flex flex-col items-center gap-1 pb-2">
               <p>{repos()?.length} loaded</p>
               <Show when={!response.loading && cursor()}>
-                <Button onClick={() => refetch()}>Load More</Button>
+                <Button onClick={() => refetch()}>Load more</Button>
               </Show>
               <Show when={response.loading}>
                 <span class="iconify lucide--loader-circle animate-spin py-3.5 text-xl"></span>

@@ -439,7 +439,7 @@ const CollectionSubview = (props: {
             {displayedEntries().length}/{filteredEntries().length}
           </span>
 
-          <Button onClick={loadMore}>Load More</Button>
+          <Button onClick={loadMore}>Load more</Button>
         </Show>
       </div>
 
