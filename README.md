@@ -1,4 +1,4 @@
-# PDSls - AT Protocol Explorer
+# PDSls - Atmosphere Explorer
 
 Lightweight and client-side web app to navigate [atproto](https://atproto.com/).
 
@@ -9,6 +9,7 @@ Lightweight and client-side web app to navigate [atproto](https://atproto.com/).
 - Jetstream and firehose (com.atproto.sync.subscribeRepos) streaming.
 - Backlinks support with [constellation](https://constellation.microcosm.blue/).
 - Query moderation labels.
+- Explore and unpack repository archives (CAR).
 
 ## Hacking
 
