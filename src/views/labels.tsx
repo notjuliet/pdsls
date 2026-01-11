@@ -137,7 +137,7 @@ export const LabelView = () => {
   });
 
   const fetchLabels = async (formData: FormData, reset?: boolean) => {
-    let did = formData.get("did")?.toString()?.trim();
+    let did = formData.get("did")?.toString()?.trim() || "did:plc:ar7c4by46qjdydhdevvrndac";
     const uriPatterns = formData.get("uriPatterns")?.toString()?.trim();
 
     if (!did || !uriPatterns) {
@@ -215,7 +215,7 @@ export const LabelView = () => {
                 name="did"
                 value={didInput()}
                 onInput={(e) => setDidInput(e.currentTarget.value)}
-                placeholder="did:plc:..."
+                placeholder="moderation.bsky.app (default)"
                 class="w-full"
               />
             </label>
