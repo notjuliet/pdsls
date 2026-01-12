@@ -1,8 +1,10 @@
+import * as TID from "@atcute/tid";
 import { A, Params } from "@solidjs/router";
 import { createEffect, createSignal, Show } from "solid-js";
 import { isTouchDevice } from "../layout";
 import { didDocCache } from "../utils/api";
 import { addToClipboard } from "../utils/copy";
+import { localDateFromTimestamp } from "../utils/date";
 import Tooltip from "./tooltip";
 
 export const [pds, setPDS] = createSignal<string>();
@@ -161,7 +163,14 @@ export const NavBar = (props: { params: Params }) => {
               <Tooltip text="Record">
                 <span class="iconify lucide--file-json text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
               </Tooltip>
-              <span class="py-0.5 font-medium">{props.params.rkey}</span>
+              <div class="flex min-w-0 gap-1 py-0.5 font-medium">
+                <span class="shrink-0">{props.params.rkey}</span>
+                <Show when={TID.validate(props.params.rkey!)}>
+                  <span class="truncate text-neutral-500 dark:text-neutral-400">
+                    ({localDateFromTimestamp(TID.parse(props.params.rkey!).timestamp / 1000)})
+                  </span>
+                </Show>
+              </div>
             </div>
             <CopyButton
               content={`at://${props.params.repo}/${props.params.collection}/${props.params.rkey}`}
