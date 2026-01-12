@@ -143,8 +143,15 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
   );
 };
 
-const JSONNumber = ({ data }: { data: number }) => {
-  return <span>{data}</span>;
+const JSONNumber = ({ data, isSize }: { data: number; isSize?: boolean }) => {
+  return (
+    <span class="flex gap-1">
+      {data}
+      <Show when={isSize}>
+        <span class="text-neutral-500 dark:text-neutral-400">({formatFileSize(data)})</span>
+      </Show>
+    </span>
+  );
 };
 
 const JSONBoolean = ({ data }: { data: boolean }) => {
@@ -161,6 +168,7 @@ const CollapsibleItem = (props: {
   maxWidth?: string;
   isType?: boolean;
   isLink?: boolean;
+  isSize?: boolean;
   parentIsBlob?: boolean;
 }) => {
   const ctx = useJSONCtx();
@@ -202,7 +210,12 @@ const CollapsibleItem = (props: {
         }}
       >
         <JSONCtx.Provider value={{ ...ctx, parentIsBlob: isBlobContext }}>
-          <JSONValueInner data={props.value} isType={props.isType} isLink={props.isLink} />
+          <JSONValueInner
+            data={props.value}
+            isType={props.isType}
+            isLink={props.isLink}
+            isSize={props.isSize}
+          />
         </JSONCtx.Provider>
       </span>
     </span>
@@ -243,6 +256,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
           maxWidth="set"
           isType={key === "$type"}
           isLink={key === "$link"}
+          isSize={key === "size" && isBlob}
           parentIsBlob={isBlobContext}
         />
       )}
@@ -254,7 +268,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
     pds() && params.rkey && (blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4");
 
   const MediaDisplay = () => (
-    <div class="flex flex-col gap-1">
+    <div>
       <span class="group/media relative flex w-fit">
         <Show when={!hide()}>
           <Show when={blob.mimeType.startsWith("image/")}>
@@ -292,11 +306,6 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
           </button>
         </Show>
       </span>
-      <Show when={blob.size}>
-        <span class="text-xs text-neutral-400 dark:text-neutral-500">
-          {formatFileSize(blob.size)}
-        </span>
-      </Show>
     </div>
   );
 
@@ -322,11 +331,16 @@ const JSONArray = (props: { data: JSONType[] }) => {
   );
 };
 
-const JSONValueInner = (props: { data: JSONType; isType?: boolean; isLink?: boolean }) => {
+const JSONValueInner = (props: {
+  data: JSONType;
+  isType?: boolean;
+  isLink?: boolean;
+  isSize?: boolean;
+}) => {
   const data = props.data;
   if (typeof data === "string")
     return <JSONString data={data} isType={props.isType} isLink={props.isLink} />;
-  if (typeof data === "number") return <JSONNumber data={data} />;
+  if (typeof data === "number") return <JSONNumber data={data} isSize={props.isSize} />;
   if (typeof data === "boolean") return <JSONBoolean data={data} />;
   if (data === null) return <JSONNull />;
   if (Array.isArray(data)) return <JSONArray data={data} />;
