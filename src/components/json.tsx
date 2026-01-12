@@ -309,7 +309,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
 const JSONArray = (props: { data: JSONType[] }) => {
   return (
     <For each={props.data}>
-      {(value, index) => <CollapsibleItem label={`[${index()}]`} value={value} />}
+      {(value, index) => <CollapsibleItem label={`#${index()}`} value={value} />}
     </For>
   );
 };
