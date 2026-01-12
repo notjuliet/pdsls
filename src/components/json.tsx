@@ -153,6 +153,60 @@ const JSONNull = () => {
   return <span>null</span>;
 };
 
+const CollapsibleItem = (props: {
+  label: string | number;
+  value: JSONType;
+  maxWidth?: string;
+  isType?: boolean;
+  isLink?: boolean;
+  parentIsBlob?: boolean;
+}) => {
+  const ctx = useJSONCtx();
+  const [show, setShow] = createSignal(true);
+  const isBlobContext = props.parentIsBlob ?? ctx.parentIsBlob;
+
+  return (
+    <span
+      classList={{
+        "group/indent flex gap-x-1 w-full": true,
+        "flex-col": props.value === Object(props.value),
+      }}
+    >
+      <button
+        class="group/clip relative flex size-fit shrink-0 items-center wrap-anywhere text-neutral-500 hover:text-neutral-700 active:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 dark:active:text-neutral-300"
+        classList={{
+          "max-w-[40%] sm:max-w-[50%]": props.maxWidth !== undefined,
+        }}
+        onclick={() => setShow(!show())}
+      >
+        <span
+          classList={{
+            "dark:bg-dark-500 absolute w-4 flex items-center -left-4 bg-neutral-100 text-sm": true,
+            "hidden group-hover/clip:flex": show(),
+          }}
+        >
+          {show() ?
+            <span class="iconify lucide--chevron-down"></span>
+          : <span class="iconify lucide--chevron-right"></span>}
+        </span>
+        {props.label}:
+      </button>
+      <span
+        classList={{
+          "self-center": props.value !== Object(props.value),
+          "pl-[calc(2ch-0.5px)] border-l-[0.5px] border-neutral-500/50 dark:border-neutral-400/50 has-hover:group-hover/indent:border-neutral-700 transition-colors dark:has-hover:group-hover/indent:border-neutral-300":
+            props.value === Object(props.value),
+          "invisible h-0 overflow-hidden": !show(),
+        }}
+      >
+        <JSONCtx.Provider value={{ ...ctx, parentIsBlob: isBlobContext }}>
+          <JSONValueInner data={props.value} isType={props.isType} isLink={props.isLink} />
+        </JSONCtx.Provider>
+      </span>
+    </span>
+  );
+};
+
 const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
   const ctx = useJSONCtx();
   const params = useParams();
@@ -178,50 +232,19 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
   const isBlob = props.data.$type === "blob";
   const isBlobContext = isBlob || ctx.parentIsBlob;
 
-  const Obj = ({ key, value }: { key: string; value: JSONType }) => {
-    const [show, setShow] = createSignal(true);
-
-    return (
-      <span
-        classList={{
-          "group/indent flex gap-x-1 w-full": true,
-          "flex-col": value === Object(value),
-        }}
-      >
-        <button
-          class="group/clip relative flex size-fit max-w-[40%] shrink-0 items-center wrap-anywhere text-neutral-500 hover:text-neutral-700 active:text-neutral-700 sm:max-w-[50%] dark:text-neutral-400 dark:hover:text-neutral-300 dark:active:text-neutral-300"
-          onclick={() => setShow(!show())}
-        >
-          <span
-            classList={{
-              "dark:bg-dark-500 absolute w-5 flex items-center -left-5 bg-neutral-100 text-sm": true,
-              "hidden group-hover/clip:flex": show(),
-            }}
-          >
-            {show() ?
-              <span class="iconify lucide--chevron-down"></span>
-            : <span class="iconify lucide--chevron-right"></span>}
-          </span>
-          {key}:
-        </button>
-        <span
-          classList={{
-            "self-center": value !== Object(value),
-            "pl-[calc(2ch-0.5px)] border-l-[0.5px] border-neutral-500/50 dark:border-neutral-400/50 has-hover:group-hover/indent:border-neutral-700 transition-colors dark:has-hover:group-hover/indent:border-neutral-300":
-              value === Object(value),
-            "invisible h-0 overflow-hidden": !show(),
-          }}
-        >
-          <JSONCtx.Provider value={{ ...ctx, parentIsBlob: isBlobContext }}>
-            <JSONValueInner data={value} isType={key === "$type"} isLink={key === "$link"} />
-          </JSONCtx.Provider>
-        </span>
-      </span>
-    );
-  };
-
   const rawObj = (
-    <For each={Object.entries(props.data)}>{([key, value]) => <Obj key={key} value={value} />}</For>
+    <For each={Object.entries(props.data)}>
+      {([key, value]) => (
+        <CollapsibleItem
+          label={key}
+          value={value}
+          maxWidth="set"
+          isType={key === "$type"}
+          isLink={key === "$link"}
+          parentIsBlob={isBlobContext}
+        />
+      )}
+    </For>
   );
 
   const blob: AtBlob = props.data as any;
@@ -286,18 +309,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
 const JSONArray = (props: { data: JSONType[] }) => {
   return (
     <For each={props.data}>
-      {(value, index) => (
-        <span
-          classList={{
-            "flex before:content-['-']": true,
-            "mb-2": value === Object(value) && index() !== props.data.length - 1,
-          }}
-        >
-          <span class="ml-[1ch] w-full">
-            <JSONValueInner data={value} />
-          </span>
-        </span>
-      )}
+      {(value, index) => <CollapsibleItem label={`[${index()}]`} value={value} />}
     </For>
   );
 };
