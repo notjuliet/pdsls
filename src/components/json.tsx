@@ -11,6 +11,7 @@ import {
   useContext,
 } from "solid-js";
 import { resolveLexiconAuthority } from "../utils/api";
+import { formatFileSize } from "../utils/format";
 import { hideMedia } from "../views/settings";
 import { pds } from "./navbar";
 import { addNotification, removeNotification } from "./notification";
@@ -30,6 +31,7 @@ interface AtBlob {
   $type: string;
   ref: { $link: string };
   mimeType: string;
+  size: number;
 }
 
 const isURL =
@@ -252,7 +254,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
     pds() && params.rkey && (blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4");
 
   const MediaDisplay = () => (
-    <div>
+    <div class="flex flex-col gap-1">
       <span class="group/media relative flex w-fit">
         <Show when={!hide()}>
           <Show when={blob.mimeType.startsWith("image/")}>
@@ -283,12 +285,18 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
         <Show when={hide()}>
           <button
             onclick={() => setHide(false)}
-            class="flex items-center rounded-lg bg-neutral-200 p-1.5 transition-colors hover:bg-neutral-300 active:bg-neutral-400 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
+            class="flex items-center gap-1 rounded-lg bg-neutral-200 px-2 py-1.5 text-sm transition-colors hover:bg-neutral-300 active:bg-neutral-400 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
           >
-            <span class="iconify lucide--eye text-base"></span>
+            <span class="iconify lucide--image"></span>
+            <span class="font-sans">Show media</span>
           </button>
         </Show>
       </span>
+      <Show when={blob.size}>
+        <span class="text-xs text-neutral-400 dark:text-neutral-500">
+          {formatFileSize(blob.size)}
+        </span>
+      </Show>
     </div>
   );
 

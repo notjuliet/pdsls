@@ -2,6 +2,7 @@ import { Client } from "@atcute/client";
 import { remove } from "@mary/exif-rm";
 import { createSignal, onCleanup, Show } from "solid-js";
 import { agent } from "../../auth/state";
+import { formatFileSize } from "../../utils/format";
 import { Button } from "../button.jsx";
 import { TextInput } from "../text-input.jsx";
 import { editorInstance } from "./state";
@@ -15,14 +16,6 @@ export const FileUpload = (props: {
   const [error, setError] = createSignal("");
 
   onCleanup(() => (props.blobInput.value = ""));
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
-  };
 
   const uploadBlob = async () => {
     let blob: Blob;
