@@ -1,6 +1,7 @@
 import * as CAR from "@atcute/car";
 import * as CBOR from "@atcute/cbor";
 import * as CID from "@atcute/cid";
+import { Did } from "@atcute/lexicons";
 import { fromStream, isCommit } from "@atcute/repo";
 import * as TID from "@atcute/tid";
 import { Title } from "@solidjs/meta";
@@ -10,6 +11,7 @@ import { Favicon } from "../../components/favicon.jsx";
 import { JSONValue } from "../../components/json.jsx";
 import { TextInput } from "../../components/text-input.jsx";
 import { isTouchDevice } from "../../layout.jsx";
+import { didDocCache, resolveDidDoc } from "../../utils/api.js";
 import { localDateFromTimestamp } from "../../utils/date.js";
 import { createDropHandler, createFileChangeHandler, handleDragOver } from "./file-handlers.js";
 import {
@@ -39,7 +41,7 @@ export const ExploreToolView = () => {
       const car = CAR.fromUint8Array(buffer);
 
       // Get DID from commit block
-      let did = "";
+      let did = "Repository";
       const rootCid = car.roots[0]?.$link;
       if (rootCid) {
         for (const entry of car) {
@@ -98,6 +100,16 @@ export const ExploreToolView = () => {
         await repo.dispose();
       }
 
+      // Resolve DID document to populate handle in cache
+      if (did !== "Repository") {
+        try {
+          const doc = await resolveDidDoc(did as Did);
+          didDocCache[did] = doc;
+        } catch (err) {
+          console.error("Failed to resolve DID document:", err);
+        }
+      }
+
       setArchive(result);
       setView({ type: "repo" });
     } catch (err) {
@@ -147,6 +159,11 @@ const ExploreView = (props: {
   setView: (view: View) => void;
   onClose: () => void;
 }) => {
+  const handle =
+    didDocCache[props.archive.did]?.alsoKnownAs
+      ?.filter((alias) => alias.startsWith("at://"))[0]
+      ?.split("at://")[1] ?? props.archive.did;
+
   return (
     <div class="flex w-full flex-col">
       <nav class="flex w-full flex-col text-sm wrap-anywhere sm:text-base">
@@ -157,7 +174,17 @@ const ExploreView = (props: {
             fallback={
               <div class="flex min-h-6 min-w-0 basis-full items-center gap-2 px-2 sm:min-h-7">
                 <span class="iconify lucide--book-user shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-                <span class="truncate py-0.5 font-medium">{props.archive.did || "Repository"}</span>
+                <span class="flex min-w-0 gap-1 py-0.5 font-medium">
+                  <Show
+                    when={handle !== props.archive.did}
+                    fallback={<span class="truncate">{props.archive.did}</span>}
+                  >
+                    <span class="shrink-0">{handle}</span>
+                    <span class="truncate text-neutral-500 dark:text-neutral-400">
+                      ({props.archive.did})
+                    </span>
+                  </Show>
+                </span>
               </div>
             }
           >
@@ -167,8 +194,14 @@ const ExploreView = (props: {
               class="flex min-h-6 min-w-0 basis-full items-center gap-2 px-2 sm:min-h-7"
             >
               <span class="iconify lucide--book-user shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-              <span class="truncate py-0.5 font-medium text-blue-500 transition-colors duration-150 group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-300">
-                {props.archive.did || "Repository"}
+              <span class="flex min-w-0 gap-1 py-0.5 font-medium text-blue-500 transition-colors duration-150 group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-300">
+                <Show
+                  when={handle !== props.archive.did}
+                  fallback={<span class="truncate">{props.archive.did}</span>}
+                >
+                  <span class="shrink-0">{handle}</span>
+                  <span class="truncate">({props.archive.did})</span>
+                </Show>
               </span>
             </button>
           </Show>
