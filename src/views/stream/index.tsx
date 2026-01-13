@@ -46,9 +46,11 @@ const StreamView = () => {
     // Track statistics in variables (batched update)
     totalEventsCount++;
     const eventType = record.kind || record.$type || "unknown";
-    const collection = record.commit?.collection || record.op?.path?.split("/")[0] || "unknown";
     eventTypesMap[eventType] = (eventTypesMap[eventType] || 0) + 1;
-    collectionsMap[collection] = (collectionsMap[collection] || 0) + 1;
+    if (eventType !== "account" && eventType !== "identity") {
+      const collection = record.commit?.collection || record.op?.path?.split("/")[0] || "unknown";
+      collectionsMap[collection] = (collectionsMap[collection] || 0) + 1;
+    }
 
     if (!paused()) {
       pendingRecords.push(record);
