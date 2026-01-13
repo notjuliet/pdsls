@@ -1,6 +1,6 @@
 import * as TID from "@atcute/tid";
 import { A, Params } from "@solidjs/router";
-import { createEffect, createSignal, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, Show } from "solid-js";
 import { isTouchDevice } from "../layout";
 import { didDocCache } from "../utils/api";
 import { addToClipboard } from "../utils/copy";
@@ -41,6 +41,12 @@ export const NavBar = (props: { params: Params }) => {
           ?.split("at://")[1] ?? props.params.repo;
       if (hdl !== handle()) setHandle(hdl);
     }
+  });
+
+  const rkeyTimestamp = createMemo(() => {
+    if (!props.params.rkey || !TID.validate(props.params.rkey)) return undefined;
+    const timestamp = TID.parse(props.params.rkey).timestamp / 1000;
+    return timestamp <= Date.now() ? timestamp : undefined;
   });
 
   return (
@@ -165,9 +171,9 @@ export const NavBar = (props: { params: Params }) => {
               </Tooltip>
               <div class="flex min-w-0 gap-1 py-0.5 font-medium">
                 <span class="shrink-0">{props.params.rkey}</span>
-                <Show when={TID.validate(props.params.rkey!)}>
+                <Show when={rkeyTimestamp()}>
                   <span class="truncate text-neutral-500 dark:text-neutral-400">
-                    ({localDateFromTimestamp(TID.parse(props.params.rkey!).timestamp / 1000)})
+                    ({localDateFromTimestamp(rkeyTimestamp()!)})
                   </span>
                 </Show>
               </div>
