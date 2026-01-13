@@ -13,7 +13,7 @@ import { PdsView } from "./views/pds.tsx";
 import { RecordView } from "./views/record.tsx";
 import { RepoView } from "./views/repo.tsx";
 import { Settings } from "./views/settings.tsx";
-import { StreamView } from "./views/stream.tsx";
+import { StreamView } from "./views/stream";
 
 render(
   () => (
