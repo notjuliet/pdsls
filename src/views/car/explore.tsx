@@ -224,14 +224,29 @@ const ExploreView = (props: {
             return v.type === "record" ? v.record : null;
           })()}
         >
-          {(record) => (
-            <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-              <div class="flex min-h-6 min-w-0 basis-full items-center gap-2 sm:min-h-7">
-                <span class="iconify lucide--file-json shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-                <span class="truncate py-0.5 font-medium">{record().key}</span>
+          {(record) => {
+            const rkeyTimestamp = createMemo(() => {
+              if (!record().key || !TID.validate(record().key)) return undefined;
+              const timestamp = TID.parse(record().key).timestamp / 1000;
+              return timestamp <= Date.now() ? timestamp : undefined;
+            });
+
+            return (
+              <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
+                <div class="flex min-h-6 min-w-0 basis-full items-center gap-2 sm:min-h-7">
+                  <span class="iconify lucide--file-json shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
+                  <div class="flex min-w-0 gap-1 py-0.5 font-medium">
+                    <span class="shrink-0">{record().key}</span>
+                    <Show when={rkeyTimestamp()}>
+                      <span class="truncate text-neutral-500 dark:text-neutral-400">
+                        ({localDateFromTimestamp(rkeyTimestamp()!)})
+                      </span>
+                    </Show>
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          }}
         </Show>
       </nav>
 
