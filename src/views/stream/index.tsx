@@ -349,7 +349,7 @@ const StreamView = () => {
         </Show>
         <Show when={connected()}>
           <StickyOverlay>
-            <div class="flex w-full flex-col gap-3 p-1">
+            <div class="flex w-full flex-col gap-2 p-1">
               <div class="flex flex-col gap-1 text-sm wrap-anywhere">
                 <div class="font-semibold">Parameters</div>
                 <For each={parameters()}>
