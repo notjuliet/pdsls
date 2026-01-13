@@ -124,74 +124,101 @@ const TypeBadge = (props: { type: string; format?: string; refType?: string }) =
   };
 
   return (
-    <>
-      <Show when={props.refType}>
-        <button
-          type="button"
-          onClick={handleClick}
-          class="inline-block cursor-pointer truncate rounded bg-blue-100 px-1.5 py-0.5 font-mono text-xs text-blue-800 hover:bg-blue-200 hover:underline active:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 dark:active:bg-blue-900/50"
-        >
-          {displayType}
-        </button>
-      </Show>
-      <Show when={!props.refType}>
-        <span class="inline-block rounded bg-blue-100 px-1.5 py-0.5 font-mono text-xs text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-          {displayType}
-        </span>
-      </Show>
-    </>
+    <Show
+      when={props.refType}
+      fallback={
+        <span class="font-mono text-xs text-neutral-600 dark:text-neutral-400">{displayType}</span>
+      }
+    >
+      <button
+        type="button"
+        onClick={handleClick}
+        class="inline-block cursor-pointer truncate font-mono text-xs text-blue-500 hover:underline dark:text-blue-400"
+      >
+        {displayType}
+      </button>
+    </Show>
   );
 };
 
 const UnionBadges = (props: { refs: string[] }) => (
-  <div class="flex flex-wrap gap-2">
+  <div class="flex flex-col items-start gap-1">
     <For each={props.refs}>{(refType) => <TypeBadge type="union" refType={refType} />}</For>
   </div>
 );
 
-const ConstraintsList = (props: { property: LexiconProperty }) => (
-  <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-500 dark:text-neutral-400">
-    <Show when={props.property.minLength !== undefined}>
-      <span>minLength: {props.property.minLength}</span>
-    </Show>
-    <Show when={props.property.maxLength !== undefined}>
-      <span>maxLength: {props.property.maxLength}</span>
-    </Show>
-    <Show when={props.property.maxGraphemes !== undefined}>
-      <span>maxGraphemes: {props.property.maxGraphemes}</span>
-    </Show>
-    <Show when={props.property.minGraphemes !== undefined}>
-      <span>minGraphemes: {props.property.minGraphemes}</span>
-    </Show>
-    <Show when={props.property.minimum !== undefined}>
-      <span>min: {props.property.minimum}</span>
-    </Show>
-    <Show when={props.property.maximum !== undefined}>
-      <span>max: {props.property.maximum}</span>
-    </Show>
-    <Show when={props.property.maxSize !== undefined}>
-      <span>maxSize: {props.property.maxSize}</span>
-    </Show>
-    <Show when={props.property.accept}>
-      <span>accept: [{props.property.accept!.join(", ")}]</span>
-    </Show>
-    <Show when={props.property.enum}>
-      <span>enum: [{props.property.enum!.join(", ")}]</span>
-    </Show>
-    <Show when={props.property.const}>
-      <span>const: {props.property.const?.toString()}</span>
-    </Show>
-    <Show when={props.property.default !== undefined}>
-      <span>default: {JSON.stringify(props.property.default)}</span>
-    </Show>
-    <Show when={props.property.knownValues}>
-      <span>knownValues: [{props.property.knownValues!.join(", ")}]</span>
-    </Show>
-    <Show when={props.property.closed}>
-      <span>closed: true</span>
-    </Show>
-  </div>
-);
+const ConstraintsList = (props: { property: LexiconProperty }) => {
+  const valueClass = "text-neutral-600 dark:text-neutral-400";
+  return (
+    <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+      <Show when={props.property.minLength !== undefined}>
+        <span>
+          minLength: <span class={valueClass}>{props.property.minLength}</span>
+        </span>
+      </Show>
+      <Show when={props.property.maxLength !== undefined}>
+        <span>
+          maxLength: <span class={valueClass}>{props.property.maxLength}</span>
+        </span>
+      </Show>
+      <Show when={props.property.maxGraphemes !== undefined}>
+        <span>
+          maxGraphemes: <span class={valueClass}>{props.property.maxGraphemes}</span>
+        </span>
+      </Show>
+      <Show when={props.property.minGraphemes !== undefined}>
+        <span>
+          minGraphemes: <span class={valueClass}>{props.property.minGraphemes}</span>
+        </span>
+      </Show>
+      <Show when={props.property.minimum !== undefined}>
+        <span>
+          min: <span class={valueClass}>{props.property.minimum}</span>
+        </span>
+      </Show>
+      <Show when={props.property.maximum !== undefined}>
+        <span>
+          max: <span class={valueClass}>{props.property.maximum}</span>
+        </span>
+      </Show>
+      <Show when={props.property.maxSize !== undefined}>
+        <span>
+          maxSize: <span class={valueClass}>{props.property.maxSize}</span>
+        </span>
+      </Show>
+      <Show when={props.property.accept}>
+        <span>
+          accept: <span class={valueClass}>[{props.property.accept!.join(", ")}]</span>
+        </span>
+      </Show>
+      <Show when={props.property.enum}>
+        <span>
+          enum: <span class={valueClass}>[{props.property.enum!.join(", ")}]</span>
+        </span>
+      </Show>
+      <Show when={props.property.const}>
+        <span>
+          const: <span class={valueClass}>{props.property.const?.toString()}</span>
+        </span>
+      </Show>
+      <Show when={props.property.default !== undefined}>
+        <span>
+          default: <span class={valueClass}>{JSON.stringify(props.property.default)}</span>
+        </span>
+      </Show>
+      <Show when={props.property.knownValues}>
+        <span>
+          knownValues: <span class={valueClass}>[{props.property.knownValues!.join(", ")}]</span>
+        </span>
+      </Show>
+      <Show when={props.property.closed}>
+        <span>
+          closed: <span class={valueClass}>true</span>
+        </span>
+      </Show>
+    </div>
+  );
+};
 
 const PropertyRow = (props: {
   name: string;
@@ -217,8 +244,8 @@ const PropertyRow = (props: {
   return (
     <div class="flex flex-col gap-2 py-3">
       <Show when={!props.hideNameType}>
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="font-mono text-sm font-semibold">{props.name}</span>
+        <div class="flex flex-wrap items-baseline gap-2">
+          <span class="font-semibold">{props.name}</span>
           <Show when={!props.property.refs}>
             <TypeBadge
               type={props.property.type}
@@ -227,9 +254,7 @@ const PropertyRow = (props: {
             />
           </Show>
           <Show when={props.property.refs}>
-            <span class="inline-block rounded bg-blue-100 px-1.5 py-0.5 font-mono text-xs text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-              union
-            </span>
+            <span class="font-mono text-xs text-neutral-600 dark:text-neutral-400">union</span>
           </Show>
           <Show when={props.required}>
             <span class="text-xs font-semibold text-red-500 dark:text-red-400">required</span>
@@ -244,8 +269,8 @@ const PropertyRow = (props: {
       </Show>
       <Show when={props.property.items}>
         <div class="flex flex-col gap-2">
-          <div class="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
-            <span class="font-semibold">items:</span>
+          <div class="flex items-baseline gap-2 text-xs">
+            <span class="font-medium">items:</span>
             <Show when={!props.property.items!.refs}>
               <TypeBadge
                 type={props.property.items!.type}
@@ -254,9 +279,7 @@ const PropertyRow = (props: {
               />
             </Show>
             <Show when={props.property.items!.refs}>
-              <span class="inline-block rounded bg-blue-100 px-1.5 py-0.5 font-mono text-xs text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                union
-              </span>
+              <span class="font-mono text-xs text-neutral-600 dark:text-neutral-400">union</span>
             </Show>
           </div>
           <Show when={props.property.items!.refs}>
@@ -292,7 +315,7 @@ const NsidLink = (props: { nsid: string }) => {
     <button
       type="button"
       onClick={handleClick}
-      class="cursor-pointer rounded bg-blue-100 px-1.5 py-0.5 font-mono text-xs text-blue-800 hover:bg-blue-200 hover:underline active:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 dark:active:bg-blue-900/50"
+      class="cursor-pointer font-mono text-xs text-blue-500 hover:underline dark:text-blue-400"
     >
       {props.nsid}
     </button>
@@ -314,7 +337,7 @@ const PermissionRow = (props: { permission: LexiconPermission; index: number }) 
   return (
     <div class="flex flex-col gap-2 py-3">
       <div class="flex flex-wrap items-center gap-2">
-        <span class="font-mono text-sm font-semibold">#{props.index + 1}</span>
+        <span class="font-semibold">#{props.index + 1}</span>
         <span
           class={`rounded px-1.5 py-0.5 font-mono text-xs font-semibold ${resourceColor(props.permission.resource)}`}
         >
@@ -328,7 +351,7 @@ const PermissionRow = (props: { permission: LexiconPermission; index: number }) 
           <span class="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
             Collections:
           </span>
-          <div class="flex flex-wrap gap-1">
+          <div class="flex flex-col items-start gap-1">
             <For each={props.permission.collection}>{(col) => <NsidLink nsid={col} />}</For>
           </div>
         </div>
@@ -356,7 +379,7 @@ const PermissionRow = (props: { permission: LexiconPermission; index: number }) 
           <span class="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
             Lexicon Methods:
           </span>
-          <div class="flex flex-wrap gap-1">
+          <div class="flex flex-col items-start gap-1">
             <For each={props.permission.lxm}>{(method) => <NsidLink nsid={method} />}</For>
           </div>
         </div>
@@ -681,7 +704,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
             <For each={props.def.errors}>
               {(error) => (
                 <div class="flex flex-col gap-1 py-2">
-                  <div class="font-mono text-sm font-semibold">{error.name}</div>
+                  <div class="font-semibold">{error.name}</div>
                   <Show when={error.description}>
                     <p class="text-sm text-neutral-700 dark:text-neutral-300">
                       {error.description}
@@ -738,7 +761,7 @@ export const LexiconSchemaView = (props: { schema: LexiconSchema }) => {
         <div class="flex gap-4 text-sm text-neutral-600 dark:text-neutral-400">
           <span>
             <span class="font-semibold">Lexicon version: </span>
-            <span class="font-mono">{props.schema.lexicon}</span>
+            <span>{props.schema.lexicon}</span>
           </span>
         </div>
         <Show when={props.schema.description}>
