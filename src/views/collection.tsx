@@ -49,7 +49,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
   let previewRef!: HTMLSpanElement;
 
   createEffect(() => {
-    if (hover()) setPreviewHeight(previewRef.offsetHeight);
+    if (hover() && previewRef) setPreviewHeight(previewRef.offsetHeight);
   });
 
   const isOverflowing = (previewHeight: number) =>

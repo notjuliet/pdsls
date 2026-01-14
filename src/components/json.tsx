@@ -15,6 +15,7 @@ import { formatFileSize } from "../utils/format";
 import { hideMedia } from "../views/settings";
 import { pds } from "./navbar";
 import { addNotification, removeNotification } from "./notification";
+import RecordHoverCard from "./record-hover-card";
 import VideoPlayer from "./video-player";
 
 interface JSONContext {
@@ -81,13 +82,7 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
         {(part) => (
           <>
             {isResourceUri(part) ?
-              <A
-                class="text-blue-500 hover:underline active:underline dark:text-blue-400"
-                href={`/${part}`}
-                target={ctx.newTab ? "_blank" : "_self"}
-              >
-                {part}
-              </A>
+              <RecordHoverCard uri={part} newTab={ctx.newTab} />
             : isDid(part) ?
               <A
                 class="text-blue-500 hover:underline active:underline dark:text-blue-400"
