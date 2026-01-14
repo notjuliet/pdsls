@@ -5,7 +5,16 @@ import { Did } from "@atcute/lexicons";
 import { fromStream, isCommit } from "@atcute/repo";
 import * as TID from "@atcute/tid";
 import { Title } from "@solidjs/meta";
-import { createEffect, createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  For,
+  Match,
+  Show,
+  Switch,
+  untrack,
+} from "solid-js";
 import { Button } from "../../components/button.jsx";
 import { Favicon } from "../../components/favicon.jsx";
 import { JSONValue } from "../../components/json.jsx";
@@ -13,6 +22,7 @@ import { TextInput } from "../../components/text-input.jsx";
 import { isTouchDevice } from "../../layout.jsx";
 import { didDocCache, resolveDidDoc } from "../../utils/api.js";
 import { localDateFromTimestamp } from "../../utils/date.js";
+import { createDebouncedValue } from "../../utils/hooks/debounced.js";
 import { createDropHandler, createFileChangeHandler, handleDragOver } from "./file-handlers.js";
 import {
   type Archive,
@@ -424,6 +434,7 @@ const CollectionSubview = (props: {
   onRoute: (view: View) => void;
 }) => {
   const [filter, setFilter] = createSignal("");
+  const debouncedFilter = createDebouncedValue(filter, 150);
   const [displayCount, setDisplayCount] = createSignal(RECORDS_PER_PAGE);
 
   // Sort entries by TID timestamp (most recent first), non-TID entries go to the end
@@ -441,12 +452,24 @@ const CollectionSubview = (props: {
     });
   });
 
+  const searchableEntries = createMemo(() => {
+    return sortedEntries().map((entry) => ({
+      entry,
+      searchText: JSON.stringify(entry.record).toLowerCase(),
+    }));
+  });
+
   const filteredEntries = createMemo(() => {
-    const f = filter().toLowerCase().trim();
+    const f = debouncedFilter().toLowerCase().trim();
     if (!f) return sortedEntries();
-    return sortedEntries().filter((entry) =>
-      JSON.stringify(entry.record).toLowerCase().includes(f),
-    );
+    return searchableEntries()
+      .filter(({ searchText }) => searchText.includes(f))
+      .map(({ entry }) => entry);
+  });
+
+  createEffect(() => {
+    debouncedFilter();
+    untrack(() => setDisplayCount(RECORDS_PER_PAGE));
   });
 
   const displayedEntries = createMemo(() => {
@@ -475,10 +498,7 @@ const CollectionSubview = (props: {
         <TextInput
           placeholder="Filter records"
           value={filter()}
-          onInput={(e) => {
-            setFilter(e.currentTarget.value);
-            setDisplayCount(RECORDS_PER_PAGE);
-          }}
+          onInput={(e) => setFilter(e.currentTarget.value)}
           class="grow text-sm"
         />
 
