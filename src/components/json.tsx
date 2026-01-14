@@ -23,6 +23,7 @@ interface JSONContext {
   truncate?: boolean;
   parentIsBlob?: boolean;
   newTab?: boolean;
+  hideBlobs?: boolean;
 }
 
 const JSONCtx = createContext<JSONContext>();
@@ -260,7 +261,9 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
 
   const blob: AtBlob = props.data as any;
   const canShowMedia = () =>
-    pds() && params.rkey && (blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4");
+    pds() &&
+    !ctx.hideBlobs &&
+    (blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4");
 
   const MediaDisplay = () => (
     <div>
@@ -347,9 +350,17 @@ export const JSONValue = (props: {
   repo: string;
   truncate?: boolean;
   newTab?: boolean;
+  hideBlobs?: boolean;
 }) => {
   return (
-    <JSONCtx.Provider value={{ repo: props.repo, truncate: props.truncate, newTab: props.newTab }}>
+    <JSONCtx.Provider
+      value={{
+        repo: props.repo,
+        truncate: props.truncate,
+        newTab: props.newTab,
+        hideBlobs: props.hideBlobs,
+      }}
+    >
       <JSONValueInner data={props.data} />
     </JSONCtx.Provider>
   );

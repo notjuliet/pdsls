@@ -402,7 +402,7 @@ const StreamView = () => {
           <For each={records().toReversed()}>
             {(rec) => (
               <div class="pb-2">
-                <JSONValue data={rec} repo={rec.did ?? rec.repo} />
+                <JSONValue data={rec} repo={rec.did ?? rec.repo} hideBlobs />
               </div>
             )}
           </For>

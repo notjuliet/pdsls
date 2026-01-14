@@ -146,6 +146,7 @@ const RecordHoverCard = (props: RecordHoverCardProps) => {
                 repo={parsed()?.repo || ""}
                 truncate
                 newTab
+                hideBlobs
               />
             </div>
           </Show>

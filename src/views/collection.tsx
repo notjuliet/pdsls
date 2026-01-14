@@ -82,6 +82,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
             data={props.record.record.value as JSONType}
             repo={props.record.record.uri.split("/")[2]}
             truncate
+            hideBlobs
           />
         </span>
       </Show>

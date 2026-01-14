@@ -556,7 +556,7 @@ const CollectionSubview = (props: {
                     ref={previewRef}
                     class={`dark:bg-dark-300 dark:shadow-dark-700 pointer-events-none absolute left-[50%] z-25 block max-h-80 w-max max-w-sm -translate-x-1/2 overflow-hidden rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-xs whitespace-pre-wrap shadow-md sm:max-h-112 lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
                   >
-                    <JSONValue data={entry.record} repo={props.archive.did} truncate />
+                    <JSONValue data={entry.record} repo={props.archive.did} truncate hideBlobs />
                   </span>
                 </Show>
               </button>
@@ -596,7 +596,7 @@ const RecordSubview = (props: {
         }
       >
         <div class="max-w-full min-w-full font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-max sm:max-w-screen sm:px-4 sm:text-sm md:max-w-3xl">
-          <JSONValue data={props.record.record} repo={props.archive.did || ""} newTab />
+          <JSONValue data={props.record.record} repo={props.archive.did || ""} newTab hideBlobs />
         </div>
       </Show>
     </div>
