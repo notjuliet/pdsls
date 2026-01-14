@@ -760,7 +760,7 @@ export const LexiconSchemaView = (props: { schema: LexiconSchema }) => {
         <h2 class="text-lg font-semibold">{props.schema.id}</h2>
         <div class="flex gap-4 text-sm text-neutral-600 dark:text-neutral-400">
           <span>
-            <span class="font-semibold">Lexicon version: </span>
+            <span class="font-medium">Lexicon version: </span>
             <span>{props.schema.lexicon}</span>
           </span>
         </div>

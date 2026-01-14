@@ -9,8 +9,8 @@
     "serve": "vite preview"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.82",
-    "@iconify/tailwind4": "^1.2.0",
+    "@iconify-json/lucide": "^1.2.85",
+    "@iconify/tailwind4": "^1.2.1",
     "@tailwindcss/vite": "^4.1.18",
     "prettier": "^3.7.4",
     "prettier-plugin-organize-imports": "^4.3.0",
@@ -43,8 +43,8 @@
     "@codemirror/commands": "^6.10.1",
     "@codemirror/lang-json": "^6.0.2",
     "@codemirror/lint": "^6.9.2",
-    "@codemirror/state": "^6.5.3",
-    "@codemirror/view": "^6.39.9",
+    "@codemirror/state": "^6.5.4",
+    "@codemirror/view": "^6.39.11",
     "@fsegurai/codemirror-theme-basic-dark": "^6.2.3",
     "@fsegurai/codemirror-theme-basic-light": "^6.2.3",
     "@mary/exif-rm": "jsr:^0.2.2",
