@@ -15,6 +15,8 @@ interface HoverCardProps {
   trigger?: JSX.Element;
   /** Additional classes for the wrapper span */
   class?: string;
+  /** Additional classes for the link/label */
+  labelClass?: string;
   /** Additional classes for the preview container */
   previewClass?: string;
   /** Preview content */
@@ -63,7 +65,7 @@ const HoverCard = (props: HoverCardProps) => {
     >
       {props.trigger ?? (
         <A
-          class="text-blue-500 hover:underline active:underline dark:text-blue-400"
+          class={`text-blue-500 hover:underline active:underline dark:text-blue-400 ${props.labelClass || ""}`}
           href={props.href!}
           target={props.newTab ? "_blank" : "_self"}
         >

@@ -8,6 +8,8 @@ import HoverCard from "./base";
 interface RecordHoverCardProps {
   uri: string;
   newTab?: boolean;
+  class?: string;
+  labelClass?: string;
 }
 
 const recordCache = new Map<string, { value: unknown; loading: boolean; error?: string }>();
@@ -83,6 +85,8 @@ const RecordHoverCard = (props: RecordHoverCardProps) => {
       label={props.uri}
       newTab={props.newTab}
       onHover={handlePrefetch}
+      class={props.class}
+      labelClass={props.labelClass}
       previewClass="max-h-80 w-max max-w-sm text-xs whitespace-pre-wrap sm:max-h-112 lg:max-w-lg"
     >
       <Show when={record()?.loading}>

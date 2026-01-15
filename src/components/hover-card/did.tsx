@@ -6,6 +6,8 @@ import HoverCard from "./base";
 interface DidHoverCardProps {
   did: string;
   newTab?: boolean;
+  class?: string;
+  labelClass?: string;
 }
 
 interface DidInfo {
@@ -63,6 +65,8 @@ const DidHoverCard = (props: DidHoverCardProps) => {
       label={props.did}
       newTab={props.newTab}
       onHover={handlePrefetch}
+      class={props.class}
+      labelClass={props.labelClass}
       previewClass="w-max max-w-xs font-sans text-sm"
     >
       <Show when={didInfo()?.loading}>

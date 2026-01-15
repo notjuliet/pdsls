@@ -3,9 +3,11 @@ import { Client, simpleFetchHandler } from "@atcute/client";
 import { isAtprotoDid } from "@atcute/identity";
 import { Handle } from "@atcute/lexicons";
 import { Title } from "@solidjs/meta";
-import { A, useSearchParams } from "@solidjs/router";
+import { useSearchParams } from "@solidjs/router";
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { Button } from "../components/button.jsx";
+import DidHoverCard from "../components/hover-card/did.jsx";
+import RecordHoverCard from "../components/hover-card/record.jsx";
 import { StickyOverlay } from "../components/sticky.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import { labelerCache, resolveHandle, resolvePDS } from "../utils/api.js";
@@ -39,12 +41,12 @@ const LabelCard = (props: { label: ComAtprotoLabelDefs.Label }) => {
         </div>
       </div>
 
-      <A
-        href={`/at://${label.uri.replace("at://", "")}`}
-        class="text-sm break-all text-blue-500 hover:underline dark:text-blue-400"
+      <Show
+        when={label.uri.startsWith("at://")}
+        fallback={<DidHoverCard did={label.uri} labelClass="block text-sm break-all" />}
       >
-        {label.uri}
-      </A>
+        <RecordHoverCard uri={label.uri} labelClass="block text-sm break-all" />
+      </Show>
 
       <Show when={label.cid}>
         <div class="font-mono text-xs break-all text-neutral-700 dark:text-neutral-300">

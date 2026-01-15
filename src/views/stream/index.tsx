@@ -398,7 +398,7 @@ const StreamView = () => {
         <Show when={notice().length}>
           <div class="text-red-500 dark:text-red-400">{notice()}</div>
         </Show>
-        <div class="flex w-full flex-col gap-2 divide-y-[0.5px] divide-neutral-500 font-mono text-sm wrap-anywhere whitespace-pre-wrap md:w-3xl">
+        <div class="flex w-full flex-col gap-2 divide-y-[0.5px] divide-neutral-500 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:text-sm md:w-3xl">
           <For each={records().toReversed()}>
             {(rec) => (
               <div class="pb-2">
