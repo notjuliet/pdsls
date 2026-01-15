@@ -283,7 +283,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
           <Show when={mediaLoaded()}>
             <button
               onclick={() => setHide(true)}
-              class="absolute top-1 right-1 flex items-center rounded-lg bg-neutral-900/70 p-1.5 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover/media:opacity-100 hover:bg-neutral-900/80 active:bg-neutral-900/90 dark:bg-neutral-100/70 dark:text-neutral-900 dark:hover:bg-neutral-100/80 dark:active:bg-neutral-100/90"
+              class="absolute top-1 right-1 flex items-center rounded-lg bg-neutral-700/70 p-1.5 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover/media:opacity-100 hover:bg-neutral-700 active:bg-neutral-800 dark:bg-neutral-100/70 dark:text-neutral-900 dark:hover:bg-neutral-100 dark:active:bg-neutral-200"
             >
               <span class="iconify lucide--eye-off text-base"></span>
             </button>
