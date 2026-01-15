@@ -8,6 +8,8 @@ interface DidHoverCardProps {
   newTab?: boolean;
   class?: string;
   labelClass?: string;
+  trigger?: any;
+  hoverDelay?: number;
 }
 
 interface DidInfo {
@@ -65,6 +67,8 @@ const DidHoverCard = (props: DidHoverCardProps) => {
       label={props.did}
       newTab={props.newTab}
       onHover={handlePrefetch}
+      hoverDelay={props.hoverDelay}
+      trigger={props.trigger}
       class={props.class}
       labelClass={props.labelClass}
       previewClass="w-max max-w-xs font-sans text-sm"

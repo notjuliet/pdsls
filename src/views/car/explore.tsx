@@ -544,7 +544,6 @@ const CollectionSubview = (props: {
                     </Show>
                   </button>
                 }
-                previewClass="max-h-80 w-max max-w-sm text-xs whitespace-pre-wrap sm:max-h-112 lg:max-w-lg"
               >
                 <JSONValue data={entry.record} repo={props.archive.did} truncate hideBlobs />
               </HoverCard>

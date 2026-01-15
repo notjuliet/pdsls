@@ -4,6 +4,8 @@ import { getAllBacklinks, getRecordBacklinks, LinksWithRecords } from "../utils/
 import { localDateFromTimestamp } from "../utils/date.js";
 import { Button } from "./button.jsx";
 import { Favicon } from "./favicon.jsx";
+import DidHoverCard from "./hover-card/did.jsx";
+import RecordHoverCard from "./hover-card/record.jsx";
 
 type BacklinksProps = {
   target: string;
@@ -49,19 +51,38 @@ const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
         {({ did, collection, rkey }) => {
           const timestamp =
             TID.validate(rkey) ? localDateFromTimestamp(TID.parse(rkey).timestamp / 1000) : null;
+          const uri = `at://${did}/${collection}/${rkey}`;
           return (
-            <a
-              href={`/at://${did}/${collection}/${rkey}`}
-              class="grid grid-cols-[auto_1fr_auto] items-center gap-x-1 px-2 py-1.5 font-mono text-xs select-none hover:bg-neutral-200/50 active:bg-neutral-200/50 sm:gap-x-3 sm:px-3 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700/50"
-            >
-              <span class="text-blue-500 dark:text-blue-400">{rkey}</span>
-              <span class="truncate text-neutral-700 dark:text-neutral-300" title={did}>
-                {did}
-              </span>
-              <span class="text-neutral-500 tabular-nums dark:text-neutral-400">
-                {timestamp ?? ""}
-              </span>
-            </a>
+            <RecordHoverCard
+              uri={uri}
+              hoverDelay={300}
+              class="block"
+              trigger={
+                <a
+                  href={`/${uri}`}
+                  class="grid grid-cols-[auto_1fr_auto] items-center gap-x-1 px-2 py-1.5 font-mono text-xs select-none hover:bg-neutral-200/50 sm:gap-x-3 sm:px-3 dark:hover:bg-neutral-700/50"
+                >
+                  <span class="text-blue-500 dark:text-blue-400">{rkey}</span>
+                  <DidHoverCard
+                    did={did}
+                    hoverDelay={300}
+                    class="min-w-0"
+                    trigger={
+                      <a
+                        href={`/at://${did}`}
+                        class="block truncate text-neutral-700 hover:underline dark:text-neutral-300"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {did}
+                      </a>
+                    }
+                  />
+                  <span class="text-neutral-500 tabular-nums dark:text-neutral-400">
+                    {timestamp ?? ""}
+                  </span>
+                </a>
+              }
+            />
           );
         }}
       </For>

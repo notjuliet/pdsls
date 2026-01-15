@@ -10,6 +10,8 @@ interface RecordHoverCardProps {
   newTab?: boolean;
   class?: string;
   labelClass?: string;
+  trigger?: any;
+  hoverDelay?: number;
 }
 
 const recordCache = new Map<string, { value: unknown; loading: boolean; error?: string }>();
@@ -85,9 +87,10 @@ const RecordHoverCard = (props: RecordHoverCardProps) => {
       label={props.uri}
       newTab={props.newTab}
       onHover={handlePrefetch}
+      hoverDelay={props.hoverDelay}
+      trigger={props.trigger}
       class={props.class}
       labelClass={props.labelClass}
-      previewClass="max-h-80 w-max max-w-sm text-xs whitespace-pre-wrap sm:max-h-112 lg:max-w-lg"
     >
       <Show when={record()?.loading}>
         <div class="flex items-center gap-2 font-sans text-sm text-neutral-500 dark:text-neutral-400">
