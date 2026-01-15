@@ -55,7 +55,6 @@ const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
           return (
             <RecordHoverCard
               uri={uri}
-              hoverDelay={300}
               class="block"
               trigger={
                 <a
@@ -65,7 +64,6 @@ const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
                   <span class="text-blue-500 dark:text-blue-400">{rkey}</span>
                   <DidHoverCard
                     did={did}
-                    hoverDelay={300}
                     class="min-w-0"
                     trigger={
                       <a

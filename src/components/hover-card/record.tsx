@@ -87,7 +87,7 @@ const RecordHoverCard = (props: RecordHoverCardProps) => {
       label={props.uri}
       newTab={props.newTab}
       onHover={handlePrefetch}
-      hoverDelay={props.hoverDelay}
+      hoverDelay={props.hoverDelay ?? 300}
       trigger={props.trigger}
       class={props.class}
       labelClass={props.labelClass}
