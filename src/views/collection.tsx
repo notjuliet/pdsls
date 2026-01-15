@@ -4,26 +4,18 @@ import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
 import { Title } from "@solidjs/meta";
 import { A, useBeforeLeave, useParams, useSearchParams } from "@solidjs/router";
-import {
-  createEffect,
-  createMemo,
-  createResource,
-  createSignal,
-  For,
-  onMount,
-  Show,
-} from "solid-js";
+import { createMemo, createResource, createSignal, For, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { hasUserScope } from "../auth/scope-utils";
 import { agent } from "../auth/state";
 import { Button } from "../components/button.jsx";
+import HoverCard from "../components/hover-card/base";
 import { JSONType, JSONValue } from "../components/json.jsx";
 import { Modal } from "../components/modal.jsx";
 import { addNotification, removeNotification } from "../components/notification.jsx";
 import { StickyOverlay } from "../components/sticky.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
-import { isTouchDevice } from "../layout.jsx";
 import { resolvePDS } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import {
@@ -43,50 +35,31 @@ interface AtprotoRecord {
 const DEFAULT_LIMIT = 100;
 
 const RecordLink = (props: { record: AtprotoRecord }) => {
-  const [hover, setHover] = createSignal(false);
-  const [previewHeight, setPreviewHeight] = createSignal(0);
-  let rkeyRef!: HTMLSpanElement;
-  let previewRef!: HTMLSpanElement;
-
-  createEffect(() => {
-    if (hover() && previewRef) setPreviewHeight(previewRef.offsetHeight);
-  });
-
-  const isOverflowing = (previewHeight: number) =>
-    rkeyRef.offsetTop - window.scrollY + previewHeight + 32 > window.innerHeight;
-
   return (
-    <span
-      class="relative flex w-full min-w-0 items-baseline rounded px-1 py-0.5"
-      ref={rkeyRef}
-      onmouseover={() => !isTouchDevice && setHover(true)}
-      onmouseleave={() => !isTouchDevice && setHover(false)}
-    >
-      <span class="flex items-baseline truncate">
-        <span class="shrink-0 text-sm text-blue-500 dark:text-blue-400">{props.record.rkey}</span>
-        <span class="ml-1 truncate text-xs text-neutral-500 dark:text-neutral-400" dir="rtl">
-          {props.record.cid}
-        </span>
-        <Show when={props.record.timestamp && props.record.timestamp <= Date.now()}>
-          <span class="ml-1 shrink-0 text-xs">
-            {localDateFromTimestamp(props.record.timestamp!)}
+    <HoverCard
+      class="flex w-full min-w-0 items-baseline rounded px-1 py-0.5"
+      trigger={
+        <>
+          <span class="shrink-0 text-sm text-blue-500 dark:text-blue-400">{props.record.rkey}</span>
+          <span class="ml-1 truncate text-xs text-neutral-500 dark:text-neutral-400" dir="rtl">
+            {props.record.cid}
           </span>
-        </Show>
-      </span>
-      <Show when={hover()}>
-        <span
-          ref={previewRef}
-          class={`dark:bg-dark-300 dark:shadow-dark-700 pointer-events-none absolute left-[50%] z-25 block max-h-80 w-max max-w-sm -translate-x-1/2 overflow-hidden rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-xs whitespace-pre-wrap shadow-md sm:max-h-112 lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
-        >
-          <JSONValue
-            data={props.record.record.value as JSONType}
-            repo={props.record.record.uri.split("/")[2]}
-            truncate
-            hideBlobs
-          />
-        </span>
-      </Show>
-    </span>
+          <Show when={props.record.timestamp && props.record.timestamp <= Date.now()}>
+            <span class="ml-1 shrink-0 text-xs">
+              {localDateFromTimestamp(props.record.timestamp!)}
+            </span>
+          </Show>
+        </>
+      }
+      previewClass="max-h-80 w-max max-w-sm text-xs whitespace-pre-wrap sm:max-h-112 lg:max-w-lg"
+    >
+      <JSONValue
+        data={props.record.record.value as JSONType}
+        repo={props.record.record.uri.split("/")[2]}
+        truncate
+        hideBlobs
+      />
+    </HoverCard>
   );
 };
 

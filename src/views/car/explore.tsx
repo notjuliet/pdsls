@@ -17,9 +17,9 @@ import {
 } from "solid-js";
 import { Button } from "../../components/button.jsx";
 import { Favicon } from "../../components/favicon.jsx";
+import HoverCard from "../../components/hover-card/base";
 import { JSONValue } from "../../components/json.jsx";
 import { TextInput } from "../../components/text-input.jsx";
-import { isTouchDevice } from "../../layout.jsx";
 import { didDocCache, resolveDidDoc } from "../../utils/api.js";
 import { localDateFromTimestamp } from "../../utils/date.js";
 import { createDebouncedValue } from "../../utils/hooks/debounced.js";
@@ -516,50 +516,38 @@ const CollectionSubview = (props: {
           {(entry) => {
             const isTid = TID.validate(entry.key);
             const timestamp = isTid ? TID.parse(entry.key).timestamp / 1_000 : null;
-            const [hover, setHover] = createSignal(false);
-            const [previewHeight, setPreviewHeight] = createSignal(0);
-            let rkeyRef!: HTMLButtonElement;
-            let previewRef!: HTMLSpanElement;
-
-            createEffect(() => {
-              if (hover() && previewRef) setPreviewHeight(previewRef.offsetHeight);
-            });
-
-            const isOverflowing = (previewHeight: number) =>
-              rkeyRef.offsetTop - window.scrollY + previewHeight + 32 > window.innerHeight;
 
             return (
-              <button
-                onClick={() => {
-                  props.onRoute({
-                    type: "record",
-                    collection: props.collection,
-                    record: entry,
-                  });
-                }}
-                ref={rkeyRef}
-                onmouseover={() => !isTouchDevice && setHover(true)}
-                onmouseleave={() => !isTouchDevice && setHover(false)}
-                class="relative flex w-full items-baseline gap-1 rounded px-1 py-0.5 text-left hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-              >
-                <span class="shrink-0 text-sm text-blue-500 dark:text-blue-400">{entry.key}</span>
-                <span class="truncate text-xs text-neutral-500 dark:text-neutral-400" dir="rtl">
-                  {entry.cid}
-                </span>
-                <Show when={timestamp}>
-                  {(ts) => (
-                    <span class="ml-auto shrink-0 text-xs">{localDateFromTimestamp(ts())}</span>
-                  )}
-                </Show>
-                <Show when={hover()}>
-                  <span
-                    ref={previewRef}
-                    class={`dark:bg-dark-300 dark:shadow-dark-700 pointer-events-none absolute left-[50%] z-25 block max-h-80 w-max max-w-sm -translate-x-1/2 overflow-hidden rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-xs whitespace-pre-wrap shadow-md sm:max-h-112 lg:max-w-lg dark:border-neutral-700 ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
+              <HoverCard
+                class="flex w-full items-baseline gap-1 rounded px-1 py-0.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                trigger={
+                  <button
+                    onClick={() => {
+                      props.onRoute({
+                        type: "record",
+                        collection: props.collection,
+                        record: entry,
+                      });
+                    }}
+                    class="flex w-full items-baseline gap-1 text-left"
                   >
-                    <JSONValue data={entry.record} repo={props.archive.did} truncate hideBlobs />
-                  </span>
-                </Show>
-              </button>
+                    <span class="shrink-0 text-sm text-blue-500 dark:text-blue-400">
+                      {entry.key}
+                    </span>
+                    <span class="truncate text-xs text-neutral-500 dark:text-neutral-400" dir="rtl">
+                      {entry.cid}
+                    </span>
+                    <Show when={timestamp}>
+                      {(ts) => (
+                        <span class="ml-auto shrink-0 text-xs">{localDateFromTimestamp(ts())}</span>
+                      )}
+                    </Show>
+                  </button>
+                }
+                previewClass="max-h-80 w-max max-w-sm text-xs whitespace-pre-wrap sm:max-h-112 lg:max-w-lg"
+              >
+                <JSONValue data={entry.record} repo={props.archive.did} truncate hideBlobs />
+              </HoverCard>
             );
           }}
         </For>
