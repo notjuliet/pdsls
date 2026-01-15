@@ -10,7 +10,6 @@ import DidHoverCard from "../components/hover-card/did";
 import { Modal } from "../components/modal";
 import { setPDS } from "../components/navbar";
 import Tooltip from "../components/tooltip";
-import { resolveDidDoc } from "../utils/api";
 import { localDateFromTimestamp } from "../utils/date";
 
 const LIMIT = 1000;
@@ -56,15 +55,6 @@ const PdsView = () => {
 
   const RepoCard = (repo: ComAtprotoSyncListRepos.Repo) => {
     const [openInfo, setOpenInfo] = createSignal(false);
-    const [handle, setHandle] = createSignal<string>();
-
-    const fetchHandle = async () => {
-      try {
-        const doc = await resolveDidDoc(repo.did);
-        const aka = doc.alsoKnownAs?.find((a) => a.startsWith("at://"));
-        if (aka) setHandle(aka.replace("at://", ""));
-      } catch {}
-    };
 
     return (
       <div class="flex items-center gap-0.5">
@@ -86,10 +76,7 @@ const PdsView = () => {
           </Tooltip>
         </Show>
         <button
-          onclick={() => {
-            setOpenInfo(true);
-            if (!handle()) fetchHandle();
-          }}
+          onclick={() => setOpenInfo(true)}
           class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
         >
           <span class="iconify lucide--info text-neutral-600 dark:text-neutral-400"></span>
@@ -106,8 +93,6 @@ const PdsView = () => {
               </button>
             </div>
             <div class="grid grid-cols-[auto_1fr] items-baseline gap-x-1 gap-y-0.5 text-sm">
-              <span class="font-medium">Handle:</span>
-              <span class="text-neutral-700 dark:text-neutral-300">{handle()}</span>
               <span class="font-medium">Head:</span>
               <span class="wrap-anywhere text-neutral-700 dark:text-neutral-300">{repo.head}</span>
 
