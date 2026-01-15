@@ -18,7 +18,7 @@ export const Home = () => {
               target="_blank"
               class="group grid grid-cols-[auto_1fr] items-center gap-x-2.5 gap-y-0.5 hover:text-blue-500 dark:hover:text-blue-400"
             >
-              <div class="iconify lucide--search" />
+              <div class="iconify lucide--at-sign" />
               <span class="underline decoration-transparent group-hover:decoration-current">
                 Browse the public data on atproto
               </span>
@@ -32,7 +32,7 @@ export const Home = () => {
               target="_blank"
               class="group grid grid-cols-[auto_1fr] items-center gap-x-2.5 gap-y-0.5 hover:text-blue-500 dark:hover:text-blue-400"
             >
-              <div class="iconify lucide--link" />
+              <div class="iconify lucide--sparkle" />
               <span class="underline decoration-transparent group-hover:decoration-current">
                 Backlinks support with constellation
               </span>
