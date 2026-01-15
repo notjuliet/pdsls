@@ -12,17 +12,17 @@ importers:
         specifier: ^3.1.10
         version: 3.1.10
       '@atcute/bluesky':
-        specifier: ^3.2.14
-        version: 3.2.14
+        specifier: ^3.2.15
+        version: 3.2.15
       '@atcute/car':
-        specifier: ^5.0.0
-        version: 5.0.0
+        specifier: ^5.1.0
+        version: 5.1.0
       '@atcute/cbor':
-        specifier: ^2.2.8
-        version: 2.2.8
-      '@atcute/cid':
         specifier: ^2.3.0
         version: 2.3.0
+      '@atcute/cid':
+        specifier: ^2.4.0
+        version: 2.4.0
       '@atcute/client':
         specifier: ^4.2.1
         version: 4.2.1
@@ -39,8 +39,8 @@ importers:
         specifier: ^1.2.2
         version: 1.2.2(@atcute/identity@1.1.3)
       '@atcute/leaflet':
-        specifier: ^1.0.15
-        version: 1.0.15
+        specifier: ^1.0.16
+        version: 1.0.16
       '@atcute/lexicon-doc':
         specifier: ^2.0.6
         version: 2.0.6
@@ -60,8 +60,8 @@ importers:
         specifier: ^0.1.1
         version: 0.1.1
       '@atcute/tangled':
-        specifier: ^1.0.13
-        version: 1.0.13
+        specifier: ^1.0.14
+        version: 1.0.14
       '@atcute/tid':
         specifier: ^1.1.1
         version: 1.1.1
@@ -121,14 +121,14 @@ importers:
         specifier: ^4.1.18
         version: 4.1.18(vite@7.3.1(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))
       prettier:
-        specifier: ^3.7.4
-        version: 3.7.4
+        specifier: ^3.8.0
+        version: 3.8.0
       prettier-plugin-organize-imports:
         specifier: ^4.3.0
-        version: 4.3.0(prettier@3.7.4)(typescript@5.9.3)
+        version: 4.3.0(prettier@3.8.0)(typescript@5.9.3)
       prettier-plugin-tailwindcss:
         specifier: ^0.7.2
-        version: 0.7.2(prettier-plugin-organize-imports@4.3.0(prettier@3.7.4)(typescript@5.9.3))(prettier@3.7.4)
+        version: 0.7.2(prettier-plugin-organize-imports@4.3.0(prettier@3.8.0)(typescript@5.9.3))(prettier@3.8.0)
       tailwindcss:
         specifier: ^4.1.18
         version: 4.1.18
@@ -150,20 +150,20 @@ packages:
   '@atcute/atproto@3.1.10':
     resolution: {integrity: sha512-+GKZpOc0PJcdWMQEkTfg/rSNDAAHxmAUGBl60g2az15etqJn5WaUPNGFE2sB7hKpwi5Ue2h/L0OacINcE/JDDQ==}
 
-  '@atcute/bluesky@3.2.14':
-    resolution: {integrity: sha512-XlVuF55AYIyplmKvlGLlj+cUvk9ggxNRPczkTPIY991xJ4qDxDHpBJ39ekAV4dWcuBoRo2o9JynzpafPu2ljDA==}
+  '@atcute/bluesky@3.2.15':
+    resolution: {integrity: sha512-H4RW3WffjfdKvOZ9issEUQnuSR4KfuAwwJnYu0fclA9VDa99JTJ+pa8tTl9lFeBV9DINtWJAx7rdIbICoVCstQ==}
 
   '@atcute/car@3.1.3':
     resolution: {integrity: sha512-WJ13bAEt7TjDMVi09ubjLtvhdljbWInGm9Kfy7Y6NhrmiyC/aZYaA/zHX/bHI6xv1c/h3SQduWqxOr4ae49eqA==}
 
-  '@atcute/car@5.0.0':
-    resolution: {integrity: sha512-OIY2xTXv8lSpZsDSn/UYQtJSMvDw5Hi4Q+uyvmiqSM+fht08QRAEq/nxa5YFciPZ3nfDFnZ3//EgJw7QhkSXLQ==}
+  '@atcute/car@5.1.0':
+    resolution: {integrity: sha512-W9axHVrwIkZJaeN/VQ1LyyU3b95wHBjQnrREouxygvmvWd1lmjFvF8Si8b0AG0VkWJ6h7h6qhOeUATynBzBFIg==}
 
-  '@atcute/cbor@2.2.8':
-    resolution: {integrity: sha512-UzOAN9BuN6JCXgn0ryV8qZuRJUDrNqrbLd6EFM8jc6RYssjRyGRxNy6RZ1NU/07Hd8Tq/0pz8+nQiMu5Zai5uw==}
+  '@atcute/cbor@2.3.0':
+    resolution: {integrity: sha512-7G2AndkfYzIXMBOBqUPUWP6oIJJm77KY5nYzS4Mr5NNxnmnrBrXEQqp+seCE3X5TV8FUSWQK5YRTU87uPjafMQ==}
 
-  '@atcute/cid@2.3.0':
-    resolution: {integrity: sha512-1SRdkTuMs/l5arQ+7Ag0F7JAueZqtzYE0d2gmbkuzi8EPweNU1kYlQs0CE4dSd81YF8PMDTOQty0K2ATq9CW9g==}
+  '@atcute/cid@2.4.0':
+    resolution: {integrity: sha512-6+5u9MpUrgSRQ94z7vaIX4BYk8fYr2KXUBS+rrr2NhlPy8xam8nbTlmd3hvBbtpSwShbhRAE4tA5Ab7eYUp2Yw==}
 
   '@atcute/client@4.2.1':
     resolution: {integrity: sha512-ZBFM2pW075JtgGFu5g7HHZBecrClhlcNH8GVP9Zz1aViWR+cjjBsTpeE63rJs+FCOHFYlirUyo5L8SGZ4kMINw==}
@@ -182,8 +182,8 @@ packages:
   '@atcute/identity@1.1.3':
     resolution: {integrity: sha512-oIqPoI8TwWeQxvcLmFEZLdN2XdWcaLVtlm8pNk0E72As9HNzzD9pwKPrLr3rmTLRIoULPPFmq9iFNsTeCIU9ng==}
 
-  '@atcute/leaflet@1.0.15':
-    resolution: {integrity: sha512-soA4jGsY0UxTar8rhtfQNYFXPI+qoQGgjpeMKJaO8ZCBBMRoo4OU9gsFJpUm/BYSocOBvvWSq2GV9pYEgUehTw==}
+  '@atcute/leaflet@1.0.16':
+    resolution: {integrity: sha512-YS0+93C+bG2AlB1M5Cvf8v7GMnP/67l5G+RUQQltXydqugcAEW6ZgasXN/ZlsTJJl5tdWBTS4HsRYwdS576SkA==}
 
   '@atcute/lexicon-doc@2.0.6':
     resolution: {integrity: sha512-iDYJkuom+tIw3zIvU1ggCEVFfReXKfOUtIhpY2kEg2kQeSfMB75F+8k1QOpeAQBetyWYmjsHqBuSUX9oQS6L1Q==}
@@ -209,8 +209,8 @@ packages:
   '@atcute/repo@0.1.1':
     resolution: {integrity: sha512-P5aWjt3bvcquUkUmGPslF0naAfLGRHse5Qdz9/RJYrFuoH0iiEMyRnW6M+3ksOe20GPsMnbq71WbzzFkRFPBtg==}
 
-  '@atcute/tangled@1.0.13':
-    resolution: {integrity: sha512-K95jmjDXl/f1FFzOJkk07ibNbFsPmn64sdrMACxQmUibO9WcfSjzjZLPXuH6WHFnCNtIBG3x1FQ7ndQgLoZAmw==}
+  '@atcute/tangled@1.0.14':
+    resolution: {integrity: sha512-vOJuFUCI/dova2OL5kPFgMzYLFyzFNzxxLCvtPvukgcr7ZIm4qLGkNHdVg3Jk8c0bknULe0pJnaCKUTWA1VPdA==}
 
   '@atcute/tid@1.1.1':
     resolution: {integrity: sha512-djJ8UGhLkTU5V51yCnBEruMg35qETjWzWy5sJG/2gEOl2Gd7rQWHSaf+yrO6vMS5EFA38U2xOWE3EDUPzvc2ZQ==}
@@ -1381,8 +1381,8 @@ packages:
       prettier-plugin-svelte:
         optional: true
 
-  prettier@3.7.4:
-    resolution: {integrity: sha512-v6UNi1+3hSlVvv8fSaoUbggEM5VErKmmpGA7Pl3HF8V6uKY7rvClBOJlH6yNwQtfTueNkGVpOv/mtWL9L4bgRA==}
+  prettier@3.8.0:
+    resolution: {integrity: sha512-yEPsovQfpxYfgWNhCfECjG5AQaO+K3dp6XERmOepyPDVqcJm+bjyCVO3pmU+nAPe0N5dDvekfGezt/EIiRe1TA==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -1457,8 +1457,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  ufo@1.6.2:
-    resolution: {integrity: sha512-heMioaxBcG9+Znsda5Q8sQbWnLJSl98AFDXTO80wELWEzX3hordXsTdxrIfMQoO9IY1MEnoGoPjpoKpMj+Yx0Q==}
+  ufo@1.6.3:
+    resolution: {integrity: sha512-yDJTmhydvl5lJzBmy/hyOAA0d+aqCBuwl818haVdYCRrWV84o7YyeVm4QlVHStqNrrJSTb6jKuFAVqAFsr+K3Q==}
 
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
@@ -1558,33 +1558,33 @@ snapshots:
     dependencies:
       '@atcute/lexicons': 1.2.6
 
-  '@atcute/bluesky@3.2.14':
+  '@atcute/bluesky@3.2.15':
     dependencies:
       '@atcute/atproto': 3.1.10
       '@atcute/lexicons': 1.2.6
 
   '@atcute/car@3.1.3':
     dependencies:
-      '@atcute/cbor': 2.2.8
-      '@atcute/cid': 2.3.0
+      '@atcute/cbor': 2.3.0
+      '@atcute/cid': 2.4.0
       '@atcute/uint8array': 1.0.6
       '@atcute/varint': 1.0.3
       yocto-queue: 1.2.2
 
-  '@atcute/car@5.0.0':
+  '@atcute/car@5.1.0':
     dependencies:
-      '@atcute/cbor': 2.2.8
-      '@atcute/cid': 2.3.0
+      '@atcute/cbor': 2.3.0
+      '@atcute/cid': 2.4.0
       '@atcute/uint8array': 1.0.6
       '@atcute/varint': 1.0.3
 
-  '@atcute/cbor@2.2.8':
+  '@atcute/cbor@2.3.0':
     dependencies:
-      '@atcute/cid': 2.3.0
+      '@atcute/cid': 2.4.0
       '@atcute/multibase': 1.1.6
       '@atcute/uint8array': 1.0.6
 
-  '@atcute/cid@2.3.0':
+  '@atcute/cid@2.4.0':
     dependencies:
       '@atcute/multibase': 1.1.6
       '@atcute/uint8array': 1.0.6
@@ -1602,8 +1602,8 @@ snapshots:
 
   '@atcute/did-plc@0.3.1':
     dependencies:
-      '@atcute/cbor': 2.2.8
-      '@atcute/cid': 2.3.0
+      '@atcute/cbor': 2.3.0
+      '@atcute/cid': 2.4.0
       '@atcute/crypto': 2.3.0
       '@atcute/identity': 1.1.3
       '@atcute/lexicons': 1.2.6
@@ -1624,7 +1624,7 @@ snapshots:
       '@atcute/lexicons': 1.2.6
       '@badrap/valita': 0.4.6
 
-  '@atcute/leaflet@1.0.15':
+  '@atcute/leaflet@1.0.16':
     dependencies:
       '@atcute/atproto': 3.1.10
       '@atcute/lexicons': 1.2.6
@@ -1657,8 +1657,8 @@ snapshots:
 
   '@atcute/mst@0.1.1':
     dependencies:
-      '@atcute/cbor': 2.2.8
-      '@atcute/cid': 2.3.0
+      '@atcute/cbor': 2.3.0
+      '@atcute/cid': 2.4.0
       '@atcute/uint8array': 1.0.6
 
   '@atcute/multibase@1.1.6':
@@ -1678,15 +1678,15 @@ snapshots:
 
   '@atcute/repo@0.1.1':
     dependencies:
-      '@atcute/car': 5.0.0
-      '@atcute/cbor': 2.2.8
-      '@atcute/cid': 2.3.0
+      '@atcute/car': 5.1.0
+      '@atcute/cbor': 2.3.0
+      '@atcute/cid': 2.4.0
       '@atcute/crypto': 2.3.0
       '@atcute/lexicons': 1.2.6
       '@atcute/mst': 0.1.1
       '@atcute/uint8array': 1.0.6
 
-  '@atcute/tangled@1.0.13':
+  '@atcute/tangled@1.0.14':
     dependencies:
       '@atcute/atproto': 3.1.10
       '@atcute/lexicons': 1.2.6
@@ -2207,7 +2207,7 @@ snapshots:
   '@skyware/firehose@0.5.2':
     dependencies:
       '@atcute/car': 3.1.3
-      '@atcute/cbor': 2.2.8
+      '@atcute/cbor': 2.3.0
       nanoevents: 9.1.0
 
   '@solidjs/meta@0.29.4(solid-js@1.9.10)':
@@ -2598,7 +2598,7 @@ snapshots:
       acorn: 8.15.0
       pathe: 2.0.3
       pkg-types: 1.3.1
-      ufo: 1.6.2
+      ufo: 1.6.3
 
   modern-tar@0.7.3: {}
 
@@ -2649,18 +2649,18 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  prettier-plugin-organize-imports@4.3.0(prettier@3.7.4)(typescript@5.9.3):
+  prettier-plugin-organize-imports@4.3.0(prettier@3.8.0)(typescript@5.9.3):
     dependencies:
-      prettier: 3.7.4
+      prettier: 3.8.0
       typescript: 5.9.3
 
-  prettier-plugin-tailwindcss@0.7.2(prettier-plugin-organize-imports@4.3.0(prettier@3.7.4)(typescript@5.9.3))(prettier@3.7.4):
+  prettier-plugin-tailwindcss@0.7.2(prettier-plugin-organize-imports@4.3.0(prettier@3.8.0)(typescript@5.9.3))(prettier@3.8.0):
     dependencies:
-      prettier: 3.7.4
+      prettier: 3.8.0
     optionalDependencies:
-      prettier-plugin-organize-imports: 4.3.0(prettier@3.7.4)(typescript@5.9.3)
+      prettier-plugin-organize-imports: 4.3.0(prettier@3.8.0)(typescript@5.9.3)
 
-  prettier@3.7.4: {}
+  prettier@3.8.0: {}
 
   resolve-pkg-maps@1.0.0:
     optional: true
@@ -2756,7 +2756,7 @@ snapshots:
 
   typescript@5.9.3: {}
 
-  ufo@1.6.2: {}
+  ufo@1.6.3: {}
 
   undici-types@6.21.0: {}
 

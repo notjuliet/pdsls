@@ -72,11 +72,7 @@ export const NavMenu = (props: {
   );
 };
 
-export const ActionMenu = (props: {
-  label: string;
-  icon: string;
-  onClick: () => void;
-}) => {
+export const ActionMenu = (props: { label: string; icon: string; onClick: () => void }) => {
   const ctx = useContext(MenuContext);
 
   return (
