@@ -285,7 +285,7 @@ export const LabelView = () => {
             </div>
           </StickyOverlay>
 
-          <div class="w-full max-w-3xl px-3 py-2">
+          <div class="w-full max-w-3xl py-2">
             <Show when={loading() && labels().length === 0}>
               <div class="flex flex-col items-center justify-center py-12 text-center">
                 <span class="iconify lucide--loader-circle mb-3 animate-spin text-4xl text-neutral-400" />
