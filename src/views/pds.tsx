@@ -6,6 +6,7 @@ import { Title } from "@solidjs/meta";
 import { A, useLocation, useParams } from "@solidjs/router";
 import { createResource, createSignal, For, Show } from "solid-js";
 import { Button } from "../components/button";
+import DidHoverCard from "../components/hover-card/did";
 import { Modal } from "../components/modal";
 import { setPDS } from "../components/navbar";
 import Tooltip from "../components/tooltip";
@@ -67,12 +68,18 @@ const PdsView = () => {
 
     return (
       <div class="flex items-center gap-0.5">
-        <A
-          href={`/at://${repo.did}`}
-          class="grow truncate rounded-md p-0.5 font-mono hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-        >
-          {repo.did}
-        </A>
+        <DidHoverCard
+          did={repo.did}
+          class="min-w-0 grow"
+          trigger={
+            <A
+              href={`/at://${repo.did}`}
+              class="block truncate rounded-md p-0.5 font-mono hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+            >
+              {repo.did}
+            </A>
+          }
+        />
         <Show when={!repo.active}>
           <Tooltip text={repo.status ?? "Unknown status"}>
             <span class="iconify lucide--unplug text-red-500 dark:text-red-400"></span>
