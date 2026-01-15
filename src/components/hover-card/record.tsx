@@ -99,7 +99,7 @@ const RecordHoverCard = (props: RecordHoverCardProps) => {
         <div class="font-sans text-sm text-red-500 dark:text-red-400">{record()?.error}</div>
       </Show>
       <Show when={record()?.value && !record()?.loading}>
-        <div class="font-mono text-xs whitespace-pre-wrap">
+        <div class="font-mono text-xs wrap-break-word">
           <JSONValue
             data={record()?.value as any}
             repo={parsed()?.repo || ""}
