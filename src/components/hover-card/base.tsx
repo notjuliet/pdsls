@@ -1,5 +1,5 @@
 import { A } from "@solidjs/router";
-import { createEffect, createSignal, JSX, Show } from "solid-js";
+import { createSignal, JSX, onCleanup, Show } from "solid-js";
 import { isTouchDevice } from "../../layout";
 
 interface HoverCardProps {
@@ -27,9 +27,19 @@ const HoverCard = (props: HoverCardProps) => {
   const [previewHeight, setPreviewHeight] = createSignal(0);
   let anchorRef!: HTMLSpanElement;
   let previewRef!: HTMLDivElement;
+  let resizeObserver: ResizeObserver | null = null;
 
-  createEffect(() => {
-    if (show() && previewRef) setPreviewHeight(previewRef.offsetHeight);
+  const setupResizeObserver = (el: HTMLDivElement) => {
+    resizeObserver?.disconnect();
+    previewRef = el;
+    resizeObserver = new ResizeObserver(() => {
+      if (previewRef) setPreviewHeight(previewRef.offsetHeight);
+    });
+    resizeObserver.observe(el);
+  };
+
+  onCleanup(() => {
+    resizeObserver?.disconnect();
   });
 
   const isOverflowing = (previewHeight: number) =>
@@ -62,7 +72,7 @@ const HoverCard = (props: HoverCardProps) => {
       )}
       <Show when={show() && !isTouchDevice}>
         <div
-          ref={previewRef}
+          ref={setupResizeObserver}
           class={`dark:bg-dark-300 dark:shadow-dark-700 pointer-events-none absolute left-[50%] z-50 block -translate-x-1/2 overflow-hidden rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-md dark:border-neutral-700 ${props.previewClass || ""} ${isOverflowing(previewHeight()) ? "bottom-7" : "top-7"}`}
         >
           {props.children}
