@@ -26,8 +26,7 @@ export const PermissionButton = (props: PermissionButtonProps) => {
   const baseClass =
     props.class ||
     "flex items-center rounded-sm p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600";
-  const disabledClass =
-    props.disabledClass || "flex items-center rounded-sm p-1.5 opacity-40 cursor-not-allowed";
+  const disabledClass = props.disabledClass || "flex items-center rounded-sm p-1.5 opacity-40";
 
   return (
     <Tooltip text={hasPermission() ? props.tooltip : `${props.tooltip} (permission required)`}>
