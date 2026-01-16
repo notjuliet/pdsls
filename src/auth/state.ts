@@ -13,3 +13,4 @@ export type Sessions = Record<string, Account>;
 export const [agent, setAgent] = createSignal<OAuthUserAgent | undefined>();
 export const [sessions, setSessions] = createStore<Sessions>();
 export const [openManager, setOpenManager] = createSignal(false);
+export const [pendingPermissionEdit, setPendingPermissionEdit] = createSignal<string | null>(null);

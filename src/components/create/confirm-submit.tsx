@@ -1,4 +1,5 @@
 import { createSignal, Show } from "solid-js";
+import { hasUserScope } from "../../auth/scope-utils";
 import { Button } from "../button.jsx";
 
 export const ConfirmSubmit = (props: {
@@ -57,8 +58,12 @@ export const ConfirmSubmit = (props: {
             <div class="flex items-center gap-2">
               <button
                 type="button"
-                class="-ml-2 flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs hover:bg-neutral-200/50 dark:hover:bg-neutral-700"
-                onClick={() => setRecreate(!recreate())}
+                class={
+                  hasUserScope("create") ?
+                    "-ml-2 flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs hover:bg-neutral-200/50 dark:hover:bg-neutral-700"
+                  : "-ml-2 flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs opacity-40"
+                }
+                onClick={() => hasUserScope("create") && setRecreate(!recreate())}
               >
                 <span
                   classList={{
@@ -67,7 +72,7 @@ export const ConfirmSubmit = (props: {
                     "lucide--square text-neutral-500 dark:text-neutral-400": !recreate(),
                   }}
                 ></span>
-                <span>Recreate</span>
+                <span>Recreate{hasUserScope("create") ? "" : " (create permission needed)"}</span>
               </button>
             </div>
             <p class="text-xs text-neutral-600 dark:text-neutral-400">

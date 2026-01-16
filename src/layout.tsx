@@ -3,12 +3,12 @@ import { Meta, MetaProvider, Title } from "@solidjs/meta";
 import { A, RouteSectionProps, useLocation, useNavigate } from "@solidjs/router";
 import { createEffect, ErrorBoundary, onCleanup, onMount, Show, Suspense } from "solid-js";
 import { AccountManager } from "./auth/account.jsx";
-import { hasUserScope } from "./auth/scope-utils";
 import { agent } from "./auth/state.js";
 import { RecordEditor } from "./components/create";
 import { DropdownMenu, MenuProvider, NavMenu } from "./components/dropdown.jsx";
 import { NavBar } from "./components/navbar.jsx";
 import { NotificationContainer } from "./components/notification.jsx";
+import { PermissionPromptContainer } from "./components/permission-prompt.jsx";
 import { Search, SearchButton, showSearch } from "./components/search.jsx";
 import { themeEvent } from "./components/theme.jsx";
 import { resolveHandle } from "./utils/api.js";
@@ -151,8 +151,8 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           </A>
           <div class="relative flex items-center gap-0.5 rounded-lg bg-neutral-50/60 px-1 py-0.5 dark:bg-neutral-800/60">
             <SearchButton />
-            <Show when={hasUserScope("create")}>
-              <RecordEditor create={true} />
+            <Show when={agent()}>
+              <RecordEditor create={true} scope="create" />
             </Show>
             <AccountManager />
             <MenuProvider>
@@ -188,6 +188,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           </Show>
         </div>
         <NotificationContainer />
+        <PermissionPromptContainer />
         <Show when={plcDirectory() !== "https://plc.directory"}>
           <div class="dark:bg-dark-500 fixed right-0 bottom-0 left-0 z-10 flex items-center justify-center bg-neutral-100 px-3 py-1 text-xs">
             <span>

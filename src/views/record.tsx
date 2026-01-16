@@ -9,7 +9,6 @@ import { verifyRecord } from "@atcute/repo";
 import { Title } from "@solidjs/meta";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, Show, Suspense } from "solid-js";
-import { hasUserScope } from "../auth/scope-utils";
 import { agent } from "../auth/state";
 import { Backlinks } from "../components/backlinks.jsx";
 import { Button } from "../components/button.jsx";
@@ -26,7 +25,7 @@ import { LexiconSchemaView } from "../components/lexicon-schema.jsx";
 import { Modal } from "../components/modal.jsx";
 import { pds } from "../components/navbar.jsx";
 import { addNotification, removeNotification } from "../components/notification.jsx";
-import Tooltip from "../components/tooltip.jsx";
+import { PermissionButton } from "../components/permission-button.jsx";
 import {
   didDocumentResolver,
   resolveLexiconAuthority,
@@ -406,33 +405,33 @@ export const RecordView = () => {
               </div>
               <div class="flex gap-0.5">
                 <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
-                  <Show when={hasUserScope("update")}>
-                    <RecordEditor create={false} record={record()?.value} refetch={refetch} />
-                  </Show>
-                  <Show when={hasUserScope("delete")}>
-                    <Tooltip text="Delete">
-                      <button
-                        class="flex items-center rounded-sm p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                        onclick={() => setOpenDelete(true)}
-                      >
-                        <span class="iconify lucide--trash-2"></span>
-                      </button>
-                    </Tooltip>
-                    <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
-                      <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
-                        <h2 class="mb-2 font-semibold">Delete this record?</h2>
-                        <div class="flex justify-end gap-2">
-                          <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
-                          <Button
-                            onClick={deleteRecord}
-                            class="dark:shadow-dark-700 rounded-lg bg-red-500 px-2 py-1.5 text-xs text-white shadow-xs select-none hover:bg-red-400 active:bg-red-400"
-                          >
-                            Delete
-                          </Button>
-                        </div>
+                  <RecordEditor
+                    create={false}
+                    record={record()?.value}
+                    refetch={refetch}
+                    scope="update"
+                  />
+                  <PermissionButton
+                    scope="delete"
+                    tooltip="Delete"
+                    onClick={() => setOpenDelete(true)}
+                  >
+                    <span class="iconify lucide--trash-2"></span>
+                  </PermissionButton>
+                  <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
+                    <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
+                      <h2 class="mb-2 font-semibold">Delete this record?</h2>
+                      <div class="flex justify-end gap-2">
+                        <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
+                        <Button
+                          onClick={deleteRecord}
+                          class="dark:shadow-dark-700 rounded-lg bg-red-500 px-2 py-1.5 text-xs text-white shadow-xs select-none hover:bg-red-400 active:bg-red-400"
+                        >
+                          Delete
+                        </Button>
                       </div>
-                    </Modal>
-                  </Show>
+                    </div>
+                  </Modal>
                 </Show>
                 <MenuProvider>
                   <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">

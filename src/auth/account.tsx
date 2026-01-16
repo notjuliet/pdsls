@@ -1,7 +1,7 @@
 import { Did } from "@atcute/lexicons";
 import { deleteStoredSession, getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { A } from "@solidjs/router";
-import { createSignal, For, onMount, Show } from "solid-js";
+import { createEffect, createSignal, For, onMount, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
 import { Modal } from "../components/modal.jsx";
@@ -17,7 +17,16 @@ import {
   retrieveSession,
   saveSessionToStorage,
 } from "./session-manager.js";
-import { agent, openManager, sessions, setAgent, setOpenManager, setSessions } from "./state.js";
+import {
+  agent,
+  openManager,
+  pendingPermissionEdit,
+  sessions,
+  setAgent,
+  setOpenManager,
+  setPendingPermissionEdit,
+  setSessions,
+} from "./state.js";
 
 const AccountDropdown = (props: { did: Did; onEditPermissions: (did: Did) => void }) => {
   const removeSession = async (did: Did) => {
@@ -71,6 +80,14 @@ export const AccountManager = () => {
 
   const scopeFlow = useOAuthScopeFlow({
     beforeRedirect: (account) => resumeSession(account as Did),
+  });
+
+  createEffect(() => {
+    const pending = pendingPermissionEdit();
+    if (pending) {
+      scopeFlow.initiateWithRedirect(pending);
+      setPendingPermissionEdit(null);
+    }
   });
 
   const handleAccountClick = async (did: Did) => {

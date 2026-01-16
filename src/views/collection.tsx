@@ -6,13 +6,13 @@ import { Title } from "@solidjs/meta";
 import { A, useBeforeLeave, useParams, useSearchParams } from "@solidjs/router";
 import { createMemo, createResource, createSignal, For, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
-import { hasUserScope } from "../auth/scope-utils";
 import { agent } from "../auth/state";
 import { Button } from "../components/button.jsx";
 import HoverCard from "../components/hover-card/base";
 import { JSONType, JSONValue } from "../components/json.jsx";
 import { Modal } from "../components/modal.jsx";
 import { addNotification, removeNotification } from "../components/notification.jsx";
+import { PermissionButton } from "../components/permission-button.jsx";
 import { StickyOverlay } from "../components/sticky.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
@@ -243,25 +243,23 @@ const CollectionView = () => {
           <StickyOverlay>
             <div class="flex w-full flex-col gap-2">
               <div class="flex items-center gap-1.5">
-                <Show when={agent() && agent()?.sub === did && hasUserScope("delete")}>
+                <Show when={agent() && agent()?.sub === did}>
                   <div class="flex items-center">
-                    <Tooltip
-                      text={batchDelete() ? "Cancel" : "Manage"}
-                      children={
-                        <button
-                          onclick={() => {
-                            setRecords({ from: 0, to: records.length - 1 }, "toDelete", false);
-                            setLastSelected(undefined);
-                            setBatchDelete(!batchDelete());
-                          }}
-                          class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                        >
-                          <span
-                            class={`iconify ${batchDelete() ? "lucide--x" : "lucide--trash-2"} `}
-                          ></span>
-                        </button>
-                      }
-                    />
+                    <PermissionButton
+                      scope="delete"
+                      tooltip={batchDelete() ? "Cancel" : "Manage"}
+                      class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                      disabledClass="flex items-center rounded-md p-1.5 opacity-40"
+                      onClick={() => {
+                        setRecords({ from: 0, to: records.length - 1 }, "toDelete", false);
+                        setLastSelected(undefined);
+                        setBatchDelete(!batchDelete());
+                      }}
+                    >
+                      <span
+                        class={`iconify ${batchDelete() ? "lucide--x" : "lucide--trash-2"} `}
+                      ></span>
+                    </PermissionButton>
                     <Show when={batchDelete()}>
                       <Tooltip
                         text="Select all"
@@ -274,22 +272,18 @@ const CollectionView = () => {
                           </button>
                         }
                       />
-                      <Show when={hasUserScope("create")}>
-                        <Tooltip
-                          text="Recreate"
-                          children={
-                            <button
-                              onclick={() => {
-                                setRecreate(true);
-                                setOpenDelete(true);
-                              }}
-                              class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                            >
-                              <span class="iconify lucide--recycle text-green-500 dark:text-green-400"></span>
-                            </button>
-                          }
-                        />
-                      </Show>
+                      <PermissionButton
+                        scope="create"
+                        tooltip="Recreate"
+                        class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                        disabledClass="flex items-center rounded-md p-1.5 opacity-40"
+                        onClick={() => {
+                          setRecreate(true);
+                          setOpenDelete(true);
+                        }}
+                      >
+                        <span class="iconify lucide--recycle text-green-500 dark:text-green-400"></span>
+                      </PermissionButton>
                       <Tooltip
                         text="Delete"
                         children={

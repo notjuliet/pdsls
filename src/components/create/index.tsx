@@ -18,6 +18,7 @@ import { agent, sessions } from "../../auth/state";
 import { Button } from "../button.jsx";
 import { Modal } from "../modal.jsx";
 import { addNotification, removeNotification } from "../notification.jsx";
+import { showPermissionPrompt } from "../permission-prompt";
 import { TextInput } from "../text-input.jsx";
 import Tooltip from "../tooltip.jsx";
 import { ConfirmSubmit } from "./confirm-submit";
@@ -30,7 +31,12 @@ const Editor = lazy(() => import("../editor.jsx").then((m) => ({ default: m.Edit
 
 export { editorInstance, placeholder, setPlaceholder };
 
-export const RecordEditor = (props: { create: boolean; record?: any; refetch?: any }) => {
+export const RecordEditor = (props: {
+  create: boolean;
+  record?: any;
+  refetch?: any;
+  scope?: "create" | "update" | "delete" | "blob";
+}) => {
   const navigate = useNavigate();
   const params = useParams();
   const [openDialog, setOpenDialog] = createSignal(false);
@@ -39,6 +45,8 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
   const [openInsertMenu, setOpenInsertMenu] = createSignal(false);
   const [openHandleDialog, setOpenHandleDialog] = createSignal(false);
   const [openConfirmDialog, setOpenConfirmDialog] = createSignal(false);
+
+  const hasPermission = () => !props.scope || hasUserScope(props.scope);
   const [isMaximized, setIsMaximized] = createSignal(false);
   const [isMinimized, setIsMinimized] = createSignal(false);
   const [collectionError, setCollectionError] = createSignal("");
@@ -365,16 +373,23 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
                         label="Insert timestamp"
                         onClick={insertTimestamp}
                       />
-                      <Show when={hasUserScope("blob")}>
-                        <MenuItem
-                          icon="lucide--upload"
-                          label="Upload blob"
-                          onClick={() => {
+                      <button
+                        type="button"
+                        class={
+                          hasUserScope("blob") ?
+                            "flex items-center gap-2 rounded-md p-2 text-left text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                          : "flex items-center gap-2 rounded-md p-2 text-left text-xs opacity-40"
+                        }
+                        onClick={() => {
+                          if (hasUserScope("blob")) {
                             setOpenInsertMenu(false);
                             blobInput.click();
-                          }}
-                        />
-                      </Show>
+                          }
+                        }}
+                      >
+                        <span class="iconify lucide--upload shrink-0"></span>
+                        <span>Upload blob{hasUserScope("blob") ? "" : " (permission needed)"}</span>
+                      </button>
                     </div>
                   </Show>
                   <input
@@ -441,13 +456,29 @@ export const RecordEditor = (props: { create: boolean; record?: any; refetch?: a
           <span class="text-sm font-medium">{props.create ? "Creating" : "Editing"} record</span>
         </button>
       </Show>
-      <Tooltip text={props.create ? "Create record (n)" : "Edit record (e)"}>
+      <Tooltip
+        text={
+          hasPermission() ?
+            props.create ?
+              "Create record (n)"
+            : "Edit record (e)"
+          : `${props.create ? "Create record" : "Edit record"} (permission required)`
+        }
+      >
         <button
-          class={`flex items-center p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 ${props.create ? "rounded-lg" : "rounded-sm"}`}
+          class={
+            hasPermission() ?
+              `flex items-center p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 ${props.create ? "rounded-lg" : "rounded-sm"}`
+            : `flex items-center p-1.5 opacity-40 ${props.create ? "rounded-lg" : "rounded-sm"}`
+          }
           onclick={() => {
-            setNotice("");
-            setOpenDialog(true);
-            setIsMinimized(false);
+            if (hasPermission()) {
+              setNotice("");
+              setOpenDialog(true);
+              setIsMinimized(false);
+            } else if (props.scope) {
+              showPermissionPrompt(props.scope);
+            }
           }}
         >
           <div
