@@ -107,7 +107,7 @@ const HoverCard = (props: HoverCardProps) => {
         <A
           class={`text-blue-500 hover:underline active:underline dark:text-blue-400 ${props.labelClass || ""}`}
           href={props.href!}
-          target={props.newTab ? "_blank" : "_self"}
+          target={props.newTab ? "_blank" : undefined}
         >
           {props.label}
         </A>
