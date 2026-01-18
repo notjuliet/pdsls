@@ -28,7 +28,7 @@ export const PermissionPromptContainer = () => {
 
   return (
     <Modal open={requestedScope() !== null} onClose={() => setRequestedScope(null)}>
-      <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-70 left-[50%] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
+      <div class="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[calc(100%-2rem)] max-w-md rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
         <h2 class="mb-2 font-semibold">Permission required</h2>
         <p class="mb-4 text-sm text-neutral-600 dark:text-neutral-400">
           You need the "{scopeLabel()}" permission to perform this action.

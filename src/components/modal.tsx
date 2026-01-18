@@ -5,6 +5,7 @@ export interface ModalProps extends Pick<ComponentProps<"svg">, "children"> {
   onClose?: () => void;
   closeOnClick?: boolean;
   nonBlocking?: boolean;
+  alignTop?: boolean;
 }
 
 export const Modal = (props: ModalProps) => {
@@ -12,9 +13,11 @@ export const Modal = (props: ModalProps) => {
     <Show when={props.open}>
       <div
         data-modal
-        class="fixed inset-0 z-50 h-full max-h-none w-full max-w-none bg-transparent text-neutral-900 dark:text-neutral-200"
+        class="fixed inset-0 z-50 flex h-full max-h-none w-full max-w-none justify-center bg-transparent text-neutral-900 dark:text-neutral-200"
         classList={{
           "pointer-events-none": props.nonBlocking,
+          "items-start pt-18": props.alignTop,
+          "items-center": !props.alignTop,
         }}
         ref={(node) => {
           const handleEscape = (e: KeyboardEvent) => {

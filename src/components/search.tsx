@@ -354,8 +354,8 @@ const ListUrlsTooltip = () => {
 
   return (
     <>
-      <Modal open={openList()} onClose={() => setOpenList(false)}>
-        <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute top-16 left-[50%] w-88 -translate-x-1/2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-104 dark:border-neutral-700 starting:opacity-0">
+      <Modal open={openList()} onClose={() => setOpenList(false)} alignTop>
+        <div class="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-88 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-104 dark:border-neutral-700 starting:opacity-0">
           <div class="mb-2 flex items-center gap-1 font-semibold">
             <span class="iconify lucide--link"></span>
             <span>Supported URLs</span>
