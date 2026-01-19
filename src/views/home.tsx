@@ -11,7 +11,7 @@ export const Home = () => {
   }) => (
     <a
       href={props.href}
-      class={`relative flex items-center gap-1.5 after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:text-${props.color} after:transition-[width] after:duration-300 after:ease-out hover:after:w-full ${props.darkColor ? `dark:after:text-${props.darkColor}` : ""}`}
+      class={`relative flex items-center gap-1.5 after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current ${props.color} after:transition-[width] after:duration-300 after:ease-out hover:after:w-full ${props.darkColor ?? ""}`}
       target="_blank"
     >
       {props.children}
@@ -158,25 +158,33 @@ export const Home = () => {
       </div>
 
       <div class="flex justify-center gap-1.5 text-sm text-neutral-600 sm:gap-2 dark:text-neutral-300">
-        <FooterLink href="https://juli.ee" color="rose-400" darkColor="rose-300">
+        <FooterLink
+          href="https://juli.ee"
+          color="after:text-rose-400"
+          darkColor="dark:after:text-rose-300"
+        >
           <span class="iconify lucide--terminal text-rose-400 dark:text-rose-300"></span>
           <span class="font-pecita">juliet</span>
         </FooterLink>
         {/* • */}
-        {/* <FooterLink href="https://raycast.com/" color="[#FF6363]"> */}
+        {/* <FooterLink href="https://raycast.com/" color="after:text-[#FF6363]"> */}
         {/*   <span class="iconify-color i-raycast-light block dark:hidden"></span> */}
         {/*   <span class="iconify-color i-raycast-dark hidden dark:block"></span> */}
         {/*   Raycast */}
         {/* </FooterLink> */}•
         <FooterLink
           href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz"
-          color="[#0085ff]"
+          color="after:text-[#0085ff]"
         >
           <span class="simple-icons--bluesky iconify text-[#0085ff]"></span>
           Bluesky
         </FooterLink>
         •
-        <FooterLink href="https://tangled.org/@pdsls.dev/pdsls/" color="black" darkColor="white">
+        <FooterLink
+          href="https://tangled.org/@pdsls.dev/pdsls/"
+          color="after:text-black"
+          darkColor="dark:after:text-white"
+        >
           <span class="iconify i-tangled text-black dark:text-white"></span>
           Source
         </FooterLink>
