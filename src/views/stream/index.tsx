@@ -3,19 +3,119 @@ import { Title } from "@solidjs/meta";
 import { A, useLocation, useSearchParams } from "@solidjs/router";
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { Button } from "../../components/button";
+import DidHoverCard from "../../components/hover-card/did";
 import { JSONValue } from "../../components/json";
-import { StickyOverlay } from "../../components/sticky";
 import { TextInput } from "../../components/text-input";
+import { addToClipboard } from "../../utils/copy";
+import { localDateFromTimestamp } from "../../utils/date";
 import { StreamStats, StreamStatsPanel } from "./stats";
 
 const LIMIT = 20;
 type Parameter = { name: string; param: string | string[] | undefined };
 
+const StreamRecordItem = (props: { record: any; streamType: "jetstream" | "firehose" }) => {
+  const [expanded, setExpanded] = createSignal(false);
+
+  const getBasicInfo = () => {
+    const rec = props.record;
+    if (props.streamType === "jetstream") {
+      const collection = rec.commit?.collection || rec.kind;
+      const rkey = rec.commit?.rkey;
+      const action = rec.commit?.operation;
+      const time = rec.time_us ? localDateFromTimestamp(rec.time_us / 1000) : undefined;
+      return { type: rec.kind, did: rec.did, collection, rkey, action, time };
+    } else {
+      const type = rec.$type?.split("#").pop() || rec.$type;
+      const did = rec.repo ?? rec.did;
+      const pathParts = rec.op?.path?.split("/") || [];
+      const collection = pathParts[0];
+      const rkey = pathParts[1];
+      const time = rec.time ? localDateFromTimestamp(Date.parse(rec.time)) : undefined;
+      return { type, did, collection, rkey, action: rec.op?.action, time };
+    }
+  };
+
+  const info = getBasicInfo();
+
+  const typeColors: Record<string, string> = {
+    create: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+    update: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
+    delete: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+    identity: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
+    account: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+    sync: "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300",
+  };
+
+  const copyRecord = (e: MouseEvent) => {
+    e.stopPropagation();
+    addToClipboard(JSON.stringify(props.record, null, 2));
+  };
+
+  return (
+    <div class="flex flex-col gap-2">
+      <div class="flex items-start gap-1">
+        <button
+          type="button"
+          onclick={() => setExpanded(!expanded())}
+          class="dark:hover:bg-dark-200 flex min-w-0 flex-1 items-start gap-2 rounded p-1 text-left hover:bg-neutral-200/70"
+        >
+          <span class="mt-0.5 shrink-0 text-neutral-400 dark:text-neutral-500">
+            {expanded() ?
+              <span class="iconify lucide--chevron-down"></span>
+            : <span class="iconify lucide--chevron-right"></span>}
+          </span>
+          <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+            <div class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 sm:gap-x-2">
+              <span
+                class={`rounded px-1.5 py-0.5 text-xs font-medium ${typeColors[info.type === "commit" ? info.action : info.type] || "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300"}`}
+              >
+                {info.type === "commit" ? info.action : info.type}
+              </span>
+              <Show when={info.collection && info.collection !== info.type}>
+                <span class="text-neutral-600 dark:text-neutral-300">{info.collection}</span>
+              </Show>
+              <Show when={info.rkey}>
+                <span class="text-neutral-400 dark:text-neutral-500">{info.rkey}</span>
+              </Show>
+            </div>
+            <div class="flex flex-col gap-x-2 gap-y-0.5 text-xs text-neutral-500 sm:flex-row sm:items-center dark:text-neutral-400">
+              <Show when={info.did}>
+                <span class="w-fit" onclick={(e) => e.stopPropagation()}>
+                  <DidHoverCard newTab did={info.did} />
+                </span>
+              </Show>
+              <Show when={info.time}>
+                <span>{info.time}</span>
+              </Show>
+            </div>
+          </div>
+        </button>
+        <Show when={expanded()}>
+          <button
+            type="button"
+            onclick={copyRecord}
+            class="flex size-6 shrink-0 items-center justify-center rounded text-neutral-500 transition-colors hover:bg-neutral-200 hover:text-neutral-600 active:bg-neutral-300 sm:size-7 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:active:bg-neutral-600"
+          >
+            <span class="iconify lucide--copy"></span>
+          </button>
+        </Show>
+      </div>
+      <Show when={expanded()}>
+        <div class="ml-6.5">
+          <div class="w-full text-xs wrap-anywhere whitespace-pre-wrap md:w-2xl">
+            <JSONValue newTab data={props.record} repo={info.did} hideBlobs />
+          </div>
+        </div>
+      </Show>
+    </div>
+  );
+};
+
 const StreamView = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [parameters, setParameters] = createSignal<Parameter[]>([]);
   const streamType = useLocation().pathname === "/firehose" ? "firehose" : "jetstream";
-  const [records, setRecords] = createSignal<Array<any>>([]);
+  const [records, setRecords] = createSignal<any[]>([]);
   const [connected, setConnected] = createSignal(false);
   const [paused, setPaused] = createSignal(false);
   const [notice, setNotice] = createSignal("");
@@ -266,7 +366,7 @@ const StreamView = () => {
   return (
     <>
       <Title>{streamType === "firehose" ? "Firehose" : "Jetstream"} - PDSls</Title>
-      <div class="flex w-full flex-col items-center">
+      <div class="flex w-full flex-col items-center gap-2">
         <div class="flex gap-4 font-medium">
           <A
             class="flex items-center gap-1 border-b-2"
@@ -284,7 +384,7 @@ const StreamView = () => {
           </A>
         </div>
         <Show when={!connected()}>
-          <form ref={formRef} class="mt-4 mb-4 flex w-full flex-col gap-1.5 px-2 text-sm">
+          <form ref={formRef} class="flex w-full flex-col gap-1.5 p-2 text-sm">
             <label class="flex items-center justify-end gap-x-1">
               <span class="min-w-20">Instance</span>
               <TextInput
@@ -350,63 +450,62 @@ const StreamView = () => {
           </form>
         </Show>
         <Show when={connected()}>
-          <StickyOverlay>
-            <div class="flex w-full flex-col gap-2 p-1">
-              <div class="flex flex-col gap-1 text-sm wrap-anywhere">
-                <div class="font-semibold">Parameters</div>
-                <For each={parameters()}>
-                  {(param) => (
-                    <Show when={param.param}>
-                      <div class="text-sm">
-                        <div class="text-xs text-neutral-500 dark:text-neutral-400">
-                          {param.name}
-                        </div>
-                        <div class="text-neutral-700 dark:text-neutral-300">{param.param}</div>
-                      </div>
-                    </Show>
-                  )}
-                </For>
-              </div>
-              <StreamStatsPanel stats={stats()} currentTime={currentTime()} />
-              <div class="flex justify-end gap-2">
-                <button
-                  type="button"
-                  ontouchstart={(e) => {
-                    e.preventDefault();
-                    requestAnimationFrame(() => togglePause());
-                  }}
-                  onclick={togglePause}
-                  class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
-                >
-                  {paused() ? "Resume" : "Pause"}
-                </button>
-                <button
-                  type="button"
-                  ontouchstart={(e) => {
-                    e.preventDefault();
-                    requestAnimationFrame(() => disconnect());
-                  }}
-                  onclick={disconnect}
-                  class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
-                >
-                  Disconnect
-                </button>
-              </div>
+          <div class="flex w-full flex-col gap-2 p-2">
+            <div class="flex flex-col gap-1 text-sm wrap-anywhere">
+              <div class="font-semibold">Parameters</div>
+              <For each={parameters()}>
+                {(param) => (
+                  <Show when={param.param}>
+                    <div class="text-sm">
+                      <div class="text-xs text-neutral-500 dark:text-neutral-400">{param.name}</div>
+                      <div class="text-neutral-700 dark:text-neutral-300">{param.param}</div>
+                    </div>
+                  </Show>
+                )}
+              </For>
             </div>
-          </StickyOverlay>
+            <StreamStatsPanel stats={stats()} currentTime={currentTime()} />
+            <div class="flex justify-end gap-2">
+              <button
+                type="button"
+                ontouchstart={(e) => {
+                  e.preventDefault();
+                  requestAnimationFrame(() => togglePause());
+                }}
+                onclick={togglePause}
+                class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+              >
+                {paused() ? "Resume" : "Pause"}
+              </button>
+              <button
+                type="button"
+                ontouchstart={(e) => {
+                  e.preventDefault();
+                  requestAnimationFrame(() => disconnect());
+                }}
+                onclick={disconnect}
+                class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+              >
+                Disconnect
+              </button>
+            </div>
+          </div>
         </Show>
         <Show when={notice().length}>
           <div class="text-red-500 dark:text-red-400">{notice()}</div>
         </Show>
-        <div class="flex w-full flex-col gap-2 divide-y-[0.5px] divide-neutral-500 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:text-sm md:w-3xl">
-          <For each={records().toReversed()}>
-            {(rec) => (
-              <div class="pb-2">
-                <JSONValue data={rec} repo={rec.did ?? rec.repo} hideBlobs />
-              </div>
-            )}
-          </For>
-        </div>
+        <Show when={connected() || records().length > 0}>
+          <div class="flex min-h-280 w-full flex-col gap-2 font-mono text-xs [overflow-anchor:auto] sm:text-sm">
+            <For each={records().toReversed()}>
+              {(rec) => (
+                <div class="[overflow-anchor:none]">
+                  <StreamRecordItem record={rec} streamType={streamType} />
+                </div>
+              )}
+            </For>
+            <div class="h-px [overflow-anchor:auto]" />
+          </div>
+        </Show>
       </div>
     </>
   );
