@@ -19,7 +19,7 @@ render(
   () => (
     <Router root={Layout}>
       <Route path="/" component={Home} />
-      <Route path={["/jetstream", "/firehose"]} component={StreamView} />
+      <Route path={["/jetstream", "/firehose", "/spacedust"]} component={StreamView} />
       <Route path="/labels" component={LabelView} />
       <Route path="/car" component={CarView} />
       <Route path="/car/explore" component={ExploreToolView} />

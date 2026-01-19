@@ -7,43 +7,28 @@ import DidHoverCard from "../../components/hover-card/did";
 import { JSONValue } from "../../components/json";
 import { TextInput } from "../../components/text-input";
 import { addToClipboard } from "../../utils/copy";
-import { localDateFromTimestamp } from "../../utils/date";
+import { getStreamType, STREAM_CONFIGS, STREAM_TYPES, StreamType } from "./config";
 import { StreamStats, StreamStatsPanel } from "./stats";
 
 const LIMIT = 20;
-type Parameter = { name: string; param: string | string[] | undefined };
 
-const StreamRecordItem = (props: { record: any; streamType: "jetstream" | "firehose" }) => {
+const TYPE_COLORS: Record<string, string> = {
+  create: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+  update: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
+  delete: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+  identity: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
+  account: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+  sync: "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300",
+};
+
+const StreamRecordItem = (props: { record: any; streamType: StreamType }) => {
   const [expanded, setExpanded] = createSignal(false);
+  const config = () => STREAM_CONFIGS[props.streamType];
+  const info = () => config().parseRecord(props.record);
 
-  const getBasicInfo = () => {
-    const rec = props.record;
-    if (props.streamType === "jetstream") {
-      const collection = rec.commit?.collection || rec.kind;
-      const rkey = rec.commit?.rkey;
-      const action = rec.commit?.operation;
-      const time = rec.time_us ? localDateFromTimestamp(rec.time_us / 1000) : undefined;
-      return { type: rec.kind, did: rec.did, collection, rkey, action, time };
-    } else {
-      const type = rec.$type?.split("#").pop() || rec.$type;
-      const did = rec.repo ?? rec.did;
-      const pathParts = rec.op?.path?.split("/") || [];
-      const collection = pathParts[0];
-      const rkey = pathParts[1];
-      const time = rec.time ? localDateFromTimestamp(Date.parse(rec.time)) : undefined;
-      return { type, did, collection, rkey, action: rec.op?.action, time };
-    }
-  };
-
-  const info = getBasicInfo();
-
-  const typeColors: Record<string, string> = {
-    create: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
-    update: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
-    delete: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
-    identity: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
-    account: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-    sync: "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300",
+  const displayType = () => {
+    const i = info();
+    return i.type === "commit" || i.type === "link" ? i.action : i.type;
   };
 
   const copyRecord = (e: MouseEvent) => {
@@ -65,27 +50,29 @@ const StreamRecordItem = (props: { record: any; streamType: "jetstream" | "fireh
             : <span class="iconify lucide--chevron-right"></span>}
           </span>
           <div class="flex min-w-0 flex-1 flex-col gap-0.5">
-            <div class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 sm:gap-x-2">
+            <div class="flex items-center gap-x-1.5 sm:gap-x-2">
               <span
-                class={`rounded px-1.5 py-0.5 text-xs font-medium ${typeColors[info.type === "commit" ? info.action : info.type] || "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300"}`}
+                class={`shrink-0 rounded px-1.5 py-0.5 text-xs font-medium ${TYPE_COLORS[displayType()!] || "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300"}`}
               >
-                {info.type === "commit" ? info.action : info.type}
+                {displayType()}
               </span>
-              <Show when={info.collection && info.collection !== info.type}>
-                <span class="text-neutral-600 dark:text-neutral-300">{info.collection}</span>
+              <Show when={info().collection && info().collection !== info().type}>
+                <span class="min-w-0 truncate text-neutral-600 dark:text-neutral-300">
+                  {info().collection}
+                </span>
               </Show>
-              <Show when={info.rkey}>
-                <span class="text-neutral-400 dark:text-neutral-500">{info.rkey}</span>
+              <Show when={info().rkey}>
+                <span class="shrink-0 text-neutral-400 dark:text-neutral-500">{info().rkey}</span>
               </Show>
             </div>
             <div class="flex flex-col gap-x-2 gap-y-0.5 text-xs text-neutral-500 sm:flex-row sm:items-center dark:text-neutral-400">
-              <Show when={info.did}>
+              <Show when={info().did}>
                 <span class="w-fit" onclick={(e) => e.stopPropagation()}>
-                  <DidHoverCard newTab did={info.did} />
+                  <DidHoverCard newTab did={info().did!} />
                 </span>
               </Show>
-              <Show when={info.time}>
-                <span>{info.time}</span>
+              <Show when={info().time}>
+                <span>{info().time}</span>
               </Show>
             </div>
           </div>
@@ -103,7 +90,7 @@ const StreamRecordItem = (props: { record: any; streamType: "jetstream" | "fireh
       <Show when={expanded()}>
         <div class="ml-6.5">
           <div class="w-full text-xs wrap-anywhere whitespace-pre-wrap md:w-2xl">
-            <JSONValue newTab data={props.record} repo={info.did} hideBlobs />
+            <JSONValue newTab data={props.record} repo={info().did ?? ""} hideBlobs />
           </div>
         </div>
       </Show>
@@ -111,14 +98,16 @@ const StreamRecordItem = (props: { record: any; streamType: "jetstream" | "fireh
   );
 };
 
-const StreamView = () => {
+export const StreamView = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [parameters, setParameters] = createSignal<Parameter[]>([]);
-  const streamType = useLocation().pathname === "/firehose" ? "firehose" : "jetstream";
+  const streamType = getStreamType(useLocation().pathname);
+  const config = () => STREAM_CONFIGS[streamType];
+
   const [records, setRecords] = createSignal<any[]>([]);
   const [connected, setConnected] = createSignal(false);
   const [paused, setPaused] = createSignal(false);
   const [notice, setNotice] = createSignal("");
+  const [parameters, setParameters] = createSignal<{ name: string; value?: string }[]>([]);
   const [stats, setStats] = createSignal<StreamStats>({
     totalEvents: 0,
     eventsPerSecond: 0,
@@ -126,6 +115,7 @@ const StreamView = () => {
     collections: {},
   });
   const [currentTime, setCurrentTime] = createSignal(Date.now());
+
   let socket: WebSocket;
   let firehose: Firehose;
   let formRef!: HTMLFormElement;
@@ -133,22 +123,25 @@ const StreamView = () => {
   let rafId: number | null = null;
   let statsIntervalId: number | null = null;
   let statsUpdateIntervalId: number | null = null;
-  let lastSecondEventCount = 0;
   let currentSecondEventCount = 0;
-  // Track stats in variables for batching
   let totalEventsCount = 0;
   let eventTypesMap: Record<string, number> = {};
   let collectionsMap: Record<string, number> = {};
 
   const addRecord = (record: any) => {
     currentSecondEventCount++;
-
-    // Track statistics in variables (batched update)
     totalEventsCount++;
-    const eventType = record.kind || record.$type || "unknown";
+
+    const rawEventType = record.kind || record.$type || "unknown";
+    const eventType = rawEventType.includes("#") ? rawEventType.split("#").pop() : rawEventType;
     eventTypesMap[eventType] = (eventTypesMap[eventType] || 0) + 1;
+
     if (eventType !== "account" && eventType !== "identity") {
-      const collection = record.commit?.collection || record.op?.path?.split("/")[0] || "unknown";
+      const collection =
+        record.commit?.collection ||
+        record.op?.path?.split("/")[0] ||
+        record.link?.source ||
+        "unknown";
       collectionsMap[collection] = (collectionsMap[collection] || 0) + 1;
     }
 
@@ -165,8 +158,9 @@ const StreamView = () => {
   };
 
   const disconnect = () => {
-    if (streamType === "jetstream") socket?.close();
+    if (!config().useFirehoseLib) socket?.close();
     else firehose?.close();
+
     if (rafId !== null) {
       cancelAnimationFrame(rafId);
       rafId = null;
@@ -179,23 +173,17 @@ const StreamView = () => {
       clearInterval(statsUpdateIntervalId);
       statsUpdateIntervalId = null;
     }
+
     pendingRecords = [];
     totalEventsCount = 0;
     eventTypesMap = {};
     collectionsMap = {};
     setConnected(false);
     setPaused(false);
-    setStats((prev) => ({
-      ...prev,
-      eventsPerSecond: 0,
-    }));
+    setStats((prev) => ({ ...prev, eventsPerSecond: 0 }));
   };
 
-  const togglePause = () => {
-    setPaused(!paused());
-  };
-
-  const connectSocket = async (formData: FormData) => {
+  const connectStream = async (formData: FormData) => {
     setNotice("");
     if (connected()) {
       disconnect();
@@ -203,54 +191,31 @@ const StreamView = () => {
     }
     setRecords([]);
 
-    let url = "";
-    if (streamType === "jetstream") {
-      url =
-        formData.get("instance")?.toString() ?? "wss://jetstream1.us-east.bsky.network/subscribe";
-      url = url.concat("?");
-    } else {
-      url = formData.get("instance")?.toString() ?? "wss://bsky.network";
-      url = url.replace("/xrpc/com.atproto.sync.subscribeRepos", "");
-      if (!(url.startsWith("wss://") || url.startsWith("ws://"))) url = "wss://" + url;
-    }
+    const instance = formData.get("instance")?.toString() ?? config().defaultInstance;
+    const url = config().buildUrl(instance, formData);
 
-    const collections = formData.get("collections")?.toString().split(",");
-    collections?.forEach((collection) => {
-      if (collection.length) url = url.concat(`wantedCollections=${collection}&`);
+    // Save all form fields to URL params
+    const params: Record<string, string | undefined> = { instance };
+    config().fields.forEach((field) => {
+      params[field.searchParam] = formData.get(field.name)?.toString();
     });
+    setSearchParams(params);
 
-    const dids = formData.get("dids")?.toString().split(",");
-    dids?.forEach((did) => {
-      if (did.length) url = url.concat(`wantedDids=${did}&`);
-    });
-
-    const cursor = formData.get("cursor")?.toString();
-    if (streamType === "jetstream") {
-      if (cursor?.length) url = url.concat(`cursor=${cursor}`);
-      if (url.endsWith("&")) url = url.slice(0, -1);
-    }
-
-    setSearchParams({
-      instance: formData.get("instance")?.toString(),
-      collections: formData.get("collections")?.toString(),
-      dids: formData.get("dids")?.toString(),
-      cursor: formData.get("cursor")?.toString(),
-      allEvents: formData.get("allEvents")?.toString(),
-    });
-
+    // Build parameters display
     setParameters([
-      { name: "Instance", param: formData.get("instance")?.toString() },
-      { name: "Collections", param: formData.get("collections")?.toString() },
-      { name: "DIDs", param: formData.get("dids")?.toString() },
-      { name: "Cursor", param: formData.get("cursor")?.toString() },
-      { name: "All Events", param: formData.get("allEvents")?.toString() },
+      { name: "Instance", value: instance },
+      ...config()
+        .fields.filter((f) => f.type !== "checkbox")
+        .map((f) => ({ name: f.label, value: formData.get(f.name)?.toString() })),
+      ...config()
+        .fields.filter((f) => f.type === "checkbox" && formData.get(f.name) === "on")
+        .map((f) => ({ name: f.label, value: "on" })),
     ]);
 
     setConnected(true);
     const now = Date.now();
     setCurrentTime(now);
 
-    // Reset tracking variables
     totalEventsCount = 0;
     eventTypesMap = {};
     collectionsMap = {};
@@ -272,21 +237,18 @@ const StreamView = () => {
       }));
     }, 50);
 
-    // Calculate events/sec every second
     statsIntervalId = window.setInterval(() => {
-      setStats((prev) => ({
-        ...prev,
-        eventsPerSecond: currentSecondEventCount,
-      }));
-      lastSecondEventCount = currentSecondEventCount;
+      setStats((prev) => ({ ...prev, eventsPerSecond: currentSecondEventCount }));
       currentSecondEventCount = 0;
       setCurrentTime(Date.now());
     }, 1000);
-    if (streamType === "jetstream") {
+
+    if (!config().useFirehoseLib) {
       socket = new WebSocket(url);
       socket.addEventListener("message", (event) => {
         const rec = JSON.parse(event.data);
-        if (searchParams.allEvents === "on" || (rec.kind !== "account" && rec.kind !== "identity"))
+        const isFilteredEvent = rec.kind === "account" || rec.kind === "identity";
+        if (!isFilteredEvent || streamType !== "jetstream" || searchParams.allEvents === "on")
           addRecord(rec);
       });
       socket.addEventListener("error", () => {
@@ -294,6 +256,7 @@ const StreamView = () => {
         disconnect();
       });
     } else {
+      const cursor = formData.get("cursor")?.toString();
       firehose = new Firehose({
         relay: url,
         cursor: cursor,
@@ -307,7 +270,7 @@ const StreamView = () => {
       });
       firehose.on("commit", (commit) => {
         for (const op of commit.ops) {
-          const record = {
+          addRecord({
             $type: commit.$type,
             repo: commit.repo,
             seq: commit.seq,
@@ -315,164 +278,139 @@ const StreamView = () => {
             rev: commit.rev,
             since: commit.since,
             op: op,
-          };
-          addRecord(record);
+          });
         }
       });
-      firehose.on("identity", (identity) => {
-        addRecord(identity);
-      });
-      firehose.on("account", (account) => {
-        addRecord(account);
-      });
+      firehose.on("identity", (identity) => addRecord(identity));
+      firehose.on("account", (account) => addRecord(account));
       firehose.on("sync", (sync) => {
-        const event = {
+        addRecord({
           $type: sync.$type,
           did: sync.did,
           rev: sync.rev,
           seq: sync.seq,
           time: sync.time,
-        };
-        addRecord(event);
+        });
       });
       firehose.start();
     }
   };
 
-  onMount(async () => {
-    const formData = new FormData();
-    if (searchParams.instance) formData.append("instance", searchParams.instance.toString());
-    if (searchParams.collections)
-      formData.append("collections", searchParams.collections.toString());
-    if (searchParams.dids) formData.append("dids", searchParams.dids.toString());
-    if (searchParams.cursor) formData.append("cursor", searchParams.cursor.toString());
-    if (searchParams.allEvents) formData.append("allEvents", searchParams.allEvents.toString());
-    if (searchParams.instance) connectSocket(formData);
+  onMount(() => {
+    if (searchParams.instance) {
+      const formData = new FormData();
+      formData.append("instance", searchParams.instance.toString());
+      config().fields.forEach((field) => {
+        const value = searchParams[field.searchParam];
+        if (value) formData.append(field.name, value.toString());
+      });
+      connectStream(formData);
+    }
   });
 
   onCleanup(() => {
     socket?.close();
-    if (rafId !== null) {
-      cancelAnimationFrame(rafId);
-    }
-    if (statsIntervalId !== null) {
-      clearInterval(statsIntervalId);
-    }
-    if (statsUpdateIntervalId !== null) {
-      clearInterval(statsUpdateIntervalId);
-    }
+    firehose?.close();
+    if (rafId !== null) cancelAnimationFrame(rafId);
+    if (statsIntervalId !== null) clearInterval(statsIntervalId);
+    if (statsUpdateIntervalId !== null) clearInterval(statsUpdateIntervalId);
   });
 
   return (
     <>
-      <Title>{streamType === "firehose" ? "Firehose" : "Jetstream"} - PDSls</Title>
+      <Title>{config().label} - PDSls</Title>
       <div class="flex w-full flex-col items-center gap-2">
+        {/* Tab Navigation */}
         <div class="flex gap-4 font-medium">
-          <A
-            class="flex items-center gap-1 border-b-2"
-            inactiveClass="border-transparent text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
-            href="/jetstream"
-          >
-            Jetstream
-          </A>
-          <A
-            class="flex items-center gap-1 border-b-2"
-            inactiveClass="border-transparent text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
-            href="/firehose"
-          >
-            Firehose
-          </A>
+          <For each={STREAM_TYPES}>
+            {(type) => (
+              <A
+                class="flex items-center gap-1 border-b-2"
+                inactiveClass="border-transparent text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
+                href={`/${type}`}
+              >
+                {STREAM_CONFIGS[type].label}
+              </A>
+            )}
+          </For>
         </div>
+
+        {/* Connection Form */}
         <Show when={!connected()}>
-          <form ref={formRef} class="flex w-full flex-col gap-1.5 p-2 text-sm">
+          <form ref={formRef} class="flex w-full flex-col gap-2 p-2 text-sm">
             <label class="flex items-center justify-end gap-x-1">
-              <span class="min-w-20">Instance</span>
+              <span class="min-w-21 select-none">Instance</span>
               <TextInput
                 name="instance"
-                value={
-                  searchParams.instance ??
-                  (streamType === "jetstream" ?
-                    "wss://jetstream1.us-east.bsky.network/subscribe"
-                  : "wss://bsky.network")
-                }
+                value={searchParams.instance ?? config().defaultInstance}
                 class="grow"
               />
             </label>
-            <Show when={streamType === "jetstream"}>
-              <label class="flex items-center justify-end gap-x-1">
-                <span class="min-w-20">Collections</span>
-                <textarea
-                  name="collections"
-                  spellcheck={false}
-                  placeholder="Comma-separated list of collections"
-                  value={searchParams.collections ?? ""}
-                  class="dark:bg-dark-100 grow rounded-lg bg-white px-2 py-1 outline-1 outline-neutral-200 focus:outline-[1.5px] focus:outline-neutral-600 dark:outline-neutral-600 dark:focus:outline-neutral-400"
-                />
-              </label>
-            </Show>
-            <Show when={streamType === "jetstream"}>
-              <label class="flex items-center justify-end gap-x-1">
-                <span class="min-w-20">DIDs</span>
-                <textarea
-                  name="dids"
-                  spellcheck={false}
-                  placeholder="Comma-separated list of DIDs"
-                  value={searchParams.dids ?? ""}
-                  class="dark:bg-dark-100 grow rounded-lg bg-white px-2 py-1 outline-1 outline-neutral-200 focus:outline-[1.5px] focus:outline-neutral-600 dark:outline-neutral-600 dark:focus:outline-neutral-400"
-                />
-              </label>
-            </Show>
-            <label class="flex items-center justify-end gap-x-1">
-              <span class="min-w-20">Cursor</span>
-              <TextInput
-                name="cursor"
-                placeholder="Leave empty for live-tail"
-                value={searchParams.cursor ?? ""}
-                class="grow"
-              />
-            </label>
-            <Show when={streamType === "jetstream"}>
-              <div class="flex items-center justify-end gap-x-1">
-                <input
-                  type="checkbox"
-                  name="allEvents"
-                  id="allEvents"
-                  checked={searchParams.allEvents === "on" ? true : false}
-                />
-                <label for="allEvents" class="select-none">
-                  Show account and identity events
+
+            <For each={config().fields}>
+              {(field) => (
+                <label class="flex items-center justify-end gap-x-1">
+                  <Show when={field.type === "checkbox"}>
+                    <input
+                      type="checkbox"
+                      name={field.name}
+                      id={field.name}
+                      checked={searchParams[field.searchParam] === "on"}
+                    />
+                  </Show>
+                  <span class="min-w-21 select-none">{field.label}</span>
+                  <Show when={field.type === "textarea"}>
+                    <textarea
+                      name={field.name}
+                      spellcheck={false}
+                      placeholder={field.placeholder}
+                      value={(searchParams[field.searchParam] as string) ?? ""}
+                      class="dark:bg-dark-100 grow rounded-lg bg-white px-2 py-1 outline-1 outline-neutral-200 focus:outline-[1.5px] focus:outline-neutral-600 dark:outline-neutral-600 dark:focus:outline-neutral-400"
+                    />
+                  </Show>
+                  <Show when={field.type === "text"}>
+                    <TextInput
+                      name={field.name}
+                      placeholder={field.placeholder}
+                      value={(searchParams[field.searchParam] as string) ?? ""}
+                      class="grow"
+                    />
+                  </Show>
                 </label>
-              </div>
-            </Show>
+              )}
+            </For>
+
             <div class="flex justify-end gap-2">
-              <Button onClick={() => connectSocket(new FormData(formRef))}>Connect</Button>
+              <Button onClick={() => connectStream(new FormData(formRef))}>Connect</Button>
             </div>
           </form>
         </Show>
+
+        {/* Connected State */}
         <Show when={connected()}>
           <div class="flex w-full flex-col gap-2 p-2">
             <div class="flex flex-col gap-1 text-sm wrap-anywhere">
               <div class="font-semibold">Parameters</div>
               <For each={parameters()}>
                 {(param) => (
-                  <Show when={param.param}>
+                  <Show when={param.value}>
                     <div class="text-sm">
                       <div class="text-xs text-neutral-500 dark:text-neutral-400">{param.name}</div>
-                      <div class="text-neutral-700 dark:text-neutral-300">{param.param}</div>
+                      <div class="text-neutral-700 dark:text-neutral-300">{param.value}</div>
                     </div>
                   </Show>
                 )}
               </For>
             </div>
-            <StreamStatsPanel stats={stats()} currentTime={currentTime()} />
+            <StreamStatsPanel stats={stats()} currentTime={currentTime()} streamType={streamType} />
             <div class="flex justify-end gap-2">
               <button
                 type="button"
                 ontouchstart={(e) => {
                   e.preventDefault();
-                  requestAnimationFrame(() => togglePause());
+                  requestAnimationFrame(() => setPaused(!paused()));
                 }}
-                onclick={togglePause}
+                onclick={() => setPaused(!paused())}
                 class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
               >
                 {paused() ? "Resume" : "Pause"}
@@ -491,9 +429,13 @@ const StreamView = () => {
             </div>
           </div>
         </Show>
+
+        {/* Error Notice */}
         <Show when={notice().length}>
           <div class="text-red-500 dark:text-red-400">{notice()}</div>
         </Show>
+
+        {/* Records List */}
         <Show when={connected() || records().length > 0}>
           <div class="flex min-h-280 w-full flex-col gap-2 font-mono text-xs [overflow-anchor:auto] sm:text-sm">
             <For each={records().toReversed()}>
@@ -510,5 +452,3 @@ const StreamView = () => {
     </>
   );
 };
-
-export { StreamView };

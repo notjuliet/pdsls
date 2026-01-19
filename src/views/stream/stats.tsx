@@ -1,4 +1,5 @@
 import { For, Show } from "solid-js";
+import { STREAM_CONFIGS, StreamType } from "./config";
 
 export type StreamStats = {
   connectedAt?: number;
@@ -22,7 +23,12 @@ const formatUptime = (ms: number) => {
   }
 };
 
-export const StreamStatsPanel = (props: { stats: StreamStats; currentTime: number }) => {
+export const StreamStatsPanel = (props: {
+  stats: StreamStats;
+  currentTime: number;
+  streamType: StreamType;
+}) => {
+  const config = () => STREAM_CONFIGS[props.streamType];
   const uptime = () => (props.stats.connectedAt ? props.currentTime - props.stats.connectedAt : 0);
 
   const topCollections = () =>
@@ -60,7 +66,7 @@ export const StreamStatsPanel = (props: { stats: StreamStats; currentTime: numbe
           </div>
         </div>
 
-        <Show when={topEventTypes().length > 0}>
+        <Show when={topEventTypes().length > 0 && config().showEventTypes}>
           <div class="mt-2">
             <div class="mb-1 text-xs text-neutral-500 dark:text-neutral-400">Event Types</div>
             <div class="grid grid-cols-[1fr_5rem_3rem] gap-x-1 gap-y-0.5 font-mono text-xs sm:gap-x-4">
@@ -86,14 +92,18 @@ export const StreamStatsPanel = (props: { stats: StreamStats; currentTime: numbe
 
         <Show when={topCollections().length > 0}>
           <div class="mt-2">
-            <div class="mb-1 text-xs text-neutral-500 dark:text-neutral-400">Top Collections</div>
+            <div class="mb-1 text-xs text-neutral-500 dark:text-neutral-400">
+              {config().collectionsLabel}
+            </div>
             <div class="grid grid-cols-[1fr_5rem_3rem] gap-x-1 gap-y-0.5 font-mono text-xs sm:gap-x-4">
               <For each={topCollections()}>
                 {([collection, count]) => {
                   const percentage = ((count / props.stats.totalEvents) * 100).toFixed(1);
                   return (
                     <>
-                      <span class="text-neutral-700 dark:text-neutral-300">{collection}</span>
+                      <span class="min-w-0 truncate text-neutral-700 dark:text-neutral-300">
+                        {collection}
+                      </span>
                       <span class="text-right text-neutral-600 tabular-nums dark:text-neutral-400">
                         {count.toLocaleString()}
                       </span>
