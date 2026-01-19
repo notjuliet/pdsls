@@ -5,7 +5,7 @@ import { createEffect, ErrorBoundary, onCleanup, onMount, Show, Suspense } from 
 import { AccountManager } from "./auth/account.jsx";
 import { agent } from "./auth/state.js";
 import { RecordEditor } from "./components/create";
-import { DropdownMenu, MenuProvider, NavMenu } from "./components/dropdown.jsx";
+import { DropdownMenu, MenuProvider, MenuSeparator, NavMenu } from "./components/dropdown.jsx";
 import { NavBar } from "./components/navbar.jsx";
 import { NotificationContainer } from "./components/notification.jsx";
 import { PermissionPromptContainer } from "./components/permission-prompt.jsx";
@@ -160,8 +160,10 @@ const Layout = (props: RouteSectionProps<unknown>) => {
                 <NavMenu href="/jetstream" label="Jetstream" icon="lucide--radio-tower" />
                 <NavMenu href="/firehose" label="Firehose" icon="lucide--rss" />
                 <NavMenu href="/spacedust" label="Spacedust" icon="lucide--orbit" />
+                <MenuSeparator />
                 <NavMenu href="/labels" label="Labels" icon="lucide--tag" />
                 <NavMenu href="/car" label="Archive tools" icon="lucide--folder-archive" />
+                <MenuSeparator />
                 <NavMenu href="/settings" label="Settings" icon="lucide--settings" />
               </DropdownMenu>
             </MenuProvider>
