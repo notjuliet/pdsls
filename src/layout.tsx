@@ -159,6 +159,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
               <DropdownMenu icon="lucide--menu text-lg" buttonClass="rounded-lg p-1.5">
                 <NavMenu href="/jetstream" label="Jetstream" icon="lucide--radio-tower" />
                 <NavMenu href="/firehose" label="Firehose" icon="lucide--rss" />
+                <NavMenu href="/spacedust" label="Spacedust" icon="lucide--orbit" />
                 <NavMenu href="/labels" label="Labels" icon="lucide--tag" />
                 <NavMenu href="/car" label="Archive tools" icon="lucide--folder-archive" />
                 <NavMenu href="/settings" label="Settings" icon="lucide--settings" />

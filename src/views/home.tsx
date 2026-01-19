@@ -1,7 +1,23 @@
 import { A } from "@solidjs/router";
+import { JSX } from "solid-js";
 import { setOpenManager } from "../auth/state.js";
 
 export const Home = () => {
+  const FooterLink = (props: {
+    href: string;
+    color: string;
+    darkColor?: string;
+    children: JSX.Element;
+  }) => (
+    <a
+      href={props.href}
+      class={`relative flex items-center gap-1.5 after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:text-${props.color} after:transition-[width] after:duration-300 after:ease-out hover:after:w-full ${props.darkColor ? `dark:after:text-${props.darkColor}` : ""}`}
+      target="_blank"
+    >
+      {props.children}
+    </a>
+  );
+
   return (
     <div class="flex w-full flex-col gap-6 px-2 wrap-break-word">
       <div class="flex flex-col gap-3">
@@ -28,7 +44,7 @@ export const Home = () => {
               </span>
             </a>
             <a
-              href="https://constellation.microcosm.blue"
+              href="https://microcosm.blue"
               target="_blank"
               class="group grid grid-cols-[auto_1fr] items-center gap-x-2.5 gap-y-0.5 hover:text-blue-500 dark:hover:text-blue-400"
             >
@@ -89,6 +105,19 @@ export const Home = () => {
                 Raw repository event stream
               </span>
             </A>
+            <A
+              href="/spacedust"
+              class="group grid grid-cols-[auto_1fr] items-center gap-x-2.5 gap-y-0.5 hover:text-blue-500 dark:hover:text-blue-400"
+            >
+              <div class="iconify lucide--orbit" />
+              <span class="underline decoration-transparent group-hover:decoration-current">
+                Spacedust
+              </span>
+              <div />
+              <span class="text-xs text-neutral-500 dark:text-neutral-400">
+                Interaction links event stream
+              </span>
+            </A>
           </div>
         </section>
 
@@ -128,33 +157,29 @@ export const Home = () => {
         </section>
       </div>
 
-      <div class="flex justify-center gap-2 text-sm text-neutral-600 dark:text-neutral-300">
-        <a
-          href="https://juli.ee"
-          target="_blank"
-          class="relative flex items-center gap-1.5 after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:text-rose-400 after:transition-[width] after:duration-300 after:ease-out hover:after:w-full dark:after:text-rose-300"
-        >
+      <div class="flex justify-center gap-1.5 text-sm text-neutral-600 sm:gap-2 dark:text-neutral-300">
+        <FooterLink href="https://juli.ee" color="rose-400" darkColor="rose-300">
           <span class="iconify lucide--terminal text-rose-400 dark:text-rose-300"></span>
           <span class="font-pecita">juliet</span>
-        </a>
-        •
-        <a
+        </FooterLink>
+        {/* • */}
+        {/* <FooterLink href="https://raycast.com/" color="[#FF6363]"> */}
+        {/*   <span class="iconify-color i-raycast-light block dark:hidden"></span> */}
+        {/*   <span class="iconify-color i-raycast-dark hidden dark:block"></span> */}
+        {/*   Raycast */}
+        {/* </FooterLink> */}•
+        <FooterLink
           href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz"
-          class="relative flex items-center gap-1.5 after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:text-[#0085ff] after:transition-[width] after:duration-300 after:ease-out hover:after:w-full"
-          target="_blank"
+          color="[#0085ff]"
         >
           <span class="simple-icons--bluesky iconify text-[#0085ff]"></span>
           Bluesky
-        </a>
+        </FooterLink>
         •
-        <a
-          href="https://tangled.org/@pdsls.dev/pdsls/"
-          class="relative flex items-center gap-1.5 after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:text-black after:transition-[width] after:duration-300 after:ease-out hover:after:w-full dark:after:text-white"
-          target="_blank"
-        >
+        <FooterLink href="https://tangled.org/@pdsls.dev/pdsls/" color="black" darkColor="white">
           <span class="iconify i-tangled text-black dark:text-white"></span>
           Source
-        </a>
+        </FooterLink>
       </div>
     </div>
   );
