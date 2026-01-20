@@ -27,9 +27,16 @@ export const StreamStatsPanel = (props: {
   stats: StreamStats;
   currentTime: number;
   streamType: StreamType;
+  showAllEvents?: boolean;
 }) => {
   const config = () => STREAM_CONFIGS[props.streamType];
   const uptime = () => (props.stats.connectedAt ? props.currentTime - props.stats.connectedAt : 0);
+
+  const shouldShowEventTypes = () => {
+    if (!config().showEventTypes) return false;
+    if (props.streamType === "jetstream") return props.showAllEvents === true;
+    return true;
+  };
 
   const topCollections = () =>
     Object.entries(props.stats.collections)
@@ -66,7 +73,7 @@ export const StreamStatsPanel = (props: {
           </div>
         </div>
 
-        <Show when={topEventTypes().length > 0 && config().showEventTypes}>
+        <Show when={topEventTypes().length > 0 && shouldShowEventTypes()}>
           <div class="mt-2">
             <div class="mb-1 text-xs text-neutral-500 dark:text-neutral-400">Event Types</div>
             <div class="grid grid-cols-[1fr_5rem_3rem] gap-x-1 gap-y-0.5 font-mono text-xs sm:gap-x-4">

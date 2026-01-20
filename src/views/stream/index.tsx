@@ -402,7 +402,12 @@ export const StreamView = () => {
                 )}
               </For>
             </div>
-            <StreamStatsPanel stats={stats()} currentTime={currentTime()} streamType={streamType} />
+            <StreamStatsPanel
+              stats={stats()}
+              currentTime={currentTime()}
+              streamType={streamType}
+              showAllEvents={searchParams.allEvents === "on"}
+            />
             <div class="flex justify-end gap-2">
               <button
                 type="button"
