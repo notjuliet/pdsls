@@ -66,14 +66,12 @@ const SearchButton = () => {
   return (
     <button
       onclick={() => setShowSearch(!showSearch())}
-      class="dark:bg-dark-200 text-baseline dark:hover:bg-dark-100 mr-1 box-border flex h-7 items-center gap-1 rounded-md border-[0.5px] border-neutral-300 bg-white px-2 text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-600 dark:active:bg-neutral-700"
+      class="dark:bg-dark-200 dark:hover:bg-dark-100 mr-1 box-border flex h-7.5 items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 text-xs text-neutral-500 hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-600 dark:text-neutral-400 dark:active:bg-neutral-700"
     >
       <span class="iconify lucide--search"></span>
-      <Show
-        when={!isTouchDevice}
-        fallback={<span class="text-neutral-500 dark:text-neutral-400">Search</span>}
-      >
-        <kbd class="font-sans leading-none text-neutral-500 select-none dark:text-neutral-400">
+      <span>Search</span>
+      <Show when={!isTouchDevice}>
+        <kbd class="font-sans text-neutral-400 dark:text-neutral-500">
           {/Mac/i.test(navigator.platform) ? "⌘" : "⌃"}K
         </kbd>
       </Show>
@@ -103,10 +101,18 @@ const Search = () => {
   });
 
   createEffect(() => {
-    if (showSearch()) searchInput.focus();
+    if (showSearch()) {
+      searchInput.focus();
+    } else {
+      setInput(undefined);
+      setSelectedIndex(-1);
+      setSearch(undefined);
+    }
   });
 
-  const fetchTypeahead = async (input: string) => {
+  const fetchTypeahead = async (input: string | undefined) => {
+    if (!input) return [];
+
     const { prefix, query } = parsePrefix(input);
 
     if (prefix === "@") {
@@ -125,8 +131,10 @@ const Search = () => {
 
   const [input, setInput] = createSignal<string>();
   const [selectedIndex, setSelectedIndex] = createSignal(-1);
-  const [isFocused, setIsFocused] = createSignal(false);
-  const [search] = createResource(createDebouncedValue(input, 200), fetchTypeahead);
+  const [search, { mutate: setSearch }] = createResource(
+    createDebouncedValue(input, 200),
+    fetchTypeahead,
+  );
 
   const getPrefixSuggestions = () => {
     const currentInput = input();
@@ -149,8 +157,6 @@ const Search = () => {
     }
 
     setShowSearch(false);
-    setInput(undefined);
-    setSelectedIndex(-1);
 
     const { prefix, query } = parsePrefix(input);
 
@@ -190,156 +196,157 @@ const Search = () => {
   };
 
   return (
-    <form
-      class="relative w-full"
-      onsubmit={(e) => {
-        e.preventDefault();
-        processInput(searchInput.value);
-      }}
-    >
-      <label for="input" class="hidden">
-        PDS URL, AT URI, NSID, DID, or handle
-      </label>
-      <div class="dark:bg-dark-100 flex items-center gap-2 rounded-lg bg-white px-2 outline-1 outline-neutral-200 focus-within:outline-[1.5px] focus-within:outline-neutral-600 dark:outline-neutral-600 dark:focus-within:outline-neutral-400">
-        <label
-          for="input"
-          class="iconify lucide--search text-neutral-500 dark:text-neutral-400"
-        ></label>
-        <input
-          type="text"
-          spellcheck={false}
-          autocapitalize="off"
-          placeholder="Handle, DID, AT URI, NSID, PDS"
-          ref={searchInput}
-          id="input"
-          class="grow py-1.5 select-none placeholder:text-sm focus:outline-none"
-          value={input() ?? ""}
-          onInput={(e) => {
-            setInput(e.currentTarget.value);
-            setSelectedIndex(-1);
+    <Modal open={showSearch()} onClose={() => setShowSearch(false)} alignTop>
+      <div class="dark:bg-dark-200 dark:shadow-dark-700 pointer-events-auto mx-3 w-full max-w-lg rounded-lg border-[0.5px] border-neutral-300 bg-white shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
+        <form
+          class="w-full"
+          onsubmit={(e) => {
+            e.preventDefault();
+            processInput(searchInput.value);
           }}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => {
-            setSelectedIndex(-1);
-            setIsFocused(false);
-          }}
-          onKeyDown={(e) => {
-            const results = search();
-            const prefixSuggestions = getPrefixSuggestions();
-            const totalSuggestions = (prefixSuggestions.length || 0) + (results?.length || 0);
+        >
+          <label for="input" class="hidden">
+            PDS URL, AT URI, NSID, DID, or handle
+          </label>
+          <div
+            class={`flex items-center gap-2 px-2 ${
+              getPrefixSuggestions().length > 0 || search()?.length ? "rounded-t-lg" : "rounded-lg"
+            }`}
+          >
+            <label
+              for="input"
+              class="iconify lucide--search text-neutral-500 dark:text-neutral-400"
+            ></label>
+            <input
+              type="text"
+              spellcheck={false}
+              autocapitalize="off"
+              placeholder="Handle, DID, AT URI, NSID, PDS"
+              ref={searchInput}
+              id="input"
+              class="grow py-2.5 select-none placeholder:text-sm focus:outline-none"
+              value={input() ?? ""}
+              onInput={(e) => {
+                setInput(e.currentTarget.value);
+                setSelectedIndex(-1);
+              }}
+              onBlur={() => setSelectedIndex(-1)}
+              onKeyDown={(e) => {
+                const results = search();
+                const prefixSuggestions = getPrefixSuggestions();
+                const totalSuggestions = (prefixSuggestions.length || 0) + (results?.length || 0);
 
-            if (!totalSuggestions) return;
+                if (!totalSuggestions) return;
 
-            if (e.key === "ArrowDown") {
-              e.preventDefault();
-              setSelectedIndex((prev) => (prev === -1 ? 0 : (prev + 1) % totalSuggestions));
-            } else if (e.key === "ArrowUp") {
-              e.preventDefault();
-              setSelectedIndex((prev) =>
-                prev === -1 ?
-                  totalSuggestions - 1
-                : (prev - 1 + totalSuggestions) % totalSuggestions,
-              );
-            } else if (e.key === "Enter") {
-              const index = selectedIndex();
-              if (index >= 0) {
-                e.preventDefault();
-                if (index < prefixSuggestions.length) {
-                  const selectedPrefix = prefixSuggestions[index];
-                  setInput(selectedPrefix.prefix);
-                  setSelectedIndex(-1);
-                  searchInput.focus();
-                } else {
-                  const adjustedIndex = index - prefixSuggestions.length;
-                  if (results && results[adjustedIndex]) {
+                if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  setSelectedIndex((prev) => (prev === -1 ? 0 : (prev + 1) % totalSuggestions));
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  setSelectedIndex((prev) =>
+                    prev === -1 ?
+                      totalSuggestions - 1
+                    : (prev - 1 + totalSuggestions) % totalSuggestions,
+                  );
+                } else if (e.key === "Enter") {
+                  const index = selectedIndex();
+                  if (index >= 0) {
+                    e.preventDefault();
+                    if (index < prefixSuggestions.length) {
+                      const selectedPrefix = prefixSuggestions[index];
+                      setInput(selectedPrefix.prefix);
+                      setSelectedIndex(-1);
+                      searchInput.focus();
+                    } else {
+                      const adjustedIndex = index - prefixSuggestions.length;
+                      if (results && results[adjustedIndex]) {
+                        setShowSearch(false);
+                        navigate(`/at://${results[adjustedIndex].did}`);
+                      }
+                    }
+                  } else if (results?.length && prefixSuggestions.length === 0) {
+                    e.preventDefault();
                     setShowSearch(false);
-                    setInput(undefined);
-                    navigate(`/at://${results[adjustedIndex].did}`);
-                    setSelectedIndex(-1);
+                    navigate(`/at://${results[0].did}`);
                   }
                 }
-              } else if (results?.length && prefixSuggestions.length === 0) {
-                e.preventDefault();
-                setShowSearch(false);
-                setInput(undefined);
-                navigate(`/at://${results[0].did}`);
-                setSelectedIndex(-1);
-              }
-            }
-          }}
-        />
-        <Show when={input()} fallback={ListUrlsTooltip()}>
-          <button
-            type="button"
-            class="flex items-center rounded-md p-1 hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
-            onClick={() => setInput(undefined)}
-          >
-            <span class="iconify lucide--x"></span>
-          </button>
-        </Show>
-      </div>
-      <Show when={isFocused() && (getPrefixSuggestions().length > 0 || search()?.length)}>
-        <div
-          class="dark:bg-dark-300 dark:shadow-dark-700 absolute z-30 mt-1 flex w-full flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0"
-          onMouseDown={(e) => e.preventDefault()}
-        >
-          {/* Prefix suggestions */}
-          <For each={getPrefixSuggestions()}>
-            {(prefixItem, index) => (
+              }}
+            />
+            <Show when={input()} fallback={ListUrlsTooltip()}>
               <button
                 type="button"
-                class={`flex items-center rounded-md p-2 ${
-                  index() === selectedIndex() ?
-                    "bg-neutral-200 dark:bg-neutral-700"
-                  : "hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                }`}
-                onClick={() => {
-                  setInput(prefixItem.prefix);
-                  setSelectedIndex(-1);
-                  searchInput.focus();
-                }}
+                class="dark:hover:bg-dark-100 flex items-center rounded-md p-1 hover:bg-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-700"
+                onClick={() => setInput(undefined)}
               >
-                <span class={`text-sm font-semibold`}>{prefixItem.prefix}</span>
-                <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                  {prefixItem.description}
-                </span>
+                <span class="iconify lucide--x"></span>
               </button>
-            )}
-          </For>
+            </Show>
+          </div>
 
-          {/* Typeahead results */}
-          <For each={search()}>
-            {(actor, index) => {
-              const adjustedIndex = getPrefixSuggestions().length + index();
-              return (
-                <A
-                  class={`flex items-center gap-2 rounded-md p-2 ${
-                    adjustedIndex === selectedIndex() ?
-                      "bg-neutral-200 dark:bg-neutral-700"
-                    : "hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                  }`}
-                  href={`/at://${actor.did}`}
-                  onClick={() => setShowSearch(false)}
-                >
-                  <img
-                    src={actor.avatar?.replace("img/avatar/", "img/avatar_thumbnail/")}
-                    class="size-9 rounded-full"
-                  />
-                  <div class="flex min-w-0 flex-col">
-                    <Show when={actor.displayName}>
-                      <span class="truncate text-sm font-medium">{actor.displayName}</span>
-                    </Show>
-                    <span class="truncate text-xs text-neutral-600 dark:text-neutral-400">
-                      @{actor.handle}
+          <Show when={getPrefixSuggestions().length > 0 || (input() && search()?.length)}>
+            <div
+              class="flex w-full flex-col border-t border-neutral-200 p-2 dark:border-neutral-700"
+              onMouseDown={(e) => e.preventDefault()}
+            >
+              {/* Prefix suggestions */}
+              <For each={getPrefixSuggestions()}>
+                {(prefixItem, index) => (
+                  <button
+                    type="button"
+                    class={`flex items-center rounded-md p-2 ${
+                      index() === selectedIndex() ?
+                        "bg-neutral-200 dark:bg-neutral-700"
+                      : "dark:hover:bg-dark-100 hover:bg-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-700"
+                    }`}
+                    onClick={() => {
+                      setInput(prefixItem.prefix);
+                      setSelectedIndex(-1);
+                      searchInput.focus();
+                    }}
+                  >
+                    <span class={`text-sm font-semibold`}>{prefixItem.prefix}</span>
+                    <span class="text-sm text-neutral-600 dark:text-neutral-400">
+                      {prefixItem.description}
                     </span>
-                  </div>
-                </A>
-              );
-            }}
-          </For>
-        </div>
-      </Show>
-    </form>
+                  </button>
+                )}
+              </For>
+
+              {/* Typeahead results */}
+              <For each={search()}>
+                {(actor, index) => {
+                  const adjustedIndex = getPrefixSuggestions().length + index();
+                  return (
+                    <A
+                      class={`flex items-center gap-2 rounded-md p-2 ${
+                        adjustedIndex === selectedIndex() ?
+                          "bg-neutral-200 dark:bg-neutral-700"
+                        : "dark:hover:bg-dark-100 hover:bg-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-700"
+                      }`}
+                      href={`/at://${actor.did}`}
+                      onClick={() => setShowSearch(false)}
+                    >
+                      <img
+                        src={actor.avatar?.replace("img/avatar/", "img/avatar_thumbnail/")}
+                        class="size-9 rounded-full"
+                      />
+                      <div class="flex min-w-0 flex-col">
+                        <Show when={actor.displayName}>
+                          <span class="truncate text-sm font-medium">{actor.displayName}</span>
+                        </Show>
+                        <span class="truncate text-xs text-neutral-600 dark:text-neutral-400">
+                          @{actor.handle}
+                        </span>
+                      </div>
+                    </A>
+                  );
+                }}
+              </For>
+            </div>
+          </Show>
+        </form>
+      </div>
+    </Modal>
   );
 };
 
@@ -392,7 +399,7 @@ const ListUrlsTooltip = () => {
       </Modal>
       <button
         type="button"
-        class="flex items-center rounded-md p-1 hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
+        class="dark:hover:bg-dark-100 flex items-center rounded-md p-1 hover:bg-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-700"
         onClick={() => setOpenList(true)}
       >
         <span class="iconify lucide--help-circle text-neutral-600 dark:text-neutral-300"></span>

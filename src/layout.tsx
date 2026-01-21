@@ -9,7 +9,7 @@ import { DropdownMenu, MenuProvider, MenuSeparator, NavMenu } from "./components
 import { NavBar } from "./components/navbar.jsx";
 import { NotificationContainer } from "./components/notification.jsx";
 import { PermissionPromptContainer } from "./components/permission-prompt.jsx";
-import { Search, SearchButton, showSearch } from "./components/search.jsx";
+import { Search, SearchButton } from "./components/search.jsx";
 import { themeEvent } from "./components/theme.jsx";
 import { resolveHandle } from "./utils/api.js";
 import { plcDirectory } from "./views/settings.jsx";
@@ -126,7 +126,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
       </Show>
       <div id="main" class="mx-auto mb-8 flex max-w-lg flex-col items-center p-3">
         <header
-          class={`dark:shadow-dark-700 mb-3 flex w-full items-center justify-between rounded-xl border-[0.5px] border-neutral-300 bg-neutral-50 bg-size-[95%] bg-right bg-no-repeat p-2 pl-3 shadow-xs [--header-bg:#fafafa] [--trans-blue:#5BCEFA90] [--trans-pink:#F5A9B890] [--trans-white:#FFFFFF90] dark:border-neutral-700 dark:bg-neutral-800 dark:[--header-bg:#262626] dark:[--trans-blue:#5BCEFAa0] dark:[--trans-pink:#F5A9B8a0] dark:[--trans-white:#FFFFFFa0] ${localStorage.getItem("hrt") === "true" ? "bg-[linear-gradient(to_left,transparent_10%,var(--header-bg)_85%),linear-gradient(to_bottom,var(--trans-blue)_0%,var(--trans-blue)_20%,var(--trans-pink)_20%,var(--trans-pink)_40%,var(--trans-white)_40%,var(--trans-white)_60%,var(--trans-pink)_60%,var(--trans-pink)_80%,var(--trans-blue)_80%,var(--trans-blue)_100%)]" : ""}`}
+          class={`dark:shadow-dark-700 mb-3 flex h-13 w-full items-center justify-between rounded-xl border-[0.5px] border-neutral-300 bg-neutral-50 bg-size-[95%] bg-right bg-no-repeat p-2 pl-3 shadow-xs [--header-bg:#fafafa] [--trans-blue:#5BCEFA90] [--trans-pink:#F5A9B890] [--trans-white:#FFFFFF90] dark:border-neutral-700 dark:bg-neutral-800 dark:[--header-bg:#262626] dark:[--trans-blue:#5BCEFAa0] dark:[--trans-pink:#F5A9B8a0] dark:[--trans-white:#FFFFFFa0] ${localStorage.getItem("hrt") === "true" ? "bg-[linear-gradient(to_left,transparent_10%,var(--header-bg)_85%),linear-gradient(to_bottom,var(--trans-blue)_0%,var(--trans-blue)_20%,var(--trans-pink)_20%,var(--trans-pink)_40%,var(--trans-white)_40%,var(--trans-white)_60%,var(--trans-pink)_60%,var(--trans-pink)_80%,var(--trans-blue)_80%,var(--trans-blue)_100%)]" : ""}`}
           style={{
             "background-image":
               props.params.repo && props.params.repo in headers ?
@@ -149,7 +149,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
               />
             </Show>
           </A>
-          <div class="relative flex items-center gap-0.5 rounded-lg bg-neutral-50/60 px-1 py-0.5 dark:bg-neutral-800/60">
+          <div class="relative flex items-center gap-0.5 rounded-lg bg-neutral-50/60 p-1 dark:bg-neutral-800/60">
             <SearchButton />
             <Show when={agent()}>
               <RecordEditor create={true} scope="create" />
@@ -170,9 +170,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           </div>
         </header>
         <div class="flex w-full flex-col items-center gap-3 text-pretty">
-          <Show when={showSearch() || location.pathname === "/"}>
-            <Search />
-          </Show>
+          <Search />
           <Show when={props.params.pds}>
             <NavBar params={props.params} />
           </Show>
