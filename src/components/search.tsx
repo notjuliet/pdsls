@@ -66,7 +66,7 @@ const SearchButton = () => {
   return (
     <button
       onclick={() => setShowSearch(!showSearch())}
-      class="dark:bg-dark-200 dark:hover:bg-dark-100 mr-1 box-border flex h-7.5 items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-white px-2 text-xs text-neutral-500 hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-600 dark:text-neutral-400 dark:active:bg-neutral-700"
+      class="dark:bg-dark-200 dark:hover:bg-dark-100 mr-1 box-border flex h-7.5 items-center gap-1 rounded-md border-[0.5px] border-neutral-300 bg-white px-2 text-xs text-neutral-500 hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-600 dark:text-neutral-400 dark:active:bg-neutral-700"
     >
       <span class="iconify lucide--search"></span>
       <span>Search</span>
@@ -196,154 +196,159 @@ const Search = () => {
   };
 
   return (
-    <Modal open={showSearch()} onClose={() => setShowSearch(false)} alignTop contentClass="dark:bg-dark-200 dark:shadow-dark-700 pointer-events-auto mx-3 w-full max-w-lg rounded-lg border-[0.5px] border-neutral-300 bg-white shadow-md dark:border-neutral-700">
-        <form
-          class="w-full"
-          onsubmit={(e) => {
-            e.preventDefault();
-            processInput(searchInput.value);
-          }}
+    <Modal
+      open={showSearch()}
+      onClose={() => setShowSearch(false)}
+      alignTop
+      contentClass="dark:bg-dark-200 dark:shadow-dark-700 pointer-events-auto mx-3 w-full max-w-lg rounded-lg border-[0.5px] border-neutral-300 bg-white shadow-md dark:border-neutral-700"
+    >
+      <form
+        class="w-full"
+        onsubmit={(e) => {
+          e.preventDefault();
+          processInput(searchInput.value);
+        }}
+      >
+        <label for="input" class="hidden">
+          PDS URL, AT URI, NSID, DID, or handle
+        </label>
+        <div
+          class={`flex items-center gap-2 px-2 ${
+            getPrefixSuggestions().length > 0 || search()?.length ? "rounded-t-lg" : "rounded-lg"
+          }`}
         >
-          <label for="input" class="hidden">
-            PDS URL, AT URI, NSID, DID, or handle
-          </label>
-          <div
-            class={`flex items-center gap-2 px-2 ${
-              getPrefixSuggestions().length > 0 || search()?.length ? "rounded-t-lg" : "rounded-lg"
-            }`}
-          >
-            <label
-              for="input"
-              class="iconify lucide--search text-neutral-500 dark:text-neutral-400"
-            ></label>
-            <input
-              type="text"
-              spellcheck={false}
-              autocapitalize="off"
-              placeholder="Handle, DID, AT URI, NSID, PDS"
-              ref={searchInput}
-              id="input"
-              class="grow py-2.5 select-none placeholder:text-sm focus:outline-none"
-              value={input() ?? ""}
-              onInput={(e) => {
-                setInput(e.currentTarget.value);
-                setSelectedIndex(-1);
-              }}
-              onBlur={() => setSelectedIndex(-1)}
-              onKeyDown={(e) => {
-                const results = search();
-                const prefixSuggestions = getPrefixSuggestions();
-                const totalSuggestions = (prefixSuggestions.length || 0) + (results?.length || 0);
+          <label
+            for="input"
+            class="iconify lucide--search text-neutral-500 dark:text-neutral-400"
+          ></label>
+          <input
+            type="text"
+            spellcheck={false}
+            autocapitalize="off"
+            placeholder="Handle, DID, AT URI, NSID, PDS"
+            ref={searchInput}
+            id="input"
+            class="grow py-2.5 select-none placeholder:text-sm focus:outline-none"
+            value={input() ?? ""}
+            onInput={(e) => {
+              setInput(e.currentTarget.value);
+              setSelectedIndex(-1);
+            }}
+            onBlur={() => setSelectedIndex(-1)}
+            onKeyDown={(e) => {
+              const results = search();
+              const prefixSuggestions = getPrefixSuggestions();
+              const totalSuggestions = (prefixSuggestions.length || 0) + (results?.length || 0);
 
-                if (!totalSuggestions) return;
+              if (!totalSuggestions) return;
 
-                if (e.key === "ArrowDown") {
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setSelectedIndex((prev) => (prev === -1 ? 0 : (prev + 1) % totalSuggestions));
+              } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setSelectedIndex((prev) =>
+                  prev === -1 ?
+                    totalSuggestions - 1
+                  : (prev - 1 + totalSuggestions) % totalSuggestions,
+                );
+              } else if (e.key === "Enter") {
+                const index = selectedIndex();
+                if (index >= 0) {
                   e.preventDefault();
-                  setSelectedIndex((prev) => (prev === -1 ? 0 : (prev + 1) % totalSuggestions));
-                } else if (e.key === "ArrowUp") {
-                  e.preventDefault();
-                  setSelectedIndex((prev) =>
-                    prev === -1 ?
-                      totalSuggestions - 1
-                    : (prev - 1 + totalSuggestions) % totalSuggestions,
-                  );
-                } else if (e.key === "Enter") {
-                  const index = selectedIndex();
-                  if (index >= 0) {
-                    e.preventDefault();
-                    if (index < prefixSuggestions.length) {
-                      const selectedPrefix = prefixSuggestions[index];
-                      setInput(selectedPrefix.prefix);
-                      setSelectedIndex(-1);
-                      searchInput.focus();
-                    } else {
-                      const adjustedIndex = index - prefixSuggestions.length;
-                      if (results && results[adjustedIndex]) {
-                        setShowSearch(false);
-                        navigate(`/at://${results[adjustedIndex].did}`);
-                      }
+                  if (index < prefixSuggestions.length) {
+                    const selectedPrefix = prefixSuggestions[index];
+                    setInput(selectedPrefix.prefix);
+                    setSelectedIndex(-1);
+                    searchInput.focus();
+                  } else {
+                    const adjustedIndex = index - prefixSuggestions.length;
+                    if (results && results[adjustedIndex]) {
+                      setShowSearch(false);
+                      navigate(`/at://${results[adjustedIndex].did}`);
                     }
-                  } else if (results?.length && prefixSuggestions.length === 0) {
-                    e.preventDefault();
-                    setShowSearch(false);
-                    navigate(`/at://${results[0].did}`);
                   }
+                } else if (results?.length && prefixSuggestions.length === 0) {
+                  e.preventDefault();
+                  setShowSearch(false);
+                  navigate(`/at://${results[0].did}`);
                 }
-              }}
-            />
-            <Show when={input()} fallback={ListUrlsTooltip()}>
-              <button
-                type="button"
-                class="dark:hover:bg-dark-100 flex items-center rounded-md p-1 hover:bg-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-700"
-                onClick={() => setInput(undefined)}
-              >
-                <span class="iconify lucide--x"></span>
-              </button>
-            </Show>
-          </div>
-
-          <Show when={getPrefixSuggestions().length > 0 || (input() && search()?.length)}>
-            <div
-              class="flex w-full flex-col border-t border-neutral-200 p-2 dark:border-neutral-700"
-              onMouseDown={(e) => e.preventDefault()}
+              }
+            }}
+          />
+          <Show when={input()} fallback={ListUrlsTooltip()}>
+            <button
+              type="button"
+              class="dark:hover:bg-dark-100 flex items-center rounded-md p-1 hover:bg-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-700"
+              onClick={() => setInput(undefined)}
             >
-              {/* Prefix suggestions */}
-              <For each={getPrefixSuggestions()}>
-                {(prefixItem, index) => (
-                  <button
-                    type="button"
-                    class={`flex items-center rounded-md p-2 ${
-                      index() === selectedIndex() ?
+              <span class="iconify lucide--x"></span>
+            </button>
+          </Show>
+        </div>
+
+        <Show when={getPrefixSuggestions().length > 0 || (input() && search()?.length)}>
+          <div
+            class="flex w-full flex-col border-t border-neutral-200 p-2 dark:border-neutral-700"
+            onMouseDown={(e) => e.preventDefault()}
+          >
+            {/* Prefix suggestions */}
+            <For each={getPrefixSuggestions()}>
+              {(prefixItem, index) => (
+                <button
+                  type="button"
+                  class={`flex items-center rounded-md p-2 ${
+                    index() === selectedIndex() ?
+                      "bg-neutral-200 dark:bg-neutral-700"
+                    : "dark:hover:bg-dark-100 hover:bg-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-700"
+                  }`}
+                  onClick={() => {
+                    setInput(prefixItem.prefix);
+                    setSelectedIndex(-1);
+                    searchInput.focus();
+                  }}
+                >
+                  <span class={`text-sm font-semibold`}>{prefixItem.prefix}</span>
+                  <span class="text-sm text-neutral-600 dark:text-neutral-400">
+                    {prefixItem.description}
+                  </span>
+                </button>
+              )}
+            </For>
+
+            {/* Typeahead results */}
+            <For each={search()}>
+              {(actor, index) => {
+                const adjustedIndex = getPrefixSuggestions().length + index();
+                return (
+                  <A
+                    class={`flex items-center gap-2 rounded-md p-2 ${
+                      adjustedIndex === selectedIndex() ?
                         "bg-neutral-200 dark:bg-neutral-700"
                       : "dark:hover:bg-dark-100 hover:bg-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-700"
                     }`}
-                    onClick={() => {
-                      setInput(prefixItem.prefix);
-                      setSelectedIndex(-1);
-                      searchInput.focus();
-                    }}
+                    href={`/at://${actor.did}`}
+                    onClick={() => setShowSearch(false)}
                   >
-                    <span class={`text-sm font-semibold`}>{prefixItem.prefix}</span>
-                    <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                      {prefixItem.description}
-                    </span>
-                  </button>
-                )}
-              </For>
-
-              {/* Typeahead results */}
-              <For each={search()}>
-                {(actor, index) => {
-                  const adjustedIndex = getPrefixSuggestions().length + index();
-                  return (
-                    <A
-                      class={`flex items-center gap-2 rounded-md p-2 ${
-                        adjustedIndex === selectedIndex() ?
-                          "bg-neutral-200 dark:bg-neutral-700"
-                        : "dark:hover:bg-dark-100 hover:bg-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-700"
-                      }`}
-                      href={`/at://${actor.did}`}
-                      onClick={() => setShowSearch(false)}
-                    >
-                      <img
-                        src={actor.avatar?.replace("img/avatar/", "img/avatar_thumbnail/")}
-                        class="size-9 rounded-full"
-                      />
-                      <div class="flex min-w-0 flex-col">
-                        <Show when={actor.displayName}>
-                          <span class="truncate text-sm font-medium">{actor.displayName}</span>
-                        </Show>
-                        <span class="truncate text-xs text-neutral-600 dark:text-neutral-400">
-                          @{actor.handle}
-                        </span>
-                      </div>
-                    </A>
-                  );
-                }}
-              </For>
-            </div>
-          </Show>
-        </form>
+                    <img
+                      src={actor.avatar?.replace("img/avatar/", "img/avatar_thumbnail/")}
+                      class="size-9 rounded-full"
+                    />
+                    <div class="flex min-w-0 flex-col">
+                      <Show when={actor.displayName}>
+                        <span class="truncate text-sm font-medium">{actor.displayName}</span>
+                      </Show>
+                      <span class="truncate text-xs text-neutral-600 dark:text-neutral-400">
+                        @{actor.handle}
+                      </span>
+                    </div>
+                  </A>
+                );
+              }}
+            </For>
+          </div>
+        </Show>
+      </form>
     </Modal>
   );
 };
@@ -359,39 +364,43 @@ const ListUrlsTooltip = () => {
 
   return (
     <>
-      <Modal open={openList()} onClose={() => setOpenList(false)} alignTop contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-88 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md sm:w-104 dark:border-neutral-700">
-          <div class="mb-2 flex items-center gap-1 font-semibold">
-            <span class="iconify lucide--link"></span>
-            <span>Supported URLs</span>
-          </div>
-          <div class="mb-2 text-sm text-neutral-600 dark:text-neutral-400">
-            Links that will be parsed automatically, as long as all the data necessary is on the
-            URL.
-          </div>
-          <div class="flex flex-col gap-2 text-sm">
-            <For each={Object.entries(appName)}>
-              {([appView, name]) => {
-                return (
-                  <div>
-                    <p class="font-semibold">{name}</p>
-                    <div class="grid grid-cols-2 gap-x-4 text-neutral-600 dark:text-neutral-400">
-                      <For each={urls[appView]}>
-                        {(url) => (
-                          <a
-                            href={`${url.startsWith("localhost:") ? "http://" : "https://"}${url}`}
-                            target="_blank"
-                            class="hover:underline active:underline"
-                          >
-                            {url}
-                          </a>
-                        )}
-                      </For>
-                    </div>
+      <Modal
+        open={openList()}
+        onClose={() => setOpenList(false)}
+        alignTop
+        contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-88 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md sm:w-104 dark:border-neutral-700"
+      >
+        <div class="mb-2 flex items-center gap-1 font-semibold">
+          <span class="iconify lucide--link"></span>
+          <span>Supported URLs</span>
+        </div>
+        <div class="mb-2 text-sm text-neutral-600 dark:text-neutral-400">
+          Links that will be parsed automatically, as long as all the data necessary is on the URL.
+        </div>
+        <div class="flex flex-col gap-2 text-sm">
+          <For each={Object.entries(appName)}>
+            {([appView, name]) => {
+              return (
+                <div>
+                  <p class="font-semibold">{name}</p>
+                  <div class="grid grid-cols-2 gap-x-4 text-neutral-600 dark:text-neutral-400">
+                    <For each={urls[appView]}>
+                      {(url) => (
+                        <a
+                          href={`${url.startsWith("localhost:") ? "http://" : "https://"}${url}`}
+                          target="_blank"
+                          class="hover:underline active:underline"
+                        >
+                          {url}
+                        </a>
+                      )}
+                    </For>
                   </div>
-                );
-              }}
-            </For>
-          </div>
+                </div>
+              );
+            }}
+          </For>
+        </div>
       </Modal>
       <button
         type="button"

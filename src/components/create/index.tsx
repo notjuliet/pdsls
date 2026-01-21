@@ -463,8 +463,8 @@ export const RecordEditor = (props: {
         <button
           class={
             hasPermission() ?
-              `flex items-center p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 ${props.create ? "rounded-lg" : "rounded-sm"}`
-            : `flex items-center p-1.5 opacity-40 ${props.create ? "rounded-lg" : "rounded-sm"}`
+              `flex items-center p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 ${props.create ? "rounded-md" : "rounded-sm"}`
+            : `flex items-center p-1.5 opacity-40 ${props.create ? "rounded-md" : "rounded-sm"}`
           }
           onclick={() => {
             if (hasPermission()) {
