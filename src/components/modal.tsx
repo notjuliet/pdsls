@@ -56,7 +56,7 @@ export const Modal = (props: ModalProps) => {
         }}
       >
         <div
-          class={`transition-all ease-in starting:scale-95 starting:opacity-0 ${props.contentClass ?? ""}`}
+          class={`transition-all starting:scale-95 starting:opacity-0 ${props.contentClass ?? ""}`}
         >
           {props.children}
         </div>
