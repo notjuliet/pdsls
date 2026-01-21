@@ -3,17 +3,15 @@ export type AppUrl = `${string}.${string}` | `localhost:${number}`;
 export enum App {
   Bluesky,
   Tangled,
-  Frontpage,
   Pinksea,
-  Linkat,
+  Frontpage,
 }
 
 export const appName = {
   [App.Bluesky]: "Bluesky",
   [App.Tangled]: "Tangled",
-  [App.Frontpage]: "Frontpage",
   [App.Pinksea]: "Pinksea",
-  [App.Linkat]: "Linkat",
+  [App.Frontpage]: "Frontpage",
 };
 
 export const appList: Record<AppUrl, App> = {
@@ -22,15 +20,12 @@ export const appList: Record<AppUrl, App> = {
   "bsky.app": App.Bluesky,
   "catsky.social": App.Bluesky,
   "deer.aylac.top": App.Bluesky,
-  "deer-social-ayla.pages.dev": App.Bluesky,
   "deer.social": App.Bluesky,
   "main.bsky.dev": App.Bluesky,
-  "social.daniela.lol": App.Bluesky,
   "witchsky.app": App.Bluesky,
   "tangled.org": App.Tangled,
   "frontpage.fyi": App.Frontpage,
   "pinksea.art": App.Pinksea,
-  "linkat.blue": App.Linkat,
 };
 
 export const appHandleLink: Record<App, (url: string[]) => string> = {
@@ -53,7 +48,7 @@ export const appHandleLink: Record<App, (url: string[]) => string> = {
           return `at://${user}/app.bsky.graph.follow/${rkey}`;
         }
       } else {
-        return `at://${user}`;
+        return `at://${user}/app.bsky.actor.profile/self`;
       }
     } else if (baseType === "starter-pack") {
       return `at://${user}/app.bsky.graph.starterpack/${path[2]}`;
@@ -106,5 +101,4 @@ export const appHandleLink: Record<App, (url: string[]) => string> = {
 
     return `at://${path[0]}`;
   },
-  [App.Linkat]: (path) => `at://${path[0]}/blue.linkat.board/self`,
 };

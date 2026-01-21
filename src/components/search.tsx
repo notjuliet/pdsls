@@ -16,6 +16,37 @@ import { appHandleLink, appList, appName, AppUrl } from "../utils/app-urls";
 import { createDebouncedValue } from "../utils/hooks/debounced";
 import { Modal } from "./modal";
 
+type RecentSearch = {
+  path: string;
+  label: string;
+  type: "handle" | "did" | "at-uri" | "lexicon" | "pds" | "url";
+};
+
+const RECENT_SEARCHES_KEY = "recent-searches";
+const MAX_RECENT_SEARCHES = 5;
+
+const getRecentSearches = (): RecentSearch[] => {
+  try {
+    const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
+const addRecentSearch = (search: RecentSearch) => {
+  const searches = getRecentSearches();
+  const filtered = searches.filter((s) => s.path !== search.path);
+  const updated = [search, ...filtered].slice(0, MAX_RECENT_SEARCHES);
+  localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+};
+
+const removeRecentSearch = (path: string) => {
+  const searches = getRecentSearches();
+  const updated = searches.filter((s) => s.path !== path);
+  localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+};
+
 export const [showSearch, setShowSearch] = createSignal(false);
 
 const SEARCH_PREFIXES: { prefix: string; description: string }[] = [
@@ -37,7 +68,7 @@ const parsePrefix = (input: string): { prefix: string | null; query: string } =>
   return { prefix: null, query: input };
 };
 
-const SearchButton = () => {
+export const SearchButton = () => {
   onMount(() => window.addEventListener("keydown", keyEvent));
   onCleanup(() => window.removeEventListener("keydown", keyEvent));
 
@@ -79,12 +110,13 @@ const SearchButton = () => {
   );
 };
 
-const Search = () => {
+export const Search = () => {
   const navigate = useNavigate();
   let searchInput!: HTMLInputElement;
   const rpc = new Client({
     handler: simpleFetchHandler({ service: "https://public.api.bsky.app" }),
   });
+  const [recentSearches, setRecentSearches] = createSignal<RecentSearch[]>(getRecentSearches());
 
   onMount(() => {
     const handlePaste = (e: ClipboardEvent) => {
@@ -136,14 +168,15 @@ const Search = () => {
     fetchTypeahead,
   );
 
-  const getPrefixSuggestions = () => {
-    const currentInput = input();
-    if (!currentInput) return SEARCH_PREFIXES;
+  const getRecentSuggestions = () => {
+    const currentInput = input()?.toLowerCase();
+    if (!currentInput) return recentSearches();
+    return recentSearches().filter((r) => r.label.toLowerCase().includes(currentInput));
+  };
 
-    const { prefix, query } = parsePrefix(currentInput);
-    if (prefix && query.length > 0) return [];
-
-    return SEARCH_PREFIXES.filter((p) => p.prefix.startsWith(currentInput.toLowerCase()));
+  const saveRecentSearch = (path: string, label: string, type: RecentSearch["type"]) => {
+    addRecentSearch({ path, label, type });
+    setRecentSearches(getRecentSearches());
   };
 
   const processInput = async (input: string) => {
@@ -161,37 +194,55 @@ const Search = () => {
     const { prefix, query } = parsePrefix(input);
 
     if (prefix === "@") {
-      navigate(`/at://${query}`);
+      const path = `/at://${query}`;
+      saveRecentSearch(path, query, "handle");
+      navigate(path);
     } else if (prefix === "did:") {
-      navigate(`/at://did:${query}`);
+      const path = `/at://did:${query}`;
+      saveRecentSearch(path, `did:${query}`, "did");
+      navigate(path);
     } else if (prefix === "at:") {
-      navigate(`/${input}`);
+      const path = `/${input}`;
+      saveRecentSearch(path, input, "at-uri");
+      navigate(path);
     } else if (prefix === "lex:") {
       if (query.split(".").length >= 3) {
         const nsid = query as Nsid;
         const res = await resolveLexiconAuthority(nsid);
-        navigate(`/at://${res}/com.atproto.lexicon.schema/${nsid}`);
+        const path = `/at://${res}/com.atproto.lexicon.schema/${nsid}`;
+        saveRecentSearch(path, query, "lexicon");
+        navigate(path);
       } else {
         const did = await resolveLexiconAuthorityDirect(query);
-        navigate(`/at://${did}/com.atproto.lexicon.schema`);
+        const path = `/at://${did}/com.atproto.lexicon.schema`;
+        saveRecentSearch(path, query, "lexicon");
+        navigate(path);
       }
     } else if (prefix === "pds:") {
-      navigate(`/${query}`);
+      const path = `/${query}`;
+      saveRecentSearch(path, query, "pds");
+      navigate(path);
     } else if (input.startsWith("https://") || input.startsWith("http://")) {
       const hostLength = input.indexOf("/", 8);
       const host = input.slice(0, hostLength).replace("https://", "").replace("http://", "");
 
       if (!(host in appList)) {
-        navigate(`/${input.replace("https://", "").replace("http://", "").replace("/", "")}`);
+        const path = `/${input.replace("https://", "").replace("http://", "").replace("/", "")}`;
+        saveRecentSearch(path, input, "url");
+        navigate(path);
       } else {
         const app = appList[host as AppUrl];
-        const path = input.slice(hostLength + 1).split("/");
-
-        const uri = appHandleLink[app](path);
-        navigate(`/${uri}`);
+        const pathParts = input.slice(hostLength + 1).split("/");
+        const uri = appHandleLink[app](pathParts);
+        const path = `/${uri}`;
+        saveRecentSearch(path, input, "url");
+        navigate(path);
       }
     } else {
-      navigate(`/at://${input.replace("at://", "")}`);
+      const path = `/at://${input.replace("at://", "")}`;
+      const type = input.split("/").length > 1 ? "at-uri" : "handle";
+      saveRecentSearch(path, input, type);
+      navigate(path);
     }
   };
 
@@ -200,7 +251,7 @@ const Search = () => {
       open={showSearch()}
       onClose={() => setShowSearch(false)}
       alignTop
-      contentClass="dark:bg-dark-200 dark:shadow-dark-700 pointer-events-auto mx-3 w-full max-w-lg rounded-lg border-[0.5px] border-neutral-300 bg-white shadow-md dark:border-neutral-700"
+      contentClass="dark:bg-dark-200 dark:shadow-dark-700 pointer-events-auto mx-3 w-full max-w-lg rounded-lg border-[0.5px] min-w-0 border-neutral-300 bg-white shadow-md dark:border-neutral-700"
     >
       <form
         class="w-full"
@@ -210,11 +261,11 @@ const Search = () => {
         }}
       >
         <label for="input" class="hidden">
-          PDS URL, AT URI, NSID, DID, or handle
+          Search or paste a link
         </label>
         <div
-          class={`flex items-center gap-2 px-2 ${
-            getPrefixSuggestions().length > 0 || search()?.length ? "rounded-t-lg" : "rounded-lg"
+          class={`flex items-center gap-2 px-3 ${
+            getRecentSuggestions().length > 0 || search()?.length ? "rounded-t-lg" : "rounded-lg"
           }`}
         >
           <label
@@ -225,7 +276,7 @@ const Search = () => {
             type="text"
             spellcheck={false}
             autocapitalize="off"
-            placeholder="Handle, DID, AT URI, NSID, PDS"
+            placeholder="Search or paste a link..."
             ref={searchInput}
             id="input"
             class="grow py-2.5 select-none placeholder:text-sm focus:outline-none"
@@ -237,8 +288,8 @@ const Search = () => {
             onBlur={() => setSelectedIndex(-1)}
             onKeyDown={(e) => {
               const results = search();
-              const prefixSuggestions = getPrefixSuggestions();
-              const totalSuggestions = (prefixSuggestions.length || 0) + (results?.length || 0);
+              const recent = getRecentSuggestions();
+              const totalSuggestions = recent.length + (results?.length || 0);
 
               if (!totalSuggestions) return;
 
@@ -256,79 +307,121 @@ const Search = () => {
                 const index = selectedIndex();
                 if (index >= 0) {
                   e.preventDefault();
-                  if (index < prefixSuggestions.length) {
-                    const selectedPrefix = prefixSuggestions[index];
-                    setInput(selectedPrefix.prefix);
-                    setSelectedIndex(-1);
-                    searchInput.focus();
+                  if (index < recent.length) {
+                    const item = recent[index];
+                    addRecentSearch(item);
+                    setRecentSearches(getRecentSearches());
+                    setShowSearch(false);
+                    navigate(item.path);
                   } else {
-                    const adjustedIndex = index - prefixSuggestions.length;
+                    const adjustedIndex = index - recent.length;
                     if (results && results[adjustedIndex]) {
+                      const actor = results[adjustedIndex];
+                      const path = `/at://${actor.did}`;
+                      saveRecentSearch(path, actor.handle, "handle");
                       setShowSearch(false);
-                      navigate(`/at://${results[adjustedIndex].did}`);
+                      navigate(path);
                     }
                   }
-                } else if (results?.length && prefixSuggestions.length === 0) {
+                } else if (results?.length && recent.length === 0) {
                   e.preventDefault();
+                  const actor = results[0];
+                  const path = `/at://${actor.did}`;
+                  saveRecentSearch(path, actor.handle, "handle");
                   setShowSearch(false);
-                  navigate(`/at://${results[0].did}`);
+                  navigate(path);
                 }
               }
             }}
           />
-          <Show when={input()} fallback={ListUrlsTooltip()}>
-            <button
-              type="button"
-              class="dark:hover:bg-dark-100 flex items-center rounded-md p-1 hover:bg-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-700"
-              onClick={() => setInput(undefined)}
-            >
-              <span class="iconify lucide--x"></span>
-            </button>
-          </Show>
         </div>
 
-        <Show when={getPrefixSuggestions().length > 0 || (input() && search()?.length)}>
+        <Show when={getRecentSuggestions().length > 0 || search()?.length}>
           <div
-            class="flex w-full flex-col border-t border-neutral-200 p-2 dark:border-neutral-700"
+            class={`flex w-full flex-col overflow-hidden border-t border-neutral-200 dark:border-neutral-700 ${input() ? "rounded-b-md" : ""}`}
             onMouseDown={(e) => e.preventDefault()}
           >
-            {/* Prefix suggestions */}
-            <For each={getPrefixSuggestions()}>
-              {(prefixItem, index) => (
+            {/* Recent searches */}
+            <Show when={getRecentSuggestions().length > 0}>
+              <div class="mt-2 mb-1 flex items-center justify-between px-3">
+                <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                  Recent
+                </span>
                 <button
                   type="button"
-                  class={`flex items-center rounded-md p-2 ${
-                    index() === selectedIndex() ?
-                      "bg-neutral-200 dark:bg-neutral-700"
-                    : "dark:hover:bg-dark-100 hover:bg-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-700"
-                  }`}
+                  class="text-xs text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
                   onClick={() => {
-                    setInput(prefixItem.prefix);
-                    setSelectedIndex(-1);
-                    searchInput.focus();
+                    localStorage.removeItem(RECENT_SEARCHES_KEY);
+                    setRecentSearches([]);
                   }}
                 >
-                  <span class={`text-sm font-semibold`}>{prefixItem.prefix}</span>
-                  <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                    {prefixItem.description}
-                  </span>
+                  Clear all
                 </button>
-              )}
-            </For>
+              </div>
+              <For each={getRecentSuggestions()}>
+                {(recent, index) => {
+                  const icon =
+                    recent.type === "handle" ? "lucide--at-sign"
+                    : recent.type === "did" ? "lucide--user-round"
+                    : recent.type === "at-uri" ? "lucide--link"
+                    : recent.type === "lexicon" ? "lucide--book-open"
+                    : recent.type === "pds" ? "lucide--hard-drive"
+                    : "lucide--globe";
+                  return (
+                    <div
+                      class={`group flex items-center ${
+                        index() === selectedIndex() ?
+                          "bg-neutral-200 dark:bg-neutral-700"
+                        : "dark:hover:bg-dark-100 hover:bg-neutral-100"
+                      }`}
+                    >
+                      <A
+                        href={recent.path}
+                        class="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 text-sm"
+                        onClick={() => {
+                          addRecentSearch(recent);
+                          setRecentSearches(getRecentSearches());
+                          setShowSearch(false);
+                        }}
+                      >
+                        <span
+                          class={`iconify ${icon} shrink-0 text-neutral-500 dark:text-neutral-400`}
+                        ></span>
+                        <span class="truncate">{recent.label}</span>
+                      </A>
+                      <button
+                        type="button"
+                        class="mr-1 flex items-center rounded p-1 opacity-0 group-hover:opacity-100 hover:bg-neutral-300 dark:hover:bg-neutral-600"
+                        onClick={() => {
+                          removeRecentSearch(recent.path);
+                          setRecentSearches(getRecentSearches());
+                        }}
+                      >
+                        <span class="iconify lucide--x text-sm text-neutral-500 dark:text-neutral-400"></span>
+                      </button>
+                    </div>
+                  );
+                }}
+              </For>
+            </Show>
 
             {/* Typeahead results */}
             <For each={search()}>
               {(actor, index) => {
-                const adjustedIndex = getPrefixSuggestions().length + index();
+                const adjustedIndex = getRecentSuggestions().length + index();
+                const path = `/at://${actor.did}`;
                 return (
                   <A
-                    class={`flex items-center gap-2 rounded-md p-2 ${
+                    class={`flex items-center gap-2 px-3 py-1.5 ${
                       adjustedIndex === selectedIndex() ?
                         "bg-neutral-200 dark:bg-neutral-700"
                       : "dark:hover:bg-dark-100 hover:bg-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-700"
                     }`}
-                    href={`/at://${actor.did}`}
-                    onClick={() => setShowSearch(false)}
+                    href={path}
+                    onClick={() => {
+                      saveRecentSearch(path, actor.handle, "handle");
+                      setShowSearch(false);
+                    }}
                   >
                     <img
                       src={actor.avatar?.replace("img/avatar/", "img/avatar_thumbnail/")}
@@ -348,69 +441,38 @@ const Search = () => {
             </For>
           </div>
         </Show>
+        <Show when={!input()}>
+          <div class="flex flex-col gap-1 border-t border-neutral-200 px-3 py-2 text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">
+            <div class="flex flex-wrap gap-1.5">
+              <div>
+                @<span class="text-neutral-400 dark:text-neutral-500">pdsls.dev</span>
+              </div>
+              <div>did:</div>
+              <div>at://</div>
+              <div>
+                lex:
+                <span class="text-neutral-400 dark:text-neutral-500">app.bsky.feed.post</span>
+              </div>
+              <div>
+                pds:
+                <span class="text-neutral-400 dark:text-neutral-500">tngl.sh</span>
+              </div>
+            </div>
+            <span>
+              Paste links from{" "}
+              <For each={Object.values(appName).slice(0, 4)}>
+                {(name, i) => (
+                  <>
+                    {name}
+                    {i() < 3 ? ", " : ""}
+                  </>
+                )}
+              </For>
+              {Object.keys(appName).length > 4 && <span> &amp; more</span>}
+            </span>
+          </div>
+        </Show>
       </form>
     </Modal>
   );
 };
-
-const ListUrlsTooltip = () => {
-  const [openList, setOpenList] = createSignal(false);
-
-  let urls: Record<string, AppUrl[]> = {};
-  for (const [appUrl, appView] of Object.entries(appList)) {
-    if (!urls[appView]) urls[appView] = [appUrl as AppUrl];
-    else urls[appView].push(appUrl as AppUrl);
-  }
-
-  return (
-    <>
-      <Modal
-        open={openList()}
-        onClose={() => setOpenList(false)}
-        alignTop
-        contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-88 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md sm:w-104 dark:border-neutral-700"
-      >
-        <div class="mb-2 flex items-center gap-1 font-semibold">
-          <span class="iconify lucide--link"></span>
-          <span>Supported URLs</span>
-        </div>
-        <div class="mb-2 text-sm text-neutral-600 dark:text-neutral-400">
-          Links that will be parsed automatically, as long as all the data necessary is on the URL.
-        </div>
-        <div class="flex flex-col gap-2 text-sm">
-          <For each={Object.entries(appName)}>
-            {([appView, name]) => {
-              return (
-                <div>
-                  <p class="font-semibold">{name}</p>
-                  <div class="grid grid-cols-2 gap-x-4 text-neutral-600 dark:text-neutral-400">
-                    <For each={urls[appView]}>
-                      {(url) => (
-                        <a
-                          href={`${url.startsWith("localhost:") ? "http://" : "https://"}${url}`}
-                          target="_blank"
-                          class="hover:underline active:underline"
-                        >
-                          {url}
-                        </a>
-                      )}
-                    </For>
-                  </div>
-                </div>
-              );
-            }}
-          </For>
-        </div>
-      </Modal>
-      <button
-        type="button"
-        class="dark:hover:bg-dark-100 flex items-center rounded-md p-1 hover:bg-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-700"
-        onClick={() => setOpenList(true)}
-      >
-        <span class="iconify lucide--help-circle text-neutral-600 dark:text-neutral-300"></span>
-      </button>
-    </>
-  );
-};
-
-export { Search, SearchButton };
