@@ -27,7 +27,7 @@ export const ConfirmSubmit = (props: {
   };
 
   return (
-    <div class="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[24rem] rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
+    <>
       <div class="flex flex-col gap-3 text-sm">
         <h2 class="font-semibold">{props.isCreate ? "Create" : "Edit"} record</h2>
         <div class="flex flex-col gap-1.5">
@@ -90,6 +90,6 @@ export const ConfirmSubmit = (props: {
           </Button>
         </div>
       </div>
-    </div>
+    </>
   );
 };

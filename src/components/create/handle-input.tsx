@@ -40,7 +40,7 @@ export const HandleInput = (props: { onClose: () => void }) => {
   };
 
   return (
-    <div class="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[20rem] rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
+    <>
       <h2 class="mb-2 font-semibold">Insert DID from handle</h2>
       <form ref={handleFormRef} onSubmit={resolveDid} class="flex flex-col gap-2 text-sm">
         <div class="flex flex-col gap-1">
@@ -82,6 +82,6 @@ export const HandleInput = (props: { onClose: () => void }) => {
           </Show>
         </div>
       </form>
-    </div>
+    </>
   );
 };

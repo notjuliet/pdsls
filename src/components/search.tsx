@@ -196,8 +196,7 @@ const Search = () => {
   };
 
   return (
-    <Modal open={showSearch()} onClose={() => setShowSearch(false)} alignTop>
-      <div class="dark:bg-dark-200 dark:shadow-dark-700 pointer-events-auto mx-3 w-full max-w-lg rounded-lg border-[0.5px] border-neutral-300 bg-white shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
+    <Modal open={showSearch()} onClose={() => setShowSearch(false)} alignTop contentClass="dark:bg-dark-200 dark:shadow-dark-700 pointer-events-auto mx-3 w-full max-w-lg rounded-lg border-[0.5px] border-neutral-300 bg-white shadow-md dark:border-neutral-700">
         <form
           class="w-full"
           onsubmit={(e) => {
@@ -345,7 +344,6 @@ const Search = () => {
             </div>
           </Show>
         </form>
-      </div>
     </Modal>
   );
 };
@@ -361,8 +359,7 @@ const ListUrlsTooltip = () => {
 
   return (
     <>
-      <Modal open={openList()} onClose={() => setOpenList(false)} alignTop>
-        <div class="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-88 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 sm:w-104 dark:border-neutral-700 starting:opacity-0">
+      <Modal open={openList()} onClose={() => setOpenList(false)} alignTop contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-88 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md sm:w-104 dark:border-neutral-700">
           <div class="mb-2 flex items-center gap-1 font-semibold">
             <span class="iconify lucide--link"></span>
             <span>Supported URLs</span>
@@ -395,7 +392,6 @@ const ListUrlsTooltip = () => {
               }}
             </For>
           </div>
-        </div>
       </Modal>
       <button
         type="button"

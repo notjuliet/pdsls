@@ -6,6 +6,7 @@ export interface ModalProps extends Pick<ComponentProps<"svg">, "children"> {
   closeOnClick?: boolean;
   nonBlocking?: boolean;
   alignTop?: boolean;
+  contentClass?: string;
 }
 
 export const Modal = (props: ModalProps) => {
@@ -54,7 +55,11 @@ export const Modal = (props: ModalProps) => {
           }
         }}
       >
-        {props.children}
+        <div
+          class={`transition-all ease-in starting:scale-95 starting:opacity-0 ${props.contentClass ?? ""}`}
+        >
+          {props.children}
+        </div>
       </div>
     </Show>
   );

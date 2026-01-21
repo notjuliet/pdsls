@@ -418,18 +418,20 @@ export const RecordView = () => {
                   >
                     <span class="iconify lucide--trash-2"></span>
                   </PermissionButton>
-                  <Modal open={openDelete()} onClose={() => setOpenDelete(false)}>
-                    <div class="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-opacity duration-200 dark:border-neutral-700 starting:opacity-0">
-                      <h2 class="mb-2 font-semibold">Delete this record?</h2>
-                      <div class="flex justify-end gap-2">
-                        <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
-                        <Button
-                          onClick={deleteRecord}
-                          class="dark:shadow-dark-700 rounded-lg bg-red-500 px-2 py-1.5 text-xs text-white shadow-xs select-none hover:bg-red-400 active:bg-red-400"
-                        >
-                          Delete
-                        </Button>
-                      </div>
+                  <Modal
+                    open={openDelete()}
+                    onClose={() => setOpenDelete(false)}
+                    contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
+                  >
+                    <h2 class="mb-2 font-semibold">Delete this record?</h2>
+                    <div class="flex justify-end gap-2">
+                      <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
+                      <Button
+                        onClick={deleteRecord}
+                        class="dark:shadow-dark-700 rounded-lg bg-red-500 px-2 py-1.5 text-xs text-white shadow-xs select-none hover:bg-red-400 active:bg-red-400"
+                      >
+                        Delete
+                      </Button>
                     </div>
                   </Modal>
                 </Show>

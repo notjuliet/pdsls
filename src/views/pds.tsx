@@ -81,48 +81,50 @@ const PdsView = () => {
         >
           <span class="iconify lucide--info text-neutral-600 dark:text-neutral-400"></span>
         </button>
-        <Modal open={openInfo()} onClose={() => setOpenInfo(false)}>
-          <div class="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-max max-w-[90vw] rounded-lg border-[0.5px] border-neutral-300 bg-white p-3 shadow-md transition-opacity duration-200 sm:max-w-xl dark:border-neutral-700 starting:opacity-0">
-            <div class="mb-2 flex items-center justify-between gap-4">
-              <p class="truncate font-semibold">{repo.did}</p>
-              <button
-                onclick={() => setOpenInfo(false)}
-                class="flex shrink-0 items-center rounded-md p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 active:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
-              >
-                <span class="iconify lucide--x"></span>
-              </button>
-            </div>
-            <div class="grid grid-cols-[auto_1fr] items-baseline gap-x-1 gap-y-0.5 text-sm">
-              <span class="font-medium">Head:</span>
-              <span class="wrap-anywhere text-neutral-700 dark:text-neutral-300">{repo.head}</span>
+        <Modal
+          open={openInfo()}
+          onClose={() => setOpenInfo(false)}
+          contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-max max-w-[90vw] rounded-lg border-[0.5px] border-neutral-300 bg-white p-3 shadow-md sm:max-w-xl dark:border-neutral-700"
+        >
+          <div class="mb-2 flex items-center justify-between gap-4">
+            <p class="truncate font-semibold">{repo.did}</p>
+            <button
+              onclick={() => setOpenInfo(false)}
+              class="flex shrink-0 items-center rounded-md p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 active:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
+            >
+              <span class="iconify lucide--x"></span>
+            </button>
+          </div>
+          <div class="grid grid-cols-[auto_1fr] items-baseline gap-x-1 gap-y-0.5 text-sm">
+            <span class="font-medium">Head:</span>
+            <span class="wrap-anywhere text-neutral-700 dark:text-neutral-300">{repo.head}</span>
 
-              <Show when={TID.validate(repo.rev)}>
-                <span class="font-medium">Rev:</span>
-                <div class="flex gap-1">
-                  <span class="text-neutral-700 dark:text-neutral-300">{repo.rev}</span>
-                  <span class="text-neutral-600 dark:text-neutral-400">·</span>
-                  <span class="text-neutral-600 dark:text-neutral-400">
-                    {localDateFromTimestamp(TID.parse(repo.rev).timestamp / 1000)}
-                  </span>
-                </div>
-              </Show>
+            <Show when={TID.validate(repo.rev)}>
+              <span class="font-medium">Rev:</span>
+              <div class="flex gap-1">
+                <span class="text-neutral-700 dark:text-neutral-300">{repo.rev}</span>
+                <span class="text-neutral-600 dark:text-neutral-400">·</span>
+                <span class="text-neutral-600 dark:text-neutral-400">
+                  {localDateFromTimestamp(TID.parse(repo.rev).timestamp / 1000)}
+                </span>
+              </div>
+            </Show>
 
-              <Show when={repo.active !== undefined}>
-                <span class="font-medium">Active:</span>
-                <span
-                  class={`iconify self-center ${
-                    repo.active ?
-                      "lucide--check text-green-500 dark:text-green-400"
-                    : "lucide--x text-red-500 dark:text-red-400"
-                  }`}
-                ></span>
-              </Show>
+            <Show when={repo.active !== undefined}>
+              <span class="font-medium">Active:</span>
+              <span
+                class={`iconify self-center ${
+                  repo.active ?
+                    "lucide--check text-green-500 dark:text-green-400"
+                  : "lucide--x text-red-500 dark:text-red-400"
+                }`}
+              ></span>
+            </Show>
 
-              <Show when={repo.status}>
-                <span class="font-medium">Status:</span>
-                <span class="text-neutral-700 dark:text-neutral-300">{repo.status}</span>
-              </Show>
-            </div>
+            <Show when={repo.status}>
+              <span class="font-medium">Status:</span>
+              <span class="text-neutral-700 dark:text-neutral-300">{repo.status}</span>
+            </Show>
           </div>
         </Modal>
       </div>

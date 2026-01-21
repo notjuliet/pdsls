@@ -236,216 +236,211 @@ export const RecordEditor = (props: {
         closeOnClick={false}
         nonBlocking={isMinimized()}
         alignTop
+        contentClass={`dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700 ${isMaximized() ? "w-[calc(100%-1rem)] max-w-7xl h-[85vh]" : "w-[calc(100%-1rem)] max-w-3xl h-[65vh]"} ${isMinimized() ? "hidden" : ""}`}
       >
-        <div
-          classList={{
-            "dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md transition-all duration-200 dark:border-neutral-700 starting:opacity-0": true,
-            "w-[calc(100%-1rem)] max-w-3xl h-[65vh]": !isMaximized(),
-            "w-[calc(100%-1rem)] max-w-7xl h-[85vh]": isMaximized(),
-            hidden: isMinimized(),
-          }}
-        >
-          <div class="mb-2 flex w-full justify-between text-base">
-            <div class="flex items-center gap-2">
-              <span class="font-semibold select-none">
-                {props.create ? "Creating" : "Editing"} record
-              </span>
+        <div class="mb-2 flex w-full justify-between text-base">
+          <div class="flex items-center gap-2">
+            <span class="font-semibold select-none">
+              {props.create ? "Creating" : "Editing"} record
+            </span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button
+              type="button"
+              onclick={() => setIsMinimized(true)}
+              class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+            >
+              <span class="iconify lucide--minus"></span>
+            </button>
+            <button
+              type="button"
+              onclick={() => setIsMaximized(!isMaximized())}
+              class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+            >
+              <span
+                class={`iconify ${isMaximized() ? "lucide--minimize-2" : "lucide--maximize-2"}`}
+              ></span>
+            </button>
+            <button
+              id="close"
+              onclick={() => setOpenDialog(false)}
+              class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+            >
+              <span class="iconify lucide--x"></span>
+            </button>
+          </div>
+        </div>
+        <form ref={formRef} class="flex min-h-0 flex-1 flex-col gap-y-2">
+          <Show when={props.create}>
+            <div class="flex flex-wrap items-center gap-1 text-sm">
+              <span>at://</span>
+              <select
+                class="dark:bg-dark-100 max-w-40 truncate rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 select-none focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
+                name="repo"
+                id="repo"
+              >
+                <For each={Object.keys(sessions)}>
+                  {(session) => (
+                    <option value={session} selected={session === agent()?.sub}>
+                      {sessions[session].handle ?? session}
+                    </option>
+                  )}
+                </For>
+              </select>
+              <span>/</span>
+              <TextInput
+                id="collection"
+                name="collection"
+                placeholder="Collection (default: $type)"
+                class={`w-40 placeholder:text-xs lg:w-52 ${collectionError() ? "border-red-500 focus:outline-red-500 dark:border-red-400 dark:focus:outline-red-400" : ""}`}
+                onInput={(e) => {
+                  const value = e.currentTarget.value;
+                  if (!value || isNsid(value)) setCollectionError("");
+                  else
+                    setCollectionError(
+                      "Invalid collection: use reverse domain format (e.g. app.bsky.feed.post)",
+                    );
+                }}
+              />
+              <span>/</span>
+              <TextInput
+                id="rkey"
+                name="rkey"
+                placeholder="Record key (default: TID)"
+                class={`w-40 placeholder:text-xs lg:w-52 ${rkeyError() ? "border-red-500 focus:outline-red-500 dark:border-red-400 dark:focus:outline-red-400" : ""}`}
+                onInput={(e) => {
+                  const value = e.currentTarget.value;
+                  if (!value || isRecordKey(value)) setRkeyError("");
+                  else setRkeyError("Invalid record key: 1-512 chars, use a-z A-Z 0-9 . _ ~ : -");
+                }}
+              />
             </div>
-            <div class="flex items-center gap-1">
-              <button
-                type="button"
-                onclick={() => setIsMinimized(true)}
-                class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+            <Show when={collectionError() || rkeyError()}>
+              <div class="text-xs text-red-500 dark:text-red-400">
+                <div>{collectionError()}</div>
+                <div>{rkeyError()}</div>
+              </div>
+            </Show>
+          </Show>
+          <div class="min-h-0 flex-1">
+            <Suspense
+              fallback={
+                <div class="flex h-full items-center justify-center">
+                  <span class="iconify lucide--loader-circle animate-spin text-xl"></span>
+                </div>
+              }
+            >
+              <Editor
+                content={JSON.stringify(
+                  !props.create ? props.record
+                  : params.rkey ? placeholder()
+                  : defaultPlaceholder(),
+                  null,
+                  2,
+                )}
+              />
+            </Suspense>
+          </div>
+          <div class="flex flex-col gap-2">
+            <Show when={notice()}>
+              <div class="text-sm text-red-500 dark:text-red-400">{notice()}</div>
+            </Show>
+            <div class="flex justify-between gap-2">
+              <div class="relative" ref={insertMenuRef}>
+                <button
+                  type="button"
+                  class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 flex w-fit rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1.5 text-base shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+                  onClick={() => setOpenInsertMenu(!openInsertMenu())}
+                >
+                  <span class="iconify lucide--plus select-none"></span>
+                </button>
+                <Show when={openInsertMenu()}>
+                  <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute bottom-full left-0 z-10 mb-1 flex w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1.5 shadow-md dark:border-neutral-700">
+                    <MenuItem
+                      icon="lucide--id-card"
+                      label="Insert DID"
+                      onClick={insertDidFromHandle}
+                    />
+                    <MenuItem
+                      icon="lucide--clock"
+                      label="Insert timestamp"
+                      onClick={insertTimestamp}
+                    />
+                    <button
+                      type="button"
+                      class={
+                        hasUserScope("blob") ?
+                          "flex items-center gap-2 rounded-md p-2 text-left text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                        : "flex items-center gap-2 rounded-md p-2 text-left text-xs opacity-40"
+                      }
+                      onClick={() => {
+                        if (hasUserScope("blob")) {
+                          setOpenInsertMenu(false);
+                          blobInput.click();
+                        }
+                      }}
+                    >
+                      <span class="iconify lucide--upload shrink-0"></span>
+                      <span>Upload blob{hasUserScope("blob") ? "" : " (permission needed)"}</span>
+                    </button>
+                  </div>
+                </Show>
+                <input
+                  type="file"
+                  id="blob"
+                  class="sr-only"
+                  ref={blobInput}
+                  onChange={(e) => {
+                    if (e.target.files !== null) setOpenUpload(true);
+                  }}
+                />
+              </div>
+              <Modal
+                open={openUpload()}
+                onClose={() => setOpenUpload(false)}
+                closeOnClick={false}
+                contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[20rem] rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
               >
-                <span class="iconify lucide--minus"></span>
-              </button>
-              <button
-                type="button"
-                onclick={() => setIsMaximized(!isMaximized())}
-                class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                <FileUpload
+                  file={blobInput.files![0]}
+                  blobInput={blobInput}
+                  onClose={() => setOpenUpload(false)}
+                />
+              </Modal>
+              <Modal
+                open={openHandleDialog()}
+                onClose={() => setOpenHandleDialog(false)}
+                closeOnClick={false}
+                contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[20rem] rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
               >
-                <span
-                  class={`iconify ${isMaximized() ? "lucide--minimize-2" : "lucide--maximize-2"}`}
-                ></span>
-              </button>
-              <button
-                id="close"
-                onclick={() => setOpenDialog(false)}
-                class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                <HandleInput onClose={() => setOpenHandleDialog(false)} />
+              </Modal>
+              <Modal
+                open={openConfirmDialog()}
+                onClose={() => setOpenConfirmDialog(false)}
+                closeOnClick={false}
+                contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[24rem] rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
               >
-                <span class="iconify lucide--x"></span>
-              </button>
+                <ConfirmSubmit
+                  isCreate={props.create}
+                  onConfirm={(validate, recreate) => {
+                    if (props.create) {
+                      createRecord(validate);
+                    } else {
+                      editRecord(validate, recreate);
+                    }
+                  }}
+                  onClose={() => setOpenConfirmDialog(false)}
+                />
+              </Modal>
+              <div class="flex items-center justify-end gap-2">
+                <Button onClick={() => setOpenConfirmDialog(true)}>
+                  {props.create ? "Create..." : "Edit..."}
+                </Button>
+              </div>
             </div>
           </div>
-          <form ref={formRef} class="flex min-h-0 flex-1 flex-col gap-y-2">
-            <Show when={props.create}>
-              <div class="flex flex-wrap items-center gap-1 text-sm">
-                <span>at://</span>
-                <select
-                  class="dark:bg-dark-100 max-w-40 truncate rounded-lg border-[0.5px] border-neutral-300 bg-white px-1 py-1 select-none focus:outline-[1px] focus:outline-neutral-600 dark:border-neutral-600 dark:focus:outline-neutral-400"
-                  name="repo"
-                  id="repo"
-                >
-                  <For each={Object.keys(sessions)}>
-                    {(session) => (
-                      <option value={session} selected={session === agent()?.sub}>
-                        {sessions[session].handle ?? session}
-                      </option>
-                    )}
-                  </For>
-                </select>
-                <span>/</span>
-                <TextInput
-                  id="collection"
-                  name="collection"
-                  placeholder="Collection (default: $type)"
-                  class={`w-40 placeholder:text-xs lg:w-52 ${collectionError() ? "border-red-500 focus:outline-red-500 dark:border-red-400 dark:focus:outline-red-400" : ""}`}
-                  onInput={(e) => {
-                    const value = e.currentTarget.value;
-                    if (!value || isNsid(value)) setCollectionError("");
-                    else
-                      setCollectionError(
-                        "Invalid collection: use reverse domain format (e.g. app.bsky.feed.post)",
-                      );
-                  }}
-                />
-                <span>/</span>
-                <TextInput
-                  id="rkey"
-                  name="rkey"
-                  placeholder="Record key (default: TID)"
-                  class={`w-40 placeholder:text-xs lg:w-52 ${rkeyError() ? "border-red-500 focus:outline-red-500 dark:border-red-400 dark:focus:outline-red-400" : ""}`}
-                  onInput={(e) => {
-                    const value = e.currentTarget.value;
-                    if (!value || isRecordKey(value)) setRkeyError("");
-                    else setRkeyError("Invalid record key: 1-512 chars, use a-z A-Z 0-9 . _ ~ : -");
-                  }}
-                />
-              </div>
-              <Show when={collectionError() || rkeyError()}>
-                <div class="text-xs text-red-500 dark:text-red-400">
-                  <div>{collectionError()}</div>
-                  <div>{rkeyError()}</div>
-                </div>
-              </Show>
-            </Show>
-            <div class="min-h-0 flex-1">
-              <Suspense
-                fallback={
-                  <div class="flex h-full items-center justify-center">
-                    <span class="iconify lucide--loader-circle animate-spin text-xl"></span>
-                  </div>
-                }
-              >
-                <Editor
-                  content={JSON.stringify(
-                    !props.create ? props.record
-                    : params.rkey ? placeholder()
-                    : defaultPlaceholder(),
-                    null,
-                    2,
-                  )}
-                />
-              </Suspense>
-            </div>
-            <div class="flex flex-col gap-2">
-              <Show when={notice()}>
-                <div class="text-sm text-red-500 dark:text-red-400">{notice()}</div>
-              </Show>
-              <div class="flex justify-between gap-2">
-                <div class="relative" ref={insertMenuRef}>
-                  <button
-                    type="button"
-                    class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 flex w-fit rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1.5 text-base shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
-                    onClick={() => setOpenInsertMenu(!openInsertMenu())}
-                  >
-                    <span class="iconify lucide--plus select-none"></span>
-                  </button>
-                  <Show when={openInsertMenu()}>
-                    <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute bottom-full left-0 z-10 mb-1 flex w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1.5 shadow-md dark:border-neutral-700">
-                      <MenuItem
-                        icon="lucide--id-card"
-                        label="Insert DID"
-                        onClick={insertDidFromHandle}
-                      />
-                      <MenuItem
-                        icon="lucide--clock"
-                        label="Insert timestamp"
-                        onClick={insertTimestamp}
-                      />
-                      <button
-                        type="button"
-                        class={
-                          hasUserScope("blob") ?
-                            "flex items-center gap-2 rounded-md p-2 text-left text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                          : "flex items-center gap-2 rounded-md p-2 text-left text-xs opacity-40"
-                        }
-                        onClick={() => {
-                          if (hasUserScope("blob")) {
-                            setOpenInsertMenu(false);
-                            blobInput.click();
-                          }
-                        }}
-                      >
-                        <span class="iconify lucide--upload shrink-0"></span>
-                        <span>Upload blob{hasUserScope("blob") ? "" : " (permission needed)"}</span>
-                      </button>
-                    </div>
-                  </Show>
-                  <input
-                    type="file"
-                    id="blob"
-                    class="sr-only"
-                    ref={blobInput}
-                    onChange={(e) => {
-                      if (e.target.files !== null) setOpenUpload(true);
-                    }}
-                  />
-                </div>
-                <Modal
-                  open={openUpload()}
-                  onClose={() => setOpenUpload(false)}
-                  closeOnClick={false}
-                >
-                  <FileUpload
-                    file={blobInput.files![0]}
-                    blobInput={blobInput}
-                    onClose={() => setOpenUpload(false)}
-                  />
-                </Modal>
-                <Modal
-                  open={openHandleDialog()}
-                  onClose={() => setOpenHandleDialog(false)}
-                  closeOnClick={false}
-                >
-                  <HandleInput onClose={() => setOpenHandleDialog(false)} />
-                </Modal>
-                <Modal
-                  open={openConfirmDialog()}
-                  onClose={() => setOpenConfirmDialog(false)}
-                  closeOnClick={false}
-                >
-                  <ConfirmSubmit
-                    isCreate={props.create}
-                    onConfirm={(validate, recreate) => {
-                      if (props.create) {
-                        createRecord(validate);
-                      } else {
-                        editRecord(validate, recreate);
-                      }
-                    }}
-                    onClose={() => setOpenConfirmDialog(false)}
-                  />
-                </Modal>
-                <div class="flex items-center justify-end gap-2">
-                  <Button onClick={() => setOpenConfirmDialog(true)}>
-                    {props.create ? "Create..." : "Edit..."}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
+        </form>
       </Modal>
       <Show when={isMinimized() && openDialog()}>
         <button
