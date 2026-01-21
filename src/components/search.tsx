@@ -425,7 +425,7 @@ export const Search = () => {
                   >
                     <img
                       src={actor.avatar?.replace("img/avatar/", "img/avatar_thumbnail/")}
-                      class="size-9 rounded-full"
+                      class="size-8 rounded-full"
                     />
                     <div class="flex min-w-0 flex-col">
                       <Show when={actor.displayName}>
