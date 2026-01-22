@@ -40,7 +40,9 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
       class="flex w-full min-w-0 items-baseline rounded px-1 py-0.5"
       trigger={
         <>
-          <span class="shrink-0 text-sm text-blue-500 dark:text-blue-400">{props.record.rkey}</span>
+          <span class="max-w-full shrink-0 truncate text-sm text-blue-500 dark:text-blue-400">
+            {props.record.rkey}
+          </span>
           <span class="ml-1 truncate text-xs text-neutral-500 dark:text-neutral-400" dir="rtl">
             {props.record.cid}
           </span>
