@@ -12,7 +12,7 @@ import {
 } from "solid-js";
 import { isTouchDevice } from "../layout";
 import { resolveLexiconAuthority, resolveLexiconAuthorityDirect } from "../utils/api";
-import { appHandleLink, appList, appName, AppUrl } from "../utils/app-urls";
+import { appHandleLink, appList, AppUrl } from "../utils/app-urls";
 import { createDebouncedValue } from "../utils/hooks/debounced";
 import { Modal } from "./modal";
 
@@ -458,18 +458,7 @@ export const Search = () => {
                 <span class="text-neutral-400 dark:text-neutral-500">tngl.sh</span>
               </div>
             </div>
-            <span>
-              Paste links from{" "}
-              <For each={Object.values(appName).slice(0, 4)}>
-                {(name, i) => (
-                  <>
-                    {name}
-                    {i() < 3 ? ", " : ""}
-                  </>
-                )}
-              </For>
-              {Object.keys(appName).length > 4 && <span> &amp; more</span>}
-            </span>
+            <span>Bluesky, Tangled, Pinksea, or Frontpage links</span>
           </div>
         </Show>
       </form>
