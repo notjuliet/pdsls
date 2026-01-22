@@ -445,7 +445,7 @@ export const Search = () => {
           <div class="flex flex-col gap-1 border-t border-neutral-200 px-3 py-2 text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">
             <div class="flex flex-wrap gap-1.5">
               <div>
-                @<span class="text-neutral-400 dark:text-neutral-500">pdsls.dev</span>
+                @<span class="text-neutral-400 dark:text-neutral-500">retr0.id</span>
               </div>
               <div>did:</div>
               <div>at://</div>

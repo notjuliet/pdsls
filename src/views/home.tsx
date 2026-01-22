@@ -181,7 +181,7 @@ export const Home = () => {
         </FooterLink>
         •
         <FooterLink
-          href="https://tangled.org/@pdsls.dev/pdsls/"
+          href="https://tangled.org/did:plc:6q5daed5gutiyerimlrnojnz/pdsls/"
           color="after:text-black"
           darkColor="dark:after:text-white"
         >
