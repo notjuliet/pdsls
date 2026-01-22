@@ -37,10 +37,6 @@ export const uriTemplates: TemplateMap = {
     link: `https://pinksea.art/${uri.repo}`,
     icon: "i-pinksea",
   }),
-  "blue.linkat.board": (uri) => ({
-    label: "Linkat",
-    link: `https://linkat.blue/${uri.repo}`,
-  }),
   "sh.tangled.actor.profile": (uri) => ({
     label: "Tangled",
     link: `https://tangled.org/${uri.repo}`,
@@ -50,15 +46,5 @@ export const uriTemplates: TemplateMap = {
     label: "Tangled",
     link: `https://tangled.org/${uri.repo}/${record.name}`,
     icon: "i-tangled",
-  }),
-  "pub.leaflet.document": (uri) => ({
-    label: "Leaflet",
-    link: `https://leaflet.pub/p/${uri.repo}/${uri.rkey}`,
-    icon: "iconify-color i-leaflet",
-  }),
-  "pub.leaflet.publication": (uri) => ({
-    label: "Leaflet",
-    link: `https://leaflet.pub/lish/${uri.repo}/${uri.rkey}`,
-    icon: "iconify-color i-leaflet",
   }),
 };

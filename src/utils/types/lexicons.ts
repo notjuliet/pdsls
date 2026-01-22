@@ -18,12 +18,6 @@ import {
   ChatBskyActorDeclaration,
 } from "@atcute/bluesky";
 import {
-  PubLeafletComment,
-  PubLeafletDocument,
-  PubLeafletGraphSubscription,
-  PubLeafletPublication,
-} from "@atcute/leaflet";
-import {
   ShTangledActorProfile,
   ShTangledFeedStar,
   ShTangledGraphFollow,
@@ -85,10 +79,4 @@ export const lexicons: Record<string, any> = {
   "sh.tangled.repo.pull.status.merged": ShTangledRepoPullStatusMerged.mainSchema,
   "sh.tangled.repo.pull.status.open": ShTangledRepoPullStatusOpen.mainSchema,
   "sh.tangled.knot": ShTangledKnot.mainSchema,
-
-  // Leaflet
-  "pub.leaflet.comment": PubLeafletComment.mainSchema,
-  "pub.leaflet.document": PubLeafletDocument.mainSchema,
-  "pub.leaflet.graph.subscription": PubLeafletGraphSubscription.mainSchema,
-  "pub.leaflet.publication": PubLeafletPublication.mainSchema,
 };
