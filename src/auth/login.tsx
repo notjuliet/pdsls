@@ -32,10 +32,10 @@ export const Login = (props: LoginProps) => {
   };
 
   return (
-    <div class="flex flex-col gap-y-2 px-1">
+    <div class="flex flex-col gap-y-3 px-1">
       <Show when={!scopeFlow.showScopeSelector()}>
         <Show when={props.onCancel}>
-          <div class="mb-1 flex items-center gap-2">
+          <div class="flex items-center gap-2">
             <button
               onclick={handleCancel}
               class="flex items-center rounded-md p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
@@ -45,7 +45,7 @@ export const Login = (props: LoginProps) => {
             <div class="font-semibold">Add account</div>
           </div>
         </Show>
-        <form class="flex flex-col gap-2" onsubmit={(e) => e.preventDefault()}>
+        <form class="flex flex-col gap-3" onsubmit={(e) => e.preventDefault()}>
           <label for="username" class="hidden">
             Add account
           </label>
@@ -69,7 +69,7 @@ export const Login = (props: LoginProps) => {
           </div>
           <button
             onclick={() => initiateLogin(loginInput())}
-            class="grow rounded-lg border-[0.5px] border-neutral-300 bg-neutral-100 px-3 py-2 hover:bg-neutral-200 active:bg-neutral-300 dark:border-neutral-600 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+            class="dark:hover:bg-dark-200 dark:active:bg-dark-100 flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700"
           >
             Continue
           </button>

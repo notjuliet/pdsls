@@ -126,7 +126,7 @@ export const AccountManager = () => {
           scopeFlow.cancel();
         }}
         alignTop
-        contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-88 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
+        contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-full max-w-sm rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 mx-3 shadow-md dark:border-neutral-700"
       >
         <Show when={!scopeFlow.showScopeSelector() && !showingAddAccount()}>
           <div class="mb-2 px-1 font-semibold">
@@ -170,7 +170,7 @@ export const AccountManager = () => {
           </div>
           <button
             onclick={() => setShowingAddAccount(true)}
-            class="flex w-full items-center justify-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-100 px-3 py-2 hover:bg-neutral-200 active:bg-neutral-300 dark:border-neutral-600 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+            class="dark:hover:bg-dark-200 dark:active:bg-dark-100 flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700"
           >
             <span class="iconify lucide--plus"></span>
             <span>Add account</span>
