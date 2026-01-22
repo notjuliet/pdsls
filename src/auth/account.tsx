@@ -130,7 +130,7 @@ export const AccountManager = () => {
       >
         <Show when={!scopeFlow.showScopeSelector() && !showingAddAccount()}>
           <div class="mb-2 px-1 font-semibold">
-            <span>Manage accounts</span>
+            <span>Switch account</span>
           </div>
           <div class="mb-3 max-h-80 overflow-y-auto md:max-h-100">
             <For each={Object.keys(sessions)}>
