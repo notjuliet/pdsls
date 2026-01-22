@@ -1,0 +1,10 @@
+{
+  "$schema": "https://developers.cloudflare.com/workers/wrangler/configuration/",
+  "name": "pdsls",
+  "compatibility_date": "2025-01-22",
+  "pages_build_output_dir": "dist",
+
+  // Note: The oauth-client-metadata.json file will be generated during build
+  // based on the APP_DOMAIN environment variable (defaults to pdsls.dev)
+  // Set APP_DOMAIN in Cloudflare Pages environment variables for custom domains
+}

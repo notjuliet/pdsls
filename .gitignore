@@ -2,3 +2,4 @@ node_modules
 dist
 .env
 .DS_Store
+public/oauth-client-metadata.json
