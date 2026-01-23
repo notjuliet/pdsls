@@ -21,6 +21,7 @@ export type RecordInfo = {
 
 export type StreamConfig = {
   label: string;
+  description: string;
   icon: string;
   defaultInstance: string;
   fields: FormField[];
@@ -34,6 +35,7 @@ export type StreamConfig = {
 export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
   jetstream: {
     label: "Jetstream",
+    description: "A simplified event stream with support for collection and DID filtering.",
     icon: "lucide--radio-tower",
     defaultInstance: "wss://jetstream1.us-east.bsky.network/subscribe",
     useFirehoseLib: false,
@@ -97,6 +99,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
 
   firehose: {
     label: "Firehose",
+    description: "The raw event stream from a relay or PDS.",
     icon: "lucide--rss",
     defaultInstance: "wss://bsky.network",
     useFirehoseLib: true,
@@ -132,6 +135,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
 
   spacedust: {
     label: "Spacedust",
+    description: "A stream of links showing interactions across the network.",
     icon: "lucide--link",
     defaultInstance: "wss://spacedust.microcosm.blue/subscribe",
     useFirehoseLib: false,

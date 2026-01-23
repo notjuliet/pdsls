@@ -276,6 +276,7 @@ export const Search = () => {
             type="text"
             spellcheck={false}
             autocapitalize="off"
+            autocomplete="off"
             placeholder="Search or paste a link..."
             ref={searchInput}
             id="input"

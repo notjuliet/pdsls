@@ -335,6 +335,11 @@ export const StreamView = () => {
           </For>
         </div>
 
+        {/* Stream Description */}
+        <div class="w-full px-2 text-center">
+          <p class="text-sm text-neutral-600 dark:text-neutral-400">{config().description}</p>
+        </div>
+
         {/* Connection Form */}
         <Show when={!connected()}>
           <form ref={formRef} class="flex w-full flex-col gap-2 p-2 text-sm">

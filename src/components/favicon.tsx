@@ -1,4 +1,4 @@
-import { createSignal, JSX, Show } from "solid-js";
+import { createSignal, JSX, Match, Show, Switch } from "solid-js";
 
 export const Favicon = (props: {
   authority: string;
@@ -8,23 +8,26 @@ export const Favicon = (props: {
   const domain = () => props.authority.split(".").reverse().join(".");
 
   const content = (
-    <>
-      <Show when={!loaded()}>
-        <span class="iconify lucide--globe size-4 text-neutral-400 dark:text-neutral-500" />
-      </Show>
-      <img
-        src={
-          ["bsky.app", "bsky.chat"].includes(domain()) ?
-            "https://web-cdn.bsky.app/static/apple-touch-icon.png"
-          : `https://${domain()}/favicon.ico`
-        }
-        alt=""
-        class="h-4 w-4"
-        classList={{ hidden: !loaded() }}
-        onLoad={() => setLoaded(true)}
-        onError={() => setLoaded(false)}
-      />
-    </>
+    <Switch>
+      <Match when={domain() === "tangled.sh"}>
+        <span class="iconify i-tangled size-4" />
+      </Match>
+      <Match when={["bsky.app", "bsky.chat"].includes(domain())}>
+        <img src="https://web-cdn.bsky.app/static/apple-touch-icon.png" class="size-4" />
+      </Match>
+      <Match when={true}>
+        <Show when={!loaded()}>
+          <span class="iconify lucide--globe size-4 text-neutral-400 dark:text-neutral-500" />
+        </Show>
+        <img
+          src={`https://${domain()}/favicon.ico`}
+          class="size-4"
+          classList={{ hidden: !loaded() }}
+          onLoad={() => setLoaded(true)}
+          onError={() => setLoaded(false)}
+        />
+      </Match>
+    </Switch>
   );
 
   return props.wrapper ?

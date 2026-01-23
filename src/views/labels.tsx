@@ -200,6 +200,12 @@ export const LabelView = () => {
     <>
       <Title>Labels - PDSls</Title>
       <div class="flex w-full flex-col items-center">
+        <div class="flex w-full flex-col gap-y-1 px-3 pb-3">
+          <h1 class="text-lg font-semibold">Labels</h1>
+          <p class="text-sm text-neutral-600 dark:text-neutral-400">
+            Query labels applied by labelers to accounts and records.
+          </p>
+        </div>
         <form
           ref={formRef}
           class="flex w-full max-w-3xl flex-col gap-y-3 px-3 pb-2"
