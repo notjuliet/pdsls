@@ -45,7 +45,7 @@ export const Home = () => {
       {/* Welcome Section */}
       <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-1">
-          <h1 class="text-lg font-semibold">Atmosphere Explorer</h1>
+          <h1 class="text-lg font-medium">Atmosphere Explorer</h1>
           <div class="text-sm text-neutral-600 dark:text-neutral-300">
             <p>
               Browse the public data on the{" "}
@@ -102,7 +102,7 @@ export const Home = () => {
         <div class="flex flex-col gap-2">
           <A
             href="/jetstream"
-            class="group grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-0.5 transition-colors hover:text-blue-500 dark:hover:text-blue-400"
+            class="group grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-0.5 text-neutral-700 transition-colors hover:text-blue-500 dark:text-neutral-300 dark:hover:text-blue-400"
           >
             <div class="iconify lucide--radio-tower" />
             <span class="underline decoration-transparent group-hover:decoration-current">
@@ -115,7 +115,7 @@ export const Home = () => {
           </A>
           <A
             href="/firehose"
-            class="group grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-0.5 transition-colors hover:text-blue-500 dark:hover:text-blue-400"
+            class="group grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-0.5 text-neutral-700 transition-colors hover:text-blue-500 dark:text-neutral-300 dark:hover:text-blue-400"
           >
             <div class="iconify lucide--rss" />
             <span class="underline decoration-transparent group-hover:decoration-current">
@@ -128,7 +128,7 @@ export const Home = () => {
           </A>
           <A
             href="/spacedust"
-            class="group grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-0.5 transition-colors hover:text-blue-500 dark:hover:text-blue-400"
+            class="group grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-0.5 text-neutral-700 transition-colors hover:text-blue-500 dark:text-neutral-300 dark:hover:text-blue-400"
           >
             <div class="iconify lucide--orbit" />
             <span class="underline decoration-transparent group-hover:decoration-current">
@@ -144,7 +144,7 @@ export const Home = () => {
         <div class="flex flex-col gap-2">
           <A
             href="/labels"
-            class="group grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-0.5 transition-colors hover:text-blue-500 dark:hover:text-blue-400"
+            class="group grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-0.5 text-neutral-700 transition-colors hover:text-blue-500 dark:text-neutral-300 dark:hover:text-blue-400"
           >
             <div class="iconify lucide--tag" />
             <span class="underline decoration-transparent group-hover:decoration-current">
@@ -157,7 +157,7 @@ export const Home = () => {
           </A>
           <A
             href="/car"
-            class="group grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-0.5 transition-colors hover:text-blue-500 dark:hover:text-blue-400"
+            class="group grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-0.5 text-neutral-700 transition-colors hover:text-blue-500 dark:text-neutral-300 dark:hover:text-blue-400"
           >
             <div class="iconify lucide--folder-archive" />
             <span class="underline decoration-transparent group-hover:decoration-current">
