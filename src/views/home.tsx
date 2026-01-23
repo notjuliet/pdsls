@@ -45,6 +45,9 @@ export const Home = () => {
     { did: "did:plc:k644h4rq5bjfzcetgsa6tuby", handle: "natalie.sh" },
     { did: "did:plc:ttdrpj45ibqunmfhdsb4zdwq", handle: "nekomimi.pet" },
     { did: "did:plc:fz2tul67ziakfukcwa3vdd5d", handle: "nullekko.moe" },
+    { did: "did:plc:qxichs7jsycphrsmbujwqbfb", handle: "isabelroses.com" },
+    { did: "did:plc:fnvdhaoe7b5abgrtvzf4ttl5", handle: "isuggest.selfce.st" },
+    { did: "did:plc:p5yjdr64h7mk5l3kh6oszryk", handle: "blooym.dev" },
   ];
 
   const profiles = [...allExampleProfiles].sort(() => Math.random() - 0.5).slice(0, 3);
