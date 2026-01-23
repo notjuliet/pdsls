@@ -48,6 +48,11 @@ export const Home = () => {
     { did: "did:plc:qxichs7jsycphrsmbujwqbfb", handle: "isabelroses.com" },
     { did: "did:plc:fnvdhaoe7b5abgrtvzf4ttl5", handle: "isuggest.selfce.st" },
     { did: "did:plc:p5yjdr64h7mk5l3kh6oszryk", handle: "blooym.dev" },
+    { did: "did:plc:hvakvedv6byxhufjl23mfmsd", handle: "number-one-warned.rat.mom" },
+    { did: "did:plc:6if5m2yo6kroprmmency3gt5", handle: "olaren.dev" },
+    { did: "did:plc:w7adfxpixpi77e424cjjxnxy", handle: "anyaustin.bsky.social" },
+    { did: "did:plc:h6as5sk7tfqvvnqvfrlnnwqn", handle: "cwonus.org" },
+    { did: "did:plc:mo7bk6gblylupvhetkqmndrv", handle: "claire.on-her.computer" },
   ];
 
   const profiles = [...allExampleProfiles].sort(() => Math.random() - 0.5).slice(0, 3);
