@@ -53,6 +53,7 @@ export const Home = () => {
     { did: "did:plc:w7adfxpixpi77e424cjjxnxy", handle: "anyaustin.bsky.social" },
     { did: "did:plc:h6as5sk7tfqvvnqvfrlnnwqn", handle: "cwonus.org" },
     { did: "did:plc:mo7bk6gblylupvhetkqmndrv", handle: "claire.on-her.computer" },
+    { did: "did:plc:73gqgbnvpx5syidcponjrics", handle: "coil-habdle.ebil.club" },
   ];
 
   const profiles = [...allExampleProfiles].sort(() => Math.random() - 0.5).slice(0, 3);
@@ -90,6 +91,10 @@ export const Home = () => {
                     src={`/avatar/${profile.handle}.jpg`}
                     alt={`Bluesky profile picture of ${profile.handle}`}
                     class="size-16 rounded-full ring-2 ring-transparent transition-all group-hover:ring-blue-500 active:ring-blue-500 dark:group-hover:ring-blue-400 dark:active:ring-blue-400"
+                    classList={{
+                      "animate-[spin_5s_linear_infinite] [animation-play-state:paused] group-hover:[animation-play-state:running]":
+                        profile.handle === "coil-habdle.ebil.club",
+                    }}
                   />
                   <span class="w-full truncate text-center text-xs text-neutral-600 dark:text-neutral-300">
                     @{profile.handle}
