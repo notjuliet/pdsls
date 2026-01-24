@@ -62,7 +62,7 @@ const StreamRecordItem = (props: { record: any; streamType: StreamType }) => {
                 </span>
               </Show>
               <Show when={info().rkey}>
-                <span class="shrink-0 text-neutral-400 dark:text-neutral-500">{info().rkey}</span>
+                <span class="truncate text-neutral-400 dark:text-neutral-500">{info().rkey}</span>
               </Show>
             </div>
             <div class="flex flex-col gap-x-2 gap-y-0.5 text-xs text-neutral-500 sm:flex-row sm:items-center dark:text-neutral-400">

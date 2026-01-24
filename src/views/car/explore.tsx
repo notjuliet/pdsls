@@ -531,7 +531,7 @@ const CollectionSubview = (props: {
                     }}
                     class="flex w-full items-baseline gap-1 text-left"
                   >
-                    <span class="shrink-0 text-sm text-blue-500 dark:text-blue-400">
+                    <span class="max-w-full shrink-0 truncate text-sm text-blue-500 dark:text-blue-400">
                       {entry.key}
                     </span>
                     <span class="truncate text-xs text-neutral-500 dark:text-neutral-400" dir="rtl">
