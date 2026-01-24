@@ -80,7 +80,7 @@ export const Home = () => {
         </div>
 
         {/* Example Repos */}
-        <section class="flex flex-col gap-3">
+        <section class="mb-1 flex flex-col gap-3">
           <div class="flex justify-between">
             <For each={profiles}>
               {(profile) => (
