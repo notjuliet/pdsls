@@ -277,11 +277,13 @@ export const LabelView = () => {
                   <Button
                     onClick={handleLoadMore}
                     disabled={loading()}
-                    class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 w-20 items-center justify-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+                    classList={{ "w-20 justify-center": true }}
                   >
                     <Show
                       when={!loading()}
-                      fallback={<span class="iconify lucide--loader-circle animate-spin" />}
+                      fallback={
+                        <span class="iconify lucide--loader-circle animate-spin text-base" />
+                      }
                     >
                       Load more
                     </Show>

@@ -428,7 +428,9 @@ export const RecordView = () => {
                       <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
                       <Button
                         onClick={deleteRecord}
-                        class="dark:shadow-dark-700 rounded-lg bg-red-500 px-2 py-1.5 text-xs text-white shadow-xs select-none hover:bg-red-400 active:bg-red-400"
+                        classList={{
+                          "bg-red-500! border-none! text-white! hover:bg-red-400! active:bg-red-400!": true,
+                        }}
                       >
                         Delete
                       </Button>

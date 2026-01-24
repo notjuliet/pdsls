@@ -347,13 +347,10 @@ export const RecordEditor = (props: {
             </Show>
             <div class="flex justify-between gap-2">
               <div class="relative" ref={insertMenuRef}>
-                <button
-                  type="button"
-                  class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 flex w-fit rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1.5 text-base shadow-xs hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
-                  onClick={() => setOpenInsertMenu(!openInsertMenu())}
-                >
-                  <span class="iconify lucide--plus select-none"></span>
-                </button>
+                <Button onClick={() => setOpenInsertMenu(!openInsertMenu())}>
+                  <span class="iconify lucide--plus"></span>
+                  <span>Add</span>
+                </Button>
                 <Show when={openInsertMenu()}>
                   <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute bottom-full left-0 z-10 mb-1 flex w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1.5 shadow-md dark:border-neutral-700">
                     <MenuItem

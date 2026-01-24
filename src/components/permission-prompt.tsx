@@ -40,7 +40,9 @@ export const PermissionPromptContainer = () => {
         <Button onClick={() => setRequestedScope(null)}>Cancel</Button>
         <Button
           onClick={handleEditPermissions}
-          class="dark:shadow-dark-700 rounded-lg bg-blue-500 px-2 py-1.5 text-xs text-white shadow-xs select-none hover:bg-blue-600 active:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 dark:active:bg-blue-400"
+          classList={{
+            "bg-blue-500! text-white! hover:bg-blue-600! active:bg-blue-700! dark:bg-blue-600! dark:hover:bg-blue-500! dark:active:bg-blue-400! border-none!": true,
+          }}
         >
           Edit permissions
         </Button>

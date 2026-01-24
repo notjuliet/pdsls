@@ -50,11 +50,19 @@ const BlobView = (props: { pds: string; repo: string }) => {
           <p>
             {blobs()?.length} blob{(blobs()?.length ?? 0 > 1) ? "s" : ""}
           </p>
-          <Show when={!response.loading && cursor()}>
-            <Button onClick={() => refetch()}>Load more</Button>
-          </Show>
-          <Show when={response.loading}>
-            <span class="iconify lucide--loader-circle animate-spin py-3.5 text-xl"></span>
+          <Show when={cursor()}>
+            <Button
+              onClick={() => refetch()}
+              disabled={response.loading}
+              classList={{ "w-20 justify-center": true }}
+            >
+              <Show
+                when={!response.loading}
+                fallback={<span class="iconify lucide--loader-circle animate-spin text-base" />}
+              >
+                Load more
+              </Show>
+            </Button>
           </Show>
         </div>
       </div>

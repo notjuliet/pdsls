@@ -46,7 +46,7 @@ const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
   });
 
   return (
-    <Show when={links()} fallback={<p class="px-3 py-2 text-neutral-500">Loading…</p>}>
+    <Show when={links()} fallback={<p class="px-3 py-2 text-center text-neutral-500">Loading…</p>}>
       <For each={links()!.linking_records}>
         {({ did, collection, rkey }) => {
           const timestamp =
@@ -91,7 +91,7 @@ const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
             <div class="p-2">
               <Button
                 onClick={() => setMore(true)}
-                class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 w-full items-center justify-center gap-1 rounded border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+                class="dark:hover:bg-dark-200 dark:active:bg-dark-100 w-full rounded-md border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-sm select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
               >
                 Load more
               </Button>

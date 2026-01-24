@@ -315,7 +315,12 @@ const CollectionView = () => {
                       <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
                       <Button
                         onClick={deleteRecords}
-                        class={`dark:shadow-dark-700 rounded-lg px-2 py-1.5 text-xs text-white shadow-xs select-none ${recreate() ? "bg-green-500 hover:bg-green-600 active:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:active:bg-green-800" : "bg-red-500 hover:bg-red-600 active:bg-red-700"}`}
+                        classList={{
+                          "bg-blue-500! text-white! hover:bg-blue-600! active:bg-blue-700! dark:bg-blue-600! dark:hover:bg-blue-500! dark:active:bg-blue-400! border-none!":
+                            recreate(),
+                          "text-white! border-none! bg-red-500! hover:bg-red-600! active:bg-red-700!":
+                            !recreate(),
+                        }}
                       >
                         {recreate() ? "Recreate" : "Delete"}
                       </Button>
@@ -372,7 +377,7 @@ const CollectionView = () => {
                         <Button onClick={() => refetch()}>Load more</Button>
                       </Show>
                       <Show when={response.loading}>
-                        <div class="iconify lucide--loader-circle w-20 animate-spin text-xl" />
+                        <div class="iconify lucide--loader-circle w-20 animate-spin text-lg" />
                       </Show>
                     </Show>
                   </div>

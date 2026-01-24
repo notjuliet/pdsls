@@ -253,11 +253,19 @@ const PdsView = () => {
           <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 pt-2 pb-4">
             <div class="flex flex-col items-center gap-1 pb-2">
               <p>{repos()?.length} loaded</p>
-              <Show when={!response.loading && cursor()}>
-                <Button onClick={() => refetch()}>Load more</Button>
-              </Show>
-              <Show when={response.loading}>
-                <span class="iconify lucide--loader-circle animate-spin py-3.5 text-xl"></span>
+              <Show when={cursor()}>
+                <Button
+                  onClick={() => refetch()}
+                  disabled={response.loading}
+                  classList={{ "w-20 justify-center": true }}
+                >
+                  <Show
+                    when={!response.loading}
+                    fallback={<span class="iconify lucide--loader-circle animate-spin text-base" />}
+                  >
+                    Load more
+                  </Show>
+                </Button>
               </Show>
             </div>
           </div>

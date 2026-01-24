@@ -292,7 +292,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
         <Show when={hide()}>
           <button
             onclick={() => setHide(false)}
-            class="flex items-center gap-1 rounded-lg bg-neutral-200 px-2 py-1.5 text-sm transition-colors hover:bg-neutral-300 active:bg-neutral-400 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
+            class="flex items-center gap-1 rounded-md bg-neutral-200 px-2 py-1.5 text-sm transition-colors hover:bg-neutral-300 active:bg-neutral-400 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
           >
             <span class="iconify lucide--image"></span>
             <span class="font-sans">Show media</span>

@@ -123,7 +123,7 @@ export const WelcomeView = (props: {
             </p>
             <p class="text-xs text-neutral-500 dark:text-neutral-400">or</p>
           </div>
-          <label class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-8 items-center justify-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-3 py-1.5 text-sm shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800">
+          <label class="dark:bg-dark-300 dark:hover:bg-dark-200 dark:active:bg-dark-100 flex items-center gap-1 rounded-md border border-neutral-300 bg-neutral-50 px-2.5 py-1.5 text-sm text-neutral-700 transition-colors select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:text-neutral-300">
             <input
               type="file"
               accept={isIOS ? undefined : ".car,application/vnd.ipld.car"}

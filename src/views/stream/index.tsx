@@ -414,28 +414,24 @@ export const StreamView = () => {
               showAllEvents={searchParams.allEvents === "on"}
             />
             <div class="flex justify-end gap-2">
-              <button
-                type="button"
+              <Button
                 ontouchstart={(e) => {
                   e.preventDefault();
                   requestAnimationFrame(() => setPaused(!paused()));
                 }}
-                onclick={() => setPaused(!paused())}
-                class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+                onClick={() => setPaused(!paused())}
               >
                 {paused() ? "Resume" : "Pause"}
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
                 ontouchstart={(e) => {
                   e.preventDefault();
                   requestAnimationFrame(() => disconnect());
                 }}
-                onclick={disconnect}
-                class="dark:hover:bg-dark-200 dark:shadow-dark-700 dark:active:bg-dark-100 box-border flex h-7 items-center gap-1 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-2 py-1.5 text-xs shadow-xs select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800"
+                onClick={disconnect}
               >
                 Disconnect
-              </button>
+              </Button>
             </div>
           </div>
         </Show>
