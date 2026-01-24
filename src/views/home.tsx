@@ -1,6 +1,7 @@
 import { A } from "@solidjs/router";
 import { For, JSX } from "solid-js";
 import { setOpenManager } from "../auth/state";
+import { SearchButton } from "../components/search";
 
 type ProfileData = {
   did: string;
@@ -104,20 +105,21 @@ export const Home = () => {
             </For>
           </div>
         </section>
-        <p class="text-xs text-neutral-500 dark:text-neutral-400">
-          or use the search{" "}
-          <kbd class="rounded bg-neutral-200 px-1 py-0.5 font-mono text-[10px] dark:bg-neutral-700">
-            Ctrl+K
-          </kbd>{" "}
-          to find any account
-        </p>
-        <button
-          type="button"
-          onclick={() => setOpenManager(true)}
-          class="dark:bg-dark-300 dark:hover:bg-dark-200 dark:active:bg-dark-100 w-fit rounded-md border border-neutral-300 bg-neutral-50 px-2.5 py-1.5 text-xs text-neutral-700 transition-colors hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:text-neutral-300"
-        >
-          Sign in to manage records
-        </button>
+        <div class="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+          <SearchButton />
+          <span>to find any account</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+          <button
+            type="button"
+            onclick={() => setOpenManager(true)}
+            class="dark:bg-dark-300 dark:hover:bg-dark-200 dark:active:bg-dark-100 flex w-fit items-center gap-1 rounded-md border border-neutral-300 bg-neutral-50 px-2.5 py-1.5 text-xs text-neutral-700 transition-colors hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:text-neutral-300"
+          >
+            <span class="iconify lucide--user-round"></span>
+            Sign in
+          </button>
+          <span>to manage records</span>
+        </div>
       </div>
 
       <div class="flex flex-col gap-4 text-sm">

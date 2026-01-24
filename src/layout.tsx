@@ -150,7 +150,9 @@ const Layout = (props: RouteSectionProps<unknown>) => {
             </Show>
           </A>
           <div class="relative flex items-center gap-0.5 rounded-lg bg-neutral-50/60 p-1 dark:bg-neutral-800/60">
-            <SearchButton />
+            <div class="mr-1">
+              <SearchButton />
+            </div>
             <Show when={agent()}>
               <RecordEditor create={true} scope="create" />
             </Show>
