@@ -29,6 +29,7 @@ import {
   updateNotification,
 } from "../components/notification.jsx";
 import Tooltip from "../components/tooltip.jsx";
+import { isTouchDevice } from "../layout.jsx";
 import {
   didDocCache,
   labelerCache,
@@ -411,7 +412,9 @@ export const RepoView = () => {
               </ErrorBoundary>
             </Show>
             <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
-              <div class="flex flex-col pb-16 text-sm wrap-anywhere">
+              <div
+                class={`flex flex-col ${isTouchDevice ? "pb-12" : "pb-16"} text-sm wrap-anywhere`}
+              >
                 <Show
                   when={Object.keys(nsids() ?? {}).length != 0}
                   fallback={<span class="mt-3 text-center text-base">No collections found.</span>}
@@ -626,7 +629,7 @@ export const RepoView = () => {
       </Show>
 
       <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
-        <div class="fixed bottom-12 z-10 w-full max-w-lg">
+        <div class={`fixed ${isTouchDevice ? "bottom-8" : "bottom-12"} z-10 w-full max-w-lg`}>
           <div
             class="dark:bg-dark-200 dark:shadow-dark-700 mx-3 flex cursor-text items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 shadow-md dark:border-neutral-700"
             onClick={(e) => {
