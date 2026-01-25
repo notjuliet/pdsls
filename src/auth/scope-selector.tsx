@@ -54,25 +54,35 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
         </button>
         <div class="font-semibold">Select permissions</div>
       </div>
-      <div class="flex flex-col gap-y-2 px-1">
+      <div class="flex flex-col px-1">
         <For each={GRANULAR_SCOPES}>
-          {(scope) => (
-            <div
-              class="flex items-center gap-2"
-              classList={{ "opacity-50": scope.id === "blob" && isBlobDisabled() }}
-            >
-              <input
-                id={`scope-${scope.id}`}
-                type="checkbox"
-                checked={selectedScopes().has(scope.id)}
-                disabled={scope.id === "blob" && isBlobDisabled()}
-                onChange={() => toggleScope(scope.id)}
-              />
-              <label for={`scope-${scope.id}`} class="flex grow items-center gap-2 select-none">
+          {(scope) => {
+            const isSelected = () => selectedScopes().has(scope.id);
+            const isDisabled = () => scope.id === "blob" && isBlobDisabled();
+
+            return (
+              <button
+                onclick={() => !isDisabled() && toggleScope(scope.id)}
+                disabled={isDisabled()}
+                class="group flex items-center gap-3 py-2"
+                classList={{ "opacity-50": isDisabled() }}
+              >
+                <div
+                  class="flex size-5 items-center justify-center rounded border-2 transition-colors"
+                  classList={{
+                    "bg-blue-500 border-transparent group-hover:bg-blue-600 group-active:bg-blue-400":
+                      isSelected() && !isDisabled(),
+                    "border-neutral-400 dark:border-neutral-500 group-hover:border-neutral-500 dark:group-hover:border-neutral-400 group-hover:bg-neutral-100 dark:group-hover:bg-neutral-800":
+                      !isSelected() && !isDisabled(),
+                    "border-neutral-300 dark:border-neutral-600": isDisabled(),
+                  }}
+                >
+                  {isSelected() && <span class="iconify lucide--check text-sm text-white"></span>}
+                </div>
                 <span>{scope.label}</span>
-              </label>
-            </div>
-          )}
+              </button>
+            );
+          }}
         </For>
       </div>
       <button
