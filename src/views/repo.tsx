@@ -9,7 +9,6 @@ import {
   createSignal,
   ErrorBoundary,
   For,
-  onMount,
   Show,
   Suspense,
 } from "solid-js";
@@ -29,7 +28,6 @@ import {
   removeNotification,
   updateNotification,
 } from "../components/notification.jsx";
-import { TextInput } from "../components/text-input.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import {
   didDocCache,
@@ -53,7 +51,6 @@ export const RepoView = () => {
   const [didDoc, setDidDoc] = createSignal<DidDocument>();
   const [nsids, setNsids] = createSignal<Record<string, { hidden: boolean; nsids: string[] }>>();
   const [filter, setFilter] = createSignal<string>();
-  const [showFilter, setShowFilter] = createSignal(false);
   const [validHandles, setValidHandles] = createStore<Record<string, boolean>>({});
   const [rotationKeys, setRotationKeys] = createSignal<Array<string>>([]);
   let rpc: Client;
@@ -328,15 +325,6 @@ export const RepoView = () => {
               </Show>
               <MenuProvider>
                 <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
-                  <Show
-                    when={!error() && (!location.hash || location.hash.startsWith("#collections"))}
-                  >
-                    <ActionMenu
-                      label="Filter collections"
-                      icon="lucide--filter"
-                      onClick={() => setShowFilter(!showFilter())}
-                    />
-                  </Show>
                   <CopyMenu content={params.repo!} label="Copy DID" icon="lucide--copy" />
                   <NavMenu
                     href={`/jetstream?dids=${params.repo}`}
@@ -423,21 +411,7 @@ export const RepoView = () => {
               </ErrorBoundary>
             </Show>
             <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
-              <Show when={showFilter()}>
-                <TextInput
-                  name="filter"
-                  placeholder="Filter collections"
-                  onInput={(e) => setFilter(e.currentTarget.value.toLowerCase())}
-                  class="grow"
-                  ref={(node) => {
-                    onMount(() => node.focus());
-                  }}
-                />
-              </Show>
-              <div
-                class="flex flex-col text-sm wrap-anywhere"
-                classList={{ "-mt-1": !showFilter() }}
-              >
+              <div class="flex flex-col pb-16 text-sm wrap-anywhere">
                 <Show
                   when={Object.keys(nsids() ?? {}).length != 0}
                   fallback={<span class="mt-3 text-center text-base">No collections found.</span>}
@@ -647,6 +621,31 @@ export const RepoView = () => {
                 )}
               </Show>
             </Show>
+          </div>
+        </div>
+      </Show>
+
+      <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
+        <div class="fixed bottom-12 z-10 w-full max-w-lg">
+          <div
+            class="dark:bg-dark-200 dark:shadow-dark-700 mx-3 flex cursor-text items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 shadow-md dark:border-neutral-700"
+            onClick={(e) => {
+              const input = e.currentTarget.querySelector("input");
+              input?.focus();
+            }}
+          >
+            <span class="iconify lucide--filter text-neutral-500 dark:text-neutral-400"></span>
+            <input
+              type="text"
+              spellcheck={false}
+              autocapitalize="off"
+              autocomplete="off"
+              class="grow py-2.5 select-none placeholder:text-sm focus:outline-none"
+              name="filter"
+              placeholder="Filter collections..."
+              value={filter() ?? ""}
+              onInput={(e) => setFilter(e.currentTarget.value.toLowerCase())}
+            />
           </div>
         </div>
       </Show>
