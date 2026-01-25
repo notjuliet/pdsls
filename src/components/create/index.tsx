@@ -95,7 +95,7 @@ export const RecordEditor = (props: {
       embed: {
         $type: "app.bsky.embed.external",
         external: {
-          uri: "https://pdsls.dev",
+          uri: "https://pds.ls",
           title: "PDSls",
           description: "Browse the public data on atproto",
         },
