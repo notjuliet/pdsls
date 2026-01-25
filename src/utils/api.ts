@@ -62,8 +62,14 @@ const getPDS = async (did: string) => {
     throw new Error("Not a valid DID identifier");
   }
 
-  const doc = await didDocumentResolver().resolve(did);
-  didDocCache[did] = doc;
+  let doc: DidDocument;
+  try {
+    doc = await didDocumentResolver().resolve(did);
+    didDocCache[did] = doc;
+  } catch (e) {
+    console.error(e);
+    throw new Error("Error during did document resolution");
+  }
 
   const pds = getPdsEndpoint(doc);
   const labeler = getLabelerEndpoint(doc);
