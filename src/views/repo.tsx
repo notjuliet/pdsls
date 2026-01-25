@@ -634,7 +634,7 @@ export const RepoView = () => {
             class="dark:bg-dark-200 dark:shadow-dark-700 mx-3 flex cursor-text items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 shadow-md dark:border-neutral-700"
             onClick={(e) => {
               const input = e.currentTarget.querySelector("input");
-              input?.focus();
+              if (e.target !== input) input?.focus();
             }}
           >
             <span class="iconify lucide--filter text-neutral-500 dark:text-neutral-400"></span>
@@ -643,7 +643,7 @@ export const RepoView = () => {
               spellcheck={false}
               autocapitalize="off"
               autocomplete="off"
-              class="grow py-2.5 select-none placeholder:text-sm focus:outline-none"
+              class="grow py-2 select-none placeholder:text-sm focus:outline-none"
               name="filter"
               placeholder="Filter collections..."
               value={filter() ?? ""}
