@@ -631,7 +631,7 @@ export const RepoView = () => {
       <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
         <div class={`fixed ${isTouchDevice ? "bottom-8" : "bottom-12"} z-10 w-full max-w-lg`}>
           <div
-            class="dark:bg-dark-200 dark:shadow-dark-700 mx-3 flex cursor-text items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 shadow-md dark:border-neutral-700"
+            class="dark:bg-dark-200 dark:shadow-dark-700 mx-3 flex cursor-text items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 shadow-sm dark:border-neutral-700"
             onClick={(e) => {
               const input = e.currentTarget.querySelector("input");
               if (e.target !== input) input?.focus();
