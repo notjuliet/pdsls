@@ -1,6 +1,6 @@
 import { A } from "@solidjs/router";
 import { For, JSX } from "solid-js";
-import { setOpenManager } from "../auth/state";
+import { setOpenManager, setShowAddAccount } from "../auth/state";
 import { Button } from "../components/button";
 import { SearchButton } from "../components/search";
 
@@ -111,7 +111,12 @@ export const Home = () => {
           <span>to find any account</span>
         </div>
         <div class="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
-          <Button onClick={() => setOpenManager(true)}>
+          <Button
+            onClick={() => {
+              setOpenManager(true);
+              setShowAddAccount(true);
+            }}
+          >
             <span class="iconify lucide--user-round"></span>
             Sign in
           </Button>

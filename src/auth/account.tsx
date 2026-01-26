@@ -1,7 +1,7 @@
 import { Did } from "@atcute/lexicons";
 import { deleteStoredSession, getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { A } from "@solidjs/router";
-import { createEffect, createSignal, For, onMount, Show } from "solid-js";
+import { createEffect, For, onMount, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
 import { Modal } from "../components/modal.jsx";
@@ -26,6 +26,8 @@ import {
   setOpenManager,
   setPendingPermissionEdit,
   setSessions,
+  setShowAddAccount,
+  showAddAccount,
 } from "./state.js";
 
 const AccountDropdown = (props: { did: Did; onEditPermissions: (did: Did) => void }) => {
@@ -72,7 +74,6 @@ const AccountDropdown = (props: { did: Did; onEditPermissions: (did: Did) => voi
 
 export const AccountManager = () => {
   const [avatars, setAvatars] = createStore<Record<Did, string>>();
-  const [showingAddAccount, setShowingAddAccount] = createSignal(false);
 
   const getThumbnailUrl = (avatarUrl: string) => {
     return avatarUrl.replace("img/avatar/", "img/avatar_thumbnail/");
@@ -122,13 +123,13 @@ export const AccountManager = () => {
         open={openManager()}
         onClose={() => {
           setOpenManager(false);
-          setShowingAddAccount(false);
+          setShowAddAccount(false);
           scopeFlow.cancel();
         }}
         alignTop
         contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-full max-w-sm rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 mx-3 shadow-md dark:border-neutral-700"
       >
-        <Show when={!scopeFlow.showScopeSelector() && !showingAddAccount()}>
+        <Show when={!scopeFlow.showScopeSelector() && !showAddAccount()}>
           <div class="mb-2 px-1 font-semibold">
             <span>Switch account</span>
           </div>
@@ -169,7 +170,7 @@ export const AccountManager = () => {
             </For>
           </div>
           <button
-            onclick={() => setShowingAddAccount(true)}
+            onclick={() => setShowAddAccount(true)}
             class="dark:hover:bg-dark-200 dark:active:bg-dark-100 flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700"
           >
             <span class="iconify lucide--plus"></span>
@@ -177,8 +178,8 @@ export const AccountManager = () => {
           </button>
         </Show>
 
-        <Show when={showingAddAccount() && !scopeFlow.showScopeSelector()}>
-          <Login onCancel={() => setShowingAddAccount(false)} />
+        <Show when={showAddAccount() && !scopeFlow.showScopeSelector()}>
+          <Login onCancel={() => setShowAddAccount(false)} />
         </Show>
 
         <Show when={scopeFlow.showScopeSelector()}>
@@ -189,7 +190,7 @@ export const AccountManager = () => {
             onConfirm={scopeFlow.complete}
             onCancel={() => {
               scopeFlow.cancel();
-              setShowingAddAccount(false);
+              setShowAddAccount(false);
             }}
           />
         </Show>

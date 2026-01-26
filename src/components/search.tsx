@@ -348,7 +348,7 @@ export const Search = () => {
                 </span>
                 <button
                   type="button"
-                  class="text-xs text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                  class="text-xs not-hover:text-neutral-500 dark:not-hover:text-neutral-400"
                   onClick={() => {
                     localStorage.removeItem(RECENT_SEARCHES_KEY);
                     setRecentSearches([]);
@@ -390,13 +390,13 @@ export const Search = () => {
                       </A>
                       <button
                         type="button"
-                        class="mr-1 flex items-center rounded p-1 opacity-0 group-hover:opacity-100 hover:bg-neutral-300 dark:hover:bg-neutral-600"
+                        class="flex items-center p-2.5 opacity-0 not-hover:text-neutral-500 group-hover:opacity-100 dark:not-hover:text-neutral-400"
                         onClick={() => {
                           removeRecentSearch(recent.path);
                           setRecentSearches(getRecentSearches());
                         }}
                       >
-                        <span class="iconify lucide--x text-sm text-neutral-500 dark:text-neutral-400"></span>
+                        <span class="iconify lucide--x text-base"></span>
                       </button>
                     </div>
                   );

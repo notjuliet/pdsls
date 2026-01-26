@@ -68,7 +68,7 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
                 classList={{ "opacity-50": isDisabled() }}
               >
                 <div
-                  class="flex size-5 items-center justify-center rounded border-2 transition-colors"
+                  class="flex size-5 items-center justify-center rounded border-2"
                   classList={{
                     "bg-blue-500 border-transparent group-hover:bg-blue-600 group-active:bg-blue-400":
                       isSelected() && !isDisabled(),

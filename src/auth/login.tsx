@@ -32,7 +32,7 @@ export const Login = (props: LoginProps) => {
   };
 
   return (
-    <div class="flex flex-col gap-y-3 px-1">
+    <div class="flex flex-col gap-y-3">
       <Show when={!scopeFlow.showScopeSelector()}>
         <Show when={props.onCancel}>
           <div class="flex items-center gap-2">
