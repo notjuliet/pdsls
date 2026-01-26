@@ -3,11 +3,11 @@ import {
   defs,
   IndexedEntry,
   IndexedEntryLog,
-  processIndexedEntryLog,
 } from "@atcute/did-plc";
-import { createEffect, createResource, createSignal, For, Show } from "solid-js";
+import { createEffect, createResource, createSignal, For, onCleanup, Show } from "solid-js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
+import PlcValidateWorker from "../workers/plc-validate.ts?worker";
 import { plcDirectory } from "./settings.jsx";
 
 type PlcEvent = "handle" | "rotation_key" | "service" | "verification_method";
@@ -32,25 +32,24 @@ export const PlcLogView = (props: { did: string }) => {
     return Array.from(groupBy(opHistory, (item) => item.orig));
   };
 
-  const validateLog = async (logs: IndexedEntryLog) => {
-    try {
-      await processIndexedEntryLog(props.did as any, logs);
-      setValidLog(true);
-    } catch (e) {
-      console.error(e);
-      setValidLog(false);
-    }
-  };
-
   const [plcOps] =
     createResource<[IndexedEntry<CompatibleOperationOrTombstone>, DiffEntry[]][]>(fetchPlcLogs);
+
+  let worker: Worker | undefined;
+  onCleanup(() => worker?.terminate());
 
   createEffect(() => {
     const logs = rawLogs();
     if (logs) {
       setValidLog(undefined);
-      // Defer validation to next tick to avoid blocking rendering
-      setTimeout(() => validateLog(logs), 0);
+      worker?.terminate();
+      worker = new PlcValidateWorker();
+      worker.onmessage = (e: MessageEvent<{ valid: boolean }>) => {
+        setValidLog(e.data.valid);
+        worker?.terminate();
+        worker = undefined;
+      };
+      worker.postMessage({ did: props.did, logs });
     }
   });
 
