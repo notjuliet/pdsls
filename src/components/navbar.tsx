@@ -108,7 +108,7 @@ export const NavBar = (props: { params: Params }) => {
                       when={handle() !== props.params.repo}
                       fallback={<span class="truncate">{props.params.repo}</span>}
                     >
-                      <span class="shrink-0">{handle()}</span>
+                      <span class="max-w-full shrink-0 truncate">{handle()}</span>
                       <span class="truncate text-neutral-500 dark:text-neutral-400">
                         ({props.params.repo})
                       </span>
@@ -125,7 +125,7 @@ export const NavBar = (props: { params: Params }) => {
                     when={handle() !== props.params.repo}
                     fallback={<span class="truncate">{props.params.repo}</span>}
                   >
-                    <span class="shrink-0">{handle()}</span>
+                    <span class="max-w-full shrink-0 truncate">{handle()}</span>
                     <span class="truncate">({props.params.repo})</span>
                   </Show>
                 </A>
@@ -170,7 +170,7 @@ export const NavBar = (props: { params: Params }) => {
                 <span class="iconify lucide--file-json text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
               </Tooltip>
               <div class="flex min-w-0 gap-1 py-0.5 font-medium">
-                <span class="shrink-0">{props.params.rkey}</span>
+                <span>{props.params.rkey}</span>
                 <Show when={rkeyTimestamp()}>
                   <span class="truncate text-neutral-500 dark:text-neutral-400">
                     ({localDateFromTimestamp(rkeyTimestamp()!)})
