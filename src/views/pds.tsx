@@ -194,7 +194,7 @@ const PdsView = () => {
                     </div>
                     <Show when={server().phoneVerificationRequired}>
                       <div class="flex items-center gap-1">
-                        <span class="font-semibold">Phone Verification Required</span>
+                        <span class="font-semibold">Captcha Verification Required</span>
                         <span class="iconify lucide--check text-green-500 dark:text-green-400"></span>
                       </div>
                     </Show>
