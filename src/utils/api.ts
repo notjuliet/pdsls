@@ -215,6 +215,32 @@ const getRecordBacklinks = (
 ): Promise<LinksWithRecords> =>
   getConstellation("/links", target, collection, path, cursor, limit || 100);
 
+export interface HandleResolveResult {
+  success: boolean;
+  did?: string;
+  error?: string;
+}
+
+export const resolveHandleDetailed = async (handle: Handle) => {
+  const dnsResolver = new DohJsonHandleResolver({ dohUrl: "https://dns.google/resolve?" });
+  const httpResolver = new WellKnownHandleResolver();
+
+  const tryResolve = async (
+    resolver: DohJsonHandleResolver | WellKnownHandleResolver,
+  ): Promise<HandleResolveResult> => {
+    try {
+      const did = await resolver.resolve(handle);
+      return { success: true, did };
+    } catch (err: any) {
+      return { success: false, error: err.message ?? String(err) };
+    }
+  };
+
+  const [dns, http] = await Promise.all([tryResolve(dnsResolver), tryResolve(httpResolver)]);
+
+  return { dns, http };
+};
+
 export {
   didDocCache,
   getAllBacklinks,
