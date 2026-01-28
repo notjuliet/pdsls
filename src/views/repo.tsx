@@ -506,33 +506,37 @@ export const RepoView = () => {
                         <p class="font-semibold">Aliases</p>
                         <For each={didDocument().alsoKnownAs}>
                           {(alias) => (
-                            <div class="flex items-center gap-1 text-sm text-neutral-700 dark:text-neutral-300">
-                              <span>{alias}</span>
-                              <Show when={alias.startsWith("at://")}>
-                                <button
-                                  class="flex items-center rounded p-0.5 hover:bg-neutral-200 dark:hover:bg-neutral-700"
-                                  onClick={async () => {
-                                    setHandleDetailedResult(null);
-                                    setHandleModalAlias(alias);
-                                    const handle = alias.replace("at://", "") as Handle;
-                                    const result = await resolveHandleDetailed(handle);
-                                    if (handleModalAlias() === alias)
-                                      setHandleDetailedResult(result);
+                            <Show
+                              when={alias.startsWith("at://")}
+                              fallback={
+                                <div class="text-sm text-neutral-700 dark:text-neutral-300">
+                                  {alias}
+                                </div>
+                              }
+                            >
+                              <button
+                                class="-ml-1 flex w-fit items-center gap-1 rounded px-1 py-0.5 text-sm text-neutral-700 hover:bg-neutral-200 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                                onClick={async () => {
+                                  setHandleDetailedResult(null);
+                                  setHandleModalAlias(alias);
+                                  const handle = alias.replace("at://", "") as Handle;
+                                  const result = await resolveHandleDetailed(handle);
+                                  if (handleModalAlias() === alias) setHandleDetailedResult(result);
+                                }}
+                              >
+                                <span>{alias}</span>
+                                <span
+                                  classList={{
+                                    "iconify text-base lucide--check text-green-600 dark:text-green-400":
+                                      validHandles[alias] === true,
+                                    "iconify lucide--x text-red-500 dark:text-red-400":
+                                      validHandles[alias] === false,
+                                    "iconify lucide--loader-circle animate-spin":
+                                      validHandles[alias] === undefined,
                                   }}
-                                >
-                                  <span
-                                    classList={{
-                                      "iconify text-base lucide--check text-green-600 dark:text-green-400":
-                                        validHandles[alias] === true,
-                                      "iconify lucide--x text-red-500 dark:text-red-400":
-                                        validHandles[alias] === false,
-                                      "iconify lucide--loader-circle animate-spin":
-                                        validHandles[alias] === undefined,
-                                    }}
-                                  ></span>
-                                </button>
-                              </Show>
-                            </div>
+                                ></span>
+                              </button>
+                            </Show>
                           )}
                         </For>
                       </div>
