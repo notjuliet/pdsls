@@ -18,7 +18,7 @@ export const Modal = (props: ModalProps) => {
         classList={{
           "pointer-events-none": props.nonBlocking,
           "items-start pt-18": props.alignTop,
-          "items-center": !props.alignTop,
+          "items-start pt-[20vh]": !props.alignTop,
         }}
         ref={(node) => {
           const handleEscape = (e: KeyboardEvent) => {
