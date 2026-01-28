@@ -542,7 +542,7 @@ export const RepoView = () => {
                     <Modal
                       open={handleModalAlias() !== null}
                       onClose={() => setHandleModalAlias(null)}
-                      contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-max max-w-[90vw] rounded-lg border-[0.5px] border-neutral-300 bg-white p-4 shadow-md sm:max-w-xl dark:border-neutral-700"
+                      contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto min-w-[min(24rem,90vw)] max-w-[90vw] rounded-lg border-[0.5px] border-neutral-300 bg-white p-4 shadow-md sm:max-w-xl dark:border-neutral-700"
                     >
                       <div class="mb-2 flex items-center justify-between gap-4">
                         <p class="truncate font-semibold">
