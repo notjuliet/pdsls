@@ -108,10 +108,16 @@ export const NavBar = (props: { params: Params }) => {
           <div
             class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40"
             onMouseEnter={() => {
-              setRepoHovered(true);
-              setHasHoveredRepo(true);
+              if (!isTouchDevice) {
+                setRepoHovered(true);
+                setHasHoveredRepo(true);
+              }
             }}
-            onMouseLeave={() => setRepoHovered(false)}
+            onMouseLeave={() => {
+              if (!isTouchDevice) {
+                setRepoHovered(false);
+              }
+            }}
           >
             <div class="flex min-w-0 basis-full items-center gap-2">
               <Tooltip text="Repository">
