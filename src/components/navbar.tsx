@@ -132,7 +132,7 @@ export const NavBar = (props: { params: Params }) => {
                   <Show when={hasHoveredRepo() && isCustomDomain()}>
                     <img
                       src={`https://${handle()}/favicon.ico`}
-                      class="size-4 rounded-full"
+                      class="size-4"
                       classList={{ hidden: !repoHovered() || !faviconLoaded() }}
                       onLoad={() => setFaviconLoaded(true)}
                       onError={() => setFaviconLoaded(false)}
