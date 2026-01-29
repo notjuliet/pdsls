@@ -104,7 +104,7 @@ export const DropdownMenu = (props: {
   const ctx = useContext(MenuContext);
   const [menu, setMenu] = createSignal<HTMLDivElement>();
   const [menuButton, setMenuButton] = createSignal<HTMLButtonElement>();
-  const [buttonRect, setButtonRect] = createSignal<DOMRect>();
+  const [buttonRect, setButtonRect] = createSignal<{ bottom: number; right: number }>();
 
   const clickEvent = (event: MouseEvent) => {
     const target = event.target as Node;
@@ -113,19 +113,30 @@ export const DropdownMenu = (props: {
 
   const updatePosition = () => {
     const rect = menuButton()?.getBoundingClientRect();
-    if (rect) setButtonRect(rect);
+    if (rect) {
+      const isTouchDevice = window.matchMedia("(hover: none)").matches;
+      const vv = isTouchDevice ? window.visualViewport : null;
+      setButtonRect({
+        bottom: rect.bottom + (vv?.offsetTop ?? 0),
+        right: rect.right + (vv?.offsetLeft ?? 0),
+      });
+    }
   };
 
   onMount(() => {
     window.addEventListener("click", clickEvent);
     window.addEventListener("scroll", updatePosition, true);
     window.addEventListener("resize", updatePosition);
+    window.visualViewport?.addEventListener("resize", updatePosition);
+    window.visualViewport?.addEventListener("scroll", updatePosition);
   });
 
   onCleanup(() => {
     window.removeEventListener("click", clickEvent);
     window.removeEventListener("scroll", updatePosition, true);
     window.removeEventListener("resize", updatePosition);
+    window.visualViewport?.removeEventListener("resize", updatePosition);
+    window.visualViewport?.removeEventListener("scroll", updatePosition);
   });
 
   return (
