@@ -32,6 +32,10 @@ const CopyButton = (props: { content: string; label: string }) => {
 
 export const NavBar = (props: { params: Params }) => {
   const [handle, setHandle] = createSignal(props.params.repo);
+  const [repoHovered, setRepoHovered] = createSignal(false);
+  const [hasHoveredRepo, setHasHoveredRepo] = createSignal(false);
+  const [faviconLoaded, setFaviconLoaded] = createSignal(false);
+  const isCustomDomain = () => handle() && !handle()!.endsWith(".bsky.social");
 
   createEffect(() => {
     if (pds() !== undefined && props.params.repo) {
@@ -41,6 +45,12 @@ export const NavBar = (props: { params: Params }) => {
           ?.split("at://")[1] ?? props.params.repo;
       if (hdl !== handle()) setHandle(hdl);
     }
+  });
+
+  createEffect(() => {
+    handle();
+    setHasHoveredRepo(false);
+    setFaviconLoaded(false);
   });
 
   const rkeyTimestamp = createMemo(() => {
@@ -95,10 +105,40 @@ export const NavBar = (props: { params: Params }) => {
       <div class="flex flex-col">
         <Show when={props.params.repo}>
           {/* Repository Level */}
-          <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
+          <div
+            class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40"
+            onMouseEnter={() => {
+              setRepoHovered(true);
+              setHasHoveredRepo(true);
+            }}
+            onMouseLeave={() => setRepoHovered(false)}
+          >
             <div class="flex min-w-0 basis-full items-center gap-2">
               <Tooltip text="Repository">
-                <span class="iconify lucide--book-user shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
+                <div class="relative flex h-5 w-4 shrink-0 items-center justify-center">
+                  <span
+                    class="iconify lucide--book-user absolute text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"
+                    classList={{
+                      hidden:
+                        (repoHovered() && isCustomDomain() && faviconLoaded()) ||
+                        (repoHovered() && handle() === "jcsalterego.bsky.social"),
+                    }}
+                  ></span>
+                  <Show when={repoHovered() && handle() === "jcsalterego.bsky.social"}>
+                    <div class="flex size-4 items-center justify-center rounded-full bg-blue-500">
+                      <span class="iconify lucide--check size-2.5 text-white"></span>
+                    </div>
+                  </Show>
+                  <Show when={hasHoveredRepo() && isCustomDomain()}>
+                    <img
+                      src={`https://${handle()}/favicon.ico`}
+                      class="size-4 rounded-full"
+                      classList={{ hidden: !repoHovered() || !faviconLoaded() }}
+                      onLoad={() => setFaviconLoaded(true)}
+                      onError={() => setFaviconLoaded(false)}
+                    />
+                  </Show>
+                </div>
               </Tooltip>
               <Show
                 when={props.params.collection}
