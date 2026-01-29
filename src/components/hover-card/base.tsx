@@ -1,7 +1,7 @@
 import { A } from "@solidjs/router";
 import { createSignal, JSX, onCleanup, Show } from "solid-js";
 import { Portal } from "solid-js/web";
-import { isTouchDevice } from "../../layout";
+import { canHover } from "../../layout";
 
 interface HoverCardProps {
   /** Link href - if provided, renders an A tag */
@@ -112,7 +112,7 @@ const HoverCard = (props: HoverCardProps) => {
           {props.label}
         </A>
       )}
-      <Show when={show() && !isTouchDevice}>
+      <Show when={show() && canHover}>
         <Portal>
           <div
             ref={setupResizeObserver}

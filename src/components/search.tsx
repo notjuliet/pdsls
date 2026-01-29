@@ -10,7 +10,7 @@ import {
   onMount,
   Show,
 } from "solid-js";
-import { isTouchDevice } from "../layout";
+import { canHover } from "../layout";
 import { resolveLexiconAuthority, resolveLexiconAuthorityDirect } from "../utils/api";
 import { appHandleLink, appList, AppUrl } from "../utils/app-urls";
 import { createDebouncedValue } from "../utils/hooks/debounced";
@@ -99,7 +99,7 @@ export const SearchButton = () => {
     <Button onClick={() => setShowSearch(!showSearch())}>
       <span class="iconify lucide--search"></span>
       <span>Search</span>
-      <Show when={!isTouchDevice}>
+      <Show when={canHover}>
         <kbd class="font-sans text-neutral-400 dark:text-neutral-500">
           {/Mac/i.test(navigator.platform) ? "⌘" : "⌃"}K
         </kbd>

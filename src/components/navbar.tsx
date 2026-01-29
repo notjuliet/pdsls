@@ -1,7 +1,7 @@
 import * as TID from "@atcute/tid";
 import { A, Params } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, Show } from "solid-js";
-import { isTouchDevice } from "../layout";
+import { canHover } from "../layout";
 import { didDocCache } from "../utils/api";
 import { addToClipboard } from "../utils/copy";
 import { localDateFromTimestamp } from "../utils/date";
@@ -11,7 +11,7 @@ export const [pds, setPDS] = createSignal<string>();
 
 const CopyButton = (props: { content: string; label: string }) => {
   return (
-    <Show when={!isTouchDevice}>
+    <Show when={canHover}>
       <Tooltip text={props.label}>
         <button
           type="button"
@@ -108,13 +108,13 @@ export const NavBar = (props: { params: Params }) => {
           <div
             class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40"
             onMouseEnter={() => {
-              if (!isTouchDevice) {
+              if (canHover) {
                 setRepoHovered(true);
                 setHasHoveredRepo(true);
               }
             }}
             onMouseLeave={() => {
-              if (!isTouchDevice) {
+              if (canHover) {
                 setRepoHovered(false);
               }
             }}

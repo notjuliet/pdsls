@@ -14,7 +14,7 @@ import { themeEvent } from "./components/theme.jsx";
 import { resolveHandle } from "./utils/api.js";
 import { plcDirectory } from "./views/settings.jsx";
 
-export const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 1;
+export const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
 const headers: Record<string, string> = {
   "did:plc:ia76kvnndjutgedggx2ibrem": "bunny.jpg",

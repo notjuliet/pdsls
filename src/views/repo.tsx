@@ -29,7 +29,7 @@ import {
   removeNotification,
   updateNotification,
 } from "../components/notification.jsx";
-import { isTouchDevice } from "../layout.jsx";
+import { canHover } from "../layout.jsx";
 import {
   didDocCache,
   type HandleResolveResult,
@@ -419,9 +419,7 @@ export const RepoView = () => {
               </ErrorBoundary>
             </Show>
             <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
-              <div
-                class={`flex flex-col ${isTouchDevice ? "pb-12" : "pb-16"} text-sm wrap-anywhere`}
-              >
+              <div class={`flex flex-col ${canHover ? "pb-16" : "pb-12"} text-sm wrap-anywhere`}>
                 <Show
                   when={Object.keys(nsids() ?? {}).length != 0}
                   fallback={<span class="mt-3 text-center text-base">No collections found.</span>}
@@ -745,7 +743,7 @@ export const RepoView = () => {
       </Show>
 
       <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
-        <div class={`fixed ${isTouchDevice ? "bottom-8" : "bottom-12"} z-10 w-full max-w-lg`}>
+        <div class={`fixed ${canHover ? "bottom-12" : "bottom-8"} z-10 w-full max-w-lg`}>
           <div
             class="dark:bg-dark-200 dark:shadow-dark-700 mx-3 flex cursor-text items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 shadow-sm dark:border-neutral-700"
             onClick={(e) => {
