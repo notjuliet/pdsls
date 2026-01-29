@@ -56,6 +56,8 @@ export const Home = () => {
     { did: "did:plc:h6as5sk7tfqvvnqvfrlnnwqn", handle: "cwonus.org" },
     { did: "did:plc:mo7bk6gblylupvhetkqmndrv", handle: "claire.on-her.computer" },
     { did: "did:plc:73gqgbnvpx5syidcponjrics", handle: "coil-habdle.ebil.club" },
+    { did: "did:plc:gy5roooborfiyvl2xadsam3e", handle: "slug.moe" },
+    { did: "did:plc:dadnngq7hpnuglhxm556wgzi", handle: "drunk.moe" },
   ];
 
   const profiles = [...allExampleProfiles].sort(() => Math.random() - 0.5).slice(0, 3);
