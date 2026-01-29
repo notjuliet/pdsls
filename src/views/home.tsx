@@ -58,6 +58,7 @@ export const Home = () => {
     { did: "did:plc:73gqgbnvpx5syidcponjrics", handle: "coil-habdle.ebil.club" },
     { did: "did:plc:gy5roooborfiyvl2xadsam3e", handle: "slug.moe" },
     { did: "did:plc:dadnngq7hpnuglhxm556wgzi", handle: "drunk.moe" },
+    { did: "did:plc:ra3gxl2udc22odfbvcfslcn3", handle: "notnite.com" },
   ];
 
   const profiles = [...allExampleProfiles].sort(() => Math.random() - 0.5).slice(0, 3);
