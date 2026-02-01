@@ -59,6 +59,9 @@ export const Home = () => {
     { did: "did:plc:gy5roooborfiyvl2xadsam3e", handle: "slug.moe" },
     { did: "did:plc:dadnngq7hpnuglhxm556wgzi", handle: "drunk.moe" },
     { did: "did:plc:ra3gxl2udc22odfbvcfslcn3", handle: "notnite.com" },
+    { did: "did:plc:h5wsnqetncv6lu2weom35lg2", handle: "nel.pet" },
+    { did: "did:plc:irs2tcoeuvuwj3m4yampbuco", handle: "shi.gg" },
+    { did: "did:plc:vafqb3yhndyawabm2t2zhw5z", handle: "neko.moe.observer" },
   ];
 
   const profiles = [...allExampleProfiles].sort(() => Math.random() - 0.5).slice(0, 3);
