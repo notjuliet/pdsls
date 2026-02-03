@@ -53,9 +53,9 @@ interface LexiconDef {
   format?: string;
   // Permission-set fields
   title?: string;
-  "title:langs"?: { [lang: string]: string };
+  "title:lang"?: { [lang: string]: string };
   detail?: string;
-  "detail:langs"?: { [lang: string]: string };
+  "detail:lang"?: { [lang: string]: string };
   permissions?: LexiconPermission[];
 }
 
@@ -480,16 +480,16 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
               <span class="text-sm font-medium">{props.def.title}</span>
             </div>
           </Show>
-          <Show when={props.def["title:langs"]}>
+          <Show when={props.def["title:lang"]}>
             <div class="flex flex-col gap-1">
               <span class="text-xs font-semibold text-neutral-500 uppercase dark:text-neutral-400">
                 Localized Titles
               </span>
               <div class="flex flex-col gap-1">
-                <For each={Object.entries(props.def["title:langs"]!)}>
+                <For each={Object.entries(props.def["title:lang"]!)}>
                   {([lang, text]) => (
                     <div class="flex items-center gap-2 text-sm">
-                      <span class="rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-xs dark:bg-neutral-800">
+                      <span class="dark:bg-dark-200 rounded bg-neutral-200/50 px-1.5 py-0.5 font-mono text-xs">
                         {lang}
                       </span>
                       <span>{text}</span>
@@ -507,16 +507,16 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
               <p class="text-sm text-neutral-700 dark:text-neutral-300">{props.def.detail}</p>
             </div>
           </Show>
-          <Show when={props.def["detail:langs"]}>
+          <Show when={props.def["detail:lang"]}>
             <div class="flex flex-col gap-1">
               <span class="text-xs font-semibold text-neutral-500 uppercase dark:text-neutral-400">
                 Localized Details
               </span>
               <div class="flex flex-col gap-1">
-                <For each={Object.entries(props.def["detail:langs"]!)}>
+                <For each={Object.entries(props.def["detail:lang"]!)}>
                   {([lang, text]) => (
                     <div class="flex flex-col gap-1 text-sm">
-                      <span class="w-fit rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-xs dark:bg-neutral-800">
+                      <span class="dark:bg-dark-200 w-fit rounded bg-neutral-200/50 px-1.5 py-0.5 font-mono text-xs">
                         {lang}
                       </span>
                       <p class="text-neutral-700 dark:text-neutral-300">{text}</p>
