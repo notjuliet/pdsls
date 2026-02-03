@@ -4,9 +4,9 @@
   "type": "module",
   "scripts": {
     "start": "vite",
-    "predev": "node scripts/generate-oauth-metadata.js",
+    "predev": "node scripts/generate-metadata.js",
     "dev": "vite",
-    "prebuild": "node scripts/generate-oauth-metadata.js",
+    "prebuild": "node scripts/generate-metadata.js",
     "build": "vite build",
     "serve": "vite preview"
   },

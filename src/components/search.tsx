@@ -128,6 +128,14 @@ export const Search = () => {
 
     window.addEventListener("paste", handlePaste);
     onCleanup(() => window.removeEventListener("paste", handlePaste));
+
+    const requestUrl = new URL(location.href);
+    const requestQuery = requestUrl.searchParams.get("q");
+    if (requestQuery !== null) {
+      requestUrl.searchParams.delete("q");
+      history.replaceState(null, "", requestUrl.toString());
+      processInput(requestQuery);
+    }
   });
 
   createEffect(() => {

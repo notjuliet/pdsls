@@ -3,3 +3,4 @@ dist
 .env
 .DS_Store
 public/oauth-client-metadata.json
+public/opensearch.xml
