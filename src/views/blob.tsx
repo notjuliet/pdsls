@@ -4,7 +4,7 @@ import { Button } from "../components/button";
 
 const LIMIT = 1000;
 
-const BlobView = (props: { pds: string; repo: string }) => {
+export const BlobView = (props: { pds: string; repo: string }) => {
   const [cursor, setCursor] = createSignal<string>();
   let rpc: Client;
 
@@ -46,7 +46,7 @@ const BlobView = (props: { pds: string; repo: string }) => {
         </div>
       </Show>
       <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 pt-2 pb-4">
-        <div class="flex flex-col items-center gap-1 pb-2">
+        <div class="flex min-w-50 items-center justify-around gap-3 pb-2">
           <p>
             {blobs()?.length} blob{(blobs()?.length ?? 0 > 1) ? "s" : ""}
           </p>
@@ -69,5 +69,3 @@ const BlobView = (props: { pds: string; repo: string }) => {
     </div>
   );
 };
-
-export { BlobView };

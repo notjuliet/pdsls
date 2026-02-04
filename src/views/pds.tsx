@@ -206,7 +206,7 @@ export const PdsView = () => {
         </div>
         <Show when={!location.hash || location.hash === "#repos"}>
           <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 pt-2 pb-4">
-            <div class="flex flex-col items-center gap-1 pb-2">
+            <div class="flex min-w-50 items-center justify-around gap-3 pb-2">
               <p>{repos()?.length} loaded</p>
               <Show when={cursor()}>
                 <Button
