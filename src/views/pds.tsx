@@ -52,24 +52,44 @@ export const PdsView = () => {
   const [repos, setRepos] = createSignal<ComAtprotoSyncListRepos.Repo[]>();
 
   const RepoCard = (repo: ComAtprotoSyncListRepos.Repo) => {
+    const [expanded, setExpanded] = createSignal(false);
+
     return (
-      <A
-        href={`/at://${repo.did}`}
-        class="dark:hover:bg-dark-200 flex min-w-0 items-start gap-2 rounded px-1.5 py-1 text-left hover:bg-neutral-200/70"
-      >
-        <div class="flex min-w-0 flex-1 flex-col">
-          <div class="flex items-center gap-x-2 text-sm">
-            <span class="min-w-0 truncate font-mono" onclick={(e) => e.stopPropagation()}>
-              <DidHoverCard newTab did={repo.did} />
+      <div class="flex flex-col gap-1">
+        <div class="flex items-start">
+          <button
+            type="button"
+            onclick={() => setExpanded(!expanded())}
+            class="dark:hover:bg-dark-200 flex min-w-0 flex-1 items-center gap-2 rounded p-1 hover:bg-neutral-200/70"
+          >
+            <span class="mt-0.5 flex shrink-0 items-center text-neutral-400 dark:text-neutral-500">
+              {expanded() ?
+                <span class="iconify lucide--chevron-down"></span>
+              : <span class="iconify lucide--chevron-right"></span>}
             </span>
-            <Show when={!repo.active}>
-              <span class="flex shrink-0 items-center gap-1 text-red-500 dark:text-red-400">
-                <span class="iconify lucide--alert-triangle"></span>
-                {repo.status ?? "inactive"}
+            <div class="flex min-w-0 flex-1 items-center gap-x-2 text-sm">
+              <span class="min-w-0 truncate font-mono" onclick={(e) => e.stopPropagation()}>
+                <DidHoverCard newTab did={repo.did} />
               </span>
-            </Show>
-          </div>
-          <div class="flex flex-col gap-x-2 font-mono text-xs text-neutral-500 dark:text-neutral-400">
+              <Show when={!repo.active}>
+                <span class="flex shrink-0 items-center gap-1 text-red-500 dark:text-red-400">
+                  <span class="iconify lucide--unplug"></span>
+                  {repo.status ?? "inactive"}
+                </span>
+              </Show>
+            </div>
+          </button>
+          <Show when={expanded()}>
+            <A
+              href={`/at://${repo.did}`}
+              class="flex size-7 shrink-0 items-center justify-center rounded text-neutral-500 transition-colors hover:bg-neutral-200 hover:text-neutral-600 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:active:bg-neutral-600"
+            >
+              <span class="iconify lucide--arrow-right"></span>
+            </A>
+          </Show>
+        </div>
+        <Show when={expanded()}>
+          <div class="mb-2 ml-[28px] flex flex-col gap-1 font-mono text-xs text-neutral-500 dark:text-neutral-400">
             <Show when={repo.head}>
               <span class="truncate">{repo.head}</span>
             </Show>
@@ -81,8 +101,8 @@ export const PdsView = () => {
               </div>
             </Show>
           </div>
-        </div>
-      </A>
+        </Show>
+      </div>
     );
   };
 
