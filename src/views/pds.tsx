@@ -55,7 +55,7 @@ export const PdsView = () => {
     const [expanded, setExpanded] = createSignal(false);
 
     return (
-      <div class="flex flex-col gap-0.5">
+      <div class="flex flex-col gap-1">
         <div class="flex items-start">
           <button
             type="button"
@@ -89,7 +89,7 @@ export const PdsView = () => {
           </Show>
         </div>
         <Show when={expanded()}>
-          <div class="mb-2 ml-[30px] flex flex-col gap-1 font-mono text-xs text-neutral-500 dark:text-neutral-400">
+          <div class="mb-2 ml-7.5 flex flex-col gap-1 font-mono text-xs text-neutral-500 dark:text-neutral-400">
             <Show when={repo.head}>
               <span class="truncate">{repo.head}</span>
             </Show>
@@ -240,7 +240,7 @@ export const PdsView = () => {
                 <Button
                   onClick={() => refetch()}
                   disabled={response.loading}
-                  classList={{ "w-20 h-[30px] justify-center": true }}
+                  classList={{ "w-20 h-7.5 justify-center": true }}
                 >
                   <Show
                     when={!response.loading}
