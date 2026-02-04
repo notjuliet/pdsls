@@ -55,7 +55,7 @@ export const PdsView = () => {
     return (
       <A
         href={`/at://${repo.did}`}
-        class="dark:hover:bg-dark-200 flex min-w-0 items-start gap-2 rounded p-1.5 text-left hover:bg-neutral-200/70"
+        class="dark:hover:bg-dark-200 flex min-w-0 items-start gap-2 rounded px-1.5 py-1 text-left hover:bg-neutral-200/70"
       >
         <div class="flex min-w-0 flex-1 flex-col">
           <div class="flex items-center gap-x-2 text-sm">
