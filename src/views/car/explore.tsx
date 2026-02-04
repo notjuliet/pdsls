@@ -5,6 +5,7 @@ import { Did } from "@atcute/lexicons";
 import { fromStream, isCommit } from "@atcute/repo";
 import * as TID from "@atcute/tid";
 import { Title } from "@solidjs/meta";
+import { useLocation, useNavigate } from "@solidjs/router";
 import {
   createEffect,
   createMemo,
@@ -33,12 +34,60 @@ import {
   WelcomeView,
 } from "./shared.jsx";
 
+const viewToHash = (view: View): string => {
+  switch (view.type) {
+    case "repo":
+      return "";
+    case "collection":
+      return `#${view.collection.name}`;
+    case "record":
+      return `#${view.collection.name}/${view.record.key}`;
+  }
+};
+
+const hashToView = (hash: string, archive: Archive): View => {
+  if (!hash || hash === "#") return { type: "repo" };
+
+  const raw = hash.startsWith("#") ? hash.slice(1) : hash;
+  const slashIdx = raw.indexOf("/");
+
+  if (slashIdx === -1) {
+    const collection = archive.entries.find((e) => e.name === raw);
+    if (collection) return { type: "collection", collection };
+    return { type: "repo" };
+  }
+
+  const collectionName = raw.slice(0, slashIdx);
+  const recordKey = raw.slice(slashIdx + 1);
+  const collection = archive.entries.find((e) => e.name === collectionName);
+  if (collection) {
+    const record = collection.entries.find((r) => r.key === recordKey);
+    if (record) return { type: "record", collection, record };
+    return { type: "collection", collection };
+  }
+
+  return { type: "repo" };
+};
+
 export const ExploreToolView = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [archive, setArchive] = createSignal<Archive | null>(null);
   const [loading, setLoading] = createSignal(false);
   const [progress, setProgress] = createSignal(0);
   const [error, setError] = createSignal<string>();
-  const [view, setView] = createSignal<View>({ type: "repo" });
+
+  const view = createMemo((): View => {
+    const arch = archive();
+    if (!arch) return { type: "repo" };
+    return hashToView(location.hash, arch);
+  });
+
+  const navigateToView = (newView: View) => {
+    const hash = viewToHash(newView);
+    navigate(`${location.pathname}${hash}`);
+  };
 
   const parseCarFile = async (file: File) => {
     setLoading(true);
@@ -121,7 +170,7 @@ export const ExploreToolView = () => {
       }
 
       setArchive(result);
-      setView({ type: "repo" });
+      if (location.hash) navigate(location.pathname, { replace: true });
     } catch (err) {
       console.error("Failed to parse CAR file:", err);
       setError(err instanceof Error ? err.message : "Failed to parse CAR file");
@@ -135,8 +184,8 @@ export const ExploreToolView = () => {
 
   const reset = () => {
     setArchive(null);
-    setView({ type: "repo" });
     setError(undefined);
+    if (location.hash) navigate(location.pathname, { replace: true });
   };
 
   return (
@@ -157,7 +206,9 @@ export const ExploreToolView = () => {
           />
         }
       >
-        {(arch) => <ExploreView archive={arch()} view={view} setView={setView} onClose={reset} />}
+        {(arch) => (
+          <ExploreView archive={arch()} view={view} setView={navigateToView} onClose={reset} />
+        )}
       </Show>
     </>
   );
