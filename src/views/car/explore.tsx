@@ -570,7 +570,7 @@ const CollectionSubview = (props: {
 
             return (
               <HoverCard
-                class="flex w-full items-baseline gap-1 rounded px-1 py-0.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                class="flex w-full items-baseline gap-1 rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                 trigger={
                   <button
                     onClick={() => {
@@ -580,7 +580,7 @@ const CollectionSubview = (props: {
                         record: entry,
                       });
                     }}
-                    class="flex w-full items-baseline gap-1 text-left"
+                    class="flex w-full items-baseline gap-1 px-1 py-0.5"
                   >
                     <span class="max-w-full shrink-0 truncate text-sm text-blue-500 dark:text-blue-400">
                       {entry.key}
