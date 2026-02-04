@@ -94,7 +94,7 @@ export const PdsView = () => {
               <span class="truncate">{repo.head}</span>
             </Show>
             <Show when={TID.validate(repo.rev)}>
-              <div class="flex gap-1">
+              <div class="flex gap-1 text-neutral-700 dark:text-neutral-300">
                 <span>{repo.rev}</span>
                 <span>•</span>
                 <span>{localDateFromTimestamp(TID.parse(repo.rev).timestamp / 1000)}</span>
