@@ -325,8 +325,8 @@ export const StreamView = () => {
           <For each={STREAM_TYPES}>
             {(type) => (
               <A
-                class="flex items-center gap-1 border-b-2"
-                inactiveClass="border-transparent text-neutral-600 dark:text-neutral-400 hover:border-neutral-400 dark:hover:border-neutral-600"
+                class="flex items-center gap-1 border-b-2 transition-colors"
+                inactiveClass="border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
                 href={`/${type}`}
               >
                 {STREAM_CONFIGS[type].label}
