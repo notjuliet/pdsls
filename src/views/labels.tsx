@@ -277,7 +277,7 @@ export const LabelView = () => {
                   <Button
                     onClick={handleLoadMore}
                     disabled={loading()}
-                    classList={{ "w-20 justify-center": true }}
+                    classList={{ "w-20 h-[30px] justify-center": true }}
                   >
                     <Show
                       when={!loading()}

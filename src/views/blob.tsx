@@ -54,7 +54,7 @@ const BlobView = (props: { pds: string; repo: string }) => {
             <Button
               onClick={() => refetch()}
               disabled={response.loading}
-              classList={{ "w-20 justify-center": true }}
+              classList={{ "w-20 h-[30px] justify-center": true }}
             >
               <Show
                 when={!response.loading}
