@@ -226,8 +226,16 @@ export const PdsView = () => {
         </div>
         <Show when={!location.hash || location.hash === "#repos"}>
           <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 pt-2 pb-4">
-            <div class="flex min-w-50 items-center justify-around gap-3 pb-2">
-              <p>{repos()?.length} loaded</p>
+            <div class="flex items-center gap-3 pb-2">
+              <p>
+                {repos()?.length} loaded
+                <Show when={repos()?.some((r) => !r.active)}>
+                  {" · "}
+                  <span class="text-neutral-500 dark:text-neutral-400">
+                    {repos()?.filter((r) => !r.active).length} inactive
+                  </span>
+                </Show>
+              </p>
               <Show when={cursor()}>
                 <Button
                   onClick={() => refetch()}
