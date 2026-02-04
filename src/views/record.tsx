@@ -195,7 +195,7 @@ export const RecordView = () => {
   const [externalLink, setExternalLink] = createSignal<
     { label: string; link: string; icon?: string } | undefined
   >();
-  const [lexiconUri, setLexiconUri] = createSignal<string>();
+  const [lexiconAuthority, setLexiconAuthority] = createSignal<AtprotoDid>();
   const [validRecord, setValidRecord] = createSignal<boolean | undefined>(undefined);
   const [validSchema, setValidSchema] = createSignal<boolean | undefined>(undefined);
   const [schema, setSchema] = createSignal<ResolvedSchema>();
@@ -207,7 +207,6 @@ export const RecordView = () => {
   const fetchRecord = async () => {
     setValidRecord(undefined);
     setValidSchema(undefined);
-    setLexiconUri(undefined);
     const pds = await resolvePDS(did!);
     rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
     const res = await rpc.get("com.atproto.repo.getRecord", {
@@ -309,7 +308,7 @@ export const RecordView = () => {
   const resolveLexicon = async (nsid: Nsid) => {
     try {
       const authority = await resolveLexiconAuthority(nsid);
-      setLexiconUri(`at://${authority}/com.atproto.lexicon.schema/${nsid}`);
+      setLexiconAuthority(authority);
       if (params.collection !== "com.atproto.lexicon.schema") {
         const schema = await resolveLexiconSchema(authority, nsid);
         setSchema(schema);
@@ -487,7 +486,10 @@ export const RecordView = () => {
               </Show>
               <Show when={schema() || params.collection === "com.atproto.lexicon.schema"}>
                 <ErrorBoundary fallback={(err) => <div>Error: {err.message}</div>}>
-                  <LexiconSchemaView schema={schema()?.rawSchema ?? (record()?.value as any)} />
+                  <LexiconSchemaView
+                    schema={schema()?.rawSchema ?? (record()?.value as any)}
+                    authority={lexiconAuthority()}
+                  />
                 </ErrorBoundary>
               </Show>
             </Show>
@@ -565,19 +567,6 @@ export const RecordView = () => {
                     </Button>
                   </Show>
                 </div>
-                <Show when={lexiconUri()}>
-                  <div>
-                    <p class="font-semibold">Lexicon schema</p>
-                    <div class="truncate text-xs">
-                      <A
-                        href={`/${lexiconUri()}`}
-                        class="text-blue-500 hover:underline active:underline dark:text-blue-400"
-                      >
-                        {lexiconUri()}
-                      </A>
-                    </div>
-                  </div>
-                </Show>
               </div>
             </Show>
           </div>

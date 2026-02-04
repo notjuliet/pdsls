@@ -1,7 +1,9 @@
 import { Nsid } from "@atcute/lexicons";
-import { useLocation, useNavigate } from "@solidjs/router";
+import { AtprotoDid } from "@atcute/lexicons/syntax";
+import { A, useLocation, useNavigate } from "@solidjs/router";
 import { createEffect, For, Show } from "solid-js";
 import { resolveLexiconAuthority } from "../utils/api.js";
+import Tooltip from "./tooltip.jsx";
 
 // Style constants
 const CONTAINER_CLASS =
@@ -689,7 +691,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
   );
 };
 
-export const LexiconSchemaView = (props: { schema: LexiconSchema }) => {
+export const LexiconSchemaView = (props: { schema: LexiconSchema; authority?: AtprotoDid }) => {
   const location = useLocation();
 
   // Handle scrolling to a definition when hash is like #schema:definitionName
@@ -708,7 +710,20 @@ export const LexiconSchemaView = (props: { schema: LexiconSchema }) => {
     <div class="w-full max-w-4xl px-2">
       {/* Header */}
       <div class="flex flex-col gap-2 border-b border-neutral-300 pb-3 dark:border-neutral-700">
-        <h2 class="text-lg font-semibold">{props.schema.id}</h2>
+        <div class="flex items-center gap-0.5">
+          <h2 class="text-lg font-semibold">{props.schema.id}</h2>
+          <Show when={props.authority}>
+            <Tooltip text="View record">
+              <A
+                href={`/at://${props.authority}/com.atproto.lexicon.schema/${props.schema.id}`}
+                class="flex items-center p-1.5 text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"
+                target="_blank"
+              >
+                <span class="iconify lucide--external-link text-sm"></span>
+              </A>
+            </Tooltip>
+          </Show>
+        </div>
         <div class="flex gap-4 text-sm text-neutral-600 dark:text-neutral-400">
           <span>
             <span class="font-medium">Lexicon version: </span>
