@@ -3,6 +3,46 @@ import { useLocation, useNavigate } from "@solidjs/router";
 import { createEffect, For, Show } from "solid-js";
 import { resolveLexiconAuthority } from "../utils/api.js";
 
+// Style constants
+const CONTAINER_CLASS =
+  "divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/30";
+
+const CARD_CLASS =
+  "flex flex-col gap-2 rounded-lg border border-neutral-200 bg-neutral-50/50 p-3 dark:border-neutral-700 dark:bg-neutral-800/30";
+
+const RESOURCE_COLORS = {
+  repo: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  rpc: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+  default: "bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300",
+} as const;
+
+const DEF_TYPE_COLORS = {
+  record: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  query: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+  procedure: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
+  subscription: "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
+  object: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  token: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+  "permission-set": "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
+  default: "bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300",
+} as const;
+
+// Utility functions
+const hasConstraints = (property: LexiconProperty | LexiconDef) =>
+  property.minLength !== undefined ||
+  property.maxLength !== undefined ||
+  property.maxGraphemes !== undefined ||
+  property.minGraphemes !== undefined ||
+  property.minimum !== undefined ||
+  property.maximum !== undefined ||
+  property.maxSize !== undefined ||
+  property.accept ||
+  property.enum ||
+  property.const ||
+  property.default !== undefined ||
+  property.knownValues ||
+  property.closed;
+
 interface LexiconSchema {
   lexicon: number;
   id: string;
@@ -44,7 +84,7 @@ interface LexiconDef {
   closed?: boolean;
   enum?: string[];
   const?: string;
-  default?: any;
+  default?: string | number | boolean;
   minimum?: number;
   maximum?: number;
   accept?: string[];
@@ -86,7 +126,7 @@ interface LexiconProperty {
   maximum?: number;
   enum?: string[];
   const?: string | boolean | number;
-  default?: any;
+  default?: string | number | boolean;
   knownValues?: string[];
   accept?: string[];
   maxSize?: number;
@@ -226,21 +266,6 @@ const PropertyRow = (props: {
   required?: boolean;
   hideNameType?: boolean;
 }) => {
-  const hasConstraints = (property: LexiconProperty) =>
-    property.minLength !== undefined ||
-    property.maxLength !== undefined ||
-    property.maxGraphemes !== undefined ||
-    property.minGraphemes !== undefined ||
-    property.minimum !== undefined ||
-    property.maximum !== undefined ||
-    property.maxSize !== undefined ||
-    property.accept ||
-    property.enum ||
-    property.const ||
-    property.default !== undefined ||
-    property.knownValues ||
-    property.closed;
-
   return (
     <div class="flex flex-col gap-2 py-3">
       <Show when={!props.hideNameType}>
@@ -322,15 +347,50 @@ const NsidLink = (props: { nsid: string }) => {
   );
 };
 
-const resourceColor = (resource: string) => {
-  switch (resource) {
-    case "repo":
-      return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
-    case "rpc":
-      return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
-    default:
-      return "bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300";
-  }
+const resourceColor = (resource: string) =>
+  RESOURCE_COLORS[resource as keyof typeof RESOURCE_COLORS] || RESOURCE_COLORS.default;
+
+const SchemaSection = (props: { title: string; encoding: string; schema?: LexiconObject }) => {
+  return (
+    <div class="flex flex-col gap-2">
+      <h4 class="text-sm font-semibold text-neutral-600 uppercase dark:text-neutral-400">
+        {props.title}
+      </h4>
+      <div class={CARD_CLASS}>
+        <div class="text-sm">
+          <span class="font-semibold">Encoding: </span>
+          <span class="font-mono">{props.encoding}</span>
+        </div>
+        <Show when={props.schema?.ref}>
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-semibold">Schema:</span>
+            <TypeBadge type="ref" refType={props.schema!.ref} />
+          </div>
+        </Show>
+        <Show when={props.schema?.refs}>
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold">Schema (union):</span>
+            </div>
+            <UnionBadges refs={props.schema!.refs!} />
+          </div>
+        </Show>
+        <Show when={props.schema?.properties && Object.keys(props.schema.properties).length > 0}>
+          <div class={CONTAINER_CLASS}>
+            <For each={Object.entries(props.schema!.properties!)}>
+              {([name, property]) => (
+                <PropertyRow
+                  name={name}
+                  property={property}
+                  required={(props.schema?.required || []).includes(name)}
+                />
+              )}
+            </For>
+          </div>
+        </Show>
+      </div>
+    </div>
+  );
 };
 
 const PermissionRow = (props: { permission: LexiconPermission; index: number }) => {
@@ -407,43 +467,10 @@ const PermissionRow = (props: { permission: LexiconPermission; index: number }) 
 };
 
 const DefSection = (props: { name: string; def: LexiconDef }) => {
-  const defTypeColor = () => {
-    switch (props.def.type) {
-      case "record":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
-      case "query":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
-      case "procedure":
-        return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300";
-      case "subscription":
-        return "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300";
-      case "object":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
-      case "token":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
-      case "permission-set":
-        return "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300";
-      default:
-        return "bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300";
-    }
-  };
+  const defTypeColor = () =>
+    DEF_TYPE_COLORS[props.def.type as keyof typeof DEF_TYPE_COLORS] || DEF_TYPE_COLORS.default;
 
-  const hasDefContent = () =>
-    props.def.refs ||
-    props.def.minLength !== undefined ||
-    props.def.maxLength !== undefined ||
-    props.def.maxGraphemes !== undefined ||
-    props.def.minGraphemes !== undefined ||
-    props.def.minimum !== undefined ||
-    props.def.maximum !== undefined ||
-    props.def.maxSize !== undefined ||
-    props.def.accept ||
-    props.def.enum ||
-    props.def.const ||
-    props.def.default !== undefined ||
-    props.def.closed ||
-    props.def.items ||
-    props.def.knownValues;
+  const hasDefContent = () => props.def.refs || props.def.items || hasConstraints(props.def);
 
   return (
     <div class="flex flex-col gap-3" id={`def-${props.name}`}>
@@ -471,7 +498,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
 
       {/* Permission-set: Title and Detail */}
       <Show when={props.def.type === "permission-set" && (props.def.title || props.def.detail)}>
-        <div class="flex flex-col gap-2 rounded-lg border border-neutral-200 bg-neutral-50/50 p-3 dark:border-neutral-700 dark:bg-neutral-800/30">
+        <div class={CARD_CLASS}>
           <Show when={props.def.title}>
             <div class="flex flex-col gap-1">
               <span class="text-xs font-semibold text-neutral-500 uppercase dark:text-neutral-400">
@@ -530,27 +557,27 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
       </Show>
 
       {/* Permission-set: Permissions list */}
-      <Show when={props.def.permissions && props.def.permissions.length > 0}>
-        {(() => {
-          const supportedPermissions = () =>
-            props.def.permissions!.filter((p) => p.resource === "repo" || p.resource === "rpc");
-          return (
-            <Show when={supportedPermissions().length > 0}>
-              <div class="flex flex-col gap-2">
-                <h4 class="text-sm font-semibold text-neutral-600 uppercase dark:text-neutral-400">
-                  Permissions
-                </h4>
-                <div class="divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/30">
-                  <For each={supportedPermissions()}>
-                    {(permission, index) => (
-                      <PermissionRow permission={permission} index={index()} />
-                    )}
-                  </For>
-                </div>
-              </div>
-            </Show>
-          );
-        })()}
+      <Show
+        when={
+          props.def.permissions &&
+          props.def.permissions.filter((p) => p.resource === "repo" || p.resource === "rpc")
+            .length > 0
+        }
+      >
+        <div class="flex flex-col gap-2">
+          <h4 class="text-sm font-semibold text-neutral-600 uppercase dark:text-neutral-400">
+            Permissions
+          </h4>
+          <div class={CONTAINER_CLASS}>
+            <For
+              each={props.def.permissions!.filter(
+                (p) => p.resource === "repo" || p.resource === "rpc",
+              )}
+            >
+              {(permission, index) => <PermissionRow permission={permission} index={index()} />}
+            </For>
+          </div>
+        </div>
       </Show>
 
       {/* Properties (for record/object types) */}
@@ -561,7 +588,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
           <h4 class="text-sm font-semibold text-neutral-600 uppercase dark:text-neutral-400">
             Properties
           </h4>
-          <div class="divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/30">
+          <div class={CONTAINER_CLASS}>
             <For each={Object.entries(props.def.properties || props.def.record?.properties || {})}>
               {([name, property]) => (
                 <PropertyRow
@@ -586,7 +613,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
           <h4 class="text-sm font-semibold text-neutral-600 uppercase dark:text-neutral-400">
             Parameters
           </h4>
-          <div class="divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/30">
+          <div class={CONTAINER_CLASS}>
             <For each={Object.entries(props.def.parameters!.properties!)}>
               {([name, property]) => (
                 <PropertyRow
@@ -602,96 +629,20 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
 
       {/* Input */}
       <Show when={props.def.input}>
-        <div class="flex flex-col gap-2">
-          <h4 class="text-sm font-semibold text-neutral-600 uppercase dark:text-neutral-400">
-            Input
-          </h4>
-          <div class="flex flex-col gap-2 rounded-lg border border-neutral-200 bg-neutral-50/50 p-3 dark:border-neutral-700 dark:bg-neutral-800/30">
-            <div class="text-sm">
-              <span class="font-semibold">Encoding: </span>
-              <span class="font-mono">{props.def.input!.encoding}</span>
-            </div>
-            <Show when={props.def.input!.schema?.ref}>
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-semibold">Schema:</span>
-                <TypeBadge type="ref" refType={props.def.input!.schema!.ref} />
-              </div>
-            </Show>
-            <Show when={props.def.input!.schema?.refs}>
-              <div class="flex flex-col gap-2">
-                <div class="flex items-center gap-2">
-                  <span class="text-sm font-semibold">Schema (union):</span>
-                </div>
-                <UnionBadges refs={props.def.input!.schema!.refs!} />
-              </div>
-            </Show>
-            <Show
-              when={
-                props.def.input!.schema?.properties &&
-                Object.keys(props.def.input!.schema.properties).length > 0
-              }
-            >
-              <div class="divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/30">
-                <For each={Object.entries(props.def.input!.schema!.properties!)}>
-                  {([name, property]) => (
-                    <PropertyRow
-                      name={name}
-                      property={property}
-                      required={(props.def.input!.schema?.required || []).includes(name)}
-                    />
-                  )}
-                </For>
-              </div>
-            </Show>
-          </div>
-        </div>
+        <SchemaSection
+          title="Input"
+          encoding={props.def.input!.encoding}
+          schema={props.def.input!.schema}
+        />
       </Show>
 
       {/* Output */}
       <Show when={props.def.output}>
-        <div class="flex flex-col gap-2">
-          <h4 class="text-sm font-semibold text-neutral-600 uppercase dark:text-neutral-400">
-            Output
-          </h4>
-          <div class="flex flex-col gap-2 rounded-lg border border-neutral-200 bg-neutral-50/50 p-3 dark:border-neutral-700 dark:bg-neutral-800/30">
-            <div class="text-sm">
-              <span class="font-semibold">Encoding: </span>
-              <span class="font-mono">{props.def.output!.encoding}</span>
-            </div>
-            <Show when={props.def.output!.schema?.ref}>
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-semibold">Schema:</span>
-                <TypeBadge type="ref" refType={props.def.output!.schema!.ref} />
-              </div>
-            </Show>
-            <Show when={props.def.output!.schema?.refs}>
-              <div class="flex flex-col gap-2">
-                <div class="flex items-center gap-2">
-                  <span class="text-sm font-semibold">Schema (union):</span>
-                </div>
-                <UnionBadges refs={props.def.output!.schema!.refs!} />
-              </div>
-            </Show>
-            <Show
-              when={
-                props.def.output!.schema?.properties &&
-                Object.keys(props.def.output!.schema.properties).length > 0
-              }
-            >
-              <div class="divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/30">
-                <For each={Object.entries(props.def.output!.schema!.properties!)}>
-                  {([name, property]) => (
-                    <PropertyRow
-                      name={name}
-                      property={property}
-                      required={(props.def.output!.schema?.required || []).includes(name)}
-                    />
-                  )}
-                </For>
-              </div>
-            </Show>
-          </div>
-        </div>
+        <SchemaSection
+          title="Output"
+          encoding={props.def.output!.encoding}
+          schema={props.def.output!.schema}
+        />
       </Show>
 
       {/* Errors */}
@@ -700,7 +651,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
           <h4 class="text-sm font-semibold text-neutral-600 uppercase dark:text-neutral-400">
             Errors
           </h4>
-          <div class="divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/30">
+          <div class={CONTAINER_CLASS}>
             <For each={props.def.errors}>
               {(error) => (
                 <div class="flex flex-col gap-1 py-2">
@@ -730,7 +681,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
           ) && hasDefContent()
         }
       >
-        <div class="divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/30">
+        <div class={CONTAINER_CLASS}>
           <PropertyRow name={props.name} property={props.def} hideNameType />
         </div>
       </Show>
@@ -756,7 +707,7 @@ export const LexiconSchemaView = (props: { schema: LexiconSchema }) => {
   return (
     <div class="w-full max-w-4xl px-2">
       {/* Header */}
-      <div class="flex flex-col gap-2 border-b border-neutral-300 pb-4 dark:border-neutral-700">
+      <div class="flex flex-col gap-2 border-b border-neutral-300 pb-3 dark:border-neutral-700">
         <h2 class="text-lg font-semibold">{props.schema.id}</h2>
         <div class="flex gap-4 text-sm text-neutral-600 dark:text-neutral-400">
           <span>
@@ -770,7 +721,7 @@ export const LexiconSchemaView = (props: { schema: LexiconSchema }) => {
       </div>
 
       {/* Definitions */}
-      <div class="flex flex-col gap-6 pt-4">
+      <div class="flex flex-col gap-6 pt-3">
         <For each={Object.entries(props.schema.defs)}>
           {([name, def]) => <DefSection name={name} def={def} />}
         </For>

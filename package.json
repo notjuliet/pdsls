@@ -11,7 +11,7 @@
     "serve": "vite preview"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.87",
+    "@iconify-json/lucide": "^1.2.88",
     "@iconify/tailwind4": "^1.2.1",
     "@tailwindcss/vite": "^4.1.18",
     "prettier": "^3.8.1",
@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@atcute/atproto": "^3.1.10",
-    "@atcute/bluesky": "^3.2.16",
+    "@atcute/bluesky": "^3.2.17",
     "@atcute/car": "^5.1.0",
     "@atcute/cbor": "^2.3.0",
     "@atcute/cid": "^2.4.0",
@@ -39,7 +39,7 @@
     "@atcute/multibase": "^1.1.7",
     "@atcute/oauth-browser-client": "^3.0.0",
     "@atcute/repo": "^0.1.1",
-    "@atcute/tangled": "^1.0.15",
+    "@atcute/tangled": "^1.0.16",
     "@atcute/tid": "^1.1.1",
     "@codemirror/commands": "^6.10.1",
     "@codemirror/lang-json": "^6.0.2",
