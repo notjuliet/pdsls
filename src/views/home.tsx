@@ -212,12 +212,13 @@ export const Home = () => {
           <span class="iconify lucide--terminal text-rose-400 dark:text-rose-300"></span>
           <span class="font-pecita">juliet</span>
         </FooterLink>
-        {/* • */}
-        {/* <FooterLink href="https://raycast.com/" color="after:text-[#FF6363]"> */}
-        {/*   <span class="iconify-color i-raycast-light block dark:hidden"></span> */}
-        {/*   <span class="iconify-color i-raycast-dark hidden dark:block"></span> */}
-        {/*   Raycast */}
-        {/* </FooterLink> */}•
+        •
+        <FooterLink href="https://raycast.com/juliet_philippe/pdsls" color="after:text-[#FF6363]">
+          <span class="iconify-color i-raycast-light block dark:hidden"></span>
+          <span class="iconify-color i-raycast-dark hidden dark:block"></span>
+          Raycast
+        </FooterLink>
+        •
         <FooterLink
           href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz"
           color="after:text-[#0085ff]"
