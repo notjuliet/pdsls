@@ -104,7 +104,7 @@ export const Home = () => {
                         profile.handle === "coil-habdle.ebil.club",
                     }}
                   />
-                  <span class="w-full truncate text-center text-xs text-neutral-600 dark:text-neutral-300">
+                  <span class="w-full truncate px-0.5 text-center text-xs text-neutral-600 dark:text-neutral-300">
                     @{profile.handle}
                   </span>
                 </A>
