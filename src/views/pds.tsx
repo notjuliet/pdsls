@@ -55,12 +55,12 @@ export const PdsView = () => {
     const [expanded, setExpanded] = createSignal(false);
 
     return (
-      <div class="flex flex-col gap-1">
+      <div class="flex flex-col gap-0.5">
         <div class="flex items-start">
           <button
             type="button"
             onclick={() => setExpanded(!expanded())}
-            class="dark:hover:bg-dark-200 flex min-w-0 flex-1 items-center gap-2 rounded p-1 hover:bg-neutral-200/70"
+            class="dark:hover:bg-dark-200 flex min-w-0 flex-1 items-center gap-2 rounded p-1.5 hover:bg-neutral-200/70"
           >
             <span class="mt-0.5 flex shrink-0 items-center text-neutral-400 dark:text-neutral-500">
               {expanded() ?
@@ -82,14 +82,14 @@ export const PdsView = () => {
           <Show when={expanded()}>
             <A
               href={`/at://${repo.did}`}
-              class="flex size-7 shrink-0 items-center justify-center rounded text-neutral-500 transition-colors hover:bg-neutral-200 hover:text-neutral-600 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:active:bg-neutral-600"
+              class="flex size-7.5 shrink-0 items-center justify-center rounded text-neutral-500 transition-colors hover:bg-neutral-200 hover:text-neutral-600 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:active:bg-neutral-600"
             >
               <span class="iconify lucide--arrow-right"></span>
             </A>
           </Show>
         </div>
         <Show when={expanded()}>
-          <div class="mb-2 ml-[28px] flex flex-col gap-1 font-mono text-xs text-neutral-500 dark:text-neutral-400">
+          <div class="mb-2 ml-[30px] flex flex-col gap-1 font-mono text-xs text-neutral-500 dark:text-neutral-400">
             <Show when={repo.head}>
               <span class="truncate">{repo.head}</span>
             </Show>
@@ -135,7 +135,7 @@ export const PdsView = () => {
             <Tab tab="firehose" label="Firehose" />
           </div>
           <Show when={!location.hash || location.hash === "#repos"}>
-            <div class="-mx-1.5 flex flex-col pb-20">
+            <div class="-mx-2 flex flex-col pb-20">
               <For each={repos()}>{(repo) => <RepoCard {...repo} />}</For>
             </div>
           </Show>
