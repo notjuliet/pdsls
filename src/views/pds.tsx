@@ -8,6 +8,7 @@ import { createResource, createSignal, For, Show } from "solid-js";
 import { Button } from "../components/button";
 import DidHoverCard from "../components/hover-card/did";
 import { setPDS } from "../components/navbar";
+import { canHover } from "../layout";
 import { localDateFromTimestamp } from "../utils/date";
 
 const LIMIT = 1000;
@@ -59,8 +60,8 @@ export const PdsView = () => {
       <div class="flex flex-col gap-1">
         <div
           class="dark:hover:bg-dark-200 flex min-w-0 flex-1 items-center rounded hover:bg-neutral-200/70"
-          onMouseEnter={() => setHovering(true)}
-          onMouseLeave={() => setHovering(false)}
+          onMouseEnter={() => canHover && setHovering(true)}
+          onMouseLeave={() => canHover && setHovering(false)}
         >
           <button
             type="button"
