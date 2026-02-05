@@ -53,14 +53,19 @@ export const PdsView = () => {
 
   const RepoCard = (repo: ComAtprotoSyncListRepos.Repo) => {
     const [expanded, setExpanded] = createSignal(false);
+    const [hovering, setHovering] = createSignal(false);
 
     return (
       <div class="flex flex-col gap-1">
-        <div class="flex items-start">
+        <div
+          class="dark:hover:bg-dark-200 flex min-w-0 flex-1 items-center rounded hover:bg-neutral-200/70"
+          onMouseEnter={() => setHovering(true)}
+          onMouseLeave={() => setHovering(false)}
+        >
           <button
             type="button"
             onclick={() => setExpanded(!expanded())}
-            class="dark:hover:bg-dark-200 flex min-w-0 flex-1 items-center gap-2 rounded p-1.5 hover:bg-neutral-200/70"
+            class="flex min-w-0 flex-1 items-center gap-2 p-1.5"
           >
             <span class="mt-0.5 flex shrink-0 items-center text-neutral-400 dark:text-neutral-500">
               {expanded() ?
@@ -79,10 +84,10 @@ export const PdsView = () => {
               </Show>
             </div>
           </button>
-          <Show when={expanded()}>
+          <Show when={expanded() || hovering()}>
             <A
               href={`/at://${repo.did}`}
-              class="flex size-7.5 shrink-0 items-center justify-center rounded text-neutral-500 transition-colors hover:bg-neutral-200 hover:text-neutral-600 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:active:bg-neutral-600"
+              class="flex shrink-0 items-center p-2 transition-colors not-hover:text-neutral-500 not-hover:dark:text-neutral-400"
             >
               <span class="iconify lucide--arrow-right"></span>
             </A>
