@@ -292,7 +292,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
               <Show
                 when={imageObjectUrl()}
                 fallback={
-                  <div class="flex h-48 w-48 items-center justify-center rounded bg-neutral-100 dark:bg-neutral-800">
+                  <div class="flex h-48 w-48 items-center justify-center rounded bg-neutral-200 dark:bg-neutral-800">
                     <span class="iconify lucide--loader-circle animate-spin text-xl text-neutral-400 dark:text-neutral-500"></span>
                   </div>
                 }
