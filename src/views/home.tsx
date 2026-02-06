@@ -64,7 +64,14 @@ export const Home = () => {
     { did: "did:plc:vafqb3yhndyawabm2t2zhw5z", handle: "neko.moe.observer" },
   ];
 
-  const profiles = [...allExampleProfiles].sort(() => Math.random() - 0.5).slice(0, 3);
+  for (let i = allExampleProfiles.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [allExampleProfiles[i], allExampleProfiles[j]] = [
+      allExampleProfiles[j],
+      allExampleProfiles[i],
+    ];
+  }
+  const profiles = allExampleProfiles.slice(0, 3);
 
   return (
     <div class="flex w-full flex-col gap-5 px-2 wrap-break-word">
