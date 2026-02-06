@@ -66,10 +66,7 @@ export const Home = () => {
 
   for (let i = allExampleProfiles.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [allExampleProfiles[i], allExampleProfiles[j]] = [
-      allExampleProfiles[j],
-      allExampleProfiles[i],
-    ];
+    [allExampleProfiles[i], allExampleProfiles[j]] = [allExampleProfiles[j], allExampleProfiles[i]];
   }
   const profiles = allExampleProfiles.slice(0, 3);
 
