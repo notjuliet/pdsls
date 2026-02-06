@@ -23,7 +23,6 @@ import {
   NavMenu,
 } from "../components/dropdown.jsx";
 import { Favicon } from "../components/favicon.jsx";
-import { Modal } from "../components/modal.jsx";
 import {
   addNotification,
   removeNotification,
@@ -56,7 +55,7 @@ export const RepoView = () => {
   const [filter, setFilter] = createSignal<string>();
   const [validHandles, setValidHandles] = createStore<Record<string, boolean>>({});
   const [rotationKeys, setRotationKeys] = createSignal<Array<string>>([]);
-  const [handleModalAlias, setHandleModalAlias] = createSignal<string | null>(null);
+  const [expandedAlias, setExpandedAlias] = createSignal<string | null>(null);
   const [handleDetailedResult, setHandleDetailedResult] = createSignal<{
     dns: HandleResolveResult;
     http: HandleResolveResult;
@@ -512,135 +511,131 @@ export const RepoView = () => {
                                 </div>
                               }
                             >
-                              <button
-                                class="-ml-1 flex w-fit items-center gap-1 rounded px-1 py-0.5 text-sm text-neutral-700 hover:bg-neutral-200 active:bg-neutral-200 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
-                                onClick={async () => {
-                                  setHandleDetailedResult(null);
-                                  setHandleModalAlias(alias);
-                                  const handle = alias.replace("at://", "") as Handle;
-                                  const result = await resolveHandleDetailed(handle);
-                                  if (handleModalAlias() === alias) setHandleDetailedResult(result);
-                                }}
-                              >
-                                <span>{alias}</span>
-                                <span
-                                  classList={{
-                                    "iconify text-base lucide--check text-green-600 dark:text-green-400":
-                                      validHandles[alias] === true,
-                                    "iconify lucide--x text-red-500 dark:text-red-400":
-                                      validHandles[alias] === false,
-                                    "iconify lucide--loader-circle animate-spin":
-                                      validHandles[alias] === undefined,
+                              <div class="flex flex-col gap-2">
+                                <button
+                                  class="-ml-1 flex w-fit items-center gap-1 rounded px-1 py-0.5 text-sm text-neutral-700 hover:bg-neutral-200 active:bg-neutral-200 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+                                  onClick={async () => {
+                                    if (expandedAlias() === alias) {
+                                      setExpandedAlias(null);
+                                    } else {
+                                      setHandleDetailedResult(null);
+                                      setExpandedAlias(alias);
+                                      const handle = alias.replace("at://", "") as Handle;
+                                      const result = await resolveHandleDetailed(handle);
+                                      if (expandedAlias() === alias)
+                                        setHandleDetailedResult(result);
+                                    }
                                   }}
-                                ></span>
-                              </button>
+                                >
+                                  <span>{alias}</span>
+                                  <span
+                                    classList={{
+                                      "iconify text-base lucide--check text-green-600 dark:text-green-400":
+                                        validHandles[alias] === true,
+                                      "iconify lucide--x text-red-500 dark:text-red-400":
+                                        validHandles[alias] === false,
+                                      "iconify lucide--loader-circle animate-spin":
+                                        validHandles[alias] === undefined,
+                                    }}
+                                  ></span>
+                                </button>
+
+                                {/* Inline expansion */}
+                                <Show when={expandedAlias() === alias}>
+                                  <div class="mb-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-800/50">
+                                    <Show
+                                      when={handleDetailedResult()}
+                                      fallback={
+                                        <div class="flex items-center gap-2 py-2 text-sm">
+                                          <span class="iconify lucide--loader-circle animate-spin"></span>
+                                          <span>Resolving handle...</span>
+                                        </div>
+                                      }
+                                    >
+                                      {(result) => {
+                                        const expectedDid = didDocument().id;
+                                        const dnsOk = () =>
+                                          result().dns.success && result().dns.did === expectedDid;
+                                        const httpOk = () =>
+                                          result().http.success &&
+                                          result().http.did === expectedDid;
+                                        const dnsMismatch = () =>
+                                          result().dns.success && result().dns.did !== expectedDid;
+                                        const httpMismatch = () =>
+                                          result().http.success &&
+                                          result().http.did !== expectedDid;
+
+                                        return (
+                                          <div class="grid grid-cols-[auto_1fr] items-center gap-x-1.5 text-sm">
+                                            {/* DNS Result */}
+                                            <span
+                                              classList={{
+                                                "iconify lucide--check text-green-600 dark:text-green-400":
+                                                  dnsOk(),
+                                                "iconify lucide--x text-red-500 dark:text-red-400":
+                                                  !dnsOk(),
+                                              }}
+                                            ></span>
+                                            <span class="font-medium">DNS (TXT record)</span>
+                                            <span></span>
+                                            <div class="mb-2 text-sm wrap-anywhere text-neutral-500 dark:text-neutral-400">
+                                              <Show
+                                                when={result().dns.success}
+                                                fallback={
+                                                  <div class="text-red-500 dark:text-red-400">
+                                                    {result().dns.error}
+                                                  </div>
+                                                }
+                                              >
+                                                <div>{result().dns.did}</div>
+                                                <Show when={dnsMismatch()}>
+                                                  <div class="text-red-500 dark:text-red-400">
+                                                    Expected: {expectedDid}
+                                                  </div>
+                                                </Show>
+                                              </Show>
+                                            </div>
+
+                                            {/* HTTP Result */}
+                                            <span
+                                              classList={{
+                                                "iconify lucide--check text-green-600 dark:text-green-400":
+                                                  httpOk(),
+                                                "iconify lucide--x text-red-500 dark:text-red-400":
+                                                  !httpOk(),
+                                              }}
+                                            ></span>
+                                            <span class="font-medium">HTTP (.well-known)</span>
+                                            <span></span>
+                                            <div class="text-sm wrap-anywhere text-neutral-500 dark:text-neutral-400">
+                                              <Show
+                                                when={result().http.success}
+                                                fallback={
+                                                  <div class="text-red-500 dark:text-red-400">
+                                                    {result().http.error}
+                                                  </div>
+                                                }
+                                              >
+                                                <div>{result().http.did}</div>
+                                                <Show when={httpMismatch()}>
+                                                  <div class="text-red-500 dark:text-red-400">
+                                                    Expected: {expectedDid}
+                                                  </div>
+                                                </Show>
+                                              </Show>
+                                            </div>
+                                          </div>
+                                        );
+                                      }}
+                                    </Show>
+                                  </div>
+                                </Show>
+                              </div>
                             </Show>
                           )}
                         </For>
                       </div>
                     </Show>
-
-                    {/* Handle Verification Modal */}
-                    <Modal
-                      open={handleModalAlias() !== null}
-                      onClose={() => setHandleModalAlias(null)}
-                      contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto min-w-[min(24rem,90vw)] max-w-[90vw] rounded-lg border-[0.5px] border-neutral-300 bg-white p-4 shadow-md sm:max-w-xl dark:border-neutral-700"
-                    >
-                      <div class="mb-2 flex items-center justify-between gap-4">
-                        <p class="truncate font-semibold">
-                          {handleModalAlias()?.replace("at://", "")}
-                        </p>
-                        <button
-                          onclick={() => setHandleModalAlias(null)}
-                          class="flex shrink-0 items-center rounded-md p-1.5 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 active:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
-                        >
-                          <span class="iconify lucide--x"></span>
-                        </button>
-                      </div>
-                      <div class="flex flex-col gap-2">
-                        <Show
-                          when={handleDetailedResult()}
-                          fallback={
-                            <div class="flex items-center gap-2 py-2">
-                              <span class="iconify lucide--loader-circle animate-spin"></span>
-                              <span>Resolving handle...</span>
-                            </div>
-                          }
-                        >
-                          {(result) => {
-                            const expectedDid = didDocument().id;
-                            const dnsOk = () =>
-                              result().dns.success && result().dns.did === expectedDid;
-                            const httpOk = () =>
-                              result().http.success && result().http.did === expectedDid;
-                            const dnsMismatch = () =>
-                              result().dns.success && result().dns.did !== expectedDid;
-                            const httpMismatch = () =>
-                              result().http.success && result().http.did !== expectedDid;
-
-                            return (
-                              <div class="grid grid-cols-[auto_1fr] items-center gap-x-1.5">
-                                {/* DNS Result */}
-                                <span
-                                  classList={{
-                                    "iconify lucide--check text-green-600 dark:text-green-400":
-                                      dnsOk(),
-                                    "iconify lucide--x text-red-500 dark:text-red-400": !dnsOk(),
-                                  }}
-                                ></span>
-                                <span class="font-medium">DNS (TXT record)</span>
-                                <span></span>
-                                <div class="mb-2 text-sm wrap-anywhere text-neutral-500 dark:text-neutral-400">
-                                  <Show
-                                    when={result().dns.success}
-                                    fallback={
-                                      <div class="text-red-500 dark:text-red-400">
-                                        {result().dns.error}
-                                      </div>
-                                    }
-                                  >
-                                    <div>{result().dns.did}</div>
-                                    <Show when={dnsMismatch()}>
-                                      <div class="text-red-500 dark:text-red-400">
-                                        Expected: {expectedDid}
-                                      </div>
-                                    </Show>
-                                  </Show>
-                                </div>
-
-                                {/* HTTP Result */}
-                                <span
-                                  classList={{
-                                    "iconify lucide--check text-green-600 dark:text-green-400":
-                                      httpOk(),
-                                    "iconify lucide--x text-red-500 dark:text-red-400": !httpOk(),
-                                  }}
-                                ></span>
-                                <span class="font-medium">HTTP (.well-known)</span>
-                                <span></span>
-                                <div class="text-sm wrap-anywhere text-neutral-500 dark:text-neutral-400">
-                                  <Show
-                                    when={result().http.success}
-                                    fallback={
-                                      <div class="text-red-500 dark:text-red-400">
-                                        {result().http.error}
-                                      </div>
-                                    }
-                                  >
-                                    <div>{result().http.did}</div>
-                                    <Show when={httpMismatch()}>
-                                      <div class="text-red-500 dark:text-red-400">
-                                        Expected: {expectedDid}
-                                      </div>
-                                    </Show>
-                                  </Show>
-                                </div>
-                              </div>
-                            );
-                          }}
-                        </Show>
-                      </div>
-                    </Modal>
 
                     {/* Services Section */}
                     <Show when={didDocument().service}>
