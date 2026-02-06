@@ -3,12 +3,11 @@ import { A, useNavigate, useParams } from "@solidjs/router";
 import {
   createContext,
   createEffect,
+  createResource,
   createSignal,
   ErrorBoundary,
   For,
   on,
-  onCleanup,
-  onMount,
   Show,
   useContext,
 } from "solid-js";
@@ -263,26 +262,21 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
     (blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4");
 
   const MediaDisplay = () => {
-    const [imageObjectUrl, setImageObjectUrl] = createSignal<string>();
+    const [imageUrl] = createResource(
+      () => (blob.mimeType.startsWith("image/") ? blob.ref.$link : null),
+      async (cid) => {
+        const url = `https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${ctx.repo}&cid=${cid}`;
 
-    onMount(() => {
-      if (blob.mimeType.startsWith("image/")) {
-        const fetchImage = async () => {
-          const res = await fetch(
-            `https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${ctx.repo}&cid=${blob.ref.$link}`,
-          );
-          if (!res.ok) throw new Error(res.statusText);
-          const blobData = await res.blob();
-          const url = URL.createObjectURL(blobData);
-          setImageObjectUrl(url);
-        };
-        fetchImage().catch((err) => console.error("Failed to load image:", err));
-      }
-    });
+        await new Promise<void>((resolve) => {
+          const img = new Image();
+          img.src = url;
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+        });
 
-    onCleanup(() => {
-      if (imageObjectUrl()) URL.revokeObjectURL(imageObjectUrl()!);
-    });
+        return url;
+      },
+    );
 
     return (
       <div>
@@ -290,7 +284,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
           <Show when={!hide()}>
             <Show when={blob.mimeType.startsWith("image/")}>
               <Show
-                when={imageObjectUrl()}
+                when={!imageUrl.loading && imageUrl()}
                 fallback={
                   <div class="flex h-48 w-48 items-center justify-center rounded bg-neutral-200 dark:bg-neutral-800">
                     <span class="iconify lucide--loader-circle animate-spin text-xl text-neutral-400 dark:text-neutral-500"></span>
@@ -299,7 +293,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
               >
                 <img
                   class="h-auto max-h-48 max-w-64 object-contain"
-                  src={imageObjectUrl()}
+                  src={imageUrl()}
                   onLoad={() => setMediaLoaded(true)}
                 />
               </Show>
