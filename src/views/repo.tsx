@@ -95,7 +95,7 @@ export const RepoView = () => {
       <A
         classList={{
           "border-b-2 font-medium transition-colors": true,
-          "border-transparent text-neutral-600 dark:text-neutral-300/80 hover:text-neutral-900 dark:hover:text-neutral-100":
+          "border-transparent not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80":
             !isActive(),
         }}
         href={`/at://${params.repo}#${props.tab}`}
