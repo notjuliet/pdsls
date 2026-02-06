@@ -288,12 +288,21 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
       <div>
         <span class="group/media relative flex w-fit">
           <Show when={!hide()}>
-            <Show when={blob.mimeType.startsWith("image/") && imageObjectUrl()}>
-              <img
-                class="h-auto max-h-48 max-w-48 object-contain sm:max-h-64 sm:max-w-64"
-                src={imageObjectUrl()}
-                onLoad={() => setMediaLoaded(true)}
-              />
+            <Show when={blob.mimeType.startsWith("image/")}>
+              <Show
+                when={imageObjectUrl()}
+                fallback={
+                  <div class="flex h-48 w-48 items-center justify-center rounded bg-neutral-100 dark:bg-neutral-800">
+                    <span class="iconify lucide--loader-circle animate-spin text-xl text-neutral-400 dark:text-neutral-500"></span>
+                  </div>
+                }
+              >
+                <img
+                  class="h-auto max-h-48 max-w-64 object-contain"
+                  src={imageObjectUrl()}
+                  onLoad={() => setMediaLoaded(true)}
+                />
+              </Show>
             </Show>
             <Show when={blob.mimeType === "video/mp4"}>
               <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
