@@ -68,7 +68,7 @@ export const NavBar = (props: { params: Params }) => {
             <span
               classList={{
                 "iconify shrink-0 transition-colors duration-200": true,
-                "lucide--alert-triangle text-red-500 dark:text-red-400":
+                "lucide--unplug text-red-500 dark:text-red-400":
                   pds() === "Missing PDS" && props.params.repo?.startsWith("did:"),
                 "lucide--hard-drive text-neutral-500 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200":
                   pds() !== "Missing PDS" || !props.params.repo?.startsWith("did:"),

@@ -325,8 +325,14 @@ export const RepoView = () => {
             </div>
             <div class="flex gap-1">
               <Show when={error() && error() !== "Missing PDS"}>
-                <div class="flex items-center gap-1 font-medium text-red-500 dark:text-red-400">
-                  <span class="iconify lucide--alert-triangle"></span>
+                <div class="flex items-center gap-1.5 rounded-md border border-red-500 px-2 py-0.5 text-xs font-medium text-red-500 sm:text-sm dark:border-red-400 dark:text-red-400">
+                  <span
+                    class={`iconify ${
+                      error() === "Deactivated" ? "lucide--user-round-x"
+                      : error() === "Takendown" ? "lucide--shield-ban"
+                      : "lucide--unplug"
+                    }`}
+                  ></span>
                   <span>{error()}</span>
                 </div>
               </Show>

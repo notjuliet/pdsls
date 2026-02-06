@@ -79,7 +79,13 @@ export const PdsView = () => {
               </span>
               <Show when={!repo.active}>
                 <span class="flex shrink-0 items-center gap-1 text-red-500 dark:text-red-400">
-                  <span class="iconify lucide--unplug"></span>
+                  <span
+                    class={`iconify ${
+                      repo.status === "deactivated" ? "lucide--user-round-x"
+                      : repo.status === "takendown" ? "lucide--shield-ban"
+                      : "lucide--unplug"
+                    }`}
+                  ></span>
                   {repo.status ?? "inactive"}
                 </span>
               </Show>
@@ -145,7 +151,7 @@ export const PdsView = () => {
               <For each={repos()}>{(repo) => <RepoCard {...repo} />}</For>
             </div>
           </Show>
-          <div class="flex flex-col gap-2">
+          <div class="flex flex-col gap-3">
             <Show when={location.hash === "#info"}>
               <Show when={version()}>
                 {(version) => (
@@ -160,7 +166,9 @@ export const PdsView = () => {
                   <>
                     <div class="flex flex-col">
                       <span class="font-semibold">DID</span>
-                      <span class="text-sm">{server().did}</span>
+                      <span class="text-sm text-neutral-700 dark:text-neutral-300">
+                        {server().did}
+                      </span>
                     </div>
                     <div class="flex items-center gap-1">
                       <span class="font-semibold">Invite Code Required</span>
@@ -183,7 +191,11 @@ export const PdsView = () => {
                       <div class="flex flex-col">
                         <span class="font-semibold">Available User Domains</span>
                         <For each={server().availableUserDomains}>
-                          {(domain) => <span class="text-sm wrap-anywhere">{domain}</span>}
+                          {(domain) => (
+                            <span class="text-sm wrap-anywhere text-neutral-700 dark:text-neutral-300">
+                              {domain}
+                            </span>
+                          )}
                         </For>
                       </div>
                     </Show>
@@ -192,7 +204,7 @@ export const PdsView = () => {
                         <span class="font-semibold">Privacy Policy</span>
                         <a
                           href={server().links?.privacyPolicy}
-                          class="text-sm hover:underline"
+                          class="text-sm text-neutral-700 hover:underline dark:text-neutral-300"
                           target="_blank"
                           rel="noopener"
                         >
@@ -205,7 +217,7 @@ export const PdsView = () => {
                         <span class="font-semibold">Terms of Service</span>
                         <a
                           href={server().links?.termsOfService}
-                          class="text-sm hover:underline"
+                          class="text-sm text-neutral-700 hover:underline dark:text-neutral-300"
                           target="_blank"
                           rel="noopener"
                         >
@@ -218,7 +230,7 @@ export const PdsView = () => {
                         <span class="font-semibold">Contact</span>
                         <a
                           href={`mailto:${server().contact?.email}`}
-                          class="text-sm hover:underline"
+                          class="text-sm text-neutral-700 hover:underline dark:text-neutral-300"
                         >
                           {server().contact?.email}
                         </a>

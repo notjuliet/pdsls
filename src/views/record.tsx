@@ -509,15 +509,20 @@ export const RecordView = () => {
               </ErrorBoundary>
             </Show>
             <Show when={location.hash === "#info"}>
-              <div class="flex w-full flex-col gap-2 px-2 text-sm">
+              <div class="flex w-full flex-col gap-3 px-2">
                 <div>
                   <p class="font-semibold">AT URI</p>
-                  <div class="truncate text-xs">{record()?.uri}</div>
+                  <div class="truncate text-xs text-neutral-700 dark:text-neutral-300">
+                    {record()?.uri}
+                  </div>
                 </div>
                 <Show when={record()?.cid}>
                   <div>
                     <p class="font-semibold">CID</p>
-                    <div class="truncate text-left text-xs" dir="rtl">
+                    <div
+                      class="truncate text-left text-xs text-neutral-700 dark:text-neutral-300"
+                      dir="rtl"
+                    >
                       {record()?.cid}
                     </div>
                   </div>
