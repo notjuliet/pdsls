@@ -227,9 +227,13 @@ export const resolveHandleDetailed = async (handle: Handle) => {
 
   const tryResolve = async (
     resolver: DohJsonHandleResolver | WellKnownHandleResolver,
+    timeoutMs: number = 5000,
   ): Promise<HandleResolveResult> => {
     try {
-      const did = await resolver.resolve(handle);
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out")), timeoutMs),
+      );
+      const did = await Promise.race([resolver.resolve(handle), timeoutPromise]);
       return { success: true, did };
     } catch (err: any) {
       return { success: false, error: err.message ?? String(err) };
