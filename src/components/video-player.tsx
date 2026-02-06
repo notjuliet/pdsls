@@ -1,4 +1,4 @@
-import { onMount } from "solid-js";
+import { onCleanup, onMount } from "solid-js";
 import { pds } from "./navbar";
 
 export interface VideoPlayerProps {
@@ -9,6 +9,7 @@ export interface VideoPlayerProps {
 
 const VideoPlayer = (props: VideoPlayerProps) => {
   let video!: HTMLVideoElement;
+  let objectUrl: string | undefined;
 
   onMount(async () => {
     // thanks bf <3
@@ -17,8 +18,12 @@ const VideoPlayer = (props: VideoPlayerProps) => {
     );
     if (!res.ok) throw new Error(res.statusText);
     const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    if (video) video.src = url;
+    objectUrl = URL.createObjectURL(blob);
+    if (video) video.src = objectUrl;
+  });
+
+  onCleanup(() => {
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
   });
 
   return (

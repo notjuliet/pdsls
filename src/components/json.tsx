@@ -7,6 +7,8 @@ import {
   ErrorBoundary,
   For,
   on,
+  onCleanup,
+  onMount,
   Show,
   useContext,
 } from "solid-js";
@@ -260,47 +262,70 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
     !ctx.hideBlobs &&
     (blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4");
 
-  const MediaDisplay = () => (
-    <div>
-      <span class="group/media relative flex w-fit">
-        <Show when={!hide()}>
-          <Show when={blob.mimeType.startsWith("image/")}>
-            <img
-              class="h-auto max-h-48 max-w-48 object-contain sm:max-h-64 sm:max-w-64"
-              src={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${ctx.repo}&cid=${blob.ref.$link}`}
-              onLoad={() => setMediaLoaded(true)}
-            />
-          </Show>
-          <Show when={blob.mimeType === "video/mp4"}>
-            <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
-              <VideoPlayer
-                did={ctx.repo}
-                cid={blob.ref.$link}
+  const MediaDisplay = () => {
+    const [imageObjectUrl, setImageObjectUrl] = createSignal<string>();
+
+    onMount(() => {
+      if (blob.mimeType.startsWith("image/")) {
+        const fetchImage = async () => {
+          const res = await fetch(
+            `https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${ctx.repo}&cid=${blob.ref.$link}`,
+          );
+          if (!res.ok) throw new Error(res.statusText);
+          const blobData = await res.blob();
+          const url = URL.createObjectURL(blobData);
+          setImageObjectUrl(url);
+        };
+        fetchImage().catch((err) => console.error("Failed to load image:", err));
+      }
+    });
+
+    onCleanup(() => {
+      if (imageObjectUrl()) URL.revokeObjectURL(imageObjectUrl()!);
+    });
+
+    return (
+      <div>
+        <span class="group/media relative flex w-fit">
+          <Show when={!hide()}>
+            <Show when={blob.mimeType.startsWith("image/") && imageObjectUrl()}>
+              <img
+                class="h-auto max-h-48 max-w-48 object-contain sm:max-h-64 sm:max-w-64"
+                src={imageObjectUrl()}
                 onLoad={() => setMediaLoaded(true)}
               />
-            </ErrorBoundary>
+            </Show>
+            <Show when={blob.mimeType === "video/mp4"}>
+              <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
+                <VideoPlayer
+                  did={ctx.repo}
+                  cid={blob.ref.$link}
+                  onLoad={() => setMediaLoaded(true)}
+                />
+              </ErrorBoundary>
+            </Show>
+            <Show when={mediaLoaded()}>
+              <button
+                onclick={() => setHide(true)}
+                class="absolute top-1 right-1 flex items-center rounded-lg bg-neutral-700/70 p-1.5 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover/media:opacity-100 hover:bg-neutral-700 active:bg-neutral-800 dark:bg-neutral-100/70 dark:text-neutral-900 dark:hover:bg-neutral-100 dark:active:bg-neutral-200"
+              >
+                <span class="iconify lucide--eye-off text-base"></span>
+              </button>
+            </Show>
           </Show>
-          <Show when={mediaLoaded()}>
+          <Show when={hide()}>
             <button
-              onclick={() => setHide(true)}
-              class="absolute top-1 right-1 flex items-center rounded-lg bg-neutral-700/70 p-1.5 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover/media:opacity-100 hover:bg-neutral-700 active:bg-neutral-800 dark:bg-neutral-100/70 dark:text-neutral-900 dark:hover:bg-neutral-100 dark:active:bg-neutral-200"
+              onclick={() => setHide(false)}
+              class="flex items-center gap-1 rounded-md bg-neutral-200 px-2 py-1.5 text-sm transition-colors hover:bg-neutral-300 active:bg-neutral-400 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
             >
-              <span class="iconify lucide--eye-off text-base"></span>
+              <span class="iconify lucide--image"></span>
+              <span class="font-sans">Show media</span>
             </button>
           </Show>
-        </Show>
-        <Show when={hide()}>
-          <button
-            onclick={() => setHide(false)}
-            class="flex items-center gap-1 rounded-md bg-neutral-200 px-2 py-1.5 text-sm transition-colors hover:bg-neutral-300 active:bg-neutral-400 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
-          >
-            <span class="iconify lucide--image"></span>
-            <span class="font-sans">Show media</span>
-          </button>
-        </Show>
-      </span>
-    </div>
-  );
+        </span>
+      </div>
+    );
+  };
 
   if (blob.$type === "blob") {
     return (
