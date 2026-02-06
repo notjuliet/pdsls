@@ -11,7 +11,7 @@
     "serve": "vite preview"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.88",
+    "@iconify-json/lucide": "^1.2.89",
     "@iconify/tailwind4": "^1.2.1",
     "@tailwindcss/vite": "^4.1.18",
     "prettier": "^3.8.1",

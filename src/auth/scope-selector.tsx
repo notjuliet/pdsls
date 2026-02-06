@@ -64,7 +64,7 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
               <button
                 onclick={() => !isDisabled() && toggleScope(scope.id)}
                 disabled={isDisabled()}
-                class="group flex items-center gap-3 py-2"
+                class="group flex items-center gap-3 py-1.5"
                 classList={{ "opacity-50": isDisabled() }}
               >
                 <div

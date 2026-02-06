@@ -452,9 +452,16 @@ export const RecordEditor = (props: {
         text={
           hasPermission() ?
             props.create ?
-              "Create record (n)"
-            : "Edit record (e)"
+              "Create record"
+            : "Edit record"
           : `${props.create ? "Create record" : "Edit record"} (permission required)`
+        }
+        shortcut={
+          hasPermission() ?
+            props.create ?
+              "N"
+            : "E"
+          : undefined
         }
       >
         <button

@@ -50,6 +50,7 @@ export const NavMenu = (props: {
   icon?: string;
   newTab?: boolean;
   external?: boolean;
+  shortcut?: string;
 }) => {
   const ctx = useContext(MenuContext);
 
@@ -58,13 +59,20 @@ export const NavMenu = (props: {
       href={props.href}
       onClick={() => ctx?.setShowMenu(false)}
       class="flex items-center gap-2 rounded-md p-1.5 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-      classList={{ "justify-between": props.external }}
+      classList={{ "justify-between": props.external || !!props.shortcut }}
       target={props.newTab ? "_blank" : undefined}
     >
-      <Show when={props.icon}>
-        <span class={"iconify shrink-0 " + props.icon}></span>
+      <div class="flex items-center gap-2">
+        <Show when={props.icon}>
+          <span class={"iconify shrink-0 " + props.icon}></span>
+        </Show>
+        <span class="whitespace-nowrap">{props.label}</span>
+      </div>
+      <Show when={props.shortcut}>
+        <kbd class="rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 font-mono text-[10px] text-neutral-500 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-400">
+          {props.shortcut}
+        </kbd>
       </Show>
-      <span class="whitespace-nowrap">{props.label}</span>
       <Show when={props.external}>
         <span class="iconify lucide--external-link"></span>
       </Show>
