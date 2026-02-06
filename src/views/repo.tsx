@@ -447,7 +447,7 @@ export const RepoView = () => {
                           id={`collection-${authority}`}
                           class="group flex items-start gap-2 rounded-lg p-1 transition-colors"
                           classList={{
-                            "dark:hover:bg-dark-200 hover:bg-neutral-200": !isHighlighted(),
+                            "dark:hover:bg-dark-300 hover:bg-neutral-200": !isHighlighted(),
                             "bg-blue-100 dark:bg-blue-500/25": isHighlighted(),
                           }}
                         >
