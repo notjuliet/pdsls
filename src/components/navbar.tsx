@@ -5,6 +5,7 @@ import { canHover } from "../layout";
 import { didDocCache } from "../utils/api";
 import { addToClipboard } from "../utils/copy";
 import { localDateFromTimestamp } from "../utils/date";
+import { Favicon } from "./favicon";
 import Tooltip from "./tooltip";
 
 export const [pds, setPDS] = createSignal<string>();
@@ -35,6 +36,7 @@ export const NavBar = (props: { params: Params }) => {
   const [repoHovered, setRepoHovered] = createSignal(false);
   const [hasHoveredRepo, setHasHoveredRepo] = createSignal(false);
   const [faviconLoaded, setFaviconLoaded] = createSignal(false);
+  const [collectionHovered, setCollectionHovered] = createSignal(false);
   const isCustomDomain = () => handle() && !handle()!.endsWith(".bsky.social");
 
   createEffect(() => {
@@ -183,10 +185,31 @@ export const NavBar = (props: { params: Params }) => {
 
         {/* Collection Level */}
         <Show when={props.params.collection}>
-          <div class="group flex items-center justify-between gap-2 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
+          <div
+            class="group flex items-center justify-between gap-2 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40"
+            onMouseEnter={() => {
+              if (canHover) setCollectionHovered(true);
+            }}
+            onMouseLeave={() => {
+              if (canHover) setCollectionHovered(false);
+            }}
+          >
             <div class="flex basis-full items-center gap-2">
               <Tooltip text="Collection">
-                <span class="iconify lucide--folder-open text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
+                <div class="relative flex h-5 w-3.5 shrink-0 items-center justify-center sm:w-4">
+                  <Show
+                    when={collectionHovered()}
+                    fallback={
+                      <span class="iconify lucide--folder-open text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
+                    }
+                  >
+                    {(() => {
+                      const parts = props.params.collection!.split(".");
+                      const authority = `${parts[0]}.${parts[1]}`;
+                      return <Favicon authority={authority} wrapper={(c) => c} />;
+                    })()}
+                  </Show>
+                </div>
               </Tooltip>
               <Show
                 when={props.params.rkey}
