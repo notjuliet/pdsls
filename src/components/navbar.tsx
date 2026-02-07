@@ -121,7 +121,7 @@ export const NavBar = (props: { params: Params }) => {
           >
             <div class="flex min-w-0 basis-full items-center gap-2">
               <Tooltip text="Repository">
-                <div class="relative flex h-5 w-4 shrink-0 items-center justify-center">
+                <div class="relative flex h-5 w-3.5 shrink-0 items-center justify-center sm:w-4">
                   <span
                     class="iconify lucide--book-user absolute text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"
                     classList={{
