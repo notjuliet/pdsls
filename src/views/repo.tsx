@@ -175,7 +175,7 @@ export const RepoView = () => {
             setError("Deactivated");
             break;
           case "RepoTakendown":
-            setError("Takendown");
+            setError("Taken down");
             break;
           default:
             setError("Unreachable");
@@ -329,7 +329,7 @@ export const RepoView = () => {
                   <span
                     class={`iconify ${
                       error() === "Deactivated" ? "lucide--user-round-x"
-                      : error() === "Takendown" ? "lucide--shield-ban"
+                      : error() === "Taken down" ? "lucide--shield-ban"
                       : "lucide--unplug"
                     }`}
                   ></span>
