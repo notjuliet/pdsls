@@ -136,7 +136,7 @@ export const StreamView = () => {
     const eventType = rawEventType.includes("#") ? rawEventType.split("#").pop() : rawEventType;
     eventTypesMap[eventType] = (eventTypesMap[eventType] || 0) + 1;
 
-    if (eventType !== "account" && eventType !== "identity") {
+    if (eventType !== "account" && eventType !== "identity" && eventType !== "sync") {
       const collection =
         record.commit?.collection ||
         record.op?.path?.split("/")[0] ||
