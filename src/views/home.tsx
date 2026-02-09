@@ -60,6 +60,9 @@ export const Home = () => {
     { did: "did:plc:h5wsnqetncv6lu2weom35lg2", handle: "nel.pet" },
     { did: "did:plc:irs2tcoeuvuwj3m4yampbuco", handle: "shi.gg" },
     { did: "did:plc:vafqb3yhndyawabm2t2zhw5z", handle: "neko.moe.observer" },
+    { did: "did:plc:mppmy46nmna6j4y7o3qlk7vn", handle: "isla.pet" },
+    { did: "did:plc:3l526xzfvz5pnwepjxx3inq5", handle: "angelicimouto.moe.observer" },
+    { did: "did:plc:dfl62fgb7wtjj3fcbb72naae", handle: "ptr.pet" },
   ];
 
   for (let i = allExampleProfiles.length - 1; i > 0; i--) {
@@ -104,6 +107,7 @@ export const Home = () => {
                     classList={{
                       "animate-[spin_5s_linear_infinite] [animation-play-state:paused] group-hover:[animation-play-state:running]":
                         profile.handle === "coil-habdle.ebil.club",
+                      "rounded-lg": profile.handle === "ptr.pet",
                     }}
                   />
                   <span class="w-full truncate px-0.5 text-center text-xs text-neutral-600 dark:text-neutral-300">
