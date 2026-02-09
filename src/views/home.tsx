@@ -26,10 +26,8 @@ export const Home = () => {
   );
 
   const allExampleProfiles: ProfileData[] = [
-    { did: "did:plc:7vimlesenouvuaqvle42yhvo", handle: "juli.ee" },
     { did: "did:plc:oisofpd7lj26yvgiivf3lxsi", handle: "hailey.at" },
     { did: "did:plc:vwzwgnygau7ed7b7wt5ux7y2", handle: "retr0.id" },
-    { did: "did:plc:vc7f4oafdgxsihk4cry2xpze", handle: "jcsalterego.bsky.social" },
     { did: "did:plc:uu5axsmbm2or2dngy4gwchec", handle: "futur.blue" },
     { did: "did:plc:ia76kvnndjutgedggx2ibrem", handle: "mary.my.id" },
     { did: "did:plc:hdhoaan3xa3jiuq4fg4mefid", handle: "bad-example.com" },

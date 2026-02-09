@@ -127,16 +127,9 @@ export const NavBar = (props: { params: Params }) => {
                   <span
                     class="iconify lucide--book-user absolute text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"
                     classList={{
-                      hidden:
-                        (repoHovered() && isCustomDomain() && faviconLoaded()) ||
-                        (repoHovered() && handle() === "jcsalterego.bsky.social"),
+                      hidden: !!(repoHovered() && isCustomDomain() && faviconLoaded()),
                     }}
                   ></span>
-                  <Show when={repoHovered() && handle() === "jcsalterego.bsky.social"}>
-                    <div class="flex size-4 items-center justify-center rounded-full bg-blue-500">
-                      <span class="iconify lucide--check size-2.5 text-white"></span>
-                    </div>
-                  </Show>
                   <Show when={hasHoveredRepo() && isCustomDomain()}>
                     <img
                       src={`https://${handle()}/favicon.ico`}
