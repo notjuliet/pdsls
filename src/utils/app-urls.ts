@@ -48,7 +48,7 @@ export const appHandleLink: Record<App, (url: string[]) => string> = {
           return `at://${user}/app.bsky.graph.follow/${rkey}`;
         }
       } else {
-        return `at://${user}/app.bsky.actor.profile/self`;
+        return `at://${user}`;
       }
     } else if (baseType === "starter-pack") {
       return `at://${user}/app.bsky.graph.starterpack/${path[2]}`;
