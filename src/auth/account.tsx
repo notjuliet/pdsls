@@ -141,7 +141,7 @@ export const AccountManager = () => {
                   <A
                     href={`/at://${did}`}
                     onClick={() => setOpenManager(false)}
-                    class="flex items-center rounded-md p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                    class="flex shrink-0 items-center rounded-md p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                   >
                     <Show
                       when={avatars[did as Did]}

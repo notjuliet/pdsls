@@ -18,8 +18,8 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0
       '@atcute/cbor':
-        specifier: ^2.3.0
-        version: 2.3.0
+        specifier: ^2.3.1
+        version: 2.3.1
       '@atcute/cid':
         specifier: ^2.4.0
         version: 2.4.0
@@ -45,8 +45,8 @@ importers:
         specifier: ^0.1.6
         version: 0.1.6(@atcute/identity-resolver@1.2.2(@atcute/identity@1.1.3))(@atcute/identity@1.1.3)
       '@atcute/lexicons':
-        specifier: ^1.2.7
-        version: 1.2.7
+        specifier: ^1.2.8
+        version: 1.2.8
       '@atcute/multibase':
         specifier: ^1.1.7
         version: 1.1.7
@@ -57,8 +57,8 @@ importers:
         specifier: ^0.1.1
         version: 0.1.1
       '@atcute/tangled':
-        specifier: ^1.0.16
-        version: 1.0.16
+        specifier: ^1.0.17
+        version: 1.0.17
       '@atcute/tid':
         specifier: ^1.1.1
         version: 1.1.1
@@ -69,8 +69,8 @@ importers:
         specifier: ^6.0.2
         version: 6.0.2
       '@codemirror/lint':
-        specifier: ^6.9.3
-        version: 6.9.3
+        specifier: ^6.9.4
+        version: 6.9.4
       '@codemirror/state':
         specifier: ^6.5.4
         version: 6.5.4
@@ -109,14 +109,14 @@ importers:
         version: 1.9.11
     devDependencies:
       '@iconify-json/lucide':
-        specifier: ^1.2.89
-        version: 1.2.89
+        specifier: ^1.2.90
+        version: 1.2.90
       '@iconify/tailwind4':
         specifier: ^1.2.1
         version: 1.2.1(tailwindcss@4.1.18)
       '@tailwindcss/vite':
         specifier: ^4.1.18
-        version: 4.1.18(vite@7.3.1(@types/node@25.2.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))
+        version: 4.1.18(vite@7.3.1(@types/node@25.2.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))
       prettier:
         specifier: ^3.8.1
         version: 3.8.1
@@ -134,10 +134,10 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^7.3.1
-        version: 7.3.1(@types/node@25.2.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
+        version: 7.3.1(@types/node@25.2.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
       vite-plugin-solid:
         specifier: ^2.11.10
-        version: 2.11.10(solid-js@1.9.11)(vite@7.3.1(@types/node@25.2.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))
+        version: 2.11.10(solid-js@1.9.11)(vite@7.3.1(@types/node@25.2.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))
 
 packages:
 
@@ -156,8 +156,8 @@ packages:
   '@atcute/car@5.1.0':
     resolution: {integrity: sha512-W9axHVrwIkZJaeN/VQ1LyyU3b95wHBjQnrREouxygvmvWd1lmjFvF8Si8b0AG0VkWJ6h7h6qhOeUATynBzBFIg==}
 
-  '@atcute/cbor@2.3.0':
-    resolution: {integrity: sha512-7G2AndkfYzIXMBOBqUPUWP6oIJJm77KY5nYzS4Mr5NNxnmnrBrXEQqp+seCE3X5TV8FUSWQK5YRTU87uPjafMQ==}
+  '@atcute/cbor@2.3.1':
+    resolution: {integrity: sha512-yX036iKstCck3zrK6B4FRxB7oBwAskal6m2RIRKXAN4cx27Pa92ECPuecNe/D3F6CcLzioP32/RAiOOhDAPPEw==}
 
   '@atcute/cid@2.4.0':
     resolution: {integrity: sha512-6+5u9MpUrgSRQ94z7vaIX4BYk8fYr2KXUBS+rrr2NhlPy8xam8nbTlmd3hvBbtpSwShbhRAE4tA5Ab7eYUp2Yw==}
@@ -188,8 +188,8 @@ packages:
       '@atcute/identity': ^1.1.0
       '@atcute/identity-resolver': ^1.1.3
 
-  '@atcute/lexicons@1.2.7':
-    resolution: {integrity: sha512-gCvkSMI1F1zx7xXa59iPiSKMH3L5Hga6iurGqQjaQbE2V/np/2QuDqQzt96TNbWfaFAXE9f9oY+0z3ljf/bweA==}
+  '@atcute/lexicons@1.2.8':
+    resolution: {integrity: sha512-3WPyU5droiovgVyWYuhsNibFAknna7uuVqvcnCd++oVp7ZPvXtXPFVx1MuAjJV7FspYwkuMh/GlTPsdfIOetBQ==}
 
   '@atcute/mst@0.1.2':
     resolution: {integrity: sha512-Oz5CZTjqauEJLT9B+zkoy/mjl216DrjCxJFrguRV3N+1NkIbCfAcSRf3UDSNjfzDzBkJvC1WjA/3oQkm83duPg==}
@@ -212,14 +212,14 @@ packages:
   '@atcute/repo@0.1.1':
     resolution: {integrity: sha512-P5aWjt3bvcquUkUmGPslF0naAfLGRHse5Qdz9/RJYrFuoH0iiEMyRnW6M+3ksOe20GPsMnbq71WbzzFkRFPBtg==}
 
-  '@atcute/tangled@1.0.16':
-    resolution: {integrity: sha512-8we9seXrD79MhvA0BSBgKOvZz/Cx6sJJ4wc4QcHZF4Ats/+4+xuNOwzuFNL+1sNib/GqXxa8dhmmpoY6T1PRZQ==}
+  '@atcute/tangled@1.0.17':
+    resolution: {integrity: sha512-YE2KXYSawWbASt/XB6bi0gPGkF089+wsbxQcqtksrSy7j02LGOKUFgX1gfG1ZImv40eQHjFnhLHr1OZVXeflZA==}
 
   '@atcute/tid@1.1.1':
     resolution: {integrity: sha512-djJ8UGhLkTU5V51yCnBEruMg35qETjWzWy5sJG/2gEOl2Gd7rQWHSaf+yrO6vMS5EFA38U2xOWE3EDUPzvc2ZQ==}
 
-  '@atcute/time-ms@1.2.0':
-    resolution: {integrity: sha512-dtNKebVIbr1+yu3a6vgtL4sfkNgxkL3aA+ohHsjtW83WWMjjGvX8GVTVmYCJ2dYSxIoxK0q1yWs11PmlqzmQ/A==}
+  '@atcute/time-ms@1.2.1':
+    resolution: {integrity: sha512-7tzcYMLz1IQCyneupNP5AMkgfLywzYnsWLTW/n1Ku3vM/LgicGgBVbHKhqP10H8LUz3gEf8DUMrKbTkM/VLUgA==}
 
   '@atcute/uint8array@1.1.0':
     resolution: {integrity: sha512-JtHXIVW6LPU9FMWp7SgE4HbUs3uV2WdfkK/2RWdEGjr4EgMV50P3FdU6fPeGlTfDNBJVYMIsuD2wwaKRPV/Aqg==}
@@ -230,8 +230,8 @@ packages:
   '@atcute/util-text@1.1.0':
     resolution: {integrity: sha512-34G9KD5Z9f7oEdFpZOmqrMnU86p8ne6LlxJowfZzKNszRcl1GH+FtEPh3N1woelJT2SkPXMK2anwT8DESTluwA==}
 
-  '@atcute/varint@1.0.3':
-    resolution: {integrity: sha512-fdvMPyBB+McDT+Ai5e9RwEbwYV4yjZ60S2Dn5PTjGqUyxvoCH1z42viuheDZRUDkmfQehXJTZ5az7dSozVNtog==}
+  '@atcute/varint@1.0.4':
+    resolution: {integrity: sha512-0nGBaRyJLoxVvCHTSLGwPZKs64PPi/0lDA4viF3I5zxsRmVPsXaE92J8VQj3KoZfk0+Z+liXklG1Onw7G9S4oQ==}
 
   '@babel/code-frame@7.29.0':
     resolution: {integrity: sha512-9NhCeYjq9+3uxgdtp20LSiJXJvN0FeCtNGpJxuMFZ1Kv3cWUNb6DOhJwUvcVCzKGR66cw4njwM6hrJLqgOwbcw==}
@@ -330,8 +330,8 @@ packages:
   '@codemirror/language@6.12.1':
     resolution: {integrity: sha512-Fa6xkSiuGKc8XC8Cn96T+TQHYj4ZZ7RdFmXA3i9xe/3hLHfwPZdM+dqfX0Cp0zQklBKhVD8Yzc8LS45rkqcwpQ==}
 
-  '@codemirror/lint@6.9.3':
-    resolution: {integrity: sha512-y3YkYhdnhjDBAe0VIA0c4wVoFOvnp8CnAvfLqi0TqotIv92wIlAAP7HELOpLBsKwjAX6W92rSflA6an/2zBvXw==}
+  '@codemirror/lint@6.9.4':
+    resolution: {integrity: sha512-ABc9vJ8DEmvOWuH26P3i8FpMWPQkduD9Rvba5iwb6O3hxASgclm3T3krGo8NASXkHCidz6b++LWlzWIUfEPSWw==}
 
   '@codemirror/search@6.6.0':
     resolution: {integrity: sha512-koFuNXcDvyyotWcgOnZGmY7LZqEOXZaaxD/j6n18TCLx2/9HieZJ5H6hs1g8FiRxBD0DNfs0nXn17g872RmYdw==}
@@ -661,8 +661,8 @@ packages:
       '@codemirror/view': ^6.0.0
       '@lezer/highlight': ^1.0.0
 
-  '@iconify-json/lucide@1.2.89':
-    resolution: {integrity: sha512-9rZaJZn8VBls1KZnGaFTnqqZrUkd++XB3vy9WYIMgmHHgLxQMEZXg3V+oJSEeit0kCNr/OfDBmrDwuGl/LZulA==}
+  '@iconify-json/lucide@1.2.90':
+    resolution: {integrity: sha512-dPn1pRhfBa9KR+EVpdyM1Rvw3T36hCKYxd6TxK1ifffiNt0f5yXx8ZVhqnzPH4Vkz87yLMj5xFCXomNrnzd2kQ==}
 
   '@iconify/tailwind4@1.2.1':
     resolution: {integrity: sha512-Hd7k8y7uzT3hk8ltw0jGku0r0wA8sc3d2iMvVTYv/9tMxBb+frZtWZGD9hDMU3EYuE+lMn58wi2lS8R2ZbwFcQ==}
@@ -973,14 +973,14 @@ packages:
   '@types/babel__traverse@7.28.0':
     resolution: {integrity: sha512-8PvcXf70gTDZBgt9ptxJ8elBeBjcLOAcOtoO/mPJjtji1+CdGbHgm77om1GrsPxsiE+uXIpNSK64UYaIwQXd4Q==}
 
-  '@types/bun@1.3.8':
-    resolution: {integrity: sha512-3LvWJ2q5GerAXYxO2mffLTqOzEu5qnhEAlh48Vnu8WQfnmSwbgagjGZV6BoHKJztENYEDn6QmVd949W4uESRJA==}
+  '@types/bun@1.3.9':
+    resolution: {integrity: sha512-KQ571yULOdWJiMH+RIWIOZ7B2RXQGpL1YQrBtLIV3FqDcCu6FsbFUBwhdKUlCKUpS3PJDsHlJ1QKlpxoVR+xtw==}
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
-  '@types/node@25.2.2':
-    resolution: {integrity: sha512-BkmoP5/FhRYek5izySdkOneRyXYN35I860MFAGupTdebyE66uZaR+bXLHq8k4DirE5DwQi3NuhvRU1jqTVwUrQ==}
+  '@types/node@25.2.3':
+    resolution: {integrity: sha512-m0jEgYlYz+mDJZ2+F4v8D1AyQb+QzsNqRuI7xg1VQX/KlKS0qT9r1Mo16yo5F/MtifXFgaofIFsdFMox2SxIbQ==}
 
   acorn@8.15.0:
     resolution: {integrity: sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg==}
@@ -1013,8 +1013,8 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
 
-  bun-types@1.3.8:
-    resolution: {integrity: sha512-fL99nxdOWvV4LqjmC+8Q9kW3M4QTtTR1eePs94v5ctGqU8OeceWrSUaRw3JYb7tU3FkMIAjkueehrHPPPGKi5Q==}
+  bun-types@1.3.9:
+    resolution: {integrity: sha512-+UBWWOakIP4Tswh0Bt0QD0alpTY8cb5hvgiYeWCMet9YukHbzuruIEeXC2D7nMJPB12kbh8C7XJykSexEqGKJg==}
 
   caniuse-lite@1.0.30001769:
     resolution: {integrity: sha512-BCfFL1sHijQlBGWBMuJyhZUhzo7wer5sVj9hqekB/7xn0Ypy+pER/edCYQm4exbXj4WiySGp40P8UuTh6w1srg==}
@@ -1559,29 +1559,29 @@ snapshots:
 
   '@atcute/atproto@3.1.10':
     dependencies:
-      '@atcute/lexicons': 1.2.7
+      '@atcute/lexicons': 1.2.8
 
   '@atcute/bluesky@3.2.17':
     dependencies:
       '@atcute/atproto': 3.1.10
-      '@atcute/lexicons': 1.2.7
+      '@atcute/lexicons': 1.2.8
 
   '@atcute/car@3.1.3':
     dependencies:
-      '@atcute/cbor': 2.3.0
+      '@atcute/cbor': 2.3.1
       '@atcute/cid': 2.4.0
       '@atcute/uint8array': 1.1.0
-      '@atcute/varint': 1.0.3
+      '@atcute/varint': 1.0.4
       yocto-queue: 1.2.2
 
   '@atcute/car@5.1.0':
     dependencies:
-      '@atcute/cbor': 2.3.0
+      '@atcute/cbor': 2.3.1
       '@atcute/cid': 2.4.0
       '@atcute/uint8array': 1.1.0
-      '@atcute/varint': 1.0.3
+      '@atcute/varint': 1.0.4
 
-  '@atcute/cbor@2.3.0':
+  '@atcute/cbor@2.3.1':
     dependencies:
       '@atcute/cid': 2.4.0
       '@atcute/multibase': 1.1.7
@@ -1595,7 +1595,7 @@ snapshots:
   '@atcute/client@4.2.1':
     dependencies:
       '@atcute/identity': 1.1.3
-      '@atcute/lexicons': 1.2.7
+      '@atcute/lexicons': 1.2.8
 
   '@atcute/crypto@2.3.0':
     dependencies:
@@ -1605,11 +1605,11 @@ snapshots:
 
   '@atcute/did-plc@0.3.1':
     dependencies:
-      '@atcute/cbor': 2.3.0
+      '@atcute/cbor': 2.3.1
       '@atcute/cid': 2.4.0
       '@atcute/crypto': 2.3.0
       '@atcute/identity': 1.1.3
-      '@atcute/lexicons': 1.2.7
+      '@atcute/lexicons': 1.2.8
       '@atcute/multibase': 1.1.7
       '@atcute/uint8array': 1.1.0
       '@atcute/util-fetch': 1.0.5
@@ -1618,19 +1618,19 @@ snapshots:
   '@atcute/identity-resolver@1.2.2(@atcute/identity@1.1.3)':
     dependencies:
       '@atcute/identity': 1.1.3
-      '@atcute/lexicons': 1.2.7
+      '@atcute/lexicons': 1.2.8
       '@atcute/util-fetch': 1.0.5
       '@badrap/valita': 0.4.6
 
   '@atcute/identity@1.1.3':
     dependencies:
-      '@atcute/lexicons': 1.2.7
+      '@atcute/lexicons': 1.2.8
       '@badrap/valita': 0.4.6
 
   '@atcute/lexicon-doc@2.1.0':
     dependencies:
       '@atcute/identity': 1.1.3
-      '@atcute/lexicons': 1.2.7
+      '@atcute/lexicons': 1.2.8
       '@atcute/uint8array': 1.1.0
       '@atcute/util-text': 1.1.0
       '@badrap/valita': 0.4.6
@@ -1641,12 +1641,12 @@ snapshots:
       '@atcute/identity': 1.1.3
       '@atcute/identity-resolver': 1.2.2(@atcute/identity@1.1.3)
       '@atcute/lexicon-doc': 2.1.0
-      '@atcute/lexicons': 1.2.7
+      '@atcute/lexicons': 1.2.8
       '@atcute/repo': 0.1.1
       '@atcute/util-fetch': 1.0.5
       '@badrap/valita': 0.4.6
 
-  '@atcute/lexicons@1.2.7':
+  '@atcute/lexicons@1.2.8':
     dependencies:
       '@atcute/uint8array': 1.1.0
       '@atcute/util-text': 1.1.0
@@ -1655,7 +1655,7 @@ snapshots:
 
   '@atcute/mst@0.1.2':
     dependencies:
-      '@atcute/cbor': 2.3.0
+      '@atcute/cbor': 2.3.1
       '@atcute/cid': 2.4.0
       '@atcute/uint8array': 1.1.0
 
@@ -1667,7 +1667,7 @@ snapshots:
     dependencies:
       '@atcute/client': 4.2.1
       '@atcute/identity-resolver': 1.2.2(@atcute/identity@1.1.3)
-      '@atcute/lexicons': 1.2.7
+      '@atcute/lexicons': 1.2.8
       '@atcute/multibase': 1.1.7
       '@atcute/oauth-crypto': 0.1.0
       '@atcute/oauth-types': 0.1.1
@@ -1689,32 +1689,32 @@ snapshots:
   '@atcute/oauth-types@0.1.1':
     dependencies:
       '@atcute/identity': 1.1.3
-      '@atcute/lexicons': 1.2.7
+      '@atcute/lexicons': 1.2.8
       '@atcute/oauth-keyset': 0.1.0
       '@badrap/valita': 0.4.6
 
   '@atcute/repo@0.1.1':
     dependencies:
       '@atcute/car': 5.1.0
-      '@atcute/cbor': 2.3.0
+      '@atcute/cbor': 2.3.1
       '@atcute/cid': 2.4.0
       '@atcute/crypto': 2.3.0
-      '@atcute/lexicons': 1.2.7
+      '@atcute/lexicons': 1.2.8
       '@atcute/mst': 0.1.2
       '@atcute/uint8array': 1.1.0
 
-  '@atcute/tangled@1.0.16':
+  '@atcute/tangled@1.0.17':
     dependencies:
       '@atcute/atproto': 3.1.10
-      '@atcute/lexicons': 1.2.7
+      '@atcute/lexicons': 1.2.8
 
   '@atcute/tid@1.1.1':
     dependencies:
-      '@atcute/time-ms': 1.2.0
+      '@atcute/time-ms': 1.2.1
 
-  '@atcute/time-ms@1.2.0':
+  '@atcute/time-ms@1.2.1':
     dependencies:
-      '@types/bun': 1.3.8
+      '@types/bun': 1.3.9
       node-gyp-build: 4.8.4
 
   '@atcute/uint8array@1.1.0': {}
@@ -1727,7 +1727,7 @@ snapshots:
     dependencies:
       unicode-segmenter: 0.14.5
 
-  '@atcute/varint@1.0.3': {}
+  '@atcute/varint@1.0.4': {}
 
   '@babel/code-frame@7.29.0':
     dependencies:
@@ -1870,7 +1870,7 @@ snapshots:
       '@lezer/lr': 1.4.8
       style-mod: 4.1.3
 
-  '@codemirror/lint@6.9.3':
+  '@codemirror/lint@6.9.4':
     dependencies:
       '@codemirror/state': 6.5.4
       '@codemirror/view': 6.39.13
@@ -2061,7 +2061,7 @@ snapshots:
       '@codemirror/view': 6.39.13
       '@lezer/highlight': 1.2.3
 
-  '@iconify-json/lucide@1.2.89':
+  '@iconify-json/lucide@1.2.90':
     dependencies:
       '@iconify/types': 2.0.0
 
@@ -2224,7 +2224,7 @@ snapshots:
   '@skyware/firehose@0.5.2':
     dependencies:
       '@atcute/car': 3.1.3
-      '@atcute/cbor': 2.3.0
+      '@atcute/cbor': 2.3.1
       nanoevents: 9.1.0
 
   '@solidjs/meta@0.29.4(solid-js@1.9.11)':
@@ -2298,12 +2298,12 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.1.18
       '@tailwindcss/oxide-win32-x64-msvc': 4.1.18
 
-  '@tailwindcss/vite@4.1.18(vite@7.3.1(@types/node@25.2.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))':
+  '@tailwindcss/vite@4.1.18(vite@7.3.1(@types/node@25.2.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))':
     dependencies:
       '@tailwindcss/node': 4.1.18
       '@tailwindcss/oxide': 4.1.18
       tailwindcss: 4.1.18
-      vite: 7.3.1(@types/node@25.2.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
+      vite: 7.3.1(@types/node@25.2.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
 
   '@types/babel__core@7.20.5':
     dependencies:
@@ -2326,13 +2326,13 @@ snapshots:
     dependencies:
       '@babel/types': 7.29.0
 
-  '@types/bun@1.3.8':
+  '@types/bun@1.3.9':
     dependencies:
-      bun-types: 1.3.8
+      bun-types: 1.3.9
 
   '@types/estree@1.0.8': {}
 
-  '@types/node@25.2.2':
+  '@types/node@25.2.3':
     dependencies:
       undici-types: 7.16.0
 
@@ -2366,9 +2366,9 @@ snapshots:
       node-releases: 2.0.27
       update-browserslist-db: 1.2.3(browserslist@4.28.1)
 
-  bun-types@1.3.8:
+  bun-types@1.3.9:
     dependencies:
-      '@types/node': 25.2.2
+      '@types/node': 25.2.3
 
   caniuse-lite@1.0.30001769: {}
 
@@ -2377,7 +2377,7 @@ snapshots:
       '@codemirror/autocomplete': 6.20.0
       '@codemirror/commands': 6.10.2
       '@codemirror/language': 6.12.1
-      '@codemirror/lint': 6.9.3
+      '@codemirror/lint': 6.9.4
       '@codemirror/search': 6.6.0
       '@codemirror/state': 6.5.4
       '@codemirror/view': 6.39.13
@@ -2788,7 +2788,7 @@ snapshots:
       escalade: 3.2.0
       picocolors: 1.1.1
 
-  vite-plugin-solid@2.11.10(solid-js@1.9.11)(vite@7.3.1(@types/node@25.2.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)):
+  vite-plugin-solid@2.11.10(solid-js@1.9.11)(vite@7.3.1(@types/node@25.2.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)):
     dependencies:
       '@babel/core': 7.29.0
       '@types/babel__core': 7.20.5
@@ -2796,12 +2796,12 @@ snapshots:
       merge-anything: 5.1.7
       solid-js: 1.9.11
       solid-refresh: 0.6.3(solid-js@1.9.11)
-      vite: 7.3.1(@types/node@25.2.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
-      vitefu: 1.1.1(vite@7.3.1(@types/node@25.2.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))
+      vite: 7.3.1(@types/node@25.2.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
+      vitefu: 1.1.1(vite@7.3.1(@types/node@25.2.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2))
     transitivePeerDependencies:
       - supports-color
 
-  vite@7.3.1(@types/node@25.2.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2):
+  vite@7.3.1(@types/node@25.2.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2):
     dependencies:
       esbuild: 0.27.3
       fdir: 6.5.0(picomatch@4.0.3)
@@ -2810,15 +2810,15 @@ snapshots:
       rollup: 4.57.1
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 25.2.2
+      '@types/node': 25.2.3
       fsevents: 2.3.3
       jiti: 2.6.1
       lightningcss: 1.30.2
       tsx: 4.19.2
 
-  vitefu@1.1.1(vite@7.3.1(@types/node@25.2.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)):
+  vitefu@1.1.1(vite@7.3.1(@types/node@25.2.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)):
     optionalDependencies:
-      vite: 7.3.1(@types/node@25.2.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
+      vite: 7.3.1(@types/node@25.2.3)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.19.2)
 
   w3c-keyname@2.2.8: {}
 

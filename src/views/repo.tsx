@@ -519,7 +519,7 @@ export const RepoView = () => {
                             >
                               <div class="flex flex-col gap-2">
                                 <button
-                                  class="-ml-1 flex w-fit items-center gap-1 rounded px-1 py-0.5 text-sm text-neutral-700 hover:bg-neutral-200 active:bg-neutral-200 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+                                  class="-ml-1 flex w-fit items-center gap-1 rounded px-1 py-0.5 text-left text-sm text-neutral-700 hover:bg-neutral-200 active:bg-neutral-200 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
                                   onClick={async () => {
                                     if (expandedAlias() === alias) {
                                       setExpandedAlias(null);
@@ -536,7 +536,7 @@ export const RepoView = () => {
                                   <span>{alias}</span>
                                   <span
                                     classList={{
-                                      "iconify text-base lucide--check text-green-600 dark:text-green-400":
+                                      "iconify text-base shrink-0 lucide--check text-green-600 dark:text-green-400":
                                         validHandles[alias] === true,
                                       "iconify lucide--x text-red-500 dark:text-red-400":
                                         validHandles[alias] === false,
