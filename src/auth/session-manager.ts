@@ -43,7 +43,7 @@ export const loadHandleForSession = async (did: Did, storedSessions: Sessions) =
 
 export const retrieveSession = async (): Promise<void> => {
   const init = async (): Promise<Session | undefined> => {
-    const params = new URLSearchParams(location.hash.slice(1));
+    const params = new URLSearchParams(decodeURIComponent(location.hash.slice(1)));
 
     if (params.has("state") && (params.has("code") || params.has("error"))) {
       history.replaceState(null, "", location.pathname + location.search);
