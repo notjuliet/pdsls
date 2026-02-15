@@ -784,7 +784,7 @@ export const RepoView = () => {
               value={filter() ?? ""}
               onInput={(e) => setFilter(e.currentTarget.value.toLowerCase())}
             />
-            <Show when={!filter()}>
+            <Show when={canHover && !filter()}>
               <kbd class="rounded border border-neutral-200 bg-neutral-50 px-1.5 py-0.5 font-mono text-xs text-neutral-400 select-none dark:border-neutral-600 dark:bg-neutral-700">
                 /
               </kbd>
