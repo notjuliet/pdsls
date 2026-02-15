@@ -9,6 +9,8 @@ import {
   createSignal,
   ErrorBoundary,
   For,
+  onCleanup,
+  onMount,
   Show,
   Suspense,
 } from "solid-js";
@@ -62,6 +64,7 @@ export const RepoView = () => {
   } | null>(null);
   let rpc: Client;
   let pds: string;
+  let filterInputRef: HTMLInputElement | undefined;
   const did = params.repo!;
 
   // Handle scrolling to a collection group when hash is like #collections:app.bsky
@@ -74,6 +77,22 @@ export const RepoView = () => {
         if (element) element.scrollIntoView({ behavior: "instant", block: "start" });
       });
     }
+  });
+
+  onMount(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key === "/" &&
+        !["INPUT", "TEXTAREA"].includes((e.target as HTMLElement)?.tagName) &&
+        !document.querySelector("[data-modal]")
+      ) {
+        e.preventDefault();
+        filterInputRef?.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    onCleanup(() => document.removeEventListener("keydown", handleKeyDown));
   });
 
   const RepoTab = (props: {
@@ -754,6 +773,7 @@ export const RepoView = () => {
           >
             <span class="iconify lucide--filter text-neutral-500 dark:text-neutral-400"></span>
             <input
+              ref={filterInputRef}
               type="text"
               spellcheck={false}
               autocapitalize="off"
@@ -764,6 +784,11 @@ export const RepoView = () => {
               value={filter() ?? ""}
               onInput={(e) => setFilter(e.currentTarget.value.toLowerCase())}
             />
+            <Show when={!filter()}>
+              <kbd class="rounded border border-neutral-200 bg-neutral-50 px-1.5 py-0.5 font-mono text-xs text-neutral-400 select-none dark:border-neutral-600 dark:bg-neutral-700">
+                /
+              </kbd>
+            </Show>
           </div>
         </div>
       </Show>
