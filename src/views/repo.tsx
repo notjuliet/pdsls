@@ -495,10 +495,10 @@ export const RepoView = () => {
                                   href={`/at://${did}/${authority}.${nsid}`}
                                   class="hover:underline active:underline"
                                 >
-                                  <span>{authority}</span>
-                                  <span class="text-neutral-500 dark:text-neutral-400">
-                                    .{nsid}
+                                  <span class="text-neutral-800/70 dark:text-neutral-200/70">
+                                    {authority}.
                                   </span>
+                                  <span>{nsid}</span>
                                 </A>
                               )}
                             </For>
