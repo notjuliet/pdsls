@@ -1,12 +1,124 @@
 import { A } from "@solidjs/router";
-import { For, JSX } from "solid-js";
+import { createSignal, For, JSX, onCleanup, onMount } from "solid-js";
 import { setOpenManager, setShowAddAccount } from "../auth/state";
 import { Button } from "../components/button";
+import { Favicon } from "../components/favicon";
+import { JSONValue } from "../components/json";
 import { SearchButton } from "../components/search";
 
-type ProfileData = {
-  did: string;
-  handle: string;
+const SLIDES = ["Record", "Repository", "PDS"] as const;
+
+const slideLinks = [
+  "/at://did:plc:ia76kvnndjutgedggx2ibrem/app.bsky.feed.post/3kenlltlvus2u",
+  "/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2",
+  "/npmx.social",
+] as const;
+
+const exampleRecord = {
+  text: "ma'am do you know where the petard is, i'd like to hoist myself with it",
+  $type: "app.bsky.feed.post",
+  langs: ["en"],
+  createdAt: "2023-11-20T21:44:21.000Z",
+};
+
+const exampleCollections = [
+  { authority: "app.bsky", nsids: ["actor.profile", "feed.post", "feed.like", "graph.follow"] },
+  { authority: "sh.tangled", nsids: ["actor.profile", "repo.pull"] },
+  { authority: "place.stream", nsids: ["chat.message"] },
+];
+
+const exampleRepos = [
+  "did:plc:ty2jdjtqqq4jn7kk7p3mpwae",
+  "did:plc:byfvayavc7z2ldyu6bu5myz2",
+  "did:plc:n34gdj7o3o6ktuxp5qfbgllu",
+  "did:plc:vh7y4mqklsu2uui5tlwl42dy",
+  "did:plc:uz76j2yr2ps7apdxtlgqljwk",
+];
+
+const ExplorerShowcase = () => {
+  const [slide, setSlide] = createSignal(0);
+
+  onMount(() => {
+    const id = setInterval(() => setSlide((s) => (s + 1) % SLIDES.length), 5000);
+    onCleanup(() => clearInterval(id));
+  });
+
+  return (
+    <div class="flex flex-col gap-1.5">
+      <A
+        href={slideLinks[slide()]}
+        class="relative block h-42 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50 transition-colors hover:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-neutral-600"
+      >
+        {/* Record slide */}
+        <div
+          class="pointer-events-none absolute inset-0 overflow-hidden px-3 py-2 font-mono text-xs wrap-anywhere whitespace-pre-wrap transition-opacity duration-700 sm:text-sm"
+          classList={{ "opacity-0": slide() !== 0 }}
+        >
+          <JSONValue data={exampleRecord as any} repo="did:plc:ia76kvnndjutgedggx2ibrem" />
+        </div>
+
+        {/* Collections slide */}
+        <div
+          class="pointer-events-none absolute inset-0 flex flex-col gap-1 overflow-hidden px-3 py-2 text-sm wrap-anywhere transition-opacity duration-700"
+          classList={{ "opacity-0": slide() !== 1 }}
+        >
+          <For each={exampleCollections}>
+            {({ authority, nsids }) => (
+              <div class="flex items-start gap-2">
+                <Favicon authority={authority} />
+                <div class="flex flex-col">
+                  <For each={nsids}>
+                    {(nsid) => (
+                      <span>
+                        <span class="text-neutral-500 dark:text-neutral-400">{authority}.</span>
+                        <span>{nsid}</span>
+                      </span>
+                    )}
+                  </For>
+                </div>
+              </div>
+            )}
+          </For>
+        </div>
+
+        {/* Repos slide */}
+        <div
+          class="pointer-events-none absolute inset-0 overflow-hidden py-0.5 transition-opacity duration-700"
+          classList={{ "opacity-0": slide() !== 2 }}
+        >
+          <For each={exampleRepos}>
+            {(did) => (
+              <div class="flex min-w-0 items-center gap-2 p-1.5 font-mono text-sm">
+                <span class="flex shrink-0 items-center text-neutral-400 dark:text-neutral-500">
+                  <span class="iconify lucide--chevron-right" />
+                </span>
+                <span class="truncate text-blue-500 dark:text-blue-400">{did}</span>
+              </div>
+            )}
+          </For>
+        </div>
+      </A>
+
+      {/* Slide indicator */}
+      <div class="flex items-center justify-between px-0.5">
+        <span class="text-xs text-neutral-400 dark:text-neutral-500">{SLIDES[slide()]}</span>
+        <div class="flex gap-1">
+          <For each={SLIDES}>
+            {(_, i) => (
+              <button
+                onClick={() => setSlide(i())}
+                class="h-1 rounded-full transition-all duration-300"
+                classList={{
+                  "w-4 bg-neutral-400 dark:bg-neutral-500": slide() === i(),
+                  "w-1.5 bg-neutral-300 dark:bg-neutral-600": slide() !== i(),
+                }}
+              />
+            )}
+          </For>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export const Home = () => {
@@ -24,50 +136,6 @@ export const Home = () => {
       {props.children}
     </a>
   );
-
-  const allExampleProfiles: ProfileData[] = [
-    { did: "did:plc:oisofpd7lj26yvgiivf3lxsi", handle: "hailey.at" },
-    { did: "did:plc:vwzwgnygau7ed7b7wt5ux7y2", handle: "retr0.id" },
-    { did: "did:plc:uu5axsmbm2or2dngy4gwchec", handle: "futur.blue" },
-    { did: "did:plc:ia76kvnndjutgedggx2ibrem", handle: "mary.my.id" },
-    { did: "did:plc:q6gjnaw2blty4crticxkmujt", handle: "jaz.sh" },
-    { did: "did:plc:jrtgsidnmxaen4offglr5lsh", handle: "quilling.dev" },
-    { did: "did:plc:3c6vkaq7xf5kz3va3muptjh5", handle: "aylac.top" },
-    { did: "did:plc:gwd5r7dbg3zv6dhv75hboa3f", handle: "mofu.run" },
-    { did: "did:plc:tzrpqyerzt37pyj54hh52xrz", handle: "rainy.pet" },
-    { did: "did:plc:qx7in36j344d7qqpebfiqtew", handle: "futanari.observer" },
-    { did: "did:plc:ucaezectmpny7l42baeyooxi", handle: "sapphic.moe" },
-    { did: "did:plc:6v6jqsy7swpzuu53rmzaybjy", handle: "computer.fish" },
-    { did: "did:plc:w4nvvt6feq2l3qgnwl6a7g7d", handle: "emilia.wtf" },
-    { did: "did:plc:xwhsmuozq3mlsp56dyd7copv", handle: "paizuri.moe" },
-    { did: "did:plc:aokggmp5jzj4nc5jifhiplqc", handle: "dreary.blacksky.app" },
-    { did: "did:plc:k644h4rq5bjfzcetgsa6tuby", handle: "natalie.sh" },
-    { did: "did:plc:ttdrpj45ibqunmfhdsb4zdwq", handle: "nekomimi.pet" },
-    { did: "did:plc:fz2tul67ziakfukcwa3vdd5d", handle: "nullekko.moe" },
-    { did: "did:plc:qxichs7jsycphrsmbujwqbfb", handle: "isabelroses.com" },
-    { did: "did:plc:fnvdhaoe7b5abgrtvzf4ttl5", handle: "isuggest.selfce.st" },
-    { did: "did:plc:p5yjdr64h7mk5l3kh6oszryk", handle: "blooym.dev" },
-    { did: "did:plc:hvakvedv6byxhufjl23mfmsd", handle: "number-one-warned.rat.mom" },
-    { did: "did:plc:6if5m2yo6kroprmmency3gt5", handle: "olaren.dev" },
-    { did: "did:plc:w7adfxpixpi77e424cjjxnxy", handle: "anyaustin.bsky.social" },
-    { did: "did:plc:h6as5sk7tfqvvnqvfrlnnwqn", handle: "cwonus.org" },
-    { did: "did:plc:73gqgbnvpx5syidcponjrics", handle: "coil-habdle.ebil.club" },
-    { did: "did:plc:gy5roooborfiyvl2xadsam3e", handle: "slug.moe" },
-    { did: "did:plc:dadnngq7hpnuglhxm556wgzi", handle: "drunk.moe" },
-    { did: "did:plc:ra3gxl2udc22odfbvcfslcn3", handle: "notnite.com" },
-    { did: "did:plc:h5wsnqetncv6lu2weom35lg2", handle: "nel.pet" },
-    { did: "did:plc:irs2tcoeuvuwj3m4yampbuco", handle: "shi.gg" },
-    { did: "did:plc:vafqb3yhndyawabm2t2zhw5z", handle: "neko.moe.observer" },
-    { did: "did:plc:mppmy46nmna6j4y7o3qlk7vn", handle: "isla.pet" },
-    { did: "did:plc:3l526xzfvz5pnwepjxx3inq5", handle: "angelicimouto.moe.observer" },
-    { did: "did:plc:dfl62fgb7wtjj3fcbb72naae", handle: "ptr.pet" },
-  ];
-
-  for (let i = allExampleProfiles.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [allExampleProfiles[i], allExampleProfiles[j]] = [allExampleProfiles[j], allExampleProfiles[i]];
-  }
-  const profiles = allExampleProfiles.slice(0, 3);
 
   return (
     <div class="flex w-full flex-col gap-5 px-2 wrap-break-word">
@@ -89,33 +157,8 @@ export const Home = () => {
           </div>
         </div>
 
-        {/* Example Repos */}
-        <section class="mb-1 flex flex-col gap-3">
-          <div class="flex justify-between">
-            <For each={profiles}>
-              {(profile) => (
-                <A
-                  href={`/at://${profile.did}`}
-                  class="group flex min-w-0 basis-1/3 flex-col items-center gap-1.5 transition-transform hover:scale-105 active:scale-105"
-                >
-                  <img
-                    src={`/avatar/${profile.handle}.jpg`}
-                    alt={`Bluesky profile picture of ${profile.handle}`}
-                    class="size-16 rounded-full ring-2 ring-transparent transition-all group-hover:ring-blue-500 active:ring-blue-500 dark:group-hover:ring-blue-400 dark:active:ring-blue-400"
-                    classList={{
-                      "animate-[spin_5s_linear_infinite] [animation-play-state:paused] group-hover:[animation-play-state:running]":
-                        profile.handle === "coil-habdle.ebil.club",
-                      "rounded-lg": profile.handle === "ptr.pet",
-                    }}
-                  />
-                  <span class="w-full truncate px-0.5 text-center text-xs text-neutral-600 dark:text-neutral-300">
-                    @{profile.handle}
-                  </span>
-                </A>
-              )}
-            </For>
-          </div>
-        </section>
+        <ExplorerShowcase />
+
         <div class="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
           <SearchButton />
           <span>to find any account</span>
