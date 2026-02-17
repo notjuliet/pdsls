@@ -15,7 +15,6 @@
 @theme {
   --font-sans: "Figtree", sans-serif;
   --font-mono: "Roboto Mono", monospace;
-  --font-pecita: "Pecita", serif;
 
   --color-dark-50: oklch(40.91% 0 0);
   --color-dark-100: oklch(35.62% 0 0);

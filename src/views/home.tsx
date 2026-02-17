@@ -251,15 +251,6 @@ export const Home = () => {
       </div>
 
       <div class="flex justify-center gap-1.5 text-sm text-neutral-600 sm:gap-2 dark:text-neutral-300">
-        <FooterLink
-          href="https://juli.ee"
-          color="after:text-rose-400"
-          darkColor="dark:after:text-rose-300"
-        >
-          <span class="iconify lucide--terminal text-rose-400 dark:text-rose-300"></span>
-          <span class="font-pecita">juliet</span>
-        </FooterLink>
-        •
         <FooterLink href="https://raycast.com/juliet_philippe/pdsls" color="after:text-[#FF6363]">
           <span class="iconify-color i-raycast-light block dark:hidden"></span>
           <span class="iconify-color i-raycast-dark hidden dark:block"></span>
