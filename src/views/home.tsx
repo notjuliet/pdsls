@@ -6,11 +6,11 @@ import { Favicon } from "../components/favicon";
 import { JSONValue } from "../components/json";
 import { SearchButton } from "../components/search";
 
-const SLIDES = ["Record", "Repository", "PDS"] as const;
+const SLIDES = ["Repository", "Record", "PDS"] as const;
 
 const slideLinks = [
-  "/at://did:plc:ia76kvnndjutgedggx2ibrem/app.bsky.feed.post/3kenlltlvus2u",
   "/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2",
+  "/at://did:plc:ia76kvnndjutgedggx2ibrem/app.bsky.feed.post/3kenlltlvus2u",
   "/npmx.social",
 ] as const;
 
@@ -49,18 +49,10 @@ const ExplorerShowcase = () => {
         href={slideLinks[slide()]}
         class="relative block h-42 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50 transition-colors hover:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-neutral-600"
       >
-        {/* Record slide */}
-        <div
-          class="pointer-events-none absolute inset-0 overflow-hidden px-3 py-2 font-mono text-xs wrap-anywhere whitespace-pre-wrap transition-opacity duration-700 sm:text-sm"
-          classList={{ "opacity-0": slide() !== 0 }}
-        >
-          <JSONValue data={exampleRecord as any} repo="did:plc:ia76kvnndjutgedggx2ibrem" />
-        </div>
-
         {/* Collections slide */}
         <div
           class="pointer-events-none absolute inset-0 flex flex-col gap-1 overflow-hidden px-3 py-2 text-sm wrap-anywhere transition-opacity duration-700"
-          classList={{ "opacity-0": slide() !== 1 }}
+          classList={{ "opacity-0": slide() !== 0 }}
         >
           <For each={exampleCollections}>
             {({ authority, nsids }) => (
@@ -79,6 +71,14 @@ const ExplorerShowcase = () => {
               </div>
             )}
           </For>
+        </div>
+
+        {/* Record slide */}
+        <div
+          class="pointer-events-none absolute inset-0 overflow-hidden px-3 py-2 font-mono text-xs wrap-anywhere whitespace-pre-wrap transition-opacity duration-700 sm:text-sm"
+          classList={{ "opacity-0": slide() !== 1 }}
+        >
+          <JSONValue data={exampleRecord as any} repo="did:plc:ia76kvnndjutgedggx2ibrem" />
         </div>
 
         {/* Repos slide */}
