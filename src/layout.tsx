@@ -21,12 +21,9 @@ const headers: Record<string, string> = {
   "did:plc:oisofpd7lj26yvgiivf3lxsi": "puppy.jpg",
   "did:plc:vwzwgnygau7ed7b7wt5ux7y2": "water.webp",
   "did:plc:uu5axsmbm2or2dngy4gwchec": "city.webp",
-  "did:plc:aokggmp5jzj4nc5jifhiplqc": "bridge.jpg",
-  "did:plc:bnqkww7bjxaacajzvu5gswdf": "forest.jpg",
-  "did:plc:p2cp5gopk7mgjegy6wadk3ep": "aurora.jpg",
   "did:plc:ucaezectmpny7l42baeyooxi": "almaty.webp",
-  "did:plc:7rfssi44thh6f4ywcl3u5nvt": "sonic.jpg",
-  "did:plc:6if5m2yo6kroprmmency3gt5": "montreal.webp",
+  "did:plc:355lbopbpckczt672hss2ra4": "kit.jpg",
+  "did:plc:q6ywj35eew5f3cdajho7bmq7": "dreary.jpg",
 };
 
 const Layout = (props: RouteSectionProps<unknown>) => {
