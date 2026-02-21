@@ -1,7 +1,6 @@
 import { fromStream } from "@atcute/repo";
 import { zip, type ZipEntry } from "@mary/zip";
 import { Title } from "@solidjs/meta";
-import { FileSystemWritableFileStream, showSaveFilePicker } from "native-file-system-adapter";
 import { createSignal, onCleanup } from "solid-js";
 import { createDropHandler, createFileChangeHandler, handleDragOver } from "./file-handlers.js";
 import { createLogger, LoggerView } from "./logger.jsx";
@@ -114,25 +113,26 @@ export const UnpackToolView = () => {
               const waiting = logger.progress(`Waiting for user...`);
 
               try {
-                const fd = await showSaveFilePicker({
-                  suggestedName: `${file.name.replace(/\.car$/, "")}.zip`,
-                  // @ts-expect-error: ponyfill doesn't have full typings
-                  id: "car-unpack",
-                  startIn: "downloads",
-                  types: [
-                    {
-                      description: "ZIP archive",
-                      accept: { "application/zip": [".zip"] },
-                    },
-                  ],
-                }).catch((err) => {
-                  if (err instanceof DOMException && err.name === "AbortError") {
-                    logger.warn(`File picker was cancelled`);
-                  } else {
-                    logger.warn(`Something went wrong when opening the file picker`);
-                  }
-                  return undefined;
-                });
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const fd = await (window as any).showSaveFilePicker({
+                    suggestedName: `${file.name.replace(/\.car$/, "")}.zip`,
+                    id: "car-unpack",
+                    startIn: "downloads",
+                    types: [
+                      {
+                        description: "ZIP archive",
+                        accept: { "application/zip": [".zip"] },
+                      },
+                    ],
+                  })
+                  .catch((err: unknown) => {
+                    if (err instanceof DOMException && err.name === "AbortError") {
+                      logger.warn(`File picker was cancelled`);
+                    } else {
+                      logger.warn(`Something went wrong when opening the file picker`);
+                    }
+                    return undefined;
+                  });
 
                 if (!fd) {
                   logger.warn(`No file handle obtained`);
@@ -182,9 +182,9 @@ export const UnpackToolView = () => {
         writeCount++;
         // Await every 100th write to apply backpressure
         if (writeCount % 100 === 0) {
-          await writable.write(chunk);
+          await writable.write(chunk as BufferSource);
         } else {
-          writable.write(chunk); // Fire and forget
+          writable.write(chunk as BufferSource);
         }
       }
 
