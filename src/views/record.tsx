@@ -8,7 +8,7 @@ import { AtprotoDid, Did, isNsid } from "@atcute/lexicons/syntax";
 import { verifyRecord } from "@atcute/repo";
 import { Title } from "@solidjs/meta";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
-import { createResource, createSignal, ErrorBoundary, Show, Suspense } from "solid-js";
+import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from "solid-js";
 import { agent } from "../auth/state";
 import { Backlinks } from "../components/backlinks.jsx";
 import { Button } from "../components/button.jsx";
@@ -36,6 +36,32 @@ import {
 import { clearCollectionCache } from "../utils/route-cache.js";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 import { lexicons } from "../utils/types/lexicons.js";
+
+const toAuthority = (hostname: string) => hostname.split(".").reverse().join(".");
+
+const faviconWrapper = (children: any) => (
+  <div class="flex size-4 items-center justify-center">{children}</div>
+);
+
+const bskyAltClients = [
+  {
+    label: "Blacksky",
+    hostname: "blacksky.app",
+    transform: (url: string) => url.replace("https://bsky.app", "https://blacksky.community"),
+  },
+  {
+    label: "Witchsky",
+    hostname: "witchsky.app",
+    transform: (url: string) => url.replace("https://bsky.app", "https://witchsky.app"),
+  },
+  {
+    label: "Anartia",
+    hostname: "kelinci.net",
+    icon: "https://kelinci.net/rabbit.svg",
+    transform: (url: string) =>
+      url.replace("https://bsky.app/profile", "https://anartia.kelinci.net").replace("/post/", "/"),
+  },
+];
 
 const authorityCache = new Map<string, Promise<AtprotoDid>>();
 const documentCache = new Map<string, Promise<DidDocument>>();
@@ -191,6 +217,7 @@ export const RecordView = () => {
   const navigate = useNavigate();
   const params = useParams();
   const [openDelete, setOpenDelete] = createSignal(false);
+  const [showAlternates, setShowAlternates] = createSignal(false);
   const [verifyError, setVerifyError] = createSignal("");
   const [validationError, setValidationError] = createSignal("");
   const [externalLink, setExternalLink] = createSignal<
@@ -438,20 +465,53 @@ export const RecordView = () => {
                   </Modal>
                 </Show>
                 <Show when={externalLink()}>
-                  {(link) => (
-                    <a
-                      href={link().link}
-                      target="_blank"
-                      class="flex rounded-sm p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                    >
-                      <Favicon
-                        authority={new URL(link().link).hostname.split(".").reverse().join(".")}
-                        wrapper={(children) => (
-                          <div class="flex size-4 items-center justify-center">{children}</div>
-                        )}
-                      />
-                    </a>
-                  )}
+                  {(link) => {
+                    const bskyAlts = () =>
+                      link().link.startsWith("https://bsky.app") ?
+                        bskyAltClients.map((alt) => ({ ...alt, link: alt.transform(link().link) }))
+                      : [];
+                    return (
+                      <div
+                        class="relative"
+                        onMouseEnter={() => setShowAlternates(true)}
+                        onMouseLeave={() => setShowAlternates(false)}
+                      >
+                        <a
+                          href={link().link}
+                          target="_blank"
+                          title={`Open on ${link().label}`}
+                          class="flex rounded-sm p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                        >
+                          <Favicon
+                            authority={toAuthority(new URL(link().link).hostname)}
+                            wrapper={faviconWrapper}
+                          />
+                        </a>
+                        <Show when={showAlternates() && bskyAlts().length > 0}>
+                          <div class="dark:bg-dark-500 absolute top-full left-0 z-10 flex flex-col rounded bg-neutral-100">
+                            <For each={bskyAlts()}>
+                              {(alt) => (
+                                <a
+                                  href={alt.link}
+                                  target="_blank"
+                                  title={`Open on ${alt.label}`}
+                                  class="flex rounded-sm p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                                >
+                                  {alt.icon ?
+                                    <img src={alt.icon} class="size-4" />
+                                  : <Favicon
+                                      authority={toAuthority(alt.hostname)}
+                                      wrapper={faviconWrapper}
+                                    />
+                                  }
+                                </a>
+                              )}
+                            </For>
+                          </div>
+                        </Show>
+                      </div>
+                    );
+                  }}
                 </Show>
                 <MenuProvider>
                   <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
