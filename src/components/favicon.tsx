@@ -9,7 +9,7 @@ export const Favicon = (props: {
 
   const content = (
     <Switch>
-      <Match when={domain() === "tangled.sh"}>
+      <Match when={domain() === "tangled.sh" || domain() === "tangled.org"}>
         <span class="iconify i-tangled size-4" />
       </Match>
       <Match when={["bsky.app", "bsky.chat"].includes(domain())}>

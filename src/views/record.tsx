@@ -20,6 +20,7 @@ import {
   MenuSeparator,
   NavMenu,
 } from "../components/dropdown.jsx";
+import { Favicon } from "../components/favicon.jsx";
 import { JSONValue } from "../components/json.jsx";
 import { LexiconSchemaView } from "../components/lexicon-schema.jsx";
 import { Modal } from "../components/modal.jsx";
@@ -396,13 +397,13 @@ export const RecordView = () => {
         <Show when={record()} keyed>
           <div class="flex w-full flex-col items-center">
             <div class="mb-3 flex w-full justify-between px-2 text-sm sm:text-base">
-              <div class="flex items-center gap-4">
+              <div class="flex items-center gap-3 sm:gap-4">
                 <RecordTab tab="record" label="Record" />
                 <RecordTab tab="schema" label="Schema" />
                 <RecordTab tab="backlinks" label="Backlinks" />
                 <RecordTab tab="info" label="Info" error />
               </div>
-              <div class="flex gap-0.5">
+              <div class="flex sm:gap-0.5">
                 <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
                   <RecordEditor
                     create={false}
@@ -436,6 +437,22 @@ export const RecordView = () => {
                     </div>
                   </Modal>
                 </Show>
+                <Show when={externalLink()}>
+                  {(link) => (
+                    <a
+                      href={link().link}
+                      target="_blank"
+                      class="flex rounded-sm p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                    >
+                      <Favicon
+                        authority={new URL(link().link).hostname.split(".").reverse().join(".")}
+                        wrapper={(children) => (
+                          <div class="flex size-4 items-center justify-center">{children}</div>
+                        )}
+                      />
+                    </a>
+                  )}
+                </Show>
                 <MenuProvider>
                   <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
                     <CopyMenu
@@ -452,16 +469,6 @@ export const RecordView = () => {
                       {(cid) => <CopyMenu content={cid()} label="Copy CID" icon="lucide--copy" />}
                     </Show>
                     <MenuSeparator />
-                    <Show when={externalLink()}>
-                      {(externalLink) => (
-                        <NavMenu
-                          href={externalLink()?.link}
-                          icon={`${externalLink().icon ?? "lucide--app-window"}`}
-                          label={`Open on ${externalLink().label}`}
-                          newTab
-                        />
-                      )}
-                    </Show>
                     <NavMenu
                       href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
                       icon="lucide--external-link"
