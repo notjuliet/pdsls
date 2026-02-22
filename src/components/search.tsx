@@ -465,7 +465,7 @@ export const Search = () => {
                 <span class="text-neutral-400 dark:text-neutral-500">tngl.sh</span>
               </div>
             </div>
-            <span>Bluesky, Tangled, Pinksea, or Frontpage links</span>
+            <span>Bluesky, Tangled, Pinksea, Popfeed, or Blento links</span>
           </div>
         </Show>
       </form>

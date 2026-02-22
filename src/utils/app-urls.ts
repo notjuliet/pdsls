@@ -4,14 +4,16 @@ export enum App {
   Bluesky,
   Tangled,
   Pinksea,
-  Frontpage,
+  Blento,
+  Popfeed,
 }
 
 export const appName = {
   [App.Bluesky]: "Bluesky",
   [App.Tangled]: "Tangled",
   [App.Pinksea]: "Pinksea",
-  [App.Frontpage]: "Frontpage",
+  [App.Blento]: "Blento",
+  [App.Popfeed]: "Popfeed",
 };
 
 export const appList: Record<AppUrl, App> = {
@@ -19,13 +21,13 @@ export const appList: Record<AppUrl, App> = {
   "blacksky.community": App.Bluesky,
   "bsky.app": App.Bluesky,
   "catsky.social": App.Bluesky,
-  "deer.aylac.top": App.Bluesky,
   "deer.social": App.Bluesky,
   "main.bsky.dev": App.Bluesky,
   "witchsky.app": App.Bluesky,
   "tangled.org": App.Tangled,
-  "frontpage.fyi": App.Frontpage,
   "pinksea.art": App.Pinksea,
+  "blento.app": App.Blento,
+  "popfeed.social": App.Popfeed,
 };
 
 export const appHandleLink: Record<App, (url: string[]) => string> = {
@@ -85,20 +87,29 @@ export const appHandleLink: Record<App, (url: string[]) => string> = {
 
     return `at://${user}`;
   },
-  [App.Frontpage]: (path) => {
-    if (path.length === 3) {
-      return `at://${path[1]}/fyi.unravel.frontpage.post/${path[2]}`;
-    } else if (path.length === 5) {
-      return `at://${path[3]}/fyi.unravel.frontpage.comment/${path[4]}`;
-    }
-
-    return `at://${path[0]}`;
-  },
   [App.Pinksea]: (path) => {
     if (path.length === 3) {
       return `at://${path[0]}/com.shinolabs.pinksea.oekaki/${path[2]}`;
     }
 
     return `at://${path[0]}`;
+  },
+  [App.Blento]: (path) => {
+    return `at://${path[0]}/app.blento.card`;
+  },
+  [App.Popfeed]: (path) => {
+    if (path[0] === "profile" && path[1]) {
+      return `at://${path[1]}/social.popfeed.actor.profile/self`;
+    }
+    if (
+      (path[0] === "review" || path[0] === "list") &&
+      path[1] === "at:" &&
+      path[2] &&
+      path[3] &&
+      path[4]
+    ) {
+      return `at://${path[2]}/${path[3]}/${path[4]}`;
+    }
+    return `at://${path[1]}`;
   },
 };
