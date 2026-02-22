@@ -59,7 +59,10 @@ const bskyAltClients = [
     hostname: "kelinci.net",
     icon: "https://kelinci.net/rabbit.svg",
     transform: (url: string) =>
-      url.replace("https://bsky.app/profile", "https://anartia.kelinci.net").replace("/post/", "/"),
+      url
+        .replace("https://bsky.app/profile", "https://anartia.kelinci.net")
+        .replace("/post/", "/")
+        .replace("/feed/", "/feeds/"),
   },
 ];
 
