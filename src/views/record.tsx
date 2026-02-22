@@ -483,7 +483,7 @@ export const RecordView = () => {
                           class="flex p-1.5"
                           classList={{
                             "rounded-sm hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600":
-                              !showAlternates(),
+                              !bskyAlts().length,
                             "bg-neutral-50 rounded-t dark:bg-dark-300 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600":
                               showAlternates() && bskyAlts().length > 0,
                           }}
