@@ -61,7 +61,7 @@ export const Login = (props: LoginProps) => {
               id="username"
               name="username"
               autocomplete="username"
-              autofocus
+              ref={(el) => setTimeout(() => el.focus())}
               aria-label="Your AT Protocol handle"
               class="grow py-1 select-none placeholder:text-sm focus:outline-none"
               onInput={(e) => setLoginInput(e.currentTarget.value)}
