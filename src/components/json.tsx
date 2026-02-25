@@ -168,7 +168,11 @@ const CollapsibleItem = (props: {
   const isBlobContext = props.parentIsBlob ?? ctx.parentIsBlob;
 
   const isObject = () => props.value === Object(props.value);
-  const isCollapsible = () => isObject() || typeof props.value === "string";
+  const isEmpty = () =>
+    Array.isArray(props.value) ?
+      (props.value as JSONType[]).length === 0
+    : Object.keys(props.value as object).length === 0;
+  const isCollapsible = () => (isObject() && !isEmpty()) || typeof props.value === "string";
   const summary = () => {
     if (typeof props.value === "string") {
       const len = props.value.length;
@@ -188,7 +192,7 @@ const CollapsibleItem = (props: {
     <span
       classList={{
         "group/indent flex gap-x-1 w-full": true,
-        "flex-col": isObject(),
+        "flex-col": isObject() && !isEmpty(),
       }}
     >
       <button
@@ -217,9 +221,9 @@ const CollapsibleItem = (props: {
       </button>
       <span
         classList={{
-          "self-center": !isObject(),
+          "self-center": !isObject() || isEmpty(),
           "pl-[calc(2ch-0.5px)] border-l-[0.5px] border-neutral-500/50 dark:border-neutral-400/50 has-hover:group-hover/indent:border-neutral-700 transition-colors dark:has-hover:group-hover/indent:border-neutral-400":
-            isObject(),
+            isObject() && !isEmpty(),
           "invisible h-0 overflow-hidden": !show(),
         }}
       >
@@ -386,7 +390,12 @@ const JSONValueInner = (props: {
   if (typeof data === "number") return <JSONNumber data={data} isSize={props.isSize} />;
   if (typeof data === "boolean") return <JSONBoolean data={data} />;
   if (data === null) return <JSONNull />;
-  if (Array.isArray(data)) return <JSONArray data={data} />;
+  if (Array.isArray(data))
+    return data.length === 0 ?
+        <span class="text-neutral-400 dark:text-neutral-500">[ ]</span>
+      : <JSONArray data={data} />;
+  if (Object.keys(data).length === 0)
+    return <span class="text-neutral-400 dark:text-neutral-500">{"{ }"}</span>;
   return <JSONObject data={data} />;
 };
 
