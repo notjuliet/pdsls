@@ -189,7 +189,7 @@ const CollapsibleItem = (props: {
       <button
         class="group/clip relative flex size-fit shrink-0 items-center gap-x-1 wrap-anywhere"
         classList={{
-          "max-w-[40%] sm:max-w-[50%]": props.maxWidth !== undefined,
+          "max-w-[40%] sm:max-w-[50%]": props.maxWidth !== undefined && show(),
           "text-indigo-500 hover:text-indigo-700 active:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 dark:active:text-indigo-200":
             !props.isIndex,
           "text-violet-500 hover:text-violet-700 active:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 dark:active:text-violet-200":
