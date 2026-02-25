@@ -80,7 +80,7 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
 
   return (
     <span>
-      "
+      <span class="text-neutral-500 dark:text-neutral-400">"</span>
       <For each={displayData().split(/(\s)/)}>
         {(part) => (
           <>
@@ -125,7 +125,7 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
       <Show when={isTruncated()}>
         <span>…</span>
       </Show>
-      "
+      <span class="text-neutral-500 dark:text-neutral-400">"</span>
       <Show when={isTruncated()}>
         <span class="ml-1 text-neutral-500 dark:text-neutral-400">
           (+{remainingChars().toLocaleString()})
@@ -153,6 +153,7 @@ const CollapsibleItem = (props: {
   isType?: boolean;
   isLink?: boolean;
   isSize?: boolean;
+  isIndex?: boolean;
   parentIsBlob?: boolean;
 }) => {
   const ctx = useJSONCtx();
@@ -186,9 +187,13 @@ const CollapsibleItem = (props: {
       }}
     >
       <button
-        class="group/clip relative flex size-fit shrink-0 items-center gap-x-1 wrap-anywhere text-neutral-500 hover:text-neutral-700 active:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 dark:active:text-neutral-300"
+        class="group/clip relative flex size-fit shrink-0 items-center gap-x-1 wrap-anywhere"
         classList={{
           "max-w-[40%] sm:max-w-[50%]": props.maxWidth !== undefined,
+          "text-indigo-500 hover:text-indigo-700 active:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 dark:active:text-indigo-200":
+            !props.isIndex,
+          "text-violet-500 hover:text-violet-700 active:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 dark:active:text-violet-200":
+            props.isIndex,
         }}
         onclick={() => isCollapsible() && setShow(!show())}
       >
@@ -204,7 +209,10 @@ const CollapsibleItem = (props: {
             : <span class="iconify lucide--chevron-right"></span>}
           </span>
         </Show>
-        {props.label}:
+        <span>
+          {props.label}
+          <span class="text-neutral-500 dark:text-neutral-400">:</span>
+        </span>
         <Show when={!show() && summary()}>
           <span class="text-neutral-400 dark:text-neutral-500">{summary()}</span>
         </Show>
@@ -368,7 +376,7 @@ const JSONArray = (props: { data: JSONType[] }) => {
     return <span class="text-neutral-400 dark:text-neutral-500">[ ]</span>;
   return (
     <For each={props.data}>
-      {(value, index) => <CollapsibleItem label={`#${index()}`} value={value} />}
+      {(value, index) => <CollapsibleItem label={`#${index()}`} value={value} isIndex />}
     </For>
   );
 };
@@ -383,8 +391,9 @@ const JSONValueInner = (props: {
   if (typeof data === "string")
     return <JSONString data={data} isType={props.isType} isLink={props.isLink} />;
   if (typeof data === "number") return <JSONNumber data={data} isSize={props.isSize} />;
-  if (typeof data === "boolean") return <span>{String(data)}</span>;
-  if (data === null) return <span>null</span>;
+  if (typeof data === "boolean")
+    return <span class="text-amber-500 dark:text-amber-400">{String(data)}</span>;
+  if (data === null) return <span class="text-neutral-400 dark:text-neutral-500">null</span>;
   if (Array.isArray(data)) return <JSONArray data={data} />;
   return <JSONObject data={data} />;
 };
