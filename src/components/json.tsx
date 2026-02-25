@@ -214,7 +214,9 @@ const CollapsibleItem = (props: {
           <span class="text-neutral-500 dark:text-neutral-400">:</span>
         </span>
         <Show when={!show() && summary()}>
-          <span class="text-neutral-400 dark:text-neutral-500">{summary()}</span>
+          <span class="absolute left-full ml-1 whitespace-nowrap text-neutral-400 dark:text-neutral-500">
+            {summary()}
+          </span>
         </Show>
       </button>
       <span
