@@ -145,7 +145,7 @@ export const Home = () => {
                 : "lucide--user-round"
               }
               title={sessions[agent()!.sub]?.handle ?? agent()!.sub}
-              description="View your repo"
+              description="View your repository"
               accent="blue"
             />
           </Show>
@@ -187,7 +187,7 @@ export const Home = () => {
             href="/car"
             icon="lucide--folder-archive"
             title="Archive"
-            description="Explore CAR files"
+            description="Unpack CAR files"
             accent="violet"
           />
         </div>
