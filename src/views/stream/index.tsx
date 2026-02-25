@@ -370,7 +370,7 @@ export const StreamView = () => {
                       spellcheck={false}
                       placeholder={field.placeholder}
                       value={(searchParams[field.searchParam] as string) ?? ""}
-                      class="dark:bg-dark-100 grow rounded-lg bg-white px-2 py-1 outline-1 outline-neutral-200 focus:outline-[1.5px] focus:outline-neutral-600 dark:outline-neutral-600 dark:focus:outline-neutral-400"
+                      class="dark:bg-dark-100 grow rounded-lg bg-white px-2 py-1 outline-1 outline-neutral-200 focus:outline-neutral-400 dark:outline-neutral-600 dark:focus:outline-neutral-400"
                     />
                   </Show>
                   <Show when={field.type === "text"}>

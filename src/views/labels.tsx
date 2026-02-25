@@ -237,7 +237,7 @@ export const LabelView = () => {
                 rows={2}
                 value={searchParams.uriPatterns ?? "*"}
                 placeholder="at://did:web:example.com/app.bsky.feed.post/*"
-                class="dark:bg-dark-100 grow rounded-lg bg-white px-2 py-1.5 text-sm outline-1 outline-neutral-200 focus:outline-[1.5px] focus:outline-neutral-600 dark:outline-neutral-600 dark:focus:outline-neutral-400"
+                class="dark:bg-dark-100 grow rounded-lg bg-white px-2 py-1.5 text-sm outline-1 outline-neutral-200 focus:outline-neutral-400 dark:outline-neutral-600 dark:focus:outline-neutral-400"
               />
             </label>
           </div>

@@ -49,24 +49,18 @@ export const Login = (props: LoginProps) => {
           <label for="username" class="hidden">
             Add account
           </label>
-          <div class="dark:bg-dark-100 flex grow items-center gap-2 rounded-lg bg-white px-2 outline-1 outline-neutral-200 focus-within:outline-[1.5px] focus-within:outline-neutral-600 dark:outline-neutral-600 dark:focus-within:outline-neutral-400">
-            <label
-              for="username"
-              class="iconify lucide--user-round-plus shrink-0 text-neutral-500 dark:text-neutral-400"
-            ></label>
-            <input
-              type="text"
-              spellcheck={false}
-              placeholder="user.bsky.social"
-              id="username"
-              name="username"
-              autocomplete="username"
-              ref={(el) => setTimeout(() => el.focus())}
-              aria-label="Your AT Protocol handle"
-              class="grow py-1 select-none placeholder:text-sm focus:outline-none"
-              onInput={(e) => setLoginInput(e.currentTarget.value)}
-            />
-          </div>
+          <input
+            type="text"
+            spellcheck={false}
+            placeholder="user.bsky.social"
+            id="username"
+            name="username"
+            autocomplete="username"
+            ref={(el) => setTimeout(() => el.focus())}
+            aria-label="Your AT Protocol handle"
+            class="dark:bg-dark-100 rounded-lg bg-white px-2.5 py-2 outline-1 outline-neutral-200 select-none focus:outline-neutral-400 dark:outline-neutral-600 dark:focus:outline-neutral-400"
+            onInput={(e) => setLoginInput(e.currentTarget.value)}
+          />
           <button
             onclick={() => initiateLogin(loginInput())}
             class="dark:hover:bg-dark-200 dark:active:bg-dark-100 flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700"
