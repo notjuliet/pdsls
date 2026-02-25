@@ -146,14 +146,6 @@ const JSONNumber = ({ data, isSize }: { data: number; isSize?: boolean }) => {
   );
 };
 
-const JSONBoolean = ({ data }: { data: boolean }) => {
-  return <span>{data ? "true" : "false"}</span>;
-};
-
-const JSONNull = () => {
-  return <span>null</span>;
-};
-
 const CollapsibleItem = (props: {
   label: string | number;
   value: JSONType;
@@ -182,10 +174,8 @@ const CollapsibleItem = (props: {
       const len = (props.value as JSONType[]).length;
       return `[ ${len} ${len === 1 ? "item" : "items"} ]`;
     }
-    if (isObject()) {
-      const len = Object.keys(props.value as object).length;
-      return `{ ${len} ${len === 1 ? "key" : "keys"} }`;
-    }
+    const len = Object.keys(props.value as object).length;
+    return `{ ${len} ${len === 1 ? "key" : "keys"} }`;
   };
 
   return (
@@ -356,6 +346,9 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
     );
   };
 
+  if (Object.keys(props.data).length === 0)
+    return <span class="text-neutral-400 dark:text-neutral-500">{"{ }"}</span>;
+
   if (blob.$type === "blob") {
     return (
       <>
@@ -371,6 +364,8 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
 };
 
 const JSONArray = (props: { data: JSONType[] }) => {
+  if (props.data.length === 0)
+    return <span class="text-neutral-400 dark:text-neutral-500">[ ]</span>;
   return (
     <For each={props.data}>
       {(value, index) => <CollapsibleItem label={`#${index()}`} value={value} />}
@@ -388,14 +383,9 @@ const JSONValueInner = (props: {
   if (typeof data === "string")
     return <JSONString data={data} isType={props.isType} isLink={props.isLink} />;
   if (typeof data === "number") return <JSONNumber data={data} isSize={props.isSize} />;
-  if (typeof data === "boolean") return <JSONBoolean data={data} />;
-  if (data === null) return <JSONNull />;
-  if (Array.isArray(data))
-    return data.length === 0 ?
-        <span class="text-neutral-400 dark:text-neutral-500">[ ]</span>
-      : <JSONArray data={data} />;
-  if (Object.keys(data).length === 0)
-    return <span class="text-neutral-400 dark:text-neutral-500">{"{ }"}</span>;
+  if (typeof data === "boolean") return <span>{String(data)}</span>;
+  if (data === null) return <span>null</span>;
+  if (Array.isArray(data)) return <JSONArray data={data} />;
   return <JSONObject data={data} />;
 };
 
