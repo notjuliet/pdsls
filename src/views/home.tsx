@@ -1,6 +1,6 @@
 import { A } from "@solidjs/router";
-import { JSX } from "solid-js";
-import { setOpenManager, setShowAddAccount } from "../auth/state";
+import { JSX, Show } from "solid-js";
+import { agent, avatars, sessions, setOpenManager, setShowAddAccount } from "../auth/state";
 import { setShowSearch } from "../components/search";
 
 const baseCardClass =
@@ -23,15 +23,17 @@ const accentIcon = {
 type Accent = "blue" | "orange" | "violet";
 
 const CardContent = (props: {
-  icon: string;
+  icon: string | JSX.Element;
   title: string;
   description: string;
   accent: Accent;
 }) => (
   <>
-    <span class="flex items-center gap-1.5 text-xs sm:text-base">
-      <span class={`${props.icon} iconify shrink-0 ${accentIcon[props.accent]}`} />
-      <span class="font-medium">{props.title}</span>
+    <span class="flex min-w-0 items-center gap-1.5 text-xs sm:text-base">
+      {typeof props.icon === "string" ?
+        <span class={`${props.icon} iconify shrink-0 ${accentIcon[props.accent]}`} />
+      : props.icon}
+      <span class="truncate font-medium">{props.title}</span>
     </span>
     <span class="text-xs text-neutral-500 sm:text-sm dark:text-neutral-400">
       {props.description}
@@ -41,7 +43,7 @@ const CardContent = (props: {
 
 const ButtonCard = (props: {
   onClick: () => void;
-  icon: string;
+  icon: string | JSX.Element;
   title: string;
   description: string;
   accent: Accent;
@@ -58,7 +60,7 @@ const ButtonCard = (props: {
 
 const LinkCard = (props: {
   href: string;
-  icon: string;
+  icon: string | JSX.Element;
   title: string;
   description: string;
   accent: Accent;
@@ -117,16 +119,36 @@ export const Home = () => {
             description="Find any user or record"
             accent="blue"
           />
-          <ButtonCard
-            onClick={() => {
-              setOpenManager(true);
-              setShowAddAccount(true);
-            }}
-            icon="lucide--user-round"
-            title="Sign in"
-            description="Manage records"
-            accent="blue"
-          />
+          <Show
+            when={agent()?.sub && sessions[agent()!.sub]?.signedIn}
+            fallback={
+              <ButtonCard
+                onClick={() => {
+                  setOpenManager(true);
+                  setShowAddAccount(true);
+                }}
+                icon="lucide--user-round"
+                title="Sign in"
+                description="Manage records"
+                accent="blue"
+              />
+            }
+          >
+            <LinkCard
+              href={`/at://${agent()!.sub}`}
+              icon={
+                avatars[agent()!.sub] ?
+                  <img
+                    src={avatars[agent()!.sub].replace("img/avatar/", "img/avatar_thumbnail/")}
+                    class="size-4 shrink-0 rounded-full sm:size-5"
+                  />
+                : "lucide--user-round"
+              }
+              title={sessions[agent()!.sub]?.handle ?? agent()!.sub}
+              description="View your repo"
+              accent="blue"
+            />
+          </Show>
         </div>
 
         <div class="grid grid-cols-3 gap-2">

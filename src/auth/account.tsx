@@ -2,7 +2,7 @@ import { Did } from "@atcute/lexicons";
 import { deleteStoredSession, getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { A } from "@solidjs/router";
 import { createEffect, For, onMount, Show } from "solid-js";
-import { createStore, produce } from "solid-js/store";
+import { produce } from "solid-js/store";
 import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
 import { Modal } from "../components/modal.jsx";
 import { Login } from "./login.jsx";
@@ -19,10 +19,12 @@ import {
 } from "./session-manager.js";
 import {
   agent,
+  avatars,
   openManager,
   pendingPermissionEdit,
   sessions,
   setAgent,
+  setAvatars,
   setOpenManager,
   setPendingPermissionEdit,
   setSessions,
@@ -74,8 +76,6 @@ const AccountDropdown = (props: { did: Did; onEditPermissions: (did: Did) => voi
 };
 
 export const AccountManager = () => {
-  const [avatars, setAvatars] = createStore<Record<Did, string>>();
-
   const getThumbnailUrl = (avatarUrl: string) => {
     return avatarUrl.replace("img/avatar/", "img/avatar_thumbnail/");
   };
