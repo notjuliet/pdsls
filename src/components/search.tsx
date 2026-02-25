@@ -50,6 +50,34 @@ const removeRecentSearch = (path: string) => {
 
 export const [showSearch, setShowSearch] = createSignal(false);
 
+const EXAMPLES: (RecentSearch & { prefix: string })[] = [
+  {
+    path: "/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2",
+    label: "retr0.id",
+    type: "handle",
+    prefix: "@",
+  },
+  {
+    path: "/at://did:plc:ia76kvnndjutgedggx2ibrem/app.bsky.actor.profile/self",
+    label: "mary.my.id/app.bsky.actor.profile/self",
+    type: "at-uri",
+    prefix: "at://",
+  },
+  { path: "/npmx.social", label: "npmx.social", type: "pds", prefix: "pds:" },
+  {
+    path: "/at://did:plc:4v4y5r3lwsbtmsxhile2ljac/com.atproto.lexicon.schema/app.bsky.feed.post#schema",
+    label: "app.bsky.feed.post",
+    type: "lexicon",
+    prefix: "lex:",
+  },
+  {
+    path: "/at://did:plc:oisofpd7lj26yvgiivf3lxsi/app.bsky.feed.post/3mfflamxxvk2t",
+    label: "bsky.app/profile/hailey.at/post/3mfflamxxvk2t",
+    type: "at-uri",
+    prefix: "https://",
+  },
+];
+
 const SEARCH_PREFIXES: { prefix: string; description: string }[] = [
   { prefix: "@", description: "example.com" },
   { prefix: "did:", description: "web:example.com" },
@@ -343,11 +371,40 @@ export const Search = () => {
           />
         </div>
 
-        <Show when={getRecentSuggestions().length > 0 || search()?.length}>
+        <Show
+          when={
+            getRecentSuggestions().length > 0 ||
+            search()?.length ||
+            (!input() && recentSearches().length === 0)
+          }
+        >
           <div
-            class={`flex w-full flex-col overflow-hidden border-t border-neutral-200 dark:border-neutral-700 ${input() ? "rounded-b-md" : ""}`}
+            class="flex w-full flex-col overflow-hidden rounded-b-md border-t border-neutral-200 dark:border-neutral-700"
             onMouseDown={(e) => e.preventDefault()}
           >
+            {/* Suggestions (shown when no recents and no input) */}
+            <Show when={!input() && recentSearches().length === 0}>
+              <div class="mt-2 mb-1 flex px-3">
+                <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                  Examples
+                </span>
+              </div>
+              <For each={EXAMPLES}>
+                {(example) => (
+                  <A
+                    href={example.path}
+                    class="dark:hover:bg-dark-100 flex items-center gap-2 px-3 py-2 text-sm hover:bg-neutral-100"
+                    onClick={() => setShowSearch(false)}
+                  >
+                    <span class="truncate">
+                      <span class="text-neutral-500 dark:text-neutral-400">{example.prefix}</span>
+                      {example.label}
+                    </span>
+                  </A>
+                )}
+              </For>
+            </Show>
+
             {/* Recent searches */}
             <Show when={getRecentSuggestions().length > 0}>
               <div class="mt-2 mb-1 flex items-center justify-between px-3">
@@ -446,26 +503,6 @@ export const Search = () => {
                 );
               }}
             </For>
-          </div>
-        </Show>
-        <Show when={!input()}>
-          <div class="flex flex-col gap-1 border-t border-neutral-200 px-3 py-2 text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">
-            <div class="flex flex-wrap gap-1.5">
-              <div>
-                @<span class="text-neutral-400 dark:text-neutral-500">retr0.id</span>
-              </div>
-              <div>did:</div>
-              <div>at://</div>
-              <div>
-                lex:
-                <span class="text-neutral-400 dark:text-neutral-500">app.bsky.feed.post</span>
-              </div>
-              <div>
-                pds:
-                <span class="text-neutral-400 dark:text-neutral-500">tngl.sh</span>
-              </div>
-            </div>
-            <span>Bluesky, Tangled, Pinksea, Popfeed, or Blento links</span>
           </div>
         </Show>
       </form>

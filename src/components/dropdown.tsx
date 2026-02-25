@@ -37,7 +37,9 @@ export const CopyMenu = (props: { content: string; label: string; icon?: string 
       class="flex items-center gap-2 rounded-md p-1.5 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
     >
       <Show when={props.icon}>
-        <span class={"iconify shrink-0 " + props.icon}></span>
+        <span
+          class={"iconify shrink-0 text-neutral-500 dark:text-neutral-400 " + props.icon}
+        ></span>
       </Show>
       <span class="whitespace-nowrap">{props.label}</span>
     </button>
@@ -64,7 +66,9 @@ export const NavMenu = (props: {
     >
       <div class="flex items-center gap-2">
         <Show when={props.icon}>
-          <span class={"iconify shrink-0 " + props.icon}></span>
+          <span
+            class={"iconify shrink-0 text-neutral-500 dark:text-neutral-400 " + props.icon}
+          ></span>
         </Show>
         <span class="whitespace-nowrap">{props.label}</span>
       </div>
@@ -92,7 +96,9 @@ export const ActionMenu = (props: { label: string; icon: string; onClick: () => 
       class="flex items-center gap-2 rounded-md p-1.5 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
     >
       <Show when={props.icon}>
-        <span class={"iconify shrink-0 " + props.icon}></span>
+        <span
+          class={"iconify shrink-0 text-neutral-500 dark:text-neutral-400 " + props.icon}
+        ></span>
       </Show>
       <span class="whitespace-nowrap">{props.label}</span>
     </button>
