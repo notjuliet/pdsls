@@ -167,37 +167,59 @@ const CollapsibleItem = (props: {
   const [show, setShow] = createSignal(true);
   const isBlobContext = props.parentIsBlob ?? ctx.parentIsBlob;
 
+  const isObject = () => props.value === Object(props.value);
+  const isCollapsible = () => isObject() || typeof props.value === "string";
+  const summary = () => {
+    if (typeof props.value === "string") {
+      const len = props.value.length;
+      return `${len.toLocaleString()} ${len === 1 ? "char" : "chars"}`;
+    }
+    if (Array.isArray(props.value)) {
+      const len = (props.value as JSONType[]).length;
+      return `[ ${len} ${len === 1 ? "item" : "items"} ]`;
+    }
+    if (isObject()) {
+      const len = Object.keys(props.value as object).length;
+      return `{ ${len} ${len === 1 ? "key" : "keys"} }`;
+    }
+  };
+
   return (
     <span
       classList={{
         "group/indent flex gap-x-1 w-full": true,
-        "flex-col": props.value === Object(props.value),
+        "flex-col": isObject(),
       }}
     >
       <button
-        class="group/clip relative flex size-fit shrink-0 items-center wrap-anywhere text-neutral-500 hover:text-neutral-700 active:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 dark:active:text-neutral-300"
+        class="group/clip relative flex size-fit shrink-0 items-center gap-x-1 wrap-anywhere text-neutral-500 hover:text-neutral-700 active:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 dark:active:text-neutral-300"
         classList={{
           "max-w-[40%] sm:max-w-[50%]": props.maxWidth !== undefined,
         }}
-        onclick={() => setShow(!show())}
+        onclick={() => isCollapsible() && setShow(!show())}
       >
-        <span
-          classList={{
-            "dark:bg-dark-500 absolute w-4 flex items-center -left-4 bg-neutral-100 text-sm": true,
-            "hidden group-hover/clip:flex": show(),
-          }}
-        >
-          {show() ?
-            <span class="iconify lucide--chevron-down"></span>
-          : <span class="iconify lucide--chevron-right"></span>}
-        </span>
+        <Show when={isCollapsible()}>
+          <span
+            classList={{
+              "dark:bg-dark-500 absolute w-4 flex items-center -left-4 bg-neutral-100 text-sm": true,
+              "hidden group-hover/clip:flex": show(),
+            }}
+          >
+            {show() ?
+              <span class="iconify lucide--chevron-down"></span>
+            : <span class="iconify lucide--chevron-right"></span>}
+          </span>
+        </Show>
         {props.label}:
+        <Show when={!show() && summary()}>
+          <span class="text-neutral-400 dark:text-neutral-500">{summary()}</span>
+        </Show>
       </button>
       <span
         classList={{
-          "self-center": props.value !== Object(props.value),
+          "self-center": !isObject(),
           "pl-[calc(2ch-0.5px)] border-l-[0.5px] border-neutral-500/50 dark:border-neutral-400/50 has-hover:group-hover/indent:border-neutral-700 transition-colors dark:has-hover:group-hover/indent:border-neutral-400":
-            props.value === Object(props.value),
+            isObject(),
           "invisible h-0 overflow-hidden": !show(),
         }}
       >
