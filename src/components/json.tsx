@@ -200,7 +200,7 @@ const CollapsibleItem = (props: {
         <Show when={isCollapsible()}>
           <span
             classList={{
-              "dark:bg-dark-500 absolute w-4 flex items-center -left-4 bg-neutral-100 text-sm": true,
+              "dark:bg-dark-500 absolute w-4 text-neutral-500 dark:text-neutral-400 flex items-center -left-4 bg-neutral-100 text-sm": true,
               "hidden group-hover/clip:flex": show(),
             }}
           >
