@@ -29,11 +29,13 @@ const CardContent = (props: {
   accent: Accent;
 }) => (
   <>
-    <span class="flex items-center gap-1.5 text-xs sm:text-sm">
+    <span class="flex items-center gap-1.5 text-xs sm:text-base">
       <span class={`${props.icon} iconify shrink-0 ${accentIcon[props.accent]}`} />
       <span class="font-medium">{props.title}</span>
     </span>
-    <span class="text-xs text-neutral-500 dark:text-neutral-400">{props.description}</span>
+    <span class="text-xs text-neutral-500 sm:text-sm dark:text-neutral-400">
+      {props.description}
+    </span>
   </>
 );
 
@@ -169,7 +171,7 @@ export const Home = () => {
         </div>
       </div>
 
-      <div class="flex justify-center gap-1.5 text-sm text-neutral-600 sm:gap-2 dark:text-neutral-300">
+      <div class="flex justify-center gap-1.5 text-sm text-neutral-600 sm:gap-2 sm:text-base dark:text-neutral-300">
         <FooterLink href="https://raycast.com/juliet_philippe/pdsls" color="after:text-[#FF6363]">
           <span class="iconify-color i-raycast-light block dark:hidden"></span>
           <span class="iconify-color i-raycast-dark hidden dark:block"></span>
