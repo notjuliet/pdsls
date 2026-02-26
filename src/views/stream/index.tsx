@@ -7,6 +7,7 @@ import DidHoverCard from "../../components/hover-card/did";
 import { JSONValue } from "../../components/json";
 import { TextInput } from "../../components/text-input";
 import { addToClipboard } from "../../utils/copy";
+import { websocketCloseReasons } from "../../utils/websocket";
 import { getStreamType, STREAM_CONFIGS, STREAM_TYPES, StreamType } from "./config";
 import { StreamStats, StreamStatsPanel } from "./stats";
 
@@ -183,6 +184,14 @@ export const StreamView = () => {
     setStats((prev) => ({ ...prev, eventsPerSecond: 0 }));
   };
 
+  const onWebsocketClose = (event: CloseEvent) => {
+    const code = event.code.toString();
+    if (code === "1000" || code === "1005") return;
+
+    setNotice(`Connection closed: ${websocketCloseReasons[code] ?? "Unknown reason"}`);
+    disconnect();
+  };
+
   const connectStream = async (formData: FormData) => {
     setNotice("");
     if (connected()) {
@@ -251,7 +260,9 @@ export const StreamView = () => {
         if (!isFilteredEvent || streamType !== "jetstream" || searchParams.allEvents === "on")
           addRecord(rec);
       });
+      socket.addEventListener("close", onWebsocketClose);
       socket.addEventListener("error", () => {
+        socket.removeEventListener("close", onWebsocketClose);
         setNotice("Connection error");
         disconnect();
       });
@@ -262,7 +273,9 @@ export const StreamView = () => {
         cursor: cursor,
         autoReconnect: false,
       });
+      firehose.ws.addEventListener("close", onWebsocketClose);
       firehose.on("error", (err) => {
+        firehose.ws.removeEventListener("close", onWebsocketClose);
         console.error(err);
         const message = err instanceof Error ? err.message : "Unknown error";
         setNotice(`Connection error: ${message}`);
