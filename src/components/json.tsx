@@ -8,9 +8,11 @@ import {
   ErrorBoundary,
   For,
   on,
+  onCleanup,
   Show,
   useContext,
 } from "solid-js";
+import { Portal } from "solid-js/web";
 import { resolveLexiconAuthority } from "../utils/api";
 import { formatFileSize } from "../utils/format";
 import { hideMedia } from "../views/settings";
@@ -288,6 +290,14 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
     (blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4");
 
   const MediaDisplay = () => {
+    const [expanded, setExpanded] = createSignal(false);
+
+    createEffect(() => {
+      if (!expanded()) return;
+      const handler = (e: KeyboardEvent) => { if (e.key === "Escape") setExpanded(false); };
+      window.addEventListener("keydown", handler);
+      onCleanup(() => window.removeEventListener("keydown", handler));
+    });
     const [imageUrl] = createResource(
       () => (blob.mimeType.startsWith("image/") ? blob.ref.$link : null),
       async (cid) => {
@@ -318,10 +328,24 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
                 }
               >
                 <img
-                  class="h-auto max-h-48 max-w-64 object-contain"
+                  class="h-auto max-h-48 max-w-64 cursor-zoom-in object-contain"
                   src={imageUrl()}
                   onLoad={() => setMediaLoaded(true)}
+                  onclick={() => setExpanded(true)}
                 />
+                <Show when={expanded()}>
+                  <Portal>
+                    <div
+                      class="fixed inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-black/80"
+                      onclick={() => setExpanded(false)}
+                    >
+                      <img
+                        class="max-h-screen max-w-screen object-contain"
+                        src={imageUrl()}
+                      />
+                    </div>
+                  </Portal>
+                </Show>
               </Show>
             </Show>
             <Show when={blob.mimeType === "video/mp4"}>
