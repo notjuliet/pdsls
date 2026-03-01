@@ -22,6 +22,8 @@ export const appList: Record<AppUrl, App> = {
   "bsky.app": App.Bluesky,
   "catsky.social": App.Bluesky,
   "deer.social": App.Bluesky,
+  "deer-social-ayla.pages.dev": App.Bluesky,
+  "deer.aylac.top": App.Bluesky,
   "main.bsky.dev": App.Bluesky,
   "witchsky.app": App.Bluesky,
   "tangled.org": App.Tangled,
