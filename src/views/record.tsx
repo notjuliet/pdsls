@@ -384,8 +384,7 @@ export const RecordView = () => {
     error?: boolean;
   }) => {
     const isActive = () => {
-      if (!location.hash && props.tab === "record") return true;
-      if (props.tab === "record") return location.hash.startsWith("#record");
+      if (props.tab === "record") return !location.hash || location.hash.startsWith("#record");
       if (location.hash === `#${props.tab}`) return true;
       if (props.tab === "schema" && location.hash.startsWith("#schema:")) return true;
       return false;

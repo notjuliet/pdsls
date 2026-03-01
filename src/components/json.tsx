@@ -230,7 +230,7 @@ const CollapsibleItem = (props: {
         <Show when={!show() && summary()}>
           <button
             type="button"
-            class="flex items-center gap-0.5 rounded bg-neutral-200 px-1 py-0.5 text-xs whitespace-nowrap text-neutral-500 hover:bg-neutral-300 hover:text-neutral-700 dark:bg-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-600 dark:hover:text-neutral-200"
+            class="flex items-center gap-0.5 rounded bg-neutral-200 px-1 text-xs whitespace-nowrap text-neutral-500 hover:bg-neutral-300 hover:text-neutral-700 sm:py-0.5 dark:bg-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-600 dark:hover:text-neutral-200"
             onclick={() => setShow(true)}
           >
             <span class="iconify lucide--chevron-right"></span>
