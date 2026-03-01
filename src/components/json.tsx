@@ -197,7 +197,6 @@ const CollapsibleItem = (props: {
 
   return (
     <span
-      id={`key-${fullPath()}`}
       classList={{
         "group/indent flex gap-x-1 w-full": true,
         "flex-col": isObject() && !isEmpty(),
@@ -209,6 +208,7 @@ const CollapsibleItem = (props: {
       >
         <a
           href={`#record:${fullPath()}`}
+          id={`key-${fullPath()}`}
           class="group/key rounded"
           classList={{
             "text-indigo-500 hover:text-indigo-700 active:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 dark:active:text-indigo-200":
