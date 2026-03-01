@@ -550,7 +550,7 @@ export const RecordView = () => {
             </div>
             <Show when={!location.hash || location.hash.startsWith("#record")}>
               <div class="w-full max-w-screen min-w-full px-2 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-max sm:text-sm md:max-w-3xl">
-                <JSONValue data={record()?.value as any} repo={record()!.uri.split("/")[2]} />
+                <JSONValue data={record()?.value as any} repo={record()!.uri.split("/")[2]} keyLinks />
               </div>
             </Show>
             <Show when={location.hash === "#schema" || location.hash.startsWith("#schema:")}>
