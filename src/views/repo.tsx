@@ -105,8 +105,7 @@ export const RepoView = () => {
         if (!!error() && props.tab === "identity") return true;
         return false;
       }
-      if (props.tab === "collections")
-        return location.hash === "#collections" || location.hash.startsWith("#collections:");
+      if (props.tab === "collections") return location.hash.startsWith("#collections");
       return location.hash === `#${props.tab}`;
     };
 
@@ -464,7 +463,7 @@ export const RepoView = () => {
                       return (
                         <div
                           id={`collection-${authority}`}
-                          class="group flex items-start gap-2 rounded-lg p-1 transition-colors"
+                          class="group flex items-start gap-2 rounded-lg p-1 transition-colors scroll-mt-4"
                           classList={{
                             "dark:hover:bg-dark-300 hover:bg-neutral-200": !isHighlighted(),
                             "bg-blue-100 dark:bg-blue-500/25": isHighlighted(),

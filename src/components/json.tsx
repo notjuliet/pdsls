@@ -1,5 +1,5 @@
 import { isCid, isDid, isNsid, isResourceUri, Nsid } from "@atcute/lexicons/syntax";
-import { A, useNavigate, useParams } from "@solidjs/router";
+import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import {
   createContext,
   createEffect,
@@ -28,6 +28,7 @@ interface JSONContext {
   parentIsBlob?: boolean;
   newTab?: boolean;
   hideBlobs?: boolean;
+  path?: string;
 }
 
 const JSONCtx = createContext<JSONContext>();
@@ -159,20 +160,33 @@ const CollapsibleItem = (props: {
   parentIsBlob?: boolean;
 }) => {
   const ctx = useJSONCtx();
+  const location = useLocation();
   const [show, setShow] = createSignal(true);
   const isBlobContext = props.parentIsBlob ?? ctx.parentIsBlob;
+
+  const labelStr = () => {
+    const l = String(props.label);
+    return l.startsWith("#") ? l.slice(1) : l;
+  };
+  const fullPath = () => (ctx.path ? `${ctx.path}.${labelStr()}` : labelStr());
+  const isHighlighted = () => location.hash === `#record:${fullPath()}`;
+
+  createEffect(() => {
+    if (isHighlighted()) {
+      requestAnimationFrame(() => {
+        document
+          .getElementById(`key-${fullPath()}`)
+          ?.scrollIntoView({ behavior: "instant", block: "center" });
+      });
+    }
+  });
 
   const isObject = () => props.value === Object(props.value);
   const isEmpty = () =>
     Array.isArray(props.value) ?
       (props.value as JSONType[]).length === 0
     : Object.keys(props.value as object).length === 0;
-  const isCollapsible = () => (isObject() && !isEmpty()) || typeof props.value === "string";
   const summary = () => {
-    if (typeof props.value === "string") {
-      const len = props.value.length;
-      return `${len.toLocaleString()} ${len === 1 ? "char" : "chars"}`;
-    }
     if (Array.isArray(props.value)) {
       const len = (props.value as JSONType[]).length;
       return `[ ${len} ${len === 1 ? "item" : "items"} ]`;
@@ -183,53 +197,63 @@ const CollapsibleItem = (props: {
 
   return (
     <span
+      id={`key-${fullPath()}`}
       classList={{
         "group/indent flex gap-x-1 w-full": true,
         "flex-col": isObject() && !isEmpty(),
       }}
     >
-      <button
-        class="group/clip relative flex size-fit shrink-0 items-center gap-x-1 wrap-anywhere"
-        classList={{
-          "max-w-[40%] sm:max-w-[50%]": props.maxWidth !== undefined && show(),
-          "text-indigo-500 hover:text-indigo-700 active:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 dark:active:text-indigo-200":
-            !props.isIndex,
-          "text-violet-500 hover:text-violet-700 active:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 dark:active:text-violet-200":
-            props.isIndex,
-        }}
-        onclick={() => isCollapsible() && setShow(!show())}
+      <span
+        class="relative flex size-fit shrink-0 items-center gap-x-1 wrap-anywhere"
+        classList={{ "max-w-[40%] sm:max-w-[50%]": props.maxWidth !== undefined && show() }}
       >
-        <Show when={isCollapsible()}>
-          <span
-            classList={{
-              "dark:bg-dark-500 absolute w-4 text-neutral-500 dark:text-neutral-400 flex items-center -left-4 bg-neutral-100 text-sm": true,
-              "hidden group-hover/clip:flex": show(),
-            }}
-          >
-            {show() ?
-              <span class="iconify lucide--chevron-down"></span>
-            : <span class="iconify lucide--chevron-right"></span>}
+        <a
+          href={`#record:${fullPath()}`}
+          class="group/key rounded"
+          classList={{
+            "text-indigo-500 hover:text-indigo-700 active:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 dark:active:text-indigo-200":
+              !props.isIndex && !isHighlighted(),
+            "text-violet-500 hover:text-violet-700 active:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 dark:active:text-violet-200":
+              props.isIndex && !isHighlighted(),
+            "bg-indigo-200 text-indigo-700 dark:bg-indigo-500/60 dark:text-indigo-200":
+              isHighlighted() && !props.isIndex,
+            "bg-violet-200 text-violet-700 dark:bg-violet-500/60 dark:text-violet-200":
+              isHighlighted() && props.isIndex,
+          }}
+        >
+          <span class="absolute top-1/2 -left-3.5 flex -translate-y-1/2 items-center text-xs text-neutral-500 opacity-0 transition-opacity group-hover/key:opacity-100 dark:text-neutral-400">
+            <span class="iconify lucide--link"></span>
           </span>
-        </Show>
-        <span>
           {props.label}
           <span class="text-neutral-500 dark:text-neutral-400">:</span>
-        </span>
+        </a>
         <Show when={!show() && summary()}>
-          <span class="absolute left-full ml-1 whitespace-nowrap text-neutral-400 dark:text-neutral-500">
+          <button
+            type="button"
+            class="flex items-center gap-0.5 rounded bg-neutral-200 px-1 py-0.5 text-xs whitespace-nowrap text-neutral-500 hover:bg-neutral-300 hover:text-neutral-700 dark:bg-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-600 dark:hover:text-neutral-200"
+            onclick={() => setShow(true)}
+          >
+            <span class="iconify lucide--chevron-right"></span>
             {summary()}
-          </span>
+          </button>
         </Show>
-      </button>
+      </span>
       <span
         classList={{
           "self-center": !isObject() || isEmpty(),
-          "pl-[calc(2ch-0.5px)] border-l-[0.5px] border-neutral-500/50 dark:border-neutral-400/50 has-hover:group-hover/indent:border-neutral-700 transition-colors dark:has-hover:group-hover/indent:border-neutral-400":
-            isObject() && !isEmpty(),
+          "relative pl-[2ch]": isObject() && !isEmpty(),
           "invisible h-0 overflow-hidden": !show(),
         }}
       >
-        <JSONCtx.Provider value={{ ...ctx, parentIsBlob: isBlobContext }}>
+        <Show when={isObject() && !isEmpty()}>
+          <span
+            class="group/fold absolute inset-y-0 left-0 z-10 flex w-4 -translate-x-1/2 items-center justify-center"
+            onclick={() => setShow(!show())}
+          >
+            <span class="h-full w-px bg-neutral-300 transition-colors group-hover/fold:bg-neutral-600 dark:bg-neutral-600 dark:group-hover/fold:bg-neutral-300" />
+          </span>
+        </Show>
+        <JSONCtx.Provider value={{ ...ctx, parentIsBlob: isBlobContext, path: fullPath() }}>
           <JSONValueInner
             data={props.value}
             isType={props.isType}
@@ -294,7 +318,9 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
 
     createEffect(() => {
       if (!expanded()) return;
-      const handler = (e: KeyboardEvent) => { if (e.key === "Escape") setExpanded(false); };
+      const handler = (e: KeyboardEvent) => {
+        if (e.key === "Escape") setExpanded(false);
+      };
       window.addEventListener("keydown", handler);
       onCleanup(() => window.removeEventListener("keydown", handler));
     });
@@ -339,10 +365,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
                       class="fixed inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-black/80"
                       onclick={() => setExpanded(false)}
                     >
-                      <img
-                        class="max-h-screen max-w-screen object-contain"
-                        src={imageUrl()}
-                      />
+                      <img class="max-h-screen max-w-screen object-contain" src={imageUrl()} />
                     </div>
                   </Portal>
                 </Show>

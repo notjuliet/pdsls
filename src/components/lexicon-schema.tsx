@@ -475,7 +475,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
   const hasDefContent = () => props.def.refs || props.def.items || hasConstraints(props.def);
 
   return (
-    <div class="flex flex-col gap-3" id={`def-${props.name}`}>
+    <div class="flex flex-col gap-3 scroll-mt-4" id={`def-${props.name}`}>
       <div class="group flex items-center gap-2">
         <a href={`#schema:${props.name}`} class="relative text-lg font-semibold hover:underline">
           <span class="iconify lucide--link absolute top-1/2 -left-6 -translate-y-1/2 text-base opacity-0 transition-opacity group-hover:opacity-100" />

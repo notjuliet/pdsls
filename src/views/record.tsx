@@ -385,6 +385,7 @@ export const RecordView = () => {
   }) => {
     const isActive = () => {
       if (!location.hash && props.tab === "record") return true;
+      if (props.tab === "record") return location.hash.startsWith("#record");
       if (location.hash === `#${props.tab}`) return true;
       if (props.tab === "schema" && location.hash.startsWith("#schema:")) return true;
       return false;
@@ -548,7 +549,7 @@ export const RecordView = () => {
                 </MenuProvider>
               </div>
             </div>
-            <Show when={!location.hash || location.hash === "#record"}>
+            <Show when={!location.hash || location.hash.startsWith("#record")}>
               <div class="w-full max-w-screen min-w-full px-2 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-max sm:text-sm md:max-w-3xl">
                 <JSONValue data={record()?.value as any} repo={record()!.uri.split("/")[2]} />
               </div>
