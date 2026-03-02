@@ -426,7 +426,7 @@ const CollectionView = () => {
             </div>
 
             {/* Pagination */}
-            <div class="flex w-full max-w-lg items-center justify-between">
+            <div class="flex min-h-7.5 w-full max-w-lg items-center justify-between">
               <Button
                 onClick={() => {
                   const newReverse = !reverse();
