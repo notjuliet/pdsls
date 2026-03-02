@@ -147,7 +147,7 @@ export const PdsView = () => {
             <Tab tab="firehose" label="Firehose" />
           </div>
           <Show when={!location.hash || location.hash === "#repos"}>
-            <div class="-mx-2 flex flex-col pb-20">
+            <div class="-mx-2 flex flex-col pb-12">
               <For each={repos()}>{(repo) => <RepoCard {...repo} />}</For>
             </div>
           </Show>
@@ -243,8 +243,8 @@ export const PdsView = () => {
           </div>
         </div>
         <Show when={!location.hash || location.hash === "#repos"}>
-          <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 pt-2 pb-4">
-            <div class="flex items-center gap-3 pb-2">
+          <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center border-t border-neutral-200 bg-neutral-100 pt-3 pb-6 dark:border-neutral-700">
+            <div class="flex items-center gap-3">
               <p>
                 {repos()?.length} loaded
                 <Show when={repos()?.some((r) => !r.active)}>

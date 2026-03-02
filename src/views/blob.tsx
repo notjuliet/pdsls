@@ -45,8 +45,8 @@ export const BlobView = (props: { pds: string; repo: string }) => {
           </For>
         </div>
       </Show>
-      <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 pt-2 pb-4">
-        <div class="flex min-w-50 items-center justify-around gap-3 pb-2">
+      <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center border-t border-neutral-200 bg-neutral-100 pt-3 pb-6 dark:border-neutral-700">
+        <div class="flex min-w-50 items-center justify-around gap-3">
           <p>
             {blobs()?.length} blob{(blobs()?.length ?? 0 > 1) ? "s" : ""}
           </p>
