@@ -8,10 +8,11 @@ import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { Button } from "../components/button.jsx";
 import DidHoverCard from "../components/hover-card/did.jsx";
 import RecordHoverCard from "../components/hover-card/record.jsx";
-import { StickyOverlay } from "../components/sticky.jsx";
 import { TextInput } from "../components/text-input.jsx";
+import { canHover } from "../layout.jsx";
 import { labelerCache, resolveHandle, resolvePDS } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
+import { useFilterShortcut } from "../utils/keyboard.js";
 
 const LABELS_PER_PAGE = 50;
 const DEFAULT_LABELER_DID = "did:plc:ar7c4by46qjdydhdevvrndac";
@@ -67,6 +68,7 @@ export const LabelView = () => {
 
   let rpc: Client | undefined;
   let formRef!: HTMLFormElement;
+  let filterInputRef: HTMLInputElement | undefined;
 
   const filteredLabels = createMemo(() => {
     const filterValue = filter().trim();
@@ -116,6 +118,8 @@ export const LabelView = () => {
   const hasSearched = createMemo(() => Boolean(searchParams.uriPatterns));
 
   onMount(async () => {
+    useFilterShortcut(() => filterInputRef);
+
     if (searchParams.did && searchParams.uriPatterns) {
       const formData = new FormData();
       formData.append("did", searchParams.did.toString());
@@ -128,7 +132,7 @@ export const LabelView = () => {
     let did = formData.get("did")?.toString()?.trim() || DEFAULT_LABELER_DID;
     const uriPatterns = formData.get("uriPatterns")?.toString()?.trim();
 
-    if (!did || !uriPatterns) {
+    if (!uriPatterns) {
       setError("Please provide both DID and URI patterns");
       return;
     }
@@ -244,43 +248,7 @@ export const LabelView = () => {
         </form>
 
         <Show when={hasSearched()}>
-          <StickyOverlay>
-            <div class="flex w-full items-center gap-x-2">
-              <TextInput
-                placeholder="Filter labels (* for partial, -exclude)"
-                name="filter"
-                value={filter()}
-                onInput={(e) => setFilter(e.currentTarget.value)}
-                class="min-w-0 grow text-sm placeholder:text-xs"
-              />
-              <div class="flex shrink-0 items-center gap-x-2 text-sm">
-                <Show when={labels().length > 0}>
-                  <span class="whitespace-nowrap text-neutral-600 dark:text-neutral-400">
-                    {filteredLabels().length}/{labels().length}
-                  </span>
-                </Show>
-
-                <Show when={cursor()}>
-                  <Button
-                    onClick={handleLoadMore}
-                    disabled={loading()}
-                    classList={{ "w-20 h-7.5 justify-center": true }}
-                  >
-                    <Show
-                      when={!loading()}
-                      fallback={
-                        <span class="iconify lucide--loader-circle animate-spin text-base" />
-                      }
-                    >
-                      Load more
-                    </Show>
-                  </Button>
-                </Show>
-              </div>
-            </div>
-          </StickyOverlay>
-
-          <div class="w-full max-w-3xl py-2">
+          <div class="w-full max-w-3xl py-2 pb-20">
             <Show when={loading() && labels().length === 0}>
               <div class="flex flex-col items-center justify-center py-12 text-center">
                 <span class="iconify lucide--loader-circle mb-3 animate-spin text-4xl text-neutral-400" />
@@ -311,6 +279,65 @@ export const LabelView = () => {
                 </div>
               </Show>
             </Show>
+          </div>
+
+          <div class="dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 border-t border-neutral-200 bg-neutral-100 px-3 pt-3 pb-6 dark:border-neutral-700">
+            <div
+              class="dark:bg-dark-200 flex w-full max-w-lg cursor-text items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 dark:border-neutral-700"
+              onClick={(e) => {
+                const input = e.currentTarget.querySelector("input");
+                if (e.target !== input) input?.focus();
+              }}
+            >
+              <span class="iconify lucide--filter text-neutral-500 dark:text-neutral-400" />
+              <input
+                ref={filterInputRef}
+                type="text"
+                spellcheck={false}
+                autocapitalize="off"
+                autocomplete="off"
+                class="grow py-2 select-none placeholder:text-sm focus:outline-none"
+                placeholder="Filter labels... (* for partial, -exclude)"
+                value={filter()}
+                onInput={(e) => setFilter(e.currentTarget.value)}
+              />
+              <Show when={canHover && !filter()}>
+                <kbd class="rounded border border-neutral-200 bg-neutral-50 px-1.5 py-0.5 font-mono text-xs text-neutral-400 select-none dark:border-neutral-600 dark:bg-neutral-700">
+                  /
+                </kbd>
+              </Show>
+            </div>
+
+            <div class="flex min-h-7.5 w-full max-w-lg items-center justify-between">
+              <div class="w-20" />
+
+              <div>
+                <Show when={filter()}>
+                  <span>{filteredLabels().length}</span>
+                  <span>/</span>
+                </Show>
+                <span>{labels().length} labels</span>
+              </div>
+
+              <div class="flex w-20 items-center justify-end">
+                <Show when={cursor()}>
+                  <Button
+                    onClick={handleLoadMore}
+                    disabled={loading()}
+                    classList={{ "w-20 h-7.5 justify-center": true }}
+                  >
+                    <Show
+                      when={!loading()}
+                      fallback={
+                        <span class="iconify lucide--loader-circle animate-spin text-base" />
+                      }
+                    >
+                      Load more
+                    </Show>
+                  </Button>
+                </Show>
+              </div>
+            </div>
           </div>
         </Show>
       </div>

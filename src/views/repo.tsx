@@ -9,7 +9,6 @@ import {
   createSignal,
   ErrorBoundary,
   For,
-  onCleanup,
   onMount,
   Show,
   Suspense,
@@ -42,6 +41,7 @@ import {
   validateHandle,
 } from "../utils/api.js";
 import { detectDidKeyType, detectKeyType } from "../utils/key.js";
+import { useFilterShortcut } from "../utils/keyboard.js";
 import { BlobView } from "./blob.jsx";
 import { PlcLogView } from "./logs.jsx";
 import { plcDirectory } from "./settings.jsx";
@@ -80,19 +80,7 @@ export const RepoView = () => {
   });
 
   onMount(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        e.key === "/" &&
-        !["INPUT", "TEXTAREA"].includes((e.target as HTMLElement)?.tagName) &&
-        !document.querySelector("[data-modal]")
-      ) {
-        e.preventDefault();
-        filterInputRef?.focus();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    onCleanup(() => document.removeEventListener("keydown", handleKeyDown));
+    useFilterShortcut(() => filterInputRef);
   });
 
   const RepoTab = (props: {

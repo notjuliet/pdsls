@@ -4,7 +4,7 @@ import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
 import { Title } from "@solidjs/meta";
 import { A, useBeforeLeave, useParams, useSearchParams } from "@solidjs/router";
-import { createMemo, createResource, createSignal, For, onCleanup, onMount, Show } from "solid-js";
+import { createMemo, createResource, createSignal, For, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { agent } from "../auth/state";
 import { Button } from "../components/button.jsx";
@@ -17,6 +17,7 @@ import Tooltip from "../components/tooltip.jsx";
 import { canHover } from "../layout.jsx";
 import { resolvePDS } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
+import { useFilterShortcut } from "../utils/keyboard.js";
 import {
   clearCollectionCache,
   getCollectionCache,
@@ -104,18 +105,7 @@ const CollectionView = () => {
       });
     }
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        e.key === "/" &&
-        !["INPUT", "TEXTAREA"].includes((e.target as HTMLElement)?.tagName) &&
-        !document.querySelector("[data-modal]")
-      ) {
-        e.preventDefault();
-        filterInputRef?.focus();
-      }
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    onCleanup(() => document.removeEventListener("keydown", handleKeyDown));
+    useFilterShortcut(() => filterInputRef);
   });
 
   useBeforeLeave((e) => {
