@@ -93,8 +93,7 @@ export const RepoView = () => {
         if (!!error() && props.tab === "identity") return true;
         return false;
       }
-      if (props.tab === "collections") return location.hash.startsWith("#collections");
-      return location.hash === `#${props.tab}`;
+      return location.hash.startsWith(`#${props.tab}`);
     };
 
     return (
@@ -390,7 +389,7 @@ export const RepoView = () => {
             </div>
           </div>
           <div class="flex w-full flex-col gap-1 px-2">
-            <Show when={location.hash === "#logs"}>
+            <Show when={location.hash.startsWith("#logs")}>
               <ErrorBoundary
                 fallback={(err) => <div class="wrap-break-word">Error: {err.message}</div>}
               >

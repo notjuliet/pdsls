@@ -4,6 +4,7 @@ import {
   IndexedEntry,
   IndexedEntryLog,
 } from "@atcute/did-plc";
+import { useLocation } from "@solidjs/router";
 import { createEffect, createResource, createSignal, For, onCleanup, Show } from "solid-js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
@@ -13,6 +14,7 @@ import { plcDirectory } from "./settings.jsx";
 type PlcEvent = "handle" | "rotation_key" | "service" | "verification_method";
 
 export const PlcLogView = (props: { did: string }) => {
+  const location = useLocation();
   const [activePlcEvent, setActivePlcEvent] = createSignal<PlcEvent | undefined>();
   const [validLog, setValidLog] = createSignal<boolean | undefined>(undefined);
   const [rawLogs, setRawLogs] = createSignal<IndexedEntryLog | undefined>(undefined);
@@ -50,6 +52,17 @@ export const PlcLogView = (props: { did: string }) => {
         worker = undefined;
       };
       worker.postMessage({ did: props.did, logs });
+    }
+  });
+
+  createEffect(() => {
+    const hash = location.hash;
+    if (hash.startsWith("#logs:")) {
+      const createdAt = hash.slice(6);
+      requestAnimationFrame(() => {
+        const element = document.getElementById(`log-${createdAt}`);
+        if (element) element.scrollIntoView({ behavior: "instant", block: "start" });
+      });
     }
   });
 
@@ -275,20 +288,37 @@ export const PlcLogView = (props: { did: string }) => {
       </div>
       <div class="flex flex-col gap-3">
         <For each={plcOps()}>
-          {([entry, diffs]) => (
-            <Show when={shouldShowEntry(diffs)}>
-              <div class="flex flex-col gap-1">
-                <span class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
-                  {localDateFromTimestamp(new Date(entry.createdAt).getTime())}
-                </span>
-                <div class="flex flex-col gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 text-sm dark:border-neutral-700 dark:bg-neutral-800">
-                  <For each={diffs.filter(shouldShowDiff)}>
-                    {(diff) => <DiffItem diff={diff} />}
-                  </For>
+          {([entry, diffs]) => {
+            const isHighlighted = () => location.hash === `#logs:${entry.createdAt}`;
+            return (
+              <Show when={shouldShowEntry(diffs)}>
+                <div
+                  id={`log-${entry.createdAt}`}
+                  class="group flex scroll-mt-3 flex-col gap-1 rounded-lg transition-colors"
+                >
+                  <span class="relative text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+                    <a href={`#logs:${entry.createdAt}`} class="relative hover:underline">
+                      <span class="absolute top-1/2 -left-4.5 flex -translate-y-1/2 items-center text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100 dark:text-neutral-400">
+                        <span class="iconify lucide--link text-xs"></span>
+                      </span>
+                      {localDateFromTimestamp(new Date(entry.createdAt).getTime())}
+                    </a>
+                  </span>
+                  <div
+                    class="flex flex-col gap-2 rounded-md border bg-neutral-50 p-3 text-sm dark:bg-neutral-800"
+                    classList={{
+                      "border-neutral-200 dark:border-neutral-700": !isHighlighted(),
+                      "border-blue-500 dark:border-blue-400": isHighlighted(),
+                    }}
+                  >
+                    <For each={diffs.filter(shouldShowDiff)}>
+                      {(diff) => <DiffItem diff={diff} />}
+                    </For>
+                  </div>
                 </div>
-              </div>
-            </Show>
-          )}
+              </Show>
+            );
+          }}
         </For>
       </div>
     </div>
