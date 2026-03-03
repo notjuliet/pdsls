@@ -14,6 +14,7 @@ import { labelerCache, resolveHandle, resolvePDS } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 
 const LABELS_PER_PAGE = 50;
+const DEFAULT_LABELER_DID = "did:plc:ar7c4by46qjdydhdevvrndac";
 
 const LabelCard = (props: { label: ComAtprotoLabelDefs.Label }) => {
   const label = props.label;
@@ -76,48 +77,35 @@ export const LabelView = () => {
       .map((f) => f.trim())
       .filter((f) => f.length > 0);
 
-    const exclusions: { pattern: string; hasWildcard: boolean }[] = [];
-    const inclusions: { pattern: string; hasWildcard: boolean }[] = [];
+    const toMatcher = (pattern: string): ((value: string) => boolean) => {
+      if (pattern.includes("*")) {
+        const regexPattern = pattern.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*");
+        const regex = new RegExp(`^${regexPattern}$`);
+        return (value) => regex.test(value);
+      }
+      return (value) => value === pattern;
+    };
+
+    const exclusions: ((value: string) => boolean)[] = [];
+    const inclusions: ((value: string) => boolean)[] = [];
 
     filters.forEach((f) => {
       if (f.startsWith("-")) {
-        const lower = f.slice(1).toLowerCase();
-        exclusions.push({
-          pattern: lower,
-          hasWildcard: lower.includes("*"),
-        });
+        exclusions.push(toMatcher(f.slice(1).toLowerCase()));
       } else {
-        const lower = f.toLowerCase();
-        inclusions.push({
-          pattern: lower,
-          hasWildcard: lower.includes("*"),
-        });
+        inclusions.push(toMatcher(f.toLowerCase()));
       }
     });
-
-    const matchesPattern = (value: string, filter: { pattern: string; hasWildcard: boolean }) => {
-      if (filter.hasWildcard) {
-        // Convert wildcard pattern to regex
-        const regexPattern = filter.pattern
-          .replace(/[.+?^${}()|[\]\\]/g, "\\$&") // Escape special regex chars except *
-          .replace(/\*/g, ".*"); // Replace * with .*
-        const regex = new RegExp(`^${regexPattern}$`);
-        return regex.test(value);
-      } else {
-        return value === filter.pattern;
-      }
-    };
 
     return labels().filter((label) => {
       const labelValue = label.val.toLowerCase();
 
-      if (exclusions.some((exc) => matchesPattern(labelValue, exc))) {
+      if (exclusions.some((exc) => exc(labelValue))) {
         return false;
       }
 
-      // If there are inclusions, at least one must match
       if (inclusions.length > 0) {
-        return inclusions.some((inc) => matchesPattern(labelValue, inc));
+        return inclusions.some((inc) => inc(labelValue));
       }
 
       // If only exclusions were specified, include everything not excluded
@@ -137,7 +125,7 @@ export const LabelView = () => {
   });
 
   const fetchLabels = async (formData: FormData, reset?: boolean) => {
-    let did = formData.get("did")?.toString()?.trim() || "did:plc:ar7c4by46qjdydhdevvrndac";
+    let did = formData.get("did")?.toString()?.trim() || DEFAULT_LABELER_DID;
     const uriPatterns = formData.get("uriPatterns")?.toString()?.trim();
 
     if (!did || !uriPatterns) {
@@ -170,6 +158,7 @@ export const LabelView = () => {
           uriPatterns: uriPatterns.split(",").map((p) => p.trim()),
           sources: [did as `did:${string}:${string}`],
           cursor: cursor(),
+          limit: LABELS_PER_PAGE,
         },
       });
 
