@@ -226,7 +226,7 @@ export const PlcLogView = (props: { did: string }) => {
           <div></div>
           <div
             classList={{
-              "text-sm break-all flex items-start gap-2 min-w-0": true,
+              "text-sm flex items-start gap-2 min-w-0": true,
               "text-green-700 dark:text-green-300": isAddition,
               "text-red-700 dark:text-red-300": isRemoval,
               "text-neutral-600 dark:text-neutral-400": !isAddition && !isRemoval,
@@ -238,7 +238,7 @@ export const PlcLogView = (props: { did: string }) => {
             <Show when={isRemoval}>
               <span class="shrink-0">−</span>
             </Show>
-            <span class="break-all">{value}</span>
+            <span class="truncate">{value}</span>
           </div>
         </Show>
         <Show when={oldValue && newValue}>
@@ -246,11 +246,11 @@ export const PlcLogView = (props: { did: string }) => {
           <div class="flex min-w-0 flex-col text-sm">
             <div class="flex items-start gap-2 text-red-700 dark:text-red-300">
               <span class="shrink-0">−</span>
-              <span class="break-all">{oldValue}</span>
+              <span class="truncate">{oldValue}</span>
             </div>
             <div class="flex items-start gap-2 text-green-700 dark:text-green-300">
               <span class="shrink-0">+</span>
-              <span class="break-all">{newValue}</span>
+              <span class="truncate">{newValue}</span>
             </div>
           </div>
         </Show>
