@@ -194,7 +194,7 @@ export const LabelView = () => {
         <div class="flex w-full flex-col gap-y-1 px-3 pb-3">
           <h1 class="text-lg font-semibold">Labels</h1>
           <p class="text-sm text-neutral-600 dark:text-neutral-400">
-            Query labels applied by labelers to accounts and records.
+            Query labels applied to accounts and records.
           </p>
         </div>
         <form
