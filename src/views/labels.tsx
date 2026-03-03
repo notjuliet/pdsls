@@ -21,7 +21,7 @@ const LabelCard = (props: { label: ComAtprotoLabelDefs.Label }) => {
   const label = props.label;
 
   return (
-    <div class="flex flex-col gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
+    <div class="flex min-w-0 flex-col gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
       <div class="flex flex-wrap items-baseline gap-2 text-sm">
         <span class="iconify lucide--tag shrink-0 self-center" />
         <span class="font-medium">{label.val}</span>
@@ -43,13 +43,13 @@ const LabelCard = (props: { label: ComAtprotoLabelDefs.Label }) => {
 
       <Show
         when={label.uri.startsWith("at://")}
-        fallback={<DidHoverCard did={label.uri} labelClass="block text-sm break-all" />}
+        fallback={<DidHoverCard did={label.uri} labelClass="block text-sm truncate" />}
       >
-        <RecordHoverCard uri={label.uri} labelClass="block text-sm break-all" />
+        <RecordHoverCard uri={label.uri} labelClass="block text-sm truncate" />
       </Show>
 
       <Show when={label.cid}>
-        <div class="font-mono text-xs break-all text-neutral-700 dark:text-neutral-300">
+        <div class="truncate font-mono text-xs text-neutral-700 dark:text-neutral-300">
           {label.cid}
         </div>
       </Show>
