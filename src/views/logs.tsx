@@ -6,6 +6,7 @@ import {
 } from "@atcute/did-plc";
 import { useLocation } from "@solidjs/router";
 import { createEffect, createResource, createSignal, For, onCleanup, Show } from "solid-js";
+import Tooltip from "../components/tooltip.jsx";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
 import PlcValidateWorker from "../workers/plc-validate.ts?worker";
@@ -261,9 +262,26 @@ export const PlcLogView = (props: { did: string }) => {
   return (
     <div class="flex w-full flex-col gap-3 wrap-anywhere">
       <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-1.5 text-sm">
+        <div class="flex items-center gap-1.5 text-sm font-medium text-neutral-700 dark:text-neutral-300">
           <div class="iconify lucide--filter" />
-          <p class="font-medium">Filter by type</p>
+          <p>Filter by type</p>
+          <div class="mr-1.5 ml-auto">
+            <Show when={validLog() === true}>
+              <Tooltip text="Valid log">
+                <span class="iconify lucide--check text-green-600 dark:text-green-400"></span>
+              </Tooltip>
+            </Show>
+            <Show when={validLog() === false}>
+              <Tooltip text="Validation failed">
+                <span class="iconify lucide--x text-red-500 dark:text-red-400"></span>
+              </Tooltip>
+            </Show>
+            <Show when={validLog() === undefined}>
+              <Tooltip text="Validating...">
+                <span class="iconify lucide--loader-circle animate-spin"></span>
+              </Tooltip>
+            </Show>
+          </div>
         </div>
         <div class="flex flex-wrap gap-1">
           <FilterButton event="handle" label="Alias" />
@@ -271,20 +289,6 @@ export const PlcLogView = (props: { did: string }) => {
           <FilterButton event="verification_method" label="Verification" />
           <FilterButton event="rotation_key" label="Rotation Key" />
         </div>
-      </div>
-      <div class="flex items-center gap-1.5 text-sm font-medium">
-        <Show when={validLog() === true}>
-          <span class="iconify lucide--check text-green-600 dark:text-green-400"></span>
-          <span>Valid log</span>
-        </Show>
-        <Show when={validLog() === false}>
-          <span class="iconify lucide--x text-red-500 dark:text-red-400"></span>
-          <span>Log validation failed</span>
-        </Show>
-        <Show when={validLog() === undefined}>
-          <span class="iconify lucide--loader-circle animate-spin"></span>
-          <span>Validating log...</span>
-        </Show>
       </div>
       <div class="flex flex-col gap-3">
         <For each={plcOps()}>
