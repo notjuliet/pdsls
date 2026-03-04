@@ -358,7 +358,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
 
     return (
       <div>
-        <span class="group/media relative flex w-fit">
+        <span class="group/media relative my-0.5 flex w-fit">
           <Show when={!hide()}>
             <Show when={blob.mimeType.startsWith("image/")}>
               <Show
