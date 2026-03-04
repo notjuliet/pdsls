@@ -358,7 +358,7 @@ export const RepoView = () => {
                   </Show>
                   <Show when={error()?.length === 0 || error() === undefined}>
                     <ActionMenu
-                      label="Export repo"
+                      label="Download repo"
                       icon={
                         downloading() ? "lucide--loader-circle animate-spin" : "lucide--download"
                       }
