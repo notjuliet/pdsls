@@ -104,7 +104,7 @@ const MAX_LINES = 20;
 
 // Flatten JSON into an array of { depth, segments } lines
 // Each segment is { text, color }
-function flattenJson(value, depth, lines, key, isIndex) {
+function flattenJson(value, depth, lines, key, isIndex, maxStrWidth) {
   if (lines.length >= MAX_LINES) return;
 
   const keySegs = [];
@@ -121,7 +121,7 @@ function flattenJson(value, depth, lines, key, isIndex) {
     lines.push({ depth, segments: [...keySegs, { text: String(value), color: C.number }] });
   } else if (typeof value === "string") {
     const display = value.replace(/\n/g, " ");
-    const truncated = truncateToWidth(display, MAX_STRING_WIDTH);
+    const truncated = truncateToWidth(display, maxStrWidth);
     lines.push({
       depth,
       segments: [
@@ -146,7 +146,7 @@ function flattenJson(value, depth, lines, key, isIndex) {
       }
       for (let i = 0; i < value.length; i++) {
         if (lines.length >= MAX_LINES) break;
-        flattenJson(value[i], depth + 1, lines, `#${i}`, true);
+        flattenJson(value[i], depth + 1, lines, `#${i}`, true, maxStrWidth);
       }
     }
   } else {
@@ -165,13 +165,13 @@ function flattenJson(value, depth, lines, key, isIndex) {
       }
       for (const k of keys) {
         if (lines.length >= MAX_LINES) break;
-        flattenJson(value[k], depth + 1, lines, k, false);
+        flattenJson(value[k], depth + 1, lines, k, false, maxStrWidth);
       }
     }
   }
 }
 
-function renderLine(line) {
+function renderLine(line, guideMargin) {
   const guides = [];
   for (let i = 0; i < line.depth; i++) {
     guides.push(
@@ -179,7 +179,7 @@ function renderLine(line) {
         style: {
           width: 1,
           backgroundColor: C.guide,
-          marginRight: 19,
+          marginRight: guideMargin,
           flexShrink: 0,
         },
       }),
@@ -195,13 +195,29 @@ function renderLine(line) {
 
 function OgImage({ record }) {
   const lines = [];
-  const keys = Object.keys(record);
-  for (const k of keys) {
+  for (const k of Object.keys(record)) {
     if (lines.length >= MAX_LINES) break;
-    flattenJson(record[k], 0, lines, k, false);
+    flattenJson(record[k], 0, lines, k, false, MAX_STRING_WIDTH);
   }
   if (lines.length >= MAX_LINES) {
     lines.push({ depth: 0, segments: [{ text: "…", color: C.null }] });
+  }
+
+  const availableHeight = 630 - 100; // height minus vertical padding
+  const fontSize = Math.min(32, Math.max(18, Math.floor(availableHeight / (lines.length * 1.5))));
+  const guideMargin = Math.round((fontSize * 19) / 18);
+
+  // Re-truncate string values if the larger font size means fewer chars fit.
+  // Available width: 1200 canvas - 100 padding - 80 logo area; Roboto Mono char ≈ 0.6× fontSize.
+  const maxStrWidth = Math.floor((1200 - 100 - 80) / (fontSize * 0.6));
+  if (maxStrWidth < MAX_STRING_WIDTH) {
+    for (const line of lines) {
+      for (const seg of line.segments) {
+        if (seg.color === C.string) {
+          seg.text = truncateToWidth(seg.text, maxStrWidth);
+        }
+      }
+    }
   }
 
   return h(
@@ -217,7 +233,7 @@ function OgImage({ record }) {
         background: "#1f1f1f",
         padding: "50px 50px",
         fontFamily: "Roboto Mono, Noto Sans JP, Noto Sans SC, Noto Sans KR, Noto Emoji",
-        fontSize: 18,
+        fontSize,
         lineHeight: 1.5,
         color: "#e2e8f0",
       },
@@ -240,7 +256,7 @@ function OgImage({ record }) {
     h(
       "div",
       { style: { display: "flex", flexDirection: "column", paddingRight: 80 } },
-      ...lines.map(renderLine),
+      ...lines.map((line) => renderLine(line, guideMargin)),
     ),
   );
 }
