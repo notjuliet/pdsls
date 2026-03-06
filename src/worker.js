@@ -208,8 +208,9 @@ function OgImage({ record }) {
   const guideMargin = Math.round((fontSize * 19) / 18);
 
   // Re-truncate string values if the larger font size means fewer chars fit.
-  // Available width: 1200 canvas - 100 padding - 80 logo area; Roboto Mono char ≈ 0.6× fontSize.
-  const maxStrWidth = Math.floor((1200 - 100 - 80) / (fontSize * 0.6));
+  // Available width: 1200 canvas - 100 padding - 80 logo area - 200 for key/depth overhead;
+  // Roboto Mono char ≈ 0.6× fontSize.
+  const maxStrWidth = Math.floor((1200 - 100 - 80 - 200) / (fontSize * 0.6));
   if (maxStrWidth < MAX_STRING_WIDTH) {
     for (const line of lines) {
       for (const seg of line.segments) {
