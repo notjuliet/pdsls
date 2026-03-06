@@ -7,13 +7,14 @@
     "predev": "node scripts/generate-metadata.js",
     "dev": "vite",
     "prebuild": "node scripts/generate-metadata.js",
-    "build": "vite build",
+    "build": "vite build && node scripts/build-worker.js",
     "serve": "vite preview"
   },
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.95",
     "@iconify/tailwind4": "^1.2.3",
     "@tailwindcss/vite": "^4.2.1",
+    "esbuild": "^0.27.3",
     "prettier": "^3.8.1",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.7.2",
@@ -52,6 +53,8 @@
     "@skyware/firehose": "^0.5.2",
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.4",
+    "@takumi-rs/image-response": "^0.70.4",
+    "@takumi-rs/wasm": "^0.70.4",
     "codemirror": "^6.0.2",
     "solid-js": "^1.9.11"
   },
