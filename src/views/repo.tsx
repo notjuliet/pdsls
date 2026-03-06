@@ -498,9 +498,9 @@ export const RepoView = () => {
                                 onClick={() => toggleCollapsed(authority)}
                               >
                                 <span class="text-neutral-700 dark:text-neutral-300">
-                                  {authority}.
+                                  {authority}
                                 </span>
-                                <span class="text-neutral-500 dark:text-neutral-400">*</span>
+                                <span class="text-neutral-500 dark:text-neutral-400">.*</span>
                                 <span class="ml-1.5 text-neutral-400 dark:text-neutral-500">
                                   ({nsids()?.[authority].nsids.length})
                                 </span>
