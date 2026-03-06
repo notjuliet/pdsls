@@ -103,12 +103,11 @@ async function resolveOgData(pathname) {
       const doc = await resolveDidDoc(did).catch(() => null);
       const handle = doc ? handleFromDoc(doc) : null;
       title = `at://${handle ?? did}/${collection}`;
-      description = `List of ${collection} records for ${handle ?? did}`;
+      description = `List of ${collection} records from ${handle ?? did}`;
     } else {
-      description = `View the ${rkey} record in ${collection} from ${did}`;
-
       const doc = await resolveDidDoc(did).catch(() => null);
       const handle = doc ? handleFromDoc(doc) : null;
+      description = `View the ${rkey} record in ${collection} from ${handle ?? did}`;
       title = `at://${handle ?? did}/${collection}/${rkey}`;
     }
   } else {
