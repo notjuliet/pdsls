@@ -49,7 +49,7 @@ const LabelCard = (props: { label: ComAtprotoLabelDefs.Label }) => {
       </Show>
 
       <Show when={label.cid}>
-        <div class="truncate font-mono text-xs text-neutral-700 dark:text-neutral-300">
+        <div class="truncate font-mono text-xs text-neutral-600 dark:text-neutral-400">
           {label.cid}
         </div>
       </Show>
