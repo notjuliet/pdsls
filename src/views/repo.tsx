@@ -195,6 +195,25 @@ export const RepoView = () => {
 
   const [repo] = createResource(fetchRepo);
 
+  const toggleCollapsed = (authority: string) => {
+    setNsids((prev) => ({
+      ...prev!,
+      [authority]: { ...prev![authority], hidden: !prev![authority].hidden },
+    }));
+  };
+
+  const collapseAll = () => {
+    setNsids((prev) =>
+      Object.fromEntries(Object.entries(prev!).map(([k, v]) => [k, { ...v, hidden: true }])),
+    );
+  };
+
+  const expandAll = () => {
+    setNsids((prev) =>
+      Object.fromEntries(Object.entries(prev!).map(([k, v]) => [k, { ...v, hidden: false }])),
+    );
+  };
+
   const validateHandles = async () => {
     for (const alias of didDoc()?.alsoKnownAs ?? []) {
       if (alias.startsWith("at://"))
@@ -429,7 +448,7 @@ export const RepoView = () => {
               </ErrorBoundary>
             </Show>
             <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
-              <div class={`flex flex-col ${canHover ? "pb-16" : "pb-12"} text-sm wrap-anywhere`}>
+              <div class="flex flex-col pb-20 text-sm wrap-anywhere">
                 <Show
                   when={Object.keys(nsids() ?? {}).length != 0}
                   fallback={<span class="mt-3 text-center text-base">No collections found.</span>}
@@ -446,11 +465,12 @@ export const RepoView = () => {
                   >
                     {(authority) => {
                       const isHighlighted = () => location.hash === `#collections:${authority}`;
+                      const isCollapsed = () => nsids()?.[authority].hidden ?? false;
 
                       return (
                         <div
                           id={`collection-${authority}`}
-                          class="group flex scroll-mt-4 items-start gap-2 rounded-lg p-1 transition-colors"
+                          class="group relative flex scroll-mt-4 items-start gap-2 rounded-lg p-1 transition-colors"
                           classList={{
                             "dark:hover:bg-dark-300 hover:bg-neutral-200": !isHighlighted(),
                             "bg-blue-100 dark:bg-blue-500/25": isHighlighted(),
@@ -470,25 +490,52 @@ export const RepoView = () => {
                               </a>
                             )}
                           />
-                          <div class="flex flex-1 flex-col">
-                            <For
-                              each={nsids()?.[authority].nsids.filter((nsid) =>
-                                filter() ? `${authority}.${nsid}`.includes(filter()!) : true,
-                              )}
+                          <Show
+                            when={!isCollapsed()}
+                            fallback={
+                              <button
+                                class="flex flex-1 items-center text-left"
+                                onClick={() => toggleCollapsed(authority)}
+                              >
+                                <span class="text-neutral-700 dark:text-neutral-300">
+                                  {authority}.
+                                </span>
+                                <span class="text-neutral-500 dark:text-neutral-400">*</span>
+                                <span class="ml-1.5 text-neutral-400 dark:text-neutral-500">
+                                  ({nsids()?.[authority].nsids.length})
+                                </span>
+                              </button>
+                            }
+                          >
+                            <div class="flex min-w-0 flex-1 flex-col">
+                              <For
+                                each={nsids()?.[authority].nsids.filter((nsid) =>
+                                  filter() ? `${authority}.${nsid}`.includes(filter()!) : true,
+                                )}
+                              >
+                                {(nsid, index) => (
+                                  <A
+                                    href={`/at://${did}/${authority}.${nsid}`}
+                                    class="truncate hover:underline active:underline"
+                                    classList={{ "pr-16": canHover && index() === 0 }}
+                                  >
+                                    <span class="text-neutral-800/70 dark:text-neutral-200/70">
+                                      {authority}.
+                                    </span>
+                                    <span>{nsid}</span>
+                                  </A>
+                                )}
+                              </For>
+                            </div>
+                          </Show>
+                          <Show when={canHover}>
+                            <button
+                              class="absolute top-1 right-1 rounded px-2 py-0.5 text-xs text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-neutral-300 hover:text-neutral-700 active:bg-neutral-400 dark:text-neutral-400 dark:hover:bg-neutral-600 dark:hover:text-neutral-200 dark:active:bg-neutral-500"
+                              onClick={() => toggleCollapsed(authority)}
                             >
-                              {(nsid) => (
-                                <A
-                                  href={`/at://${did}/${authority}.${nsid}`}
-                                  class="hover:underline active:underline"
-                                >
-                                  <span class="text-neutral-800/70 dark:text-neutral-200/70">
-                                    {authority}.
-                                  </span>
-                                  <span>{nsid}</span>
-                                </A>
-                              )}
-                            </For>
-                          </div>
+                              {isCollapsed() ? "expand" : "collapse"}
+                            </button>
+                          </Show>
                         </div>
                       );
                     }}
@@ -749,9 +796,9 @@ export const RepoView = () => {
       </Show>
 
       <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
-        <div class={`fixed ${canHover ? "bottom-12" : "bottom-8"} z-10 w-full max-w-lg`}>
+        <div class="dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 border-t border-neutral-200 bg-neutral-100 px-3 pt-3 pb-6 dark:border-neutral-700">
           <div
-            class="dark:bg-dark-200 dark:shadow-dark-700 mx-3 flex cursor-text items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 shadow-sm dark:border-neutral-700"
+            class="dark:bg-dark-200 flex w-full max-w-lg cursor-text items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 dark:border-neutral-700"
             onClick={(e) => {
               const input = e.currentTarget.querySelector("input");
               if (e.target !== input) input?.focus();
@@ -775,6 +822,20 @@ export const RepoView = () => {
                 /
               </kbd>
             </Show>
+          </div>
+          <div class="flex w-full max-w-lg justify-end gap-1">
+            <button
+              class="rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
+              onClick={expandAll}
+            >
+              Expand all
+            </button>
+            <button
+              class="rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
+              onClick={collapseAll}
+            >
+              Collapse all
+            </button>
           </div>
         </div>
       </Show>
