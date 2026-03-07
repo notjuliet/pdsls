@@ -187,7 +187,7 @@ function renderLine(line, guideMargin) {
   }
   return h(
     "div",
-    { style: { display: "flex", overflow: "hidden" } },
+    { style: { display: "flex", overflow: "hidden", whiteSpace: "nowrap" } },
     ...guides,
     ...line.segments.map((seg) => h("div", { style: { color: seg.color } }, seg.text)),
   );
