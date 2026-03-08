@@ -250,8 +250,8 @@ function OgImage({ record }) {
       {
         style: {
           position: "absolute",
-          bottom: 24,
-          right: 24,
+          bottom: 32,
+          right: 32,
         },
       },
       h(
