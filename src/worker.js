@@ -110,7 +110,7 @@ function flattenJson(value, depth, lines, key, isIndex, maxStrWidth) {
   const keySegs = [];
   if (key !== undefined) {
     keySegs.push({ text: String(key), color: isIndex ? C.index : C.key });
-    keySegs.push({ text: ": ", color: C.colon });
+    keySegs.push({ text: ":", color: C.colon, mr: 4 });
   }
 
   if (value === null) {
@@ -189,7 +189,9 @@ function renderLine(line, guideMargin) {
     "div",
     { style: { display: "flex", overflow: "hidden", whiteSpace: "nowrap" } },
     ...guides,
-    ...line.segments.map((seg) => h("div", { style: { color: seg.color } }, seg.text)),
+    ...line.segments.map((seg) =>
+      h("div", { style: { color: seg.color, marginRight: seg.mr ?? 0, flexShrink: seg.mr ? 0 : undefined } }, seg.text),
+    ),
   );
 }
 
@@ -205,7 +207,7 @@ function OgImage({ record }) {
 
   const availableHeight = 630 - 100; // height minus vertical padding
   const fontSize = Math.min(32, Math.max(18, Math.floor(availableHeight / (lines.length * 1.5))));
-  const guideMargin = Math.round((fontSize * 19) / 18);
+  const guideMargin = Math.round(fontSize * 1.2) - 1;
 
   // Re-truncate string values if the larger font size means fewer chars fit.
   // Available width: 1200 canvas - 100 padding - 80 logo area - 200 for key/depth overhead;
