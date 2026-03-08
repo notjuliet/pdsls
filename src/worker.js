@@ -190,7 +190,11 @@ function renderLine(line, guideMargin) {
     { style: { display: "flex", overflow: "hidden", whiteSpace: "nowrap" } },
     ...guides,
     ...line.segments.map((seg) =>
-      h("div", { style: { color: seg.color, marginRight: seg.mr ?? 0, flexShrink: seg.mr ? 0 : undefined } }, seg.text),
+      h(
+        "div",
+        { style: { color: seg.color, ...(seg.mr ? { marginRight: seg.mr } : {}) } },
+        seg.text,
+      ),
     ),
   );
 }
