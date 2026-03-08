@@ -167,14 +167,14 @@ export const Search = () => {
   });
 
   createEffect(() => {
-    if (showSearch()) {
-      searchInput.focus();
-    } else {
-      setInput(undefined);
-      setSelectedIndex(-1);
-      setSearch(undefined);
-    }
+    if (showSearch()) setTimeout(() => searchInput?.focus());
   });
+
+  const resetSearch = () => {
+    setInput(undefined);
+    setSelectedIndex(-1);
+    setSearch(undefined);
+  };
 
   const fetchTypeahead = async (input: string | undefined) => {
     if (!input) return [];
@@ -284,6 +284,7 @@ export const Search = () => {
     <Modal
       open={showSearch()}
       onClose={() => setShowSearch(false)}
+      onClosed={resetSearch}
       alignTop
       contentClass="dark:bg-dark-200 dark:shadow-dark-700 pointer-events-auto mx-3 w-full max-w-lg rounded-lg border-[0.5px] min-w-0 border-neutral-300 bg-white shadow-md dark:border-neutral-700"
     >

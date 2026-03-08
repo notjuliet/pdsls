@@ -122,8 +122,8 @@ export const AccountManager = () => {
     <>
       <Modal
         open={openManager()}
-        onClose={() => {
-          setOpenManager(false);
+        onClose={() => setOpenManager(false)}
+        onClosed={() => {
           setShowAddAccount(false);
           scopeFlow.cancel();
         }}

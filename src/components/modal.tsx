@@ -1,17 +1,38 @@
-import { ComponentProps, createEffect, onCleanup, Show } from "solid-js";
+import { ComponentProps, createEffect, createSignal, onCleanup, Show } from "solid-js";
 
 export interface ModalProps extends Pick<ComponentProps<"svg">, "children"> {
   open?: boolean;
   onClose?: () => void;
+  onClosed?: () => void;
   closeOnClick?: boolean;
   nonBlocking?: boolean;
   alignTop?: boolean;
   contentClass?: string;
 }
 
+export const CLOSE_DURATION = 200;
+
 export const Modal = (props: ModalProps) => {
+  const [mounted, setMounted] = createSignal(props.open ?? false);
+  const [closing, setClosing] = createSignal(false);
+
+  createEffect(() => {
+    if (props.open) {
+      setMounted(true);
+      setClosing(false);
+    } else if (mounted()) {
+      setClosing(true);
+      const t = setTimeout(() => {
+        setMounted(false);
+        setClosing(false);
+        props.onClosed?.();
+      }, CLOSE_DURATION);
+      onCleanup(() => clearTimeout(t));
+    }
+  });
+
   return (
-    <Show when={props.open}>
+    <Show when={mounted()}>
       <div
         data-modal
         class="fixed inset-0 z-50 flex h-full max-h-none w-full max-w-none justify-center bg-transparent text-neutral-900 dark:text-neutral-200"
@@ -57,6 +78,8 @@ export const Modal = (props: ModalProps) => {
       >
         <div
           class={`transition-all starting:scale-95 starting:opacity-0 ${props.contentClass ?? ""}`}
+          classList={{ "scale-95 opacity-0": closing() }}
+          style={{ "transition-duration": `${CLOSE_DURATION}ms` }}
         >
           {props.children}
         </div>
