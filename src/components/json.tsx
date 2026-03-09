@@ -318,11 +318,20 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
 
   const MediaDisplay = () => {
     const [expanded, setExpanded] = createSignal(false);
+    const [closing, setClosing] = createSignal(false);
+
+    const closeExpanded = () => {
+      setClosing(true);
+      setTimeout(() => {
+        setExpanded(false);
+        setClosing(false);
+      }, 200);
+    };
 
     createEffect(() => {
       if (!expanded()) return;
       const handler = (e: KeyboardEvent) => {
-        if (e.key === "Escape") setExpanded(false);
+        if (e.key === "Escape") closeExpanded();
       };
       window.addEventListener("keydown", handler);
       onCleanup(() => window.removeEventListener("keydown", handler));
@@ -364,10 +373,15 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
                 <Show when={expanded()}>
                   <Portal>
                     <div
-                      class="fixed inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-black/80"
-                      onclick={() => setExpanded(false)}
+                      class="fixed inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-black/80 transition-opacity duration-200 starting:opacity-0"
+                      classList={{ "opacity-0": closing() }}
+                      onclick={closeExpanded}
                     >
-                      <img class="max-h-screen max-w-screen object-contain" src={imageUrl()} />
+                      <img
+                        class="max-h-screen max-w-screen object-contain transition-all duration-200 starting:scale-95 starting:opacity-0"
+                        classList={{ "scale-95 opacity-0": closing() }}
+                        src={imageUrl()}
+                      />
                     </div>
                   </Portal>
                 </Show>
