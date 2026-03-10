@@ -121,7 +121,7 @@ function flattenJson(value, depth, lines, key, isIndex, maxStrWidth) {
     lines.push({ depth, segments: [...keySegs, { text: String(value), color: C.number }] });
   } else if (typeof value === "string") {
     const display = value.replace(/\n/g, " ");
-    const truncated = truncateToWidth(display, maxStrWidth);
+    const truncated = truncateToWidth(display, maxStrWidth - 2);
     lines.push({
       depth,
       segments: [
@@ -221,7 +221,7 @@ function OgImage({ record }) {
     for (const line of lines) {
       for (const seg of line.segments) {
         if (seg.color === C.string) {
-          seg.text = truncateToWidth(seg.text, maxStrWidth);
+          seg.text = truncateToWidth(seg.text, maxStrWidth - 2);
         }
       }
     }
