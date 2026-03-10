@@ -13,13 +13,7 @@ import { agent } from "../auth/state";
 import { Backlinks } from "../components/backlinks.jsx";
 import { Button } from "../components/button.jsx";
 import { RecordEditor, setPlaceholder } from "../components/create";
-import {
-  CopyMenu,
-  DropdownMenu,
-  MenuProvider,
-  MenuSeparator,
-  NavMenu,
-} from "../components/dropdown.jsx";
+import { CopyMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
 import { Favicon } from "../components/favicon.jsx";
 import { JSONValue } from "../components/json.jsx";
 import { LexiconSchemaView } from "../components/lexicon-schema.jsx";
@@ -27,12 +21,14 @@ import { Modal } from "../components/modal.jsx";
 import { pds } from "../components/navbar.jsx";
 import { addNotification, removeNotification } from "../components/notification.jsx";
 import { PermissionButton } from "../components/permission-button.jsx";
+import { canHover } from "../layout.jsx";
 import {
   didDocumentResolver,
   resolveLexiconAuthority,
   resolveLexiconSchema,
   resolvePDS,
 } from "../utils/api.js";
+import { addToClipboard } from "../utils/copy.js";
 import { clearCollectionCache } from "../utils/route-cache.js";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 import { lexicons } from "../utils/types/lexicons.js";
@@ -529,15 +525,6 @@ export const RecordView = () => {
                       label="Copy record"
                       icon="lucide--copy"
                     />
-                    <CopyMenu
-                      content={`at://${params.repo}/${params.collection}/${params.rkey}`}
-                      label="Copy AT URI"
-                      icon="lucide--copy"
-                    />
-                    <Show when={record()?.cid}>
-                      {(cid) => <CopyMenu content={cid()} label="Copy CID" icon="lucide--copy" />}
-                    </Show>
-                    <MenuSeparator />
                     <NavMenu
                       href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
                       icon="lucide--external-link"
@@ -550,7 +537,11 @@ export const RecordView = () => {
             </div>
             <Show when={!location.hash || location.hash.startsWith("#record")}>
               <div class="w-full max-w-screen min-w-full px-2 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-max sm:text-sm md:max-w-3xl">
-                <JSONValue data={record()?.value as any} repo={record()!.uri.split("/")[2]} keyLinks />
+                <JSONValue
+                  data={record()?.value as any}
+                  repo={record()!.uri.split("/")[2]}
+                  keyLinks
+                />
               </div>
             </Show>
             <Show when={location.hash === "#schema" || location.hash.startsWith("#schema:")}>
@@ -588,20 +579,41 @@ export const RecordView = () => {
               <div class="flex w-full flex-col gap-3 px-2">
                 <div>
                   <p class="font-semibold">AT URI</p>
-                  <div class="truncate text-xs text-neutral-700 dark:text-neutral-300">
-                    {record()?.uri}
-                  </div>
+                  <button
+                    class="group flex w-full items-center gap-1 text-left text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-200"
+                    onClick={() => addToClipboard(record()!.uri)}
+                  >
+                    <span class="truncate" dir="rtl">
+                      {record()?.uri}
+                    </span>
+                    <span
+                      classList={{
+                        "iconify lucide--copy shrink-0": true,
+                        "opacity-0 group-hover:opacity-100": canHover,
+                      }}
+                    ></span>
+                  </button>
                 </div>
                 <Show when={record()?.cid}>
-                  <div>
-                    <p class="font-semibold">CID</p>
-                    <div
-                      class="truncate text-left text-xs text-neutral-700 dark:text-neutral-300"
-                      dir="rtl"
-                    >
-                      {record()?.cid}
+                  {(cid) => (
+                    <div>
+                      <p class="font-semibold">CID</p>
+                      <button
+                        class="group flex w-full items-center gap-1 text-left text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-200"
+                        onClick={() => addToClipboard(cid())}
+                      >
+                        <span class="truncate" dir="rtl">
+                          {cid()}
+                        </span>
+                        <span
+                          classList={{
+                            "iconify lucide--copy shrink-0": true,
+                            "opacity-0 group-hover:opacity-100": canHover,
+                          }}
+                        ></span>
+                      </button>
                     </div>
-                  </div>
+                  )}
                 </Show>
                 <div>
                   <div class="flex items-center gap-1">

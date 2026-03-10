@@ -17,7 +17,6 @@ import { createStore } from "solid-js/store";
 import { Backlinks } from "../components/backlinks.jsx";
 import {
   ActionMenu,
-  CopyMenu,
   DropdownMenu,
   MenuProvider,
   MenuSeparator,
@@ -40,6 +39,7 @@ import {
   resolvePDS,
   validateHandle,
 } from "../utils/api.js";
+import { addToClipboard } from "../utils/copy.js";
 import { detectDidKeyType, detectKeyType } from "../utils/key.js";
 import { useFilterShortcut } from "../utils/keyboard.js";
 import { BlobView } from "./blob.jsx";
@@ -362,7 +362,6 @@ export const RepoView = () => {
               </Show>
               <MenuProvider>
                 <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
-                  <CopyMenu content={params.repo!} label="Copy DID" icon="lucide--copy" />
                   <NavMenu
                     href={`/jetstream?dids=${params.repo}`}
                     label="Jetstream"
@@ -550,9 +549,18 @@ export const RepoView = () => {
                     {/* ID Section */}
                     <div>
                       <div class="font-semibold">DID</div>
-                      <div class="text-sm text-neutral-700 dark:text-neutral-300">
-                        {didDocument().id}
-                      </div>
+                      <button
+                        class="group flex w-full items-center gap-1 text-left text-sm text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-200"
+                        onClick={() => addToClipboard(didDocument().id)}
+                      >
+                        <span class="truncate">{didDocument().id}</span>
+                        <span
+                          classList={{
+                            "iconify lucide--copy shrink-0": true,
+                            "opacity-0 group-hover:opacity-100": canHover,
+                          }}
+                        ></span>
+                      </button>
                     </div>
 
                     {/* Aliases Section */}
