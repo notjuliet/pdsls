@@ -318,7 +318,7 @@ const PropertyRow = (props: {
         <ConstraintsList property={props.property.items!} />
       </Show>
       <Show when={props.property.description && !props.hideNameType}>
-        <p class="text-sm wrap-break-word text-neutral-700 dark:text-neutral-300">
+        <p class="text-sm wrap-break-word whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
           {props.property.description}
         </p>
       </Show>
@@ -475,7 +475,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
   const hasDefContent = () => props.def.refs || props.def.items || hasConstraints(props.def);
 
   return (
-    <div class="flex flex-col gap-3 scroll-mt-4" id={`def-${props.name}`}>
+    <div class="flex scroll-mt-4 flex-col gap-3" id={`def-${props.name}`}>
       <div class="group flex items-center gap-2">
         <a href={`#schema:${props.name}`} class="relative text-lg font-semibold hover:underline">
           <span class="iconify lucide--link absolute top-1/2 -left-6 -translate-y-1/2 text-base opacity-0 transition-opacity group-hover:opacity-100" />
@@ -487,7 +487,9 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
       </div>
 
       <Show when={props.def.description}>
-        <p class="text-sm text-neutral-700 dark:text-neutral-300">{props.def.description}</p>
+        <p class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
+          {props.def.description}
+        </p>
       </Show>
 
       {/* Record key */}
@@ -533,7 +535,9 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
               <span class="text-xs font-semibold text-neutral-500 uppercase dark:text-neutral-400">
                 Detail
               </span>
-              <p class="text-sm text-neutral-700 dark:text-neutral-300">{props.def.detail}</p>
+              <p class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
+                {props.def.detail}
+              </p>
             </div>
           </Show>
           <Show when={props.def["detail:lang"]}>
@@ -548,7 +552,9 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
                       <span class="dark:bg-dark-200 w-fit rounded bg-neutral-200/50 px-1.5 py-0.5 font-mono text-xs">
                         {lang}
                       </span>
-                      <p class="text-neutral-700 dark:text-neutral-300">{text}</p>
+                      <p class="whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
+                        {text}
+                      </p>
                     </div>
                   )}
                 </For>
@@ -659,7 +665,7 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
                 <div class="flex flex-col gap-1 py-2">
                   <div class="font-semibold">{error.name}</div>
                   <Show when={error.description}>
-                    <p class="text-sm text-neutral-700 dark:text-neutral-300">
+                    <p class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
                       {error.description}
                     </p>
                   </Show>
@@ -731,7 +737,9 @@ export const LexiconSchemaView = (props: { schema: LexiconSchema; authority?: At
           </span>
         </div>
         <Show when={props.schema.description}>
-          <p class="text-sm text-neutral-700 dark:text-neutral-300">{props.schema.description}</p>
+          <p class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
+            {props.schema.description}
+          </p>
         </Show>
       </div>
 
