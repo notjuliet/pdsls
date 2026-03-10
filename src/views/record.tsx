@@ -51,6 +51,11 @@ const bskyAltClients = [
     transform: (url: string) => url.replace("https://bsky.app", "https://witchsky.app"),
   },
   {
+    label: "Red Dwarf",
+    hostname: "reddwarf.app",
+    transform: (url: string) => url.replace("https://bsky.app", "https://reddwarf.app"),
+  },
+  {
     label: "Anartia",
     hostname: "kelinci.net",
     icon: "https://kelinci.net/rabbit.svg",
@@ -483,7 +488,7 @@ export const RecordView = () => {
                           classList={{
                             "rounded-sm hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600":
                               !bskyAlts().length,
-                            "bg-neutral-50 rounded-t dark:bg-dark-200 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600":
+                            "bg-neutral-50 rounded-t dark:bg-dark-200 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600":
                               showAlternates() && bskyAlts().length > 0,
                           }}
                         >
@@ -492,15 +497,18 @@ export const RecordView = () => {
                             wrapper={faviconWrapper}
                           />
                         </a>
-                        <Show when={showAlternates() && bskyAlts().length > 0}>
-                          <div class="dark:bg-dark-200 absolute top-full left-0 z-10 flex flex-col overflow-hidden rounded-b bg-neutral-50 shadow-xs">
+                        <Show when={bskyAlts().length > 0}>
+                          <div
+                            class="dark:bg-dark-200 absolute top-full left-0 z-10 flex flex-col overflow-hidden rounded-b bg-neutral-50 shadow-xs"
+                            classList={{ invisible: !showAlternates() }}
+                          >
                             <For each={bskyAlts()}>
                               {(alt) => (
                                 <a
                                   href={alt.link}
                                   target="_blank"
                                   title={`Open on ${alt.label}`}
-                                  class="flex p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                                  class="flex p-1.5 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                                 >
                                   {alt.icon ?
                                     <img src={alt.icon} class="size-4" />
