@@ -486,6 +486,100 @@ class HeadEndRewriter {
   }
 }
 
+const MAX_FAVICON_SIZE = 100 * 1024; // 100KB
+
+async function handleFavicon(searchParams) {
+  const domain = searchParams.get("domain");
+  if (!domain) {
+    return new Response("Missing domain param", { status: 400 });
+  }
+
+  let faviconUrl = null;
+  try {
+    const pageRes = await fetch(`https://${domain}/`, {
+      signal: AbortSignal.timeout(5000),
+      headers: { "User-Agent": "PDSls-Favicon/1.0" },
+      redirect: "follow",
+    });
+
+    if (pageRes.ok && (pageRes.headers.get("content-type") ?? "").includes("text/html")) {
+      let bestHref = null;
+      let bestPriority = -1;
+
+      const rewriter = new HTMLRewriter().on("link", {
+        element(el) {
+          const rel = (el.getAttribute("rel") ?? "").toLowerCase();
+          if (!rel.includes("icon")) return;
+          const href = el.getAttribute("href");
+          if (!href) return;
+
+          // Prefer apple-touch-icon > icon with sizes > icon > shortcut icon
+          let priority = 0;
+          if (rel === "apple-touch-icon") priority = 3;
+          else if (rel === "icon" && el.getAttribute("sizes")) priority = 2;
+          else if (rel === "icon") priority = 1;
+
+          if (priority > bestPriority) {
+            bestPriority = priority;
+            bestHref = href;
+          }
+        },
+      });
+
+      const transformed = rewriter.transform(pageRes);
+      await transformed.text();
+
+      if (bestHref) {
+        try {
+          faviconUrl = new URL(bestHref, `https://${domain}/`).href;
+        } catch {
+          faviconUrl = null;
+        }
+      }
+    }
+  } catch {}
+
+  if (!faviconUrl) {
+    faviconUrl = `https://${domain}/favicon.ico`;
+  }
+
+  try {
+    const iconRes = await fetch(faviconUrl, {
+      signal: AbortSignal.timeout(5000),
+      redirect: "follow",
+    });
+
+    if (!iconRes.ok) {
+      return new Response("Favicon not found", { status: 404 });
+    }
+
+    const contentType = iconRes.headers.get("content-type") ?? "";
+    if (!contentType.includes("image") && !contentType.includes("icon")) {
+      return new Response("Not an image", { status: 404 });
+    }
+
+    const contentLength = parseInt(iconRes.headers.get("content-length") ?? "0", 10);
+    if (contentLength > MAX_FAVICON_SIZE) {
+      return new Response("Favicon too large", { status: 413 });
+    }
+
+    const body = await iconRes.arrayBuffer();
+    if (body.byteLength > MAX_FAVICON_SIZE) {
+      return new Response("Favicon too large", { status: 413 });
+    }
+
+    return new Response(body, {
+      headers: {
+        "Content-Type": contentType,
+        "Cache-Control": "public, max-age=86400",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+  } catch {
+    return new Response("Failed to fetch favicon", { status: 502 });
+  }
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -493,6 +587,12 @@ export default {
     if (url.pathname === "/og-image") {
       return handleOgImage(url.searchParams).catch(
         (err) => new Response(`Failed to generate image: ${err?.message ?? err}`, { status: 500 }),
+      );
+    }
+
+    if (url.pathname === "/favicon") {
+      return handleFavicon(url.searchParams).catch(
+        (err) => new Response(`Failed to fetch favicon: ${err?.message ?? err}`, { status: 500 }),
       );
     }
 

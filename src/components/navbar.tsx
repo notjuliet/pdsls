@@ -33,16 +33,21 @@ const CopyButton = (props: { content: string; label: string }) => {
 const HoverFavicon = (props: { domain: string; hovered: boolean; children: JSX.Element }) => {
   const [hasHovered, setHasHovered] = createSignal(false);
   const [loaded, setLoaded] = createSignal(false);
+  const [src, setSrc] = createSignal("");
 
   createEffect(() => {
     props.domain;
     setHasHovered(false);
     setLoaded(false);
+    setSrc("");
   });
 
   createEffect(() => {
     if (props.hovered) setHasHovered(true);
   });
+
+  const workerUrl = () => `/favicon?domain=${encodeURIComponent(props.domain)}`;
+  const directUrl = () => `https://${props.domain}/favicon.ico`;
 
   return (
     <div class="relative flex h-5 w-3.5 shrink-0 items-center justify-center sm:w-4">
@@ -58,15 +63,17 @@ const HoverFavicon = (props: { domain: string; hovered: boolean; children: JSX.E
           </Match>
           <Match when={true}>
             <img
-              src={
-                ["bsky.app", "bsky.chat"].includes(props.domain) ?
-                  "https://web-cdn.bsky.app/static/apple-touch-icon.png"
-                : `https://${props.domain}/favicon.ico`
-              }
+              src={src() || workerUrl()}
               class="size-4"
               classList={{ hidden: !props.hovered || !loaded() }}
               onLoad={() => setLoaded(true)}
-              onError={() => setLoaded(false)}
+              onError={() => {
+                if (!src()) {
+                  setSrc(directUrl());
+                } else {
+                  setLoaded(false);
+                }
+              }}
             />
           </Match>
         </Switch>
