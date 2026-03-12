@@ -505,6 +505,7 @@ async function handleFavicon(searchParams) {
     if (pageRes.ok && (pageRes.headers.get("content-type") ?? "").includes("text/html")) {
       let bestHref = null;
       let bestPriority = -1;
+      let bestSize = 0;
 
       const rewriter = new HTMLRewriter().on("link", {
         element(el) {
@@ -513,14 +514,21 @@ async function handleFavicon(searchParams) {
           const href = el.getAttribute("href");
           if (!href) return;
 
-          // Prefer apple-touch-icon > icon with sizes > icon > shortcut icon
+          // Prefer icon with sizes > icon > apple-touch-icon > shortcut icon
           let priority = 0;
-          if (rel === "apple-touch-icon") priority = 3;
-          else if (rel === "icon" && el.getAttribute("sizes")) priority = 2;
-          else if (rel === "icon") priority = 1;
+          if (rel === "icon" && el.getAttribute("sizes")) priority = 3;
+          else if (rel === "icon") priority = 2;
+          else if (rel === "apple-touch-icon") priority = 1;
 
-          if (priority > bestPriority) {
+          const sizesAttr = el.getAttribute("sizes") ?? "";
+          const size = Math.max(...sizesAttr.split(/\s+/).map((s) => parseInt(s) || 0), 0);
+
+          if (
+            priority > bestPriority ||
+            (priority === bestPriority && size > bestSize && size <= 64)
+          ) {
             bestPriority = priority;
+            bestSize = size;
             bestHref = href;
           }
         },
