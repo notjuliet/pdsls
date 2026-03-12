@@ -476,7 +476,8 @@ export const RepoView = () => {
                           }}
                         >
                           <Favicon
-                            authority={authority}
+                            domain={authority}
+                            reverse
                             wrapper={(children) => (
                               <a
                                 href={`#collections:${authority}`}

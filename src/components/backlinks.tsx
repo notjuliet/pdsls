@@ -151,7 +151,7 @@ const BacklinkSection = (
         onClick={() => setExpanded(!expanded())}
       >
         <div class="flex min-w-0 flex-1 items-center gap-2">
-          <Favicon authority={authority()} />
+          <Favicon domain={authority()} reverse />
           <div class="flex min-w-0 flex-1 flex-col">
             <span class="w-full truncate">{props.collection}</span>
             <span class="w-full text-xs wrap-break-word text-neutral-500 dark:text-neutral-400">

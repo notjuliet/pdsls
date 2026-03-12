@@ -33,8 +33,6 @@ import { clearCollectionCache } from "../utils/route-cache.js";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 import { lexicons } from "../utils/types/lexicons.js";
 
-const toAuthority = (hostname: string) => hostname.split(".").reverse().join(".");
-
 const faviconWrapper = (children: any) => (
   <div class="flex size-4 items-center justify-center">{children}</div>
 );
@@ -493,7 +491,7 @@ export const RecordView = () => {
                           }}
                         >
                           <Favicon
-                            authority={toAuthority(new URL(link().link).hostname)}
+                            domain={new URL(link().link).hostname}
                             wrapper={faviconWrapper}
                           />
                         </a>
@@ -512,11 +510,7 @@ export const RecordView = () => {
                                 >
                                   {alt.icon ?
                                     <img src={alt.icon} class="size-4" />
-                                  : <Favicon
-                                      authority={toAuthority(alt.hostname)}
-                                      wrapper={faviconWrapper}
-                                    />
-                                  }
+                                  : <Favicon domain={alt.hostname} wrapper={faviconWrapper} />}
                                 </a>
                               )}
                             </For>

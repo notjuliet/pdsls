@@ -1,11 +1,12 @@
 import { createSignal, JSX, Match, Show, Switch } from "solid-js";
 
 export const Favicon = (props: {
-  authority: string;
+  domain: string;
+  reverse?: boolean;
   wrapper?: (children: JSX.Element) => JSX.Element;
 }) => {
   const [loaded, setLoaded] = createSignal(false);
-  const domain = () => props.authority.split(".").reverse().join(".");
+  const domain = () => (props.reverse ? props.domain.split(".").reverse().join(".") : props.domain);
 
   const content = (
     <Switch>

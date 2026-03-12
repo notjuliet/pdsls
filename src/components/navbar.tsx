@@ -1,11 +1,10 @@
 import * as TID from "@atcute/tid";
 import { A, Params } from "@solidjs/router";
-import { createEffect, createMemo, createSignal, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, JSX, Match, Show, Switch } from "solid-js";
 import { canHover } from "../layout";
 import { didDocCache } from "../utils/api";
 import { addToClipboard } from "../utils/copy";
 import { localDateFromTimestamp } from "../utils/date";
-import { Favicon } from "./favicon";
 import Tooltip from "./tooltip";
 
 export const [pds, setPDS] = createSignal<string>();
@@ -31,11 +30,55 @@ const CopyButton = (props: { content: string; label: string }) => {
   );
 };
 
+const HoverFavicon = (props: { domain: string; hovered: boolean; children: JSX.Element }) => {
+  const [hasHovered, setHasHovered] = createSignal(false);
+  const [loaded, setLoaded] = createSignal(false);
+
+  createEffect(() => {
+    props.domain;
+    setHasHovered(false);
+    setLoaded(false);
+  });
+
+  createEffect(() => {
+    if (props.hovered) setHasHovered(true);
+  });
+
+  return (
+    <div class="relative flex h-5 w-3.5 shrink-0 items-center justify-center sm:w-4">
+      <Show when={!props.hovered || !loaded()}>{props.children}</Show>
+      <Show when={hasHovered()}>
+        <Switch>
+          <Match when={props.domain === "tangled.sh" || props.domain === "tangled.org"}>
+            <span
+              class="iconify i-tangled size-4"
+              classList={{ hidden: !props.hovered || !loaded() }}
+              ref={() => setLoaded(true)}
+            />
+          </Match>
+          <Match when={true}>
+            <img
+              src={
+                ["bsky.app", "bsky.chat"].includes(props.domain) ?
+                  "https://web-cdn.bsky.app/static/apple-touch-icon.png"
+                : `https://${props.domain}/favicon.ico`
+              }
+              class="size-4"
+              classList={{ hidden: !props.hovered || !loaded() }}
+              onLoad={() => setLoaded(true)}
+              onError={() => setLoaded(false)}
+            />
+          </Match>
+        </Switch>
+      </Show>
+    </div>
+  );
+};
+
 export const NavBar = (props: { params: Params }) => {
   const [handle, setHandle] = createSignal(props.params.repo);
+  const [pdsHovered, setPdsHovered] = createSignal(false);
   const [repoHovered, setRepoHovered] = createSignal(false);
-  const [hasHoveredRepo, setHasHoveredRepo] = createSignal(false);
-  const [faviconLoaded, setFaviconLoaded] = createSignal(false);
   const [collectionHovered, setCollectionHovered] = createSignal(false);
   const isCustomDomain = () => handle() && !handle()!.endsWith(".bsky.social");
 
@@ -49,12 +92,6 @@ export const NavBar = (props: { params: Params }) => {
     }
   });
 
-  createEffect(() => {
-    handle();
-    setHasHoveredRepo(false);
-    setFaviconLoaded(false);
-  });
-
   const rkeyTimestamp = createMemo(() => {
     if (!props.params.rkey || !TID.validate(props.params.rkey)) return undefined;
     const timestamp = TID.parse(props.params.rkey).timestamp / 1000;
@@ -64,18 +101,31 @@ export const NavBar = (props: { params: Params }) => {
   return (
     <nav class="flex w-full flex-col text-sm wrap-anywhere sm:text-base">
       {/* PDS Level */}
-      <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
+      <div
+        class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40"
+        onMouseEnter={() => {
+          if (canHover) setPdsHovered(true);
+        }}
+        onMouseLeave={() => {
+          if (canHover) setPdsHovered(false);
+        }}
+      >
         <div class="flex min-h-6 basis-full items-center gap-2 sm:min-h-7">
           <Tooltip text="PDS">
-            <span
-              classList={{
-                "iconify shrink-0 transition-colors duration-200": true,
-                "lucide--unplug text-red-500 dark:text-red-400":
-                  pds() === "Missing PDS" && props.params.repo?.startsWith("did:"),
-                "lucide--hard-drive text-neutral-500 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200":
-                  pds() !== "Missing PDS" || !props.params.repo?.startsWith("did:"),
-              }}
-            ></span>
+            <HoverFavicon
+              domain={pds() ?? ""}
+              hovered={pdsHovered() && !!pds() && pds() !== "Missing PDS"}
+            >
+              <span
+                classList={{
+                  "iconify shrink-0 transition-colors duration-200": true,
+                  "lucide--unplug text-red-500 dark:text-red-400":
+                    pds() === "Missing PDS" && props.params.repo?.startsWith("did:"),
+                  "lucide--hard-drive text-neutral-500 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200":
+                    pds() !== "Missing PDS" || !props.params.repo?.startsWith("did:"),
+                }}
+              ></span>
+            </HoverFavicon>
           </Tooltip>
           <Show when={pds() && (pds() !== "Missing PDS" || props.params.repo?.startsWith("did:"))}>
             <Show
@@ -110,36 +160,17 @@ export const NavBar = (props: { params: Params }) => {
           <div
             class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40"
             onMouseEnter={() => {
-              if (canHover) {
-                setRepoHovered(true);
-                setHasHoveredRepo(true);
-              }
+              if (canHover) setRepoHovered(true);
             }}
             onMouseLeave={() => {
-              if (canHover) {
-                setRepoHovered(false);
-              }
+              if (canHover) setRepoHovered(false);
             }}
           >
             <div class="flex min-w-0 basis-full items-center gap-2">
               <Tooltip text="Repository">
-                <div class="relative flex h-5 w-3.5 shrink-0 items-center justify-center sm:w-4">
-                  <span
-                    class="iconify lucide--book-user absolute text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"
-                    classList={{
-                      hidden: !!(repoHovered() && isCustomDomain() && faviconLoaded()),
-                    }}
-                  ></span>
-                  <Show when={hasHoveredRepo() && isCustomDomain()}>
-                    <img
-                      src={`https://${handle()}/favicon.ico`}
-                      class="size-4"
-                      classList={{ hidden: !repoHovered() || !faviconLoaded() }}
-                      onLoad={() => setFaviconLoaded(true)}
-                      onError={() => setFaviconLoaded(false)}
-                    />
-                  </Show>
-                </div>
+                <HoverFavicon domain={handle() ?? ""} hovered={repoHovered() && !!isCustomDomain()}>
+                  <span class="iconify lucide--book-user text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
+                </HoverFavicon>
               </Tooltip>
               <Show
                 when={props.params.collection}
@@ -189,20 +220,12 @@ export const NavBar = (props: { params: Params }) => {
           >
             <div class="flex basis-full items-center gap-2">
               <Tooltip text="Collection">
-                <div class="relative flex h-5 w-3.5 shrink-0 items-center justify-center sm:w-4">
-                  <Show
-                    when={collectionHovered()}
-                    fallback={
-                      <span class="iconify lucide--folder-open text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
-                    }
-                  >
-                    {(() => {
-                      const parts = props.params.collection!.split(".");
-                      const authority = `${parts[0]}.${parts[1]}`;
-                      return <Favicon authority={authority} wrapper={(c) => c} />;
-                    })()}
-                  </Show>
-                </div>
+                <HoverFavicon
+                  domain={props.params.collection!.split(".").slice(0, 2).reverse().join(".")}
+                  hovered={collectionHovered()}
+                >
+                  <span class="iconify lucide--folder-open text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
+                </HoverFavicon>
               </Tooltip>
               <Show
                 when={props.params.rkey}
