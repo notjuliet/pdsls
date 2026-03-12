@@ -34,7 +34,7 @@ export const didDocumentResolver = createMemo(
 );
 
 export const handleResolver = new CompositeHandleResolver({
-  strategy: "dns-first",
+  strategy: "race",
   methods: {
     dns: new DohJsonHandleResolver({ dohUrl: "https://dns.google/resolve?" }),
     http: new WellKnownHandleResolver(),
