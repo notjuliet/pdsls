@@ -586,45 +586,44 @@ async function handleFavicon(searchParams) {
     }
   } catch {}
 
-  if (!faviconUrl) {
-    faviconUrl = `https://${domain}/favicon.ico`;
+  const fallbackUrl = `https://${domain}/favicon.ico`;
+  const urls = faviconUrl ? [faviconUrl, fallbackUrl] : [fallbackUrl];
+
+  for (const url of urls) {
+    try {
+      const iconRes = await fetch(url, {
+        signal: AbortSignal.timeout(5000),
+        redirect: "follow",
+      });
+
+      if (!iconRes.ok) continue;
+
+      const contentType = iconRes.headers.get("content-type") ?? "";
+      if (contentType.includes("text/html") || contentType.includes("text/plain")) continue;
+
+      const contentLength = parseInt(iconRes.headers.get("content-length") ?? "0", 10);
+      if (contentLength > MAX_FAVICON_SIZE) {
+        return new Response("Favicon too large", { status: 413 });
+      }
+
+      const body = await iconRes.arrayBuffer();
+      if (body.byteLength > MAX_FAVICON_SIZE) {
+        return new Response("Favicon too large", { status: 413 });
+      }
+
+      return new Response(body, {
+        headers: {
+          "Content-Type": contentType || "image/x-icon",
+          "Cache-Control": "public, max-age=86400",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+    } catch {
+      continue;
+    }
   }
 
-  try {
-    const iconRes = await fetch(faviconUrl, {
-      signal: AbortSignal.timeout(5000),
-      redirect: "follow",
-    });
-
-    if (!iconRes.ok) {
-      return new Response("Favicon not found", { status: 404 });
-    }
-
-    const contentType = iconRes.headers.get("content-type") ?? "";
-    if (!contentType.includes("image") && !contentType.includes("icon")) {
-      return new Response("Not an image", { status: 404 });
-    }
-
-    const contentLength = parseInt(iconRes.headers.get("content-length") ?? "0", 10);
-    if (contentLength > MAX_FAVICON_SIZE) {
-      return new Response("Favicon too large", { status: 413 });
-    }
-
-    const body = await iconRes.arrayBuffer();
-    if (body.byteLength > MAX_FAVICON_SIZE) {
-      return new Response("Favicon too large", { status: 413 });
-    }
-
-    return new Response(body, {
-      headers: {
-        "Content-Type": contentType,
-        "Cache-Control": "public, max-age=86400",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
-  } catch {
-    return new Response("Failed to fetch favicon", { status: 502 });
-  }
+  return new Response("Favicon not found", { status: 404 });
 }
 
 export default {
