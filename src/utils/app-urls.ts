@@ -6,6 +6,7 @@ export enum App {
   Pinksea,
   Blento,
   Popfeed,
+  GreenGale,
 }
 
 export const appName = {
@@ -14,6 +15,7 @@ export const appName = {
   [App.Pinksea]: "Pinksea",
   [App.Blento]: "Blento",
   [App.Popfeed]: "Popfeed",
+  [App.GreenGale]: "GreenGale",
 };
 
 export const appList: Record<AppUrl, App> = {
@@ -30,6 +32,7 @@ export const appList: Record<AppUrl, App> = {
   "pinksea.art": App.Pinksea,
   "blento.app": App.Blento,
   "popfeed.social": App.Popfeed,
+  "greengale.app": App.GreenGale,
 };
 
 export const appHandleLink: Record<App, (url: string[]) => string> = {
@@ -113,5 +116,8 @@ export const appHandleLink: Record<App, (url: string[]) => string> = {
       return `at://${path[2]}/${path[3]}/${path[4]}`;
     }
     return `at://${path[1]}`;
+  },
+  [App.GreenGale]: (path) => {
+    return `at://${path[0]}/site.standard.document/${path[1]}`;
   },
 };
