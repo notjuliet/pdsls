@@ -488,6 +488,45 @@ class HeadEndRewriter {
 
 const MAX_FAVICON_SIZE = 100 * 1024; // 100KB
 
+async function corsProxy(url, fetchOpts = {}) {
+  const res = await fetch(url, {
+    signal: AbortSignal.timeout(5000),
+    ...fetchOpts,
+  });
+
+  return new Response(res.body, {
+    status: res.status,
+    headers: {
+      "Content-Type": res.headers.get("content-type") ?? "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
+}
+
+function handleResolveDidWeb(searchParams) {
+  const host = searchParams.get("host");
+  if (!host) return new Response("Missing host param", { status: 400 });
+  return corsProxy(`https://${host}/.well-known/did.json`, {
+    redirect: "manual",
+    headers: { accept: "application/did+ld+json,application/json" },
+  });
+}
+
+function handleResolveHandleDns(searchParams) {
+  const handle = searchParams.get("handle");
+  if (!handle) return new Response("Missing handle param", { status: 400 });
+  const url = new URL("https://dns.google/resolve");
+  url.searchParams.set("name", `_atproto.${handle}`);
+  url.searchParams.set("type", "TXT");
+  return corsProxy(url, { headers: { accept: "application/dns-json" } });
+}
+
+function handleResolveHandleHttp(searchParams) {
+  const handle = searchParams.get("handle");
+  if (!handle) return new Response("Missing handle param", { status: 400 });
+  return corsProxy(`https://${handle}/.well-known/atproto-did`, { redirect: "manual" });
+}
+
 async function handleFavicon(searchParams) {
   const domain = searchParams.get("domain");
   if (!domain) {
@@ -601,6 +640,18 @@ export default {
     if (url.pathname === "/favicon") {
       return handleFavicon(url.searchParams).catch(
         (err) => new Response(`Failed to fetch favicon: ${err?.message ?? err}`, { status: 500 }),
+      );
+    }
+
+    const proxyRoutes = {
+      "/resolve-did-web": handleResolveDidWeb,
+      "/resolve-handle-dns": handleResolveHandleDns,
+      "/resolve-handle-http": handleResolveHandleHttp,
+    };
+
+    if (url.pathname in proxyRoutes) {
+      return proxyRoutes[url.pathname](url.searchParams).catch(
+        (err) => new Response(`Proxy error: ${err?.message ?? err}`, { status: 500 }),
       );
     }
 

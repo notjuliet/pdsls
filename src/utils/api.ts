@@ -21,6 +21,33 @@ import { createStore } from "solid-js/store";
 import { setPDS } from "../components/navbar";
 import { plcDirectory } from "../views/settings";
 
+const proxyFetch = (rewrite: (url: URL) => string): typeof fetch => {
+  return async (input, init) => {
+    try {
+      return await fetch(input, init);
+    } catch (err) {
+      if (init?.signal?.aborted) throw err;
+      const url = new URL(
+        typeof input === "string" ? input
+        : input instanceof URL ? input.href
+        : input.url,
+      );
+      return fetch(rewrite(url));
+    }
+  };
+};
+
+const didWebProxyFetch = proxyFetch(
+  (url) => `/resolve-did-web?host=${encodeURIComponent(url.host)}`,
+);
+const dnsProxyFetch = proxyFetch(
+  (url) =>
+    `/resolve-handle-dns?handle=${encodeURIComponent(url.searchParams.get("name")?.replace("_atproto.", "") ?? "")}`,
+);
+const handleHttpProxyFetch = proxyFetch(
+  (url) => `/resolve-handle-http?handle=${encodeURIComponent(url.host)}`,
+);
+
 export const didDocumentResolver = createMemo(
   () =>
     new CompositeDidDocumentResolver({
@@ -28,16 +55,16 @@ export const didDocumentResolver = createMemo(
         plc: new PlcDidDocumentResolver({
           apiUrl: plcDirectory(),
         }),
-        web: new AtprotoWebDidDocumentResolver(),
+        web: new AtprotoWebDidDocumentResolver({ fetch: didWebProxyFetch }),
       },
     }),
 );
 
 export const handleResolver = new CompositeHandleResolver({
-  strategy: "race",
+  strategy: "dns-first",
   methods: {
-    dns: new DohJsonHandleResolver({ dohUrl: "https://dns.google/resolve?" }),
-    http: new WellKnownHandleResolver(),
+    dns: new DohJsonHandleResolver({ dohUrl: "https://dns.google/resolve?", fetch: dnsProxyFetch }),
+    http: new WellKnownHandleResolver({ fetch: handleHttpProxyFetch }),
   },
 });
 
@@ -223,7 +250,7 @@ export interface HandleResolveResult {
 
 export const resolveHandleDetailed = async (handle: Handle) => {
   const dnsResolver = new DohJsonHandleResolver({ dohUrl: "https://dns.google/resolve?" });
-  const httpResolver = new WellKnownHandleResolver();
+  const httpResolver = new WellKnownHandleResolver({ fetch: handleHttpProxyFetch });
 
   const tryResolve = async (
     resolver: DohJsonHandleResolver | WellKnownHandleResolver,
