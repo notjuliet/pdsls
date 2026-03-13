@@ -34,9 +34,12 @@ const HoverFavicon = (props: { domain: string; hovered: boolean; children: JSX.E
   const [hasHovered, setHasHovered] = createSignal(false);
   const [loaded, setLoaded] = createSignal(false);
   const [src, setSrc] = createSignal("");
+  let lastDomain = "";
 
   createEffect(() => {
-    props.domain;
+    const domain = props.domain;
+    if (!domain || domain === lastDomain) return;
+    lastDomain = domain;
     setHasHovered(false);
     setLoaded(false);
     setSrc("");
