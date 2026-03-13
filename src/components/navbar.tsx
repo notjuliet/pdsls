@@ -55,7 +55,7 @@ const HoverFavicon = (props: { domain: string; hovered: boolean; children: JSX.E
   return (
     <div class="relative flex h-5 w-3.5 shrink-0 items-center justify-center sm:w-4">
       <Show when={!props.hovered || !loaded()}>{props.children}</Show>
-      <Show when={hasHovered()}>
+      <Show when={hasHovered() && props.domain}>
         <Switch>
           <Match when={props.domain === "tangled.sh" || props.domain === "tangled.org"}>
             <span
