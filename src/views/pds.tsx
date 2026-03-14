@@ -154,6 +154,12 @@ export const PdsView = () => {
     },
   });
 
+  virtualizer.indexFromElement = (node: Element) => {
+    const indexStr = node.getAttribute("data-index");
+    if (!indexStr) return -1;
+    return parseInt(indexStr, 10);
+  };
+
   const Tab = (props: { tab: "repos" | "info" | "firehose"; label: string }) => (
     <A
       classList={{
@@ -193,7 +199,7 @@ export const PdsView = () => {
                 {(virtualItem) => (
                   <div
                     data-index={virtualItem.index}
-                    ref={(el) => virtualizer.measureElement(el)}
+                    ref={virtualizer.measureElement}
                     classList={{ "z-10": expandedIndex() === virtualItem.index }}
                     style={{
                       position: "absolute",
