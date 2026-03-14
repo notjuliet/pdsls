@@ -4,7 +4,7 @@ import { InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
 import { A, useLocation, useParams } from "@solidjs/router";
 import { createWindowVirtualizer } from "@tanstack/solid-virtual";
-import { createResource, createSignal, For, Show } from "solid-js";
+import { createEffect, createResource, createSignal, For, on, onCleanup, Show } from "solid-js";
 import { Button } from "../components/button";
 import DidHoverCard from "../components/hover-card/did";
 import { setPDS } from "../components/navbar";
@@ -19,13 +19,27 @@ const RepoCard = (props: {
   onToggle: () => void;
 }) => {
   const expanded = () => props.expanded;
+  const [collapsing, setCollapsing] = createSignal(false);
+
+  createEffect(
+    on(expanded, (curr, prev) => {
+      if (prev && !curr) {
+        setCollapsing(true);
+        const t = setTimeout(() => setCollapsing(false), 250);
+        onCleanup(() => clearTimeout(t));
+      }
+    }),
+  );
+
+  const animating = () => expanded() || collapsing();
 
   return (
     <div
       classList={{
         "group rounded-md border-[0.5px]": true,
+        "transition-[background-color,border-color,box-shadow] duration-250": animating(),
         "dark:hover:bg-dark-200 border-transparent hover:bg-neutral-200/50": !expanded(),
-        "dark:bg-dark-300 border-neutral-200 bg-neutral-50 shadow-sm transition-[background-color,border-color,box-shadow] duration-200 dark:border-neutral-700 dark:shadow-dark-700":
+        "dark:bg-dark-300 border-neutral-200 bg-neutral-50 shadow-sm dark:border-neutral-700 dark:shadow-dark-700":
           expanded(),
       }}
     >
@@ -37,7 +51,7 @@ const RepoCard = (props: {
         >
           <span
             classList={{
-              "mt-0.5 flex shrink-0 items-center text-neutral-400 transition-transform duration-200 dark:text-neutral-500": true,
+              "mt-0.5 flex shrink-0 items-center text-neutral-400 transition-transform duration-250 dark:text-neutral-500": true,
               "rotate-90": expanded(),
             }}
           >
@@ -65,7 +79,7 @@ const RepoCard = (props: {
           <A
             href={`/at://${props.repo.did}`}
             classList={{
-              "flex shrink-0 items-center p-2 transition-colors duration-200": true,
+              "flex shrink-0 items-center p-2 transition-colors duration-500": true,
               "invisible group-hover:visible not-hover:text-neutral-500 not-hover:dark:text-neutral-400":
                 !expanded(),
             }}
@@ -76,7 +90,7 @@ const RepoCard = (props: {
       </div>
       <div
         classList={{
-          "grid transition-[grid-template-rows] duration-200 ease-out": true,
+          "grid transition-[grid-template-rows] duration-250 ease-in-out": true,
           "grid-rows-[1fr]": expanded(),
           "grid-rows-[0fr]": !expanded(),
         }}
@@ -224,6 +238,8 @@ export const PdsView = () => {
                         left: 0,
                         width: "100%",
                         overflow: "visible",
+                        "transition-property": "z-index",
+                        "transition-delay": isExpanded() ? "0ms" : "250ms",
                       }}
                     >
                       <RepoCard
