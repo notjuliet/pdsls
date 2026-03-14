@@ -314,7 +314,9 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
   const canShowMedia = () =>
     pds() &&
     !ctx.hideBlobs &&
-    (blob.mimeType.startsWith("image/") || blob.mimeType === "video/mp4");
+    (blob.mimeType.startsWith("image/") ||
+      blob.mimeType === "video/mp4" ||
+      blob.mimeType.startsWith("audio/"));
 
   const MediaDisplay = () => {
     const [expanded, setExpanded] = createSignal(false);
@@ -391,6 +393,14 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
               <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
                 <VideoPlayer did={ctx.repo} cid={blob.ref.$link} />
               </ErrorBoundary>
+            </Show>
+            <Show when={blob.mimeType.startsWith("audio/")}>
+              <audio class="my-0.5 max-w-96" controls>
+                <source
+                  src={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${ctx.repo}&cid=${blob.ref.$link}`}
+                  type={blob.mimeType === "audio/x-flac" ? "audio/flac" : blob.mimeType}
+                />
+              </audio>
             </Show>
           </Show>
           <Show when={hide()}>
