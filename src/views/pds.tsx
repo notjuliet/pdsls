@@ -143,6 +143,7 @@ export const PdsView = () => {
   const [expandedIndex, setExpandedIndex] = createSignal<number | null>(null);
 
   let containerRef: HTMLDivElement | undefined;
+  const collapsedHeights = new Map<number, number>();
   const virtualizer = createWindowVirtualizer({
     get count() {
       return repos()?.length ?? 0;
@@ -153,6 +154,17 @@ export const PdsView = () => {
       return containerRef?.offsetTop ?? 0;
     },
   });
+
+  const baseMeasure = virtualizer.measureElement.bind(virtualizer);
+  virtualizer.measureElement = (el: Element | null) => {
+    if (!el) return;
+    const indexStr = el.getAttribute("data-index");
+    if (indexStr == null) return;
+    const index = parseInt(indexStr, 10);
+    if (expandedIndex() === index) return;
+    collapsedHeights.set(index, (el as HTMLElement).offsetHeight);
+    baseMeasure(el);
+  };
 
   virtualizer.indexFromElement = (node: Element) => {
     const indexStr = node.getAttribute("data-index");
@@ -196,29 +208,34 @@ export const PdsView = () => {
               style={{ height: `${virtualizer.getTotalSize()}px`, position: "relative" }}
             >
               <For each={virtualizer.getVirtualItems()}>
-                {(virtualItem) => (
-                  <div
-                    data-index={virtualItem.index}
-                    ref={virtualizer.measureElement}
-                    classList={{ "z-10": expandedIndex() === virtualItem.index }}
-                    style={{
-                      position: "absolute",
-                      top: `${virtualItem.start - virtualizer.options.scrollMargin}px`,
-                      left: 0,
-                      width: "100%",
-                    }}
-                  >
-                    <RepoCard
-                      repo={repos()![virtualItem.index]}
-                      expanded={expandedIndex() === virtualItem.index}
-                      onToggle={() => {
-                        const isClosing = expandedIndex() === virtualItem.index;
-                        setExpandedIndex(isClosing ? null : virtualItem.index);
-                        if (isClosing) requestAnimationFrame(() => virtualizer.measure());
+                {(virtualItem) => {
+                  const isExpanded = () => expandedIndex() === virtualItem.index;
+                  return (
+                    <div
+                      data-index={virtualItem.index}
+                      ref={virtualizer.measureElement}
+                      classList={{
+                        "z-10": isExpanded(),
+                        "z-0": !isExpanded(),
                       }}
-                    />
-                  </div>
-                )}
+                      style={{
+                        position: "absolute",
+                        top: `${virtualItem.start - virtualizer.options.scrollMargin}px`,
+                        left: 0,
+                        width: "100%",
+                        overflow: "visible",
+                      }}
+                    >
+                      <RepoCard
+                        repo={repos()![virtualItem.index]}
+                        expanded={isExpanded()}
+                        onToggle={() => {
+                          setExpandedIndex(isExpanded() ? null : virtualItem.index);
+                        }}
+                      />
+                    </div>
+                  );
+                }}
               </For>
             </div>
           </Show>
