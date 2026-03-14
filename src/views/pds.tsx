@@ -147,7 +147,7 @@ export const PdsView = () => {
     get count() {
       return repos()?.length ?? 0;
     },
-    estimateSize: () => 32,
+    estimateSize: () => 33,
     overscan: 10,
     get scrollMargin() {
       return containerRef?.offsetTop ?? 0;
@@ -211,11 +211,11 @@ export const PdsView = () => {
                     <RepoCard
                       repo={repos()![virtualItem.index]}
                       expanded={expandedIndex() === virtualItem.index}
-                      onToggle={() =>
-                        setExpandedIndex(
-                          expandedIndex() === virtualItem.index ? null : virtualItem.index,
-                        )
-                      }
+                      onToggle={() => {
+                        const isClosing = expandedIndex() === virtualItem.index;
+                        setExpandedIndex(isClosing ? null : virtualItem.index);
+                        if (isClosing) requestAnimationFrame(() => virtualizer.measure());
+                      }}
                     />
                   </div>
                 )}
