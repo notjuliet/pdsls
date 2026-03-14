@@ -1,10 +1,9 @@
-import { Title } from "@solidjs/meta";
 import { A } from "@solidjs/router";
 
 export const CarView = () => {
+  document.title = "Archive tools - PDSls";
   return (
     <div class="flex w-full max-w-3xl flex-col gap-y-4 px-2">
-      <Title>Archive tools - PDSls</Title>
       <div class="flex flex-col gap-y-1">
         <h1 class="text-lg font-semibold">Archive tools</h1>
         <p class="text-sm text-neutral-600 dark:text-neutral-400">

@@ -2,7 +2,6 @@ import { ComAtprotoServerDescribeServer, ComAtprotoSyncListRepos } from "@atcute
 import { Client, simpleFetchHandler } from "@atcute/client";
 import { InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
-import { Title } from "@solidjs/meta";
 import { A, useLocation, useParams } from "@solidjs/router";
 import { createResource, createSignal, For, Show } from "solid-js";
 import { Button } from "../components/button";
@@ -136,9 +135,10 @@ export const PdsView = () => {
     </A>
   );
 
+  document.title = `${params.pds} - PDSls`;
+
   return (
     <>
-      <Title>{params.pds} - PDSls</Title>
       <Show when={repos() || response()}>
         <div class="flex w-full flex-col px-2">
           <div class="mb-3 flex gap-4 text-sm sm:text-base">

@@ -1,6 +1,5 @@
 import { fromStream } from "@atcute/repo";
 import { zip, type ZipEntry } from "@mary/zip";
-import { Title } from "@solidjs/meta";
 import { createSignal, onCleanup } from "solid-js";
 import { createDropHandler, createFileChangeHandler, handleDragOver } from "./file-handlers.js";
 import { createLogger, LoggerView } from "./logger.jsx";
@@ -114,7 +113,8 @@ export const UnpackToolView = () => {
 
               try {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const fd = await (window as any).showSaveFilePicker({
+                const fd = await (window as any)
+                  .showSaveFilePicker({
                     suggestedName: `${file.name.replace(/\.car$/, "")}.zip`,
                     id: "car-unpack",
                     startIn: "downloads",
@@ -230,9 +230,9 @@ export const UnpackToolView = () => {
     baseDrop(e);
   };
 
+  document.title = "Unpack archive - PDSls";
   return (
     <>
-      <Title>Unpack archive - PDSls</Title>
       <WelcomeView
         title="Unpack archive"
         subtitle="Upload a CAR file to extract all records into a ZIP archive."

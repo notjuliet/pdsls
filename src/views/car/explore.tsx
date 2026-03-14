@@ -4,7 +4,6 @@ import * as CID from "@atcute/cid";
 import { Did } from "@atcute/lexicons";
 import { fromStream, isCommit } from "@atcute/repo";
 import * as TID from "@atcute/tid";
-import { Title } from "@solidjs/meta";
 import { useLocation, useNavigate } from "@solidjs/router";
 import {
   createEffect,
@@ -188,9 +187,9 @@ export const ExploreToolView = () => {
     if (location.hash) navigate(location.pathname, { replace: true });
   };
 
+  document.title = "Explore archive - PDSls";
   return (
     <>
-      <Title>Explore archive - PDSls</Title>
       <Show
         when={archive()}
         fallback={

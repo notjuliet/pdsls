@@ -2,7 +2,6 @@ import { ComAtprotoRepoApplyWrites, ComAtprotoRepoGetRecord } from "@atcute/atpr
 import { Client, simpleFetchHandler } from "@atcute/client";
 import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
-import { Title } from "@solidjs/meta";
 import { A, useBeforeLeave, useParams, useSearchParams } from "@solidjs/router";
 import { createMemo, createResource, createSignal, For, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
@@ -240,9 +239,10 @@ const CollectionView = () => {
       true,
     );
 
+  document.title = `${params.collection} - PDSls`;
+
   return (
     <>
-      <Title>{params.collection} - PDSls</Title>
       <Show when={records.length || response()}>
         <div class="flex w-full flex-col items-center">
           {/* Tab bar */}

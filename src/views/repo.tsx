@@ -1,7 +1,6 @@
 import { Client, simpleFetchHandler } from "@atcute/client";
 import { DidDocument } from "@atcute/identity";
 import { ActorIdentifier, Did, Handle, Nsid } from "@atcute/lexicons";
-import { Title } from "@solidjs/meta";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import {
   createEffect,
@@ -320,17 +319,17 @@ export const RepoView = () => {
     setDownloading(false);
   };
 
-  const getTitle = () => {
-    const doc = didDoc();
-    const handle = doc?.alsoKnownAs
-      ?.find((alias) => alias.startsWith("at://"))
+  document.title = `${params.repo} - PDSls`;
+
+  createEffect(() => {
+    const handle = didDoc()
+      ?.alsoKnownAs?.find((alias) => alias.startsWith("at://"))
       ?.replace("at://", "");
-    return `${handle || params.repo} - PDSls`;
-  };
+    if (handle) document.title = `${handle} - PDSls`;
+  });
 
   return (
     <>
-      <Title>{getTitle()}</Title>
       <Show when={repo()}>
         <div class="flex w-full flex-col gap-3 wrap-break-word">
           <div class="flex justify-between px-2 text-sm sm:text-base">

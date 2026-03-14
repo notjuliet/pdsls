@@ -1,5 +1,4 @@
 import { Firehose } from "@skyware/firehose";
-import { Title } from "@solidjs/meta";
 import { A, useLocation, useSearchParams } from "@solidjs/router";
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { Button } from "../../components/button";
@@ -329,9 +328,9 @@ export const StreamView = () => {
     if (statsUpdateIntervalId !== null) clearInterval(statsUpdateIntervalId);
   });
 
+  document.title = `${config().label} - PDSls`;
   return (
     <>
-      <Title>{config().label} - PDSls</Title>
       <div class="flex w-full flex-col items-center gap-2">
         {/* Tab Navigation */}
         <div class="flex gap-4 font-medium">

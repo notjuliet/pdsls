@@ -1,5 +1,4 @@
 import { Handle } from "@atcute/lexicons";
-import { Meta, MetaProvider, Title } from "@solidjs/meta";
 import { A, RouteSectionProps, useLocation, useNavigate } from "@solidjs/router";
 import { createEffect, ErrorBoundary, onCleanup, onMount, Show, Suspense } from "solid-js";
 import { AccountManager } from "./auth/account.jsx";
@@ -117,88 +116,82 @@ const Layout = (props: RouteSectionProps<unknown>) => {
   });
 
   return (
-    <MetaProvider>
-      <Title>PDSls</Title>
-      <Show when={location.pathname !== "/"}>
-        <Meta name="robots" content="noindex, nofollow" />
-      </Show>
-      <div id="main" class="mx-auto mb-8 flex max-w-lg flex-col items-center p-3">
-        <header
-          class={`dark:shadow-dark-700 mb-3 flex h-13 w-full items-center justify-between rounded-xl border-[0.5px] border-neutral-300 bg-neutral-50 bg-size-[95%] bg-right bg-no-repeat p-2 pl-3 shadow-xs [--header-bg:#fafafa] [--trans-blue:#5BCEFA90] [--trans-pink:#F5A9B890] [--trans-white:#FFFFFF90] dark:border-neutral-700 dark:bg-neutral-800 dark:[--header-bg:#262626] dark:[--trans-blue:#5BCEFAa0] dark:[--trans-pink:#F5A9B8a0] dark:[--trans-white:#FFFFFFa0] ${localStorage.getItem("hrt") === "true" ? "bg-[linear-gradient(to_left,transparent_10%,var(--header-bg)_85%),linear-gradient(to_bottom,var(--trans-blue)_0%,var(--trans-blue)_20%,var(--trans-pink)_20%,var(--trans-pink)_40%,var(--trans-white)_40%,var(--trans-white)_60%,var(--trans-pink)_60%,var(--trans-pink)_80%,var(--trans-blue)_80%,var(--trans-blue)_100%)]" : ""}`}
-          style={{
-            "background-image":
-              props.params.repo && props.params.repo in headers ?
-                `linear-gradient(to left, transparent 20%, var(--header-bg) 85%), url(/headers/${headers[props.params.repo]})`
-              : undefined,
-          }}
+    <div id="main" class="mx-auto mb-8 flex max-w-lg flex-col items-center p-3">
+      <header
+        class={`dark:shadow-dark-700 mb-3 flex h-13 w-full items-center justify-between rounded-xl border-[0.5px] border-neutral-300 bg-neutral-50 bg-size-[95%] bg-right bg-no-repeat p-2 pl-3 shadow-xs [--header-bg:#fafafa] [--trans-blue:#5BCEFA90] [--trans-pink:#F5A9B890] [--trans-white:#FFFFFF90] dark:border-neutral-700 dark:bg-neutral-800 dark:[--header-bg:#262626] dark:[--trans-blue:#5BCEFAa0] dark:[--trans-pink:#F5A9B8a0] dark:[--trans-white:#FFFFFFa0] ${localStorage.getItem("hrt") === "true" ? "bg-[linear-gradient(to_left,transparent_10%,var(--header-bg)_85%),linear-gradient(to_bottom,var(--trans-blue)_0%,var(--trans-blue)_20%,var(--trans-pink)_20%,var(--trans-pink)_40%,var(--trans-white)_40%,var(--trans-white)_60%,var(--trans-pink)_60%,var(--trans-pink)_80%,var(--trans-blue)_80%,var(--trans-blue)_100%)]" : ""}`}
+        style={{
+          "background-image":
+            props.params.repo && props.params.repo in headers ?
+              `linear-gradient(to left, transparent 20%, var(--header-bg) 85%), url(/headers/${headers[props.params.repo]})`
+            : undefined,
+        }}
+      >
+        <A
+          href="/"
+          style='font-feature-settings: "cv05"'
+          class="relative flex items-center gap-1 text-xl font-semibold"
         >
-          <A
-            href="/"
-            style='font-feature-settings: "cv05"'
-            class="relative flex items-center gap-1 text-xl font-semibold"
-          >
-            <span class="iconify tabler--binary-tree-filled text-[#76c4e5]"></span>
-            <span>PDSls</span>
-            <Show when={localStorage.getItem("hrt") === "true"}>
-              <img
-                src="/ribbon.webp"
-                alt=""
-                class="pointer-events-none absolute -top-3 -right-4 w-8 rotate-15"
-              />
-            </Show>
-          </A>
-          <div class="relative flex items-center gap-0.5 rounded-lg bg-neutral-50/60 p-1 dark:bg-neutral-800/60">
-            <div class="mr-1">
-              <SearchButton />
-            </div>
-            <Show when={agent()}>
-              <RecordEditor create={true} scope="create" />
-            </Show>
-            <AccountManager />
-            <MenuProvider>
-              <DropdownMenu icon="lucide--menu text-lg" buttonClass="rounded-md p-1.5">
-                <NavMenu href="/jetstream" label="Jetstream" icon="lucide--radio-tower" />
-                <NavMenu href="/firehose" label="Firehose" icon="lucide--rss" />
-                <NavMenu href="/spacedust" label="Spacedust" icon="lucide--sparkles" />
-                <MenuSeparator />
-                <NavMenu href="/labels" label="Labels" icon="lucide--tag" />
-                <NavMenu href="/car" label="Archive tools" icon="lucide--folder-archive" />
-                <MenuSeparator />
-                <NavMenu href="/settings" label="Settings" icon="lucide--settings" />
-              </DropdownMenu>
-            </MenuProvider>
+          <span class="iconify tabler--binary-tree-filled text-[#76c4e5]"></span>
+          <span>PDSls</span>
+          <Show when={localStorage.getItem("hrt") === "true"}>
+            <img
+              src="/ribbon.webp"
+              alt=""
+              class="pointer-events-none absolute -top-3 -right-4 w-8 rotate-15"
+            />
+          </Show>
+        </A>
+        <div class="relative flex items-center gap-0.5 rounded-lg bg-neutral-50/60 p-1 dark:bg-neutral-800/60">
+          <div class="mr-1">
+            <SearchButton />
           </div>
-        </header>
-        <div class="flex w-full flex-col items-center gap-3 text-pretty">
-          <Search />
-          <Show when={props.params.pds}>
-            <NavBar params={props.params} />
+          <Show when={agent()}>
+            <RecordEditor create={true} scope="create" />
           </Show>
-          <Show keyed when={location.pathname}>
-            <ErrorBoundary
-              fallback={(err) => <div class="mt-3 wrap-anywhere">Error: {err.message}</div>}
-            >
-              <Suspense
-                fallback={
-                  <span class="iconify lucide--loader-circle mt-3 animate-spin text-xl"></span>
-                }
-              >
-                {props.children}
-              </Suspense>
-            </ErrorBoundary>
-          </Show>
+          <AccountManager />
+          <MenuProvider>
+            <DropdownMenu icon="lucide--menu text-lg" buttonClass="rounded-md p-1.5">
+              <NavMenu href="/jetstream" label="Jetstream" icon="lucide--radio-tower" />
+              <NavMenu href="/firehose" label="Firehose" icon="lucide--rss" />
+              <NavMenu href="/spacedust" label="Spacedust" icon="lucide--sparkles" />
+              <MenuSeparator />
+              <NavMenu href="/labels" label="Labels" icon="lucide--tag" />
+              <NavMenu href="/car" label="Archive tools" icon="lucide--folder-archive" />
+              <MenuSeparator />
+              <NavMenu href="/settings" label="Settings" icon="lucide--settings" />
+            </DropdownMenu>
+          </MenuProvider>
         </div>
-        <NotificationContainer />
-        <PermissionPromptContainer />
-        <Show when={plcDirectory() !== "https://plc.directory"}>
-          <div class="dark:bg-dark-500 fixed right-0 bottom-0 left-0 z-10 flex items-center justify-center bg-neutral-100 px-3 py-1 text-xs">
-            <span>
-              PLC directory: <span class="font-medium">{plcDirectory()}</span>
-            </span>
-          </div>
+      </header>
+      <div class="flex w-full flex-col items-center gap-3 text-pretty">
+        <Search />
+        <Show when={props.params.pds}>
+          <NavBar params={props.params} />
+        </Show>
+        <Show keyed when={location.pathname}>
+          <ErrorBoundary
+            fallback={(err) => <div class="mt-3 wrap-anywhere">Error: {err.message}</div>}
+          >
+            <Suspense
+              fallback={
+                <span class="iconify lucide--loader-circle mt-3 animate-spin text-xl"></span>
+              }
+            >
+              {props.children}
+            </Suspense>
+          </ErrorBoundary>
         </Show>
       </div>
-    </MetaProvider>
+      <NotificationContainer />
+      <PermissionPromptContainer />
+      <Show when={plcDirectory() !== "https://plc.directory"}>
+        <div class="dark:bg-dark-500 fixed right-0 bottom-0 left-0 z-10 flex items-center justify-center bg-neutral-100 px-3 py-1 text-xs">
+          <span>
+            PLC directory: <span class="font-medium">{plcDirectory()}</span>
+          </span>
+        </div>
+      </Show>
+    </div>
   );
 };
 

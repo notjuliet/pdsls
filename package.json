@@ -51,7 +51,6 @@
     "@mary/exif-rm": "jsr:^0.2.2",
     "@mary/zip": "jsr:^0.1.1",
     "@skyware/firehose": "^0.5.2",
-    "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.4",
     "@takumi-rs/image-response": "^0.72.0",
     "@takumi-rs/wasm": "^0.72.0",

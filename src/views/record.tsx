@@ -6,7 +6,6 @@ import { FailedLexiconResolutionError, ResolvedSchema } from "@atcute/lexicon-re
 import { ActorIdentifier, is, Nsid } from "@atcute/lexicons";
 import { AtprotoDid, Did, isNsid } from "@atcute/lexicons/syntax";
 import { verifyRecord } from "@atcute/repo";
-import { Title } from "@solidjs/meta";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from "solid-js";
 import { agent } from "../auth/state";
@@ -408,11 +407,10 @@ export const RecordView = () => {
     );
   };
 
+  document.title = `${params.collection}/${params.rkey} - PDSls`;
+
   return (
     <>
-      <Title>
-        {params.collection}/{params.rkey} - PDSls
-      </Title>
       <ErrorBoundary
         fallback={(err) => (
           <div class="flex w-full flex-col items-center gap-1 px-2 py-4">

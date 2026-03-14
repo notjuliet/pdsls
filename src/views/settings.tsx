@@ -1,4 +1,3 @@
-import { Title } from "@solidjs/meta";
 import { createSignal } from "solid-js";
 import { TextInput } from "../components/text-input.jsx";
 import { ThemeSelection } from "../components/theme.jsx";
@@ -9,9 +8,9 @@ export const [plcDirectory, setPlcDirectory] = createSignal(
 );
 
 const Settings = () => {
+  document.title = "Settings - PDSls";
   return (
     <div class="flex w-full flex-col gap-2 px-2">
-      <Title>Settings - PDSls</Title>
       <div class="text-lg font-semibold">Settings</div>
       <div class="flex flex-col gap-3">
         <div class="flex flex-col gap-1">
