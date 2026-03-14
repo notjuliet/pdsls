@@ -36,7 +36,9 @@ const RepoCard = (props: {
   return (
     <div
       classList={{
-        "group rounded-md border-[0.5px]": true,
+        "group relative rounded-md border-[0.5px]": true,
+        "z-20": expanded(),
+        "z-10": collapsing(),
         "transition-[background-color,border-color,box-shadow] duration-250": animating(),
         "dark:hover:bg-dark-200 border-transparent hover:bg-neutral-200/50": !expanded(),
         "dark:bg-dark-300 border-neutral-200 bg-neutral-50 shadow-sm dark:border-neutral-700 dark:shadow-dark-700":
@@ -228,18 +230,12 @@ export const PdsView = () => {
                     <div
                       data-index={virtualItem.index}
                       ref={virtualizer.measureElement}
-                      classList={{
-                        "z-10": isExpanded(),
-                        "z-0": !isExpanded(),
-                      }}
                       style={{
                         position: "absolute",
                         top: `${virtualItem.start - virtualizer.options.scrollMargin}px`,
                         left: 0,
                         width: "100%",
                         overflow: "visible",
-                        "transition-property": "z-index",
-                        "transition-delay": isExpanded() ? "0ms" : "250ms",
                       }}
                     >
                       <RepoCard
