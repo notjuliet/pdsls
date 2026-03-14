@@ -3,6 +3,7 @@ import { Client, simpleFetchHandler } from "@atcute/client";
 import { InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
 import { A, useLocation, useParams } from "@solidjs/router";
+import { createWindowVirtualizer } from "@tanstack/solid-virtual";
 import { createResource, createSignal, For, Show } from "solid-js";
 import { Button } from "../components/button";
 import DidHoverCard from "../components/hover-card/did";
@@ -11,6 +12,93 @@ import { canHover } from "../layout";
 import { localDateFromTimestamp } from "../utils/date";
 
 const LIMIT = 1000;
+
+const RepoCard = (props: {
+  repo: ComAtprotoSyncListRepos.Repo;
+  expanded: boolean;
+  onToggle: () => void;
+}) => {
+  const expanded = () => props.expanded;
+
+  return (
+    <div
+      classList={{
+        "group rounded-md border-[0.5px]": true,
+        "dark:hover:bg-dark-200 border-transparent hover:bg-neutral-200/50": !expanded(),
+        "dark:bg-dark-300 border-neutral-200 bg-neutral-50 shadow-sm transition-[background-color,border-color,box-shadow] duration-200 dark:border-neutral-700 dark:shadow-dark-700":
+          expanded(),
+      }}
+    >
+      <div class="flex min-w-0 flex-1 items-center">
+        <button
+          type="button"
+          onclick={() => props.onToggle()}
+          class="flex min-w-0 flex-1 items-center gap-2 p-1.5"
+        >
+          <span
+            classList={{
+              "mt-0.5 flex shrink-0 items-center text-neutral-400 transition-transform duration-200 dark:text-neutral-500": true,
+              "rotate-90": expanded(),
+            }}
+          >
+            <span class="iconify lucide--chevron-right"></span>
+          </span>
+          <div class="flex min-w-0 flex-1 items-center gap-x-2 text-sm">
+            <span class="min-w-0 truncate font-mono" onclick={(e) => e.stopPropagation()}>
+              <DidHoverCard newTab did={props.repo.did} />
+            </span>
+            <Show when={!props.repo.active}>
+              <span class="flex shrink-0 items-center gap-1 text-red-500 dark:text-red-400">
+                <span
+                  class={`iconify ${
+                    props.repo.status === "deactivated" ? "lucide--user-round-x"
+                    : props.repo.status === "takendown" ? "lucide--shield-ban"
+                    : "lucide--unplug"
+                  }`}
+                ></span>
+                {props.repo.status ?? "inactive"}
+              </span>
+            </Show>
+          </div>
+        </button>
+        <Show when={expanded() || canHover}>
+          <A
+            href={`/at://${props.repo.did}`}
+            classList={{
+              "flex shrink-0 items-center p-2 transition-colors duration-200": true,
+              "invisible group-hover:visible not-hover:text-neutral-500 not-hover:dark:text-neutral-400":
+                !expanded(),
+            }}
+          >
+            <span class="iconify lucide--arrow-right"></span>
+          </A>
+        </Show>
+      </div>
+      <div
+        classList={{
+          "grid transition-[grid-template-rows] duration-200 ease-out": true,
+          "grid-rows-[1fr]": expanded(),
+          "grid-rows-[0fr]": !expanded(),
+        }}
+      >
+        <div class="overflow-hidden">
+          <div class="ml-7.5 flex flex-col gap-1.5 pb-1.5 font-mono text-xs text-neutral-500 dark:text-neutral-400">
+            <Show when={props.repo.head}>
+              <span class="truncate">{props.repo.head}</span>
+            </Show>
+            <Show when={TID.validate(props.repo.rev)}>
+              <div class="flex gap-1 text-neutral-700 dark:text-neutral-300">
+                <span>{props.repo.rev}</span>
+                <span>•</span>
+                <span>{localDateFromTimestamp(TID.parse(props.repo.rev).timestamp / 1000)}</span>
+              </div>
+            </Show>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const PdsView = () => {
   const params = useParams();
@@ -36,9 +124,10 @@ export const PdsView = () => {
     else setServerInfos(res.data);
   };
 
+  getVersion();
+  describeServer();
+
   const fetchRepos = async () => {
-    getVersion();
-    describeServer();
     const res = await rpc.get("com.atproto.sync.listRepos", {
       params: { limit: LIMIT, cursor: cursor() },
     });
@@ -51,71 +140,19 @@ export const PdsView = () => {
   const [response, { refetch }] = createResource(fetchRepos);
   const [repos, setRepos] = createSignal<ComAtprotoSyncListRepos.Repo[]>();
 
-  const RepoCard = (repo: ComAtprotoSyncListRepos.Repo) => {
-    const [expanded, setExpanded] = createSignal(false);
-    const [hovering, setHovering] = createSignal(false);
+  const [expandedIndex, setExpandedIndex] = createSignal<number | null>(null);
 
-    return (
-      <div class="flex flex-col gap-1">
-        <div
-          class="dark:hover:bg-dark-200 flex min-w-0 flex-1 items-center rounded hover:bg-neutral-200/70"
-          onMouseEnter={() => canHover && setHovering(true)}
-          onMouseLeave={() => canHover && setHovering(false)}
-        >
-          <button
-            type="button"
-            onclick={() => setExpanded(!expanded())}
-            class="flex min-w-0 flex-1 items-center gap-2 p-1.5"
-          >
-            <span class="mt-0.5 flex shrink-0 items-center text-neutral-400 dark:text-neutral-500">
-              {expanded() ?
-                <span class="iconify lucide--chevron-down"></span>
-              : <span class="iconify lucide--chevron-right"></span>}
-            </span>
-            <div class="flex min-w-0 flex-1 items-center gap-x-2 text-sm">
-              <span class="min-w-0 truncate font-mono" onclick={(e) => e.stopPropagation()}>
-                <DidHoverCard newTab did={repo.did} />
-              </span>
-              <Show when={!repo.active}>
-                <span class="flex shrink-0 items-center gap-1 text-red-500 dark:text-red-400">
-                  <span
-                    class={`iconify ${
-                      repo.status === "deactivated" ? "lucide--user-round-x"
-                      : repo.status === "takendown" ? "lucide--shield-ban"
-                      : "lucide--unplug"
-                    }`}
-                  ></span>
-                  {repo.status ?? "inactive"}
-                </span>
-              </Show>
-            </div>
-          </button>
-          <Show when={expanded() || hovering()}>
-            <A
-              href={`/at://${repo.did}`}
-              class="flex shrink-0 items-center p-2 transition-colors not-hover:text-neutral-500 not-hover:dark:text-neutral-400"
-            >
-              <span class="iconify lucide--arrow-right"></span>
-            </A>
-          </Show>
-        </div>
-        <Show when={expanded()}>
-          <div class="mb-2 ml-7.5 flex flex-col gap-1 font-mono text-xs text-neutral-500 dark:text-neutral-400">
-            <Show when={repo.head}>
-              <span class="truncate">{repo.head}</span>
-            </Show>
-            <Show when={TID.validate(repo.rev)}>
-              <div class="flex gap-1 text-neutral-700 dark:text-neutral-300">
-                <span>{repo.rev}</span>
-                <span>•</span>
-                <span>{localDateFromTimestamp(TID.parse(repo.rev).timestamp / 1000)}</span>
-              </div>
-            </Show>
-          </div>
-        </Show>
-      </div>
-    );
-  };
+  let containerRef: HTMLDivElement | undefined;
+  const virtualizer = createWindowVirtualizer({
+    get count() {
+      return repos()?.length ?? 0;
+    },
+    estimateSize: () => 32,
+    overscan: 10,
+    get scrollMargin() {
+      return containerRef?.offsetTop ?? 0;
+    },
+  });
 
   const Tab = (props: { tab: "repos" | "info" | "firehose"; label: string }) => (
     <A
@@ -147,8 +184,36 @@ export const PdsView = () => {
             <Tab tab="firehose" label="Firehose" />
           </div>
           <Show when={!location.hash || location.hash === "#repos"}>
-            <div class="-mx-2 flex flex-col pb-12">
-              <For each={repos()}>{(repo) => <RepoCard {...repo} />}</For>
+            <div
+              class="-mx-2 mb-9"
+              ref={containerRef}
+              style={{ height: `${virtualizer.getTotalSize()}px`, position: "relative" }}
+            >
+              <For each={virtualizer.getVirtualItems()}>
+                {(virtualItem) => (
+                  <div
+                    data-index={virtualItem.index}
+                    ref={(el) => virtualizer.measureElement(el)}
+                    classList={{ "z-10": expandedIndex() === virtualItem.index }}
+                    style={{
+                      position: "absolute",
+                      top: `${virtualItem.start - virtualizer.options.scrollMargin}px`,
+                      left: 0,
+                      width: "100%",
+                    }}
+                  >
+                    <RepoCard
+                      repo={repos()![virtualItem.index]}
+                      expanded={expandedIndex() === virtualItem.index}
+                      onToggle={() =>
+                        setExpandedIndex(
+                          expandedIndex() === virtualItem.index ? null : virtualItem.index,
+                        )
+                      }
+                    />
+                  </div>
+                )}
+              </For>
             </div>
           </Show>
           <div class="flex flex-col gap-3">
@@ -256,7 +321,10 @@ export const PdsView = () => {
               </p>
               <Show when={cursor()}>
                 <Button
-                  onClick={() => refetch()}
+                  onClick={() => {
+                    setExpandedIndex(null);
+                    refetch();
+                  }}
                   disabled={response.loading}
                   classList={{ "w-20 h-7.5 justify-center": true }}
                 >

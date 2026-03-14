@@ -98,6 +98,9 @@ importers:
       '@takumi-rs/wasm':
         specifier: ^0.72.0
         version: 0.72.0
+      '@tanstack/solid-virtual':
+        specifier: ^3.13.22
+        version: 3.13.22(solid-js@1.9.11)
       codemirror:
         specifier: ^6.0.2
         version: 6.0.2
@@ -1016,6 +1019,14 @@ packages:
 
   '@takumi-rs/wasm@0.72.0':
     resolution: {integrity: sha512-5IoekEovpjzpoHd5LM4hRLRgRwW8RdFdF9TR2kmysB1rJF34z0ynIC/Fr0yhraxvFIP0fCzdinz14YzyTq6nuQ==}
+
+  '@tanstack/solid-virtual@3.13.22':
+    resolution: {integrity: sha512-HoFRbuNfMz4IckIJAQ9RY8uJfT28AjL040cmwBZW8c1dD+VJVKRL0leZo90bU7BK4Mnhq6vt8801BZjyrY8Ffg==}
+    peerDependencies:
+      solid-js: ^1.3.0
+
+  '@tanstack/virtual-core@3.13.22':
+    resolution: {integrity: sha512-isuUGKsc5TAPDoHSbWTbl1SCil54zOS2MiWz/9GCWHPUQOvNTQx8qJEWC7UWR0lShhbK0Lmkcf0SZYxvch7G3g==}
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -2439,6 +2450,13 @@ snapshots:
       '@takumi-rs/wasm': 0.72.0
 
   '@takumi-rs/wasm@0.72.0': {}
+
+  '@tanstack/solid-virtual@3.13.22(solid-js@1.9.11)':
+    dependencies:
+      '@tanstack/virtual-core': 3.13.22
+      solid-js: 1.9.11
+
+  '@tanstack/virtual-core@3.13.22': {}
 
   '@types/babel__core@7.20.5':
     dependencies:
