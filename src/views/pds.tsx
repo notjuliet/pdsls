@@ -6,9 +6,9 @@ import { A, useLocation, useParams } from "@solidjs/router";
 import { createWindowVirtualizer } from "@tanstack/solid-virtual";
 import { createEffect, createResource, createSignal, For, on, onCleanup, Show } from "solid-js";
 import { Button } from "../components/button";
-import DidHoverCard from "../components/hover-card/did";
 import { setPDS } from "../components/navbar";
 import { canHover } from "../layout";
+import { didDocCache, resolveDidDoc } from "../utils/api";
 import { localDateFromTimestamp } from "../utils/date";
 
 const LIMIT = 1000;
@@ -18,8 +18,10 @@ const RepoCard = (props: {
   expanded: boolean;
   onToggle: () => void;
 }) => {
-  const expanded = () => props.expanded;
+  const [hovered, setHovered] = createSignal(false);
+  const expanded = () => props.expanded || hovered();
   const [collapsing, setCollapsing] = createSignal(false);
+  let hoverTimeout: number | null = null;
 
   createEffect(
     on(expanded, (curr, prev) => {
@@ -31,7 +33,42 @@ const RepoCard = (props: {
     }),
   );
 
-  const animating = () => expanded() || collapsing();
+  const [handle] = createResource(
+    () => (expanded() ? props.repo.did : null),
+    async (did) => {
+      try {
+        const doc =
+          didDocCache[did] ??
+          (didDocCache[did] = await resolveDidDoc(did as `did:${string}:${string}`));
+        return (
+          doc.alsoKnownAs?.find((aka) => aka.startsWith("at://"))?.replace("at://", "") ?? null
+        );
+      } catch {
+        return null;
+      }
+    },
+  );
+
+  const handleMouseEnter = () => {
+    if (!canHover) return;
+    hoverTimeout = window.setTimeout(() => {
+      setHovered(true);
+      hoverTimeout = null;
+    }, 300);
+  };
+
+  const handleMouseLeave = () => {
+    if (!canHover) return;
+    if (hoverTimeout !== null) {
+      clearTimeout(hoverTimeout);
+      hoverTimeout = null;
+    }
+    setHovered(false);
+  };
+
+  onCleanup(() => {
+    if (hoverTimeout !== null) clearTimeout(hoverTimeout);
+  });
 
   return (
     <div
@@ -39,16 +76,21 @@ const RepoCard = (props: {
         "group relative rounded-md border-[0.5px]": true,
         "z-20": expanded(),
         "z-10": collapsing(),
-        "transition-[background-color,border-color,box-shadow] duration-250": animating(),
+        "transition-[background-color,border-color,box-shadow] duration-250":
+          expanded() || collapsing(),
         "dark:hover:bg-dark-200 border-transparent hover:bg-neutral-200/50": !expanded(),
         "dark:bg-dark-300 border-neutral-200 bg-neutral-50 shadow-sm dark:border-neutral-700 dark:shadow-dark-700":
           expanded(),
       }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div class="flex min-w-0 flex-1 items-center">
         <button
           type="button"
-          onclick={() => props.onToggle()}
+          onclick={() => {
+            if (!canHover) props.onToggle();
+          }}
           class="flex min-w-0 flex-1 items-center gap-2 p-1.5"
         >
           <span
@@ -59,9 +101,14 @@ const RepoCard = (props: {
           >
             <span class="iconify lucide--chevron-right"></span>
           </span>
-          <div class="flex min-w-0 flex-1 items-center gap-x-2 text-sm">
+          <div class="flex min-h-5 min-w-0 flex-1 items-center gap-x-2 text-xs sm:text-sm">
             <span class="min-w-0 truncate font-mono" onclick={(e) => e.stopPropagation()}>
-              <DidHoverCard newTab did={props.repo.did} />
+              <A
+                href={`/at://${props.repo.did}`}
+                class="text-blue-500 hover:underline dark:text-blue-400"
+              >
+                {props.repo.did}
+              </A>
             </span>
             <Show when={!props.repo.active}>
               <span class="flex shrink-0 items-center gap-1 text-red-500 dark:text-red-400">
@@ -81,7 +128,7 @@ const RepoCard = (props: {
           <A
             href={`/at://${props.repo.did}`}
             classList={{
-              "flex shrink-0 items-center p-2 transition-colors duration-500": true,
+              "flex shrink-0 items-center p-2 transition-colors duration-250": true,
               "invisible group-hover:visible not-hover:text-neutral-500 not-hover:dark:text-neutral-400":
                 !expanded(),
             }}
@@ -99,8 +146,11 @@ const RepoCard = (props: {
       >
         <div class="overflow-hidden">
           <div class="ml-7.5 flex flex-col gap-1.5 pb-1.5 font-mono text-xs text-neutral-500 dark:text-neutral-400">
-            <Show when={props.repo.head}>
-              <span class="truncate">{props.repo.head}</span>
+            <Show when={handle.loading}>
+              <span class="animate-pulse">resolving...</span>
+            </Show>
+            <Show when={!handle.loading && handle()}>
+              <span class="font-medium text-neutral-900 dark:text-neutral-200">@{handle()}</span>
             </Show>
             <Show when={TID.validate(props.repo.rev)}>
               <div class="flex gap-1 text-neutral-700 dark:text-neutral-300">
@@ -109,12 +159,22 @@ const RepoCard = (props: {
                 <span>{localDateFromTimestamp(TID.parse(props.repo.rev).timestamp / 1000)}</span>
               </div>
             </Show>
+            <Show when={props.repo.head}>
+              <span class="truncate">{props.repo.head}</span>
+            </Show>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
+const InfoField = (props: { label: string; children: any }) => (
+  <div class="flex flex-col">
+    <span class="font-semibold">{props.label}</span>
+    {props.children}
+  </div>
+);
 
 export const PdsView = () => {
   const params = useParams();
@@ -129,9 +189,13 @@ export const PdsView = () => {
   const rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
 
   const getVersion = async () => {
-    // @ts-expect-error: undocumented endpoint
-    const res = await rpc.get("_health", {});
-    setVersion((res.data as any).version);
+    try {
+      // @ts-expect-error: undocumented endpoint
+      const res = await rpc.get("_health", {});
+      setVersion((res.data as any).version);
+    } catch (err) {
+      console.error("Failed to fetch version:", err);
+    }
   };
 
   const describeServer = async () => {
@@ -209,172 +273,153 @@ export const PdsView = () => {
   document.title = `${params.pds} - PDSls`;
 
   return (
-    <>
-      <Show when={repos() || response()}>
-        <div class="flex w-full flex-col px-2">
-          <div class="mb-3 flex gap-4 text-sm sm:text-base">
-            <Tab tab="repos" label="Repositories" />
-            <Tab tab="info" label="Info" />
-            <Tab tab="firehose" label="Firehose" />
-          </div>
-          <Show when={!location.hash || location.hash === "#repos"}>
-            <div
-              class="-mx-2 mb-9"
-              ref={containerRef}
-              style={{ height: `${virtualizer.getTotalSize()}px`, position: "relative" }}
-            >
-              <For each={virtualizer.getVirtualItems()}>
-                {(virtualItem) => {
-                  const isExpanded = () => expandedIndex() === virtualItem.index;
-                  return (
-                    <div
-                      data-index={virtualItem.index}
-                      ref={virtualizer.measureElement}
-                      style={{
-                        position: "absolute",
-                        top: `${virtualItem.start - virtualizer.options.scrollMargin}px`,
-                        left: 0,
-                        width: "100%",
-                        overflow: "visible",
-                      }}
-                    >
-                      <RepoCard
-                        repo={repos()![virtualItem.index]}
-                        expanded={isExpanded()}
-                        onToggle={() => {
-                          setExpandedIndex(isExpanded() ? null : virtualItem.index);
-                        }}
-                      />
-                    </div>
-                  );
-                }}
-              </For>
-            </div>
-          </Show>
-          <div class="flex flex-col gap-3">
-            <Show when={location.hash === "#info"}>
-              <Show when={version()}>
-                {(version) => (
-                  <div class="flex flex-col">
-                    <span class="font-semibold">Version</span>
-                    <span class="text-sm text-neutral-700 dark:text-neutral-300">{version()}</span>
+    <Show when={repos() || response()}>
+      <div class="flex w-full flex-col px-2">
+        <div class="mb-3 flex gap-4 text-sm sm:text-base">
+          <Tab tab="repos" label="Repositories" />
+          <Tab tab="info" label="Info" />
+          <Tab tab="firehose" label="Firehose" />
+        </div>
+        <Show when={!location.hash || location.hash === "#repos"}>
+          <div
+            class="-mx-2 mb-9"
+            ref={containerRef}
+            style={{ height: `${virtualizer.getTotalSize()}px`, position: "relative" }}
+          >
+            <For each={virtualizer.getVirtualItems()}>
+              {(virtualItem) => {
+                const isExpanded = () => expandedIndex() === virtualItem.index;
+                return (
+                  <div
+                    data-index={virtualItem.index}
+                    ref={virtualizer.measureElement}
+                    style={{
+                      position: "absolute",
+                      top: `${virtualItem.start - virtualizer.options.scrollMargin}px`,
+                      left: 0,
+                      width: "100%",
+                      overflow: "visible",
+                    }}
+                  >
+                    <RepoCard
+                      repo={repos()![virtualItem.index]}
+                      expanded={isExpanded()}
+                      onToggle={() => setExpandedIndex(isExpanded() ? null : virtualItem.index)}
+                    />
                   </div>
-                )}
-              </Show>
-              <Show when={serverInfos()}>
-                {(server) => (
-                  <>
-                    <div class="flex flex-col">
-                      <span class="font-semibold">DID</span>
-                      <span class="text-sm text-neutral-700 dark:text-neutral-300">
-                        {server().did}
-                      </span>
-                    </div>
+                );
+              }}
+            </For>
+          </div>
+        </Show>
+        <div class="flex flex-col gap-3">
+          <Show when={location.hash === "#info"}>
+            <Show when={version()}>
+              {(version) => (
+                <InfoField label="Version">
+                  <span class="text-sm text-neutral-700 dark:text-neutral-300">{version()}</span>
+                </InfoField>
+              )}
+            </Show>
+            <Show when={serverInfos()}>
+              {(server) => (
+                <>
+                  <InfoField label="DID">
+                    <span class="text-sm text-neutral-700 dark:text-neutral-300">
+                      {server().did}
+                    </span>
+                  </InfoField>
+                  <div class="flex items-center gap-1">
+                    <span class="font-semibold">Invite Code Required</span>
+                    <span
+                      classList={{
+                        "iconify lucide--check text-green-500 dark:text-green-400":
+                          server().inviteCodeRequired === true,
+                        "iconify lucide--x text-red-500 dark:text-red-400":
+                          !server().inviteCodeRequired,
+                      }}
+                    ></span>
+                  </div>
+                  <Show when={server().phoneVerificationRequired}>
                     <div class="flex items-center gap-1">
-                      <span class="font-semibold">Invite Code Required</span>
-                      <span
-                        classList={{
-                          "iconify lucide--check text-green-500 dark:text-green-400":
-                            server().inviteCodeRequired === true,
-                          "iconify lucide--x text-red-500 dark:text-red-400":
-                            !server().inviteCodeRequired,
-                        }}
-                      ></span>
+                      <span class="font-semibold">Captcha Verification Required</span>
+                      <span class="iconify lucide--check text-green-500 dark:text-green-400"></span>
                     </div>
-                    <Show when={server().phoneVerificationRequired}>
-                      <div class="flex items-center gap-1">
-                        <span class="font-semibold">Captcha Verification Required</span>
-                        <span class="iconify lucide--check text-green-500 dark:text-green-400"></span>
-                      </div>
-                    </Show>
-                    <Show when={server().availableUserDomains.length}>
-                      <div class="flex flex-col">
-                        <span class="font-semibold">Available User Domains</span>
-                        <For each={server().availableUserDomains}>
-                          {(domain) => (
-                            <span class="text-sm wrap-anywhere text-neutral-700 dark:text-neutral-300">
-                              {domain}
-                            </span>
-                          )}
-                        </For>
-                      </div>
-                    </Show>
-                    <Show when={server().links?.privacyPolicy}>
-                      <div class="flex flex-col">
-                        <span class="font-semibold">Privacy Policy</span>
+                  </Show>
+                  <Show when={server().availableUserDomains.length}>
+                    <InfoField label="Available User Domains">
+                      <For each={server().availableUserDomains}>
+                        {(domain) => (
+                          <span class="text-sm wrap-anywhere text-neutral-700 dark:text-neutral-300">
+                            {domain}
+                          </span>
+                        )}
+                      </For>
+                    </InfoField>
+                  </Show>
+                  <For
+                    each={[
+                      { label: "Privacy Policy", url: server().links?.privacyPolicy },
+                      { label: "Terms of Service", url: server().links?.termsOfService },
+                      {
+                        label: "Contact",
+                        url:
+                          server().contact?.email ? `mailto:${server().contact?.email}` : undefined,
+                        display: server().contact?.email,
+                      },
+                    ].filter((l) => l.url)}
+                  >
+                    {(link) => (
+                      <InfoField label={link.label}>
                         <a
-                          href={server().links?.privacyPolicy}
+                          href={link.url}
                           class="text-sm text-neutral-700 hover:underline dark:text-neutral-300"
                           target="_blank"
                           rel="noopener"
                         >
-                          {server().links?.privacyPolicy}
+                          {link.display ?? link.url}
                         </a>
-                      </div>
-                    </Show>
-                    <Show when={server().links?.termsOfService}>
-                      <div class="flex flex-col">
-                        <span class="font-semibold">Terms of Service</span>
-                        <a
-                          href={server().links?.termsOfService}
-                          class="text-sm text-neutral-700 hover:underline dark:text-neutral-300"
-                          target="_blank"
-                          rel="noopener"
-                        >
-                          {server().links?.termsOfService}
-                        </a>
-                      </div>
-                    </Show>
-                    <Show when={server().contact?.email}>
-                      <div class="flex flex-col">
-                        <span class="font-semibold">Contact</span>
-                        <a
-                          href={`mailto:${server().contact?.email}`}
-                          class="text-sm text-neutral-700 hover:underline dark:text-neutral-300"
-                        >
-                          {server().contact?.email}
-                        </a>
-                      </div>
-                    </Show>
-                  </>
-                )}
+                      </InfoField>
+                    )}
+                  </For>
+                </>
+              )}
+            </Show>
+          </Show>
+        </div>
+      </div>
+      <Show when={!location.hash || location.hash === "#repos"}>
+        <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center border-t border-neutral-200 bg-neutral-100 pt-3 pb-6 dark:border-neutral-700">
+          <div class="flex items-center gap-3">
+            <p>
+              {repos()?.length} loaded
+              <Show when={repos()?.some((r) => !r.active)}>
+                {" · "}
+                <span class="text-neutral-500 dark:text-neutral-400">
+                  {repos()?.filter((r) => !r.active).length} inactive
+                </span>
               </Show>
+            </p>
+            <Show when={cursor()}>
+              <Button
+                onClick={() => {
+                  setExpandedIndex(null);
+                  refetch();
+                }}
+                disabled={response.loading}
+                classList={{ "w-20 h-7.5 justify-center": true }}
+              >
+                <Show
+                  when={!response.loading}
+                  fallback={<span class="iconify lucide--loader-circle animate-spin text-base" />}
+                >
+                  Load more
+                </Show>
+              </Button>
             </Show>
           </div>
         </div>
-        <Show when={!location.hash || location.hash === "#repos"}>
-          <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center border-t border-neutral-200 bg-neutral-100 pt-3 pb-6 dark:border-neutral-700">
-            <div class="flex items-center gap-3">
-              <p>
-                {repos()?.length} loaded
-                <Show when={repos()?.some((r) => !r.active)}>
-                  {" · "}
-                  <span class="text-neutral-500 dark:text-neutral-400">
-                    {repos()?.filter((r) => !r.active).length} inactive
-                  </span>
-                </Show>
-              </p>
-              <Show when={cursor()}>
-                <Button
-                  onClick={() => {
-                    setExpandedIndex(null);
-                    refetch();
-                  }}
-                  disabled={response.loading}
-                  classList={{ "w-20 h-7.5 justify-center": true }}
-                >
-                  <Show
-                    when={!response.loading}
-                    fallback={<span class="iconify lucide--loader-circle animate-spin text-base" />}
-                  >
-                    Load more
-                  </Show>
-                </Button>
-              </Show>
-            </div>
-          </div>
-        </Show>
       </Show>
-    </>
+    </Show>
   );
 };
