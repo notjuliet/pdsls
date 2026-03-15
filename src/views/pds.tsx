@@ -82,10 +82,12 @@ const RepoCard = (props: {
         "dark:bg-dark-300 border-neutral-200 bg-neutral-50 shadow-sm dark:border-neutral-700 dark:shadow-dark-700":
           expanded(),
       }}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
-      <div class="flex min-w-0 flex-1 items-center">
+      <div
+        class="flex min-w-0 flex-1 items-center"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <button
           type="button"
           onclick={() => {
