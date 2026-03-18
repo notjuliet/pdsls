@@ -11,16 +11,16 @@
     "serve": "vite preview"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.97",
+    "@iconify-json/lucide": "^1.2.98",
     "@iconify/tailwind4": "^1.2.3",
-    "@tailwindcss/vite": "^4.2.1",
+    "@tailwindcss/vite": "^4.2.2",
     "esbuild": "^0.27.4",
     "prettier": "^3.8.1",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "tailwindcss": "^4.2.1",
+    "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1",
+    "vite": "^8.0.0",
     "vite-plugin-solid": "^2.11.11"
   },
   "dependencies": {
@@ -30,14 +30,14 @@
     "@atcute/cbor": "^2.3.2",
     "@atcute/cid": "^2.4.1",
     "@atcute/client": "^4.2.1",
-    "@atcute/crypto": "^2.4.0",
+    "@atcute/crypto": "^2.4.1",
     "@atcute/did-plc": "^0.3.2",
     "@atcute/identity": "^1.1.3",
     "@atcute/identity-resolver": "^1.2.2",
     "@atcute/lexicon-doc": "^2.1.2",
     "@atcute/lexicon-resolver": "^0.1.6",
     "@atcute/lexicons": "^1.2.9",
-    "@atcute/multibase": "^1.1.8",
+    "@atcute/multibase": "^1.2.0",
     "@atcute/oauth-browser-client": "^3.0.0",
     "@atcute/repo": "^0.1.3",
     "@atcute/tid": "^1.1.2",
@@ -51,12 +51,12 @@
     "@mary/exif-rm": "jsr:^0.2.2",
     "@mary/zip": "jsr:^0.1.1",
     "@skyware/firehose": "^0.5.2",
-    "@solidjs/router": "^0.15.4",
-    "@takumi-rs/image-response": "^0.72.0",
-    "@takumi-rs/wasm": "^0.72.0",
-    "@tanstack/solid-virtual": "^3.13.22",
+    "@solidjs/router": "^0.16.1",
+    "@takumi-rs/image-response": "^0.73.1",
+    "@takumi-rs/wasm": "^0.73.1",
+    "@tanstack/solid-virtual": "^3.13.23",
     "codemirror": "^6.0.2",
     "solid-js": "^1.9.11"
   },
-  "packageManager": "pnpm@10.17.1+sha512.17c560fca4867ae9473a3899ad84a88334914f379be46d455cbf92e5cf4b39d34985d452d2583baf19967fa76cb5c17bc9e245529d0b98745721aa7200ecaf7a"
+  "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be"
 }
