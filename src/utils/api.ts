@@ -140,10 +140,6 @@ const validateHandle = async (handle: Handle, did: Did) => {
   return true;
 };
 
-const resolvePDS = async (did: string) => {
-  return await getPDS(did);
-};
-
 const resolveLexiconAuthority = async (nsid: Nsid) => {
   return await authorityResolver.resolve(nsid);
 };
@@ -273,7 +269,6 @@ export {
   resolveLexiconAuthority,
   resolveLexiconAuthorityDirect,
   resolveLexiconSchema,
-  resolvePDS,
   validateHandle,
   type LinkData,
   type LinksWithRecords,
