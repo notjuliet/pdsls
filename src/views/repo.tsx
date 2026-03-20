@@ -3,8 +3,8 @@ import { DidDocument } from "@atcute/identity";
 import { ActorIdentifier, Did, Handle, Nsid } from "@atcute/lexicons";
 import {
   A,
-  type RouteSectionProps,
   type RoutePreloadFunc,
+  type RouteSectionProps,
   useLocation,
   useNavigate,
   useParams,
@@ -19,11 +19,7 @@ import {
   Show,
   Suspense,
 } from "solid-js";
-import { NestedLayout } from "../components/nested-layout.jsx";
-import { Spinner } from "../components/spinner.jsx";
 import { createStore } from "solid-js/store";
-import { RepoProvider, useRepo } from "../lib/repo-context.jsx";
-import { setPDS } from "../components/navbar.jsx";
 import { Backlinks } from "../components/backlinks.jsx";
 import {
   ActionMenu,
@@ -33,12 +29,16 @@ import {
   NavMenu,
 } from "../components/dropdown.jsx";
 import { Favicon } from "../components/favicon.jsx";
+import { setPDS } from "../components/navbar.jsx";
+import { NestedLayout } from "../components/nested-layout.jsx";
 import {
   addNotification,
   removeNotification,
   updateNotification,
 } from "../components/notification.jsx";
+import { Spinner } from "../components/spinner.jsx";
 import { canHover } from "../layout.jsx";
+import { RepoProvider, useRepo } from "../lib/repo-context.jsx";
 import {
   didDocCache,
   getPDS,
@@ -66,48 +66,52 @@ export const RepoLayout = (props: RouteSectionProps) => {
   const navigate = useNavigate();
   const hasChild = () => !!params.collection;
 
-  const [resolution] = createResource(
-    () => params.repo,
-    async (identifier) => {
-      // Handle non-DID identifiers (handles, NSIDs) via redirect
-      if (!identifier.startsWith("did:")) {
-        try {
-          const resolvedDid = await resolveHandle(identifier as Handle);
-          navigate(location.pathname.replace(identifier, resolvedDid), { replace: true });
-          return null;
-        } catch {
-          try {
-            const nsid = identifier as Nsid;
-            const authority = await resolveLexiconAuthority(nsid);
-            navigate(`/at://${authority}/com.atproto.lexicon.schema/${nsid}`, { replace: true });
-            return null;
-          } catch {
+  // Redirect non-DID identifiers (handles, NSIDs) via effect — must be separate from
+  // the resource because navigate inside a resource fetcher doesn't reliably re-trigger it
+  createEffect(() => {
+    const identifier = params.repo;
+    if (!identifier || identifier.startsWith("did:")) return;
+    resolveHandle(identifier as Handle)
+      .then((resolvedDid) => {
+        navigate(location.pathname.replace(identifier, resolvedDid), { replace: true });
+      })
+      .catch(() => {
+        resolveLexiconAuthority(identifier as Nsid)
+          .then((authority) => {
+            navigate(`/at://${authority}/com.atproto.lexicon.schema/${identifier}`, {
+              replace: true,
+            });
+          })
+          .catch(() => {
             navigate(`/${identifier}`, { replace: true });
-            return null;
-          }
-        }
-      }
+          });
+      });
+  });
 
-      // Resolve DID → PDS, create RPC client
+  // Resource only runs for DIDs — resolves PDS + creates RPC client
+  const [resolution] = createResource(
+    () => {
+      const id = params.repo;
+      return id?.startsWith("did:") ? id : undefined;
+    },
+    async (did) => {
       try {
-        const pdsUrl = await getPDS(identifier);
+        const pdsUrl = await getPDS(did);
         const rpc = new Client({ handler: simpleFetchHandler({ service: pdsUrl }) });
-        const didDoc = didDocCache[identifier] as DidDocument | undefined;
+        const didDoc = didDocCache[did] as DidDocument | undefined;
         setPDS(pdsUrl.replace("https://", "").replace("http://", ""));
-        return { did: identifier, pds: pdsUrl, rpc, didDoc };
+        return { did, pds: pdsUrl, rpc, didDoc };
       } catch {
         let didDoc: DidDocument | undefined;
-        if (identifier.startsWith("did:web")) {
+        if (did.startsWith("did:web")) {
           try {
-            const res = await fetch(
-              `https://${identifier.replace("did:web:", "")}/.well-known/did.json`,
-            );
+            const res = await fetch(`https://${did.replace("did:web:", "")}/.well-known/did.json`);
             didDoc = await res.json();
           } catch {}
         }
         setPDS("Missing PDS");
         return {
-          did: identifier,
+          did,
           pds: undefined as string | undefined,
           rpc: undefined as Client | undefined,
           didDoc,
@@ -134,20 +138,17 @@ export const RepoLayout = (props: RouteSectionProps) => {
         error: () => current()?.error,
       }}
     >
-      <NestedLayout
-        key={params.repo}
-        hasChild={hasChild()}
-        view={() => <RepoView hidden={hasChild()} />}
-      >
+      <NestedLayout key={params.repo} hasChild={hasChild()} view={() => <RepoView />}>
         {props.children}
       </NestedLayout>
     </RepoProvider>
   );
 };
 
-const RepoView = (props: { hidden: boolean }) => {
+const RepoView = () => {
   const repo = useRepo();
   const params = useParams();
+  const hidden = () => !!params.collection;
   const location = useLocation();
   const [error, setError] = createSignal<string>();
   const [downloading, setDownloading] = createSignal(false);
@@ -260,14 +261,10 @@ const RepoView = (props: { hidden: boolean }) => {
     }
   };
 
-  const [repoData] = createResource(
-    () => {
-      if (props.hidden) return undefined;
-      if (!repo.rpc() && !repo.error()) return undefined;
-      return true;
-    },
-    fetchRepo,
-  );
+  const [repoData] = createResource(() => {
+    if (!repo.rpc() && !repo.error()) return undefined;
+    return true;
+  }, fetchRepo);
 
   const toggleCollapsed = (authority: string) => {
     setNsids((prev) => ({
@@ -397,15 +394,16 @@ const RepoView = (props: { hidden: boolean }) => {
   };
 
   createEffect(() => {
-    if (props.hidden) return;
-    const handle = repo.didDoc()
+    if (hidden()) return;
+    const handle = repo
+      .didDoc()
       ?.alsoKnownAs?.find((alias) => alias.startsWith("at://"))
       ?.replace("at://", "");
     document.title = handle ? `${handle} - PDSls` : `${params.repo} - PDSls`;
   });
 
   return (
-    <Show when={!props.hidden}>
+    <Show when={!hidden()}>
       <Show when={repoData.loading || (!repoData() && !repo.rpc() && !repo.error())}>
         <Spinner />
       </Show>

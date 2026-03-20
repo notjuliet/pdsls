@@ -253,7 +253,7 @@ export const RecordView = () => {
     setPlaceholder(res.data.value);
     setExternalLink(checkUri(res.data.uri, res.data.value));
     resolveLexicon(collection as Nsid, collection);
-    verifyRecordIntegrity(collection, rkey);
+    verifyRecordIntegrity(rpc, collection, rkey);
     validateLocalSchema(collection, res.data.value);
 
     return res.data;
@@ -312,9 +312,9 @@ export const RecordView = () => {
     setRemoteValidation(false);
   };
 
-  const verifyRecordIntegrity = async (collection: string, rkey: string) => {
+  const verifyRecordIntegrity = async (rpc: Client, collection: string, rkey: string) => {
     try {
-      const { ok, data } = await repo.rpc()!.get("com.atproto.sync.getRecord", {
+      const { ok, data } = await rpc.get("com.atproto.sync.getRecord", {
         params: {
           did: did as Did,
           collection: collection as Nsid,

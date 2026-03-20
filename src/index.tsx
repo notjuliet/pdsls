@@ -11,7 +11,7 @@ import { Home } from "./views/home.tsx";
 import { LabelView } from "./views/labels.tsx";
 import { PdsLayout } from "./views/pds.tsx";
 import { RecordView } from "./views/record.tsx";
-import { repoPreload, RepoLayout } from "./views/repo.tsx";
+import { RepoLayout, repoPreload } from "./views/repo.tsx";
 import { Settings } from "./views/settings.tsx";
 import { StreamView } from "./views/stream";
 

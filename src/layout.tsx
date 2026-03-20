@@ -172,11 +172,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
             return <div class="mt-3 wrap-anywhere">Error: {err.message}</div>;
           }}
         >
-          <Suspense
-            fallback={<Spinner />}
-          >
-            {props.children}
-          </Suspense>
+          <Suspense fallback={<Spinner />}>{props.children}</Suspense>
         </ErrorBoundary>
       </div>
       <NotificationContainer />
