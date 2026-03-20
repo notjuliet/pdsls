@@ -1,5 +1,5 @@
 import { ComAtprotoRepoApplyWrites, ComAtprotoRepoGetRecord } from "@atcute/atproto";
-import { Client, simpleFetchHandler } from "@atcute/client";
+import { Client } from "@atcute/client";
 import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
 import { A, type RouteSectionProps, useParams, useSearchParams } from "@solidjs/router";
@@ -7,6 +7,7 @@ import { createMemo, createResource, createSignal, For, onMount, Show } from "so
 import { NestedLayout } from "../components/nested-layout.jsx";
 import { Spinner } from "../components/spinner.jsx";
 import { createStore } from "solid-js/store";
+import { useRepo } from "../lib/repo-context.jsx";
 import { agent } from "../auth/state";
 import { Button } from "../components/button.jsx";
 import HoverCard from "../components/hover-card/base";
@@ -16,7 +17,6 @@ import { addNotification, removeNotification } from "../components/notification.
 import { PermissionButton } from "../components/permission-button.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import { canHover } from "../layout.jsx";
-import { resolvePDS } from "../utils/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { useFilterShortcut } from "../utils/keyboard.js";
 
@@ -71,6 +71,7 @@ export const CollectionLayout = (props: RouteSectionProps) => {
 };
 
 const CollectionView = (props: { hidden: boolean }) => {
+  const repo = useRepo();
   const params = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const [cursor, setCursor] = createSignal<string>();
@@ -87,9 +88,7 @@ const CollectionView = (props: { hidden: boolean }) => {
   };
   const [recreate, setRecreate] = createSignal(false);
   const [openDelete, setOpenDelete] = createSignal(false);
-  const did = params.repo;
-  let pds: string;
-  let rpc: Client;
+  const did = repo.did();
   let filterInputRef: HTMLInputElement | undefined;
 
   onMount(() => {
@@ -97,11 +96,10 @@ const CollectionView = (props: { hidden: boolean }) => {
   });
 
   const fetchRecords = async () => {
+    const rpc = repo.rpc()!;
     const collection = params.collection!;
     const isLoadMore = cursor() !== undefined;
 
-    if (!pds) pds = await resolvePDS(did!);
-    if (!rpc) rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
     const res = await rpc.get("com.atproto.repo.listRecords", {
       params: {
         repo: did as ActorIdentifier,
@@ -128,7 +126,10 @@ const CollectionView = (props: { hidden: boolean }) => {
     return res.data.records;
   };
 
-  const [response, { refetch }] = createResource(() => (props.hidden ? undefined : true), fetchRecords);
+  const [response, { refetch }] = createResource(
+    () => (!props.hidden && repo.rpc() ? true : undefined),
+    fetchRecords,
+  );
 
   const filteredRecords = createMemo(() =>
     records.filter((rec) =>
@@ -159,9 +160,9 @@ const CollectionView = (props: { hidden: boolean }) => {
     });
 
     const BATCHSIZE = 200;
-    rpc = new Client({ handler: agent()! });
+    const authRpc = new Client({ handler: agent()! });
     for (let i = 0; i < writes.length; i += BATCHSIZE) {
-      await rpc.post("com.atproto.repo.applyWrites", {
+      await authRpc.post("com.atproto.repo.applyWrites", {
         input: {
           repo: agent()!.sub,
           writes: writes.slice(i, i + BATCHSIZE),

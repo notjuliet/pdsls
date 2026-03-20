@@ -1,7 +1,14 @@
 import { Client, simpleFetchHandler } from "@atcute/client";
 import { DidDocument } from "@atcute/identity";
 import { ActorIdentifier, Did, Handle, Nsid } from "@atcute/lexicons";
-import { A, type RouteSectionProps, useLocation, useNavigate, useParams } from "@solidjs/router";
+import {
+  A,
+  type RouteSectionProps,
+  type RoutePreloadFunc,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "@solidjs/router";
 import {
   createEffect,
   createResource,
@@ -15,6 +22,8 @@ import {
 import { NestedLayout } from "../components/nested-layout.jsx";
 import { Spinner } from "../components/spinner.jsx";
 import { createStore } from "solid-js/store";
+import { RepoProvider, useRepo } from "../lib/repo-context.jsx";
+import { setPDS } from "../components/navbar.jsx";
 import { Backlinks } from "../components/backlinks.jsx";
 import {
   ActionMenu,
@@ -32,12 +41,12 @@ import {
 import { canHover } from "../layout.jsx";
 import {
   didDocCache,
+  getPDS,
   type HandleResolveResult,
   labelerCache,
   resolveHandle,
   resolveHandleDetailed,
   resolveLexiconAuthority,
-  resolvePDS,
   validateHandle,
 } from "../utils/api.js";
 import { addToClipboard } from "../utils/copy.js";
@@ -47,23 +56,101 @@ import { BlobView } from "./blob.jsx";
 import { PlcLogView } from "./logs.jsx";
 import { plcDirectory } from "./settings.jsx";
 
+export const repoPreload: RoutePreloadFunc = ({ params }) => {
+  if (params.repo?.startsWith("did:")) void getPDS(params.repo);
+};
+
 export const RepoLayout = (props: RouteSectionProps) => {
   const params = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const hasChild = () => !!params.collection;
+
+  const [resolution] = createResource(
+    () => params.repo,
+    async (identifier) => {
+      // Handle non-DID identifiers (handles, NSIDs) via redirect
+      if (!identifier.startsWith("did:")) {
+        try {
+          const resolvedDid = await resolveHandle(identifier as Handle);
+          navigate(location.pathname.replace(identifier, resolvedDid), { replace: true });
+          return null;
+        } catch {
+          try {
+            const nsid = identifier as Nsid;
+            const authority = await resolveLexiconAuthority(nsid);
+            navigate(`/at://${authority}/com.atproto.lexicon.schema/${nsid}`, { replace: true });
+            return null;
+          } catch {
+            navigate(`/${identifier}`, { replace: true });
+            return null;
+          }
+        }
+      }
+
+      // Resolve DID → PDS, create RPC client
+      try {
+        const pdsUrl = await getPDS(identifier);
+        const rpc = new Client({ handler: simpleFetchHandler({ service: pdsUrl }) });
+        const didDoc = didDocCache[identifier] as DidDocument | undefined;
+        setPDS(pdsUrl.replace("https://", "").replace("http://", ""));
+        return { did: identifier, pds: pdsUrl, rpc, didDoc };
+      } catch {
+        let didDoc: DidDocument | undefined;
+        if (identifier.startsWith("did:web")) {
+          try {
+            const res = await fetch(
+              `https://${identifier.replace("did:web:", "")}/.well-known/did.json`,
+            );
+            didDoc = await res.json();
+          } catch {}
+        }
+        setPDS("Missing PDS");
+        return {
+          did: identifier,
+          pds: undefined as string | undefined,
+          rpc: undefined as Client | undefined,
+          didDoc,
+          error: "Missing PDS",
+        };
+      }
+    },
+  );
+
+  // Only expose data when resolution matches current params (prevents stale data during transitions)
+  const current = () => {
+    const r = resolution();
+    if (!r || r.did !== params.repo) return null;
+    return r;
+  };
+
   return (
-    <NestedLayout key={params.repo} hasChild={hasChild()} view={() => <RepoView hidden={hasChild()} />}>
-      {props.children}
-    </NestedLayout>
+    <RepoProvider
+      value={{
+        did: () => params.repo!,
+        pds: () => current()?.pds,
+        rpc: () => current()?.rpc,
+        didDoc: () => current()?.didDoc,
+        error: () => current()?.error,
+      }}
+    >
+      <NestedLayout
+        key={params.repo}
+        hasChild={hasChild()}
+        view={() => <RepoView hidden={hasChild()} />}
+      >
+        {props.children}
+      </NestedLayout>
+    </RepoProvider>
   );
 };
 
 const RepoView = (props: { hidden: boolean }) => {
+  const repo = useRepo();
   const params = useParams();
   const location = useLocation();
-  const navigate = useNavigate();
   const [error, setError] = createSignal<string>();
   const [downloading, setDownloading] = createSignal(false);
-  const [didDoc, setDidDoc] = createSignal<DidDocument>();
   const [nsids, setNsids] = createSignal<Record<string, { hidden: boolean; nsids: string[] }>>();
   const [filter, setFilter] = createSignal<string>();
   const [validHandles, setValidHandles] = createStore<Record<string, boolean>>({});
@@ -73,10 +160,8 @@ const RepoView = (props: { hidden: boolean }) => {
     dns: HandleResolveResult;
     http: HandleResolveResult;
   } | null>(null);
-  let rpc: Client;
-  let pds: string;
   let filterInputRef: HTMLInputElement | undefined;
-  const did = params.repo!;
+  const did = repo.did();
 
   // Handle scrolling to a collection group when hash is like #collections:app.bsky
   createEffect(() => {
@@ -128,45 +213,16 @@ const RepoView = (props: { hidden: boolean }) => {
   };
 
   const fetchRepo = async () => {
-    try {
-      pds = await resolvePDS(did);
-      setDidDoc(didDocCache[did] as DidDocument);
-    } catch {
-      // Fallback for feedgens
-      if (did.startsWith("did:web")) {
-        try {
-          const res = await fetch(`https://${did.replace("did:web:", "")}/.well-known/did.json`);
-          const didDoc = await res.json();
-          setDidDoc(didDoc);
-        } catch {}
-      } else if (!did.startsWith("did:")) {
-        try {
-          const resolvedDid = await resolveHandle(did as Handle);
-          navigate(location.pathname.replace(did, resolvedDid), { replace: true });
-          return;
-        } catch {
-          try {
-            const nsid = did as Nsid;
-            const res = await resolveLexiconAuthority(nsid);
-            navigate(`/at://${res}/com.atproto.lexicon.schema/${nsid}`, { replace: true });
-            return;
-          } catch {
-            navigate(`/${did}`, { replace: true });
-            return;
-          }
-        }
-      }
+    if (repo.error()) {
+      setError(repo.error()!);
     }
 
     if (did.startsWith("did:plc")) getRotationKeys();
     validateHandles();
 
-    if (!pds) {
-      setError("Missing PDS");
-      return {};
-    }
+    const rpc = repo.rpc();
+    if (!rpc) return {};
 
-    rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
     try {
       const res = await rpc.get("com.atproto.repo.describeRepo", {
         params: { repo: did as ActorIdentifier },
@@ -204,7 +260,14 @@ const RepoView = (props: { hidden: boolean }) => {
     }
   };
 
-  const [repo] = createResource(() => (props.hidden ? undefined : true), fetchRepo);
+  const [repoData] = createResource(
+    () => {
+      if (props.hidden) return undefined;
+      if (!repo.rpc() && !repo.error()) return undefined;
+      return true;
+    },
+    fetchRepo,
+  );
 
   const toggleCollapsed = (authority: string) => {
     setNsids((prev) => ({
@@ -226,7 +289,7 @@ const RepoView = (props: { hidden: boolean }) => {
   };
 
   const validateHandles = async () => {
-    for (const alias of didDoc()?.alsoKnownAs ?? []) {
+    for (const alias of repo.didDoc()?.alsoKnownAs ?? []) {
       if (alias.startsWith("at://"))
         setValidHandles(
           alias,
@@ -236,6 +299,8 @@ const RepoView = (props: { hidden: boolean }) => {
   };
 
   const downloadRepo = async () => {
+    const pdsUrl = repo.pds();
+    if (!pdsUrl) return;
     let notificationId: string | null = null;
     const abortController = new AbortController();
 
@@ -254,7 +319,7 @@ const RepoView = (props: { hidden: boolean }) => {
         },
       });
 
-      const response = await fetch(`${pds}/xrpc/com.atproto.sync.getRepo?did=${did}`, {
+      const response = await fetch(`${pdsUrl}/xrpc/com.atproto.sync.getRepo?did=${did}`, {
         signal: abortController.signal,
       });
       if (!response.ok) {
@@ -333,7 +398,7 @@ const RepoView = (props: { hidden: boolean }) => {
 
   createEffect(() => {
     if (props.hidden) return;
-    const handle = didDoc()
+    const handle = repo.didDoc()
       ?.alsoKnownAs?.find((alias) => alias.startsWith("at://"))
       ?.replace("at://", "");
     document.title = handle ? `${handle} - PDSls` : `${params.repo} - PDSls`;
@@ -341,10 +406,10 @@ const RepoView = (props: { hidden: boolean }) => {
 
   return (
     <Show when={!props.hidden}>
-      <Show when={repo.loading}>
+      <Show when={repoData.loading || (!repoData() && !repo.rpc() && !repo.error())}>
         <Spinner />
       </Show>
-      <Show when={repo()}>
+      <Show when={repoData() || repo.error()}>
         <div class="flex w-full flex-col gap-3 wrap-break-word">
           <div class="flex justify-between px-2 text-sm sm:text-base">
             <div class="flex items-center gap-3 sm:gap-4">
@@ -455,7 +520,7 @@ const RepoView = (props: { hidden: boolean }) => {
                     <div class="iconify lucide--loader-circle mt-2 animate-spin self-center text-xl" />
                   }
                 >
-                  <BlobView pds={pds!} repo={did} />
+                  <BlobView pds={repo.pds()!} repo={did} />
                 </Suspense>
               </ErrorBoundary>
             </Show>
@@ -557,7 +622,7 @@ const RepoView = (props: { hidden: boolean }) => {
               </div>
             </Show>
             <Show when={location.hash === "#identity" || (error() && !location.hash)}>
-              <Show when={didDoc()}>
+              <Show when={repo.didDoc()}>
                 {(didDocument) => (
                   <div class="flex flex-col gap-3 wrap-anywhere">
                     {/* ID Section */}

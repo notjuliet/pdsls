@@ -11,7 +11,7 @@ import { Home } from "./views/home.tsx";
 import { LabelView } from "./views/labels.tsx";
 import { PdsLayout } from "./views/pds.tsx";
 import { RecordView } from "./views/record.tsx";
-import { RepoLayout } from "./views/repo.tsx";
+import { repoPreload, RepoLayout } from "./views/repo.tsx";
 import { Settings } from "./views/settings.tsx";
 import { StreamView } from "./views/stream";
 
@@ -27,7 +27,7 @@ render(
       <Route path="/settings" component={Settings} />
       <Route path="/:pds" component={PdsLayout}>
         <Route path="/" />
-        <Route path="/:repo" component={RepoLayout}>
+        <Route path="/:repo" component={RepoLayout} preload={repoPreload}>
           <Route path="/" />
           <Route path="/:collection" component={CollectionLayout}>
             <Route path="/" />

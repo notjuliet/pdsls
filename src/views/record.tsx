@@ -21,11 +21,11 @@ import { pds } from "../components/navbar.jsx";
 import { addNotification, removeNotification } from "../components/notification.jsx";
 import { PermissionButton } from "../components/permission-button.jsx";
 import { canHover } from "../layout.jsx";
+import { useRepo } from "../lib/repo-context.jsx";
 import {
   didDocumentResolver,
   resolveLexiconAuthority,
   resolveLexiconSchema,
-  resolvePDS,
 } from "../utils/api.js";
 import { addToClipboard } from "../utils/copy.js";
 import { AtUri, uriTemplates } from "../utils/templates.js";
@@ -213,6 +213,7 @@ const resolveAllLexicons = async (
 };
 
 export const RecordView = () => {
+  const repo = useRepo();
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams();
@@ -229,16 +230,14 @@ export const RecordView = () => {
   const [schema, setSchema] = createSignal<ResolvedSchema>();
   const [lexiconNotFound, setLexiconNotFound] = createSignal<boolean>();
   const [remoteValidation, setRemoteValidation] = createSignal<boolean>();
-  const did = params.repo;
-  let rpc: Client;
+  const did = repo.did();
 
   const fetchRecord = async () => {
+    const rpc = repo.rpc()!;
     const collection = params.collection!;
     const rkey = params.rkey!;
     setValidRecord(undefined);
     setValidSchema(undefined);
-    const pds = await resolvePDS(did!);
-    rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
     const res = await rpc.get("com.atproto.repo.getRecord", {
       params: {
         repo: did as ActorIdentifier,
@@ -260,7 +259,10 @@ export const RecordView = () => {
     return res.data;
   };
 
-  const [record, { refetch }] = createResource(() => params.rkey, fetchRecord);
+  const [record, { refetch }] = createResource(
+    () => (repo.rpc() ? params.rkey : undefined),
+    fetchRecord,
+  );
 
   const validateLocalSchema = async (collection: string, record: Record<string, unknown>) => {
     try {
@@ -312,7 +314,7 @@ export const RecordView = () => {
 
   const verifyRecordIntegrity = async (collection: string, rkey: string) => {
     try {
-      const { ok, data } = await rpc.get("com.atproto.sync.getRecord", {
+      const { ok, data } = await repo.rpc()!.get("com.atproto.sync.getRecord", {
         params: {
           did: did as Did,
           collection: collection as Nsid,
@@ -354,8 +356,8 @@ export const RecordView = () => {
   const deleteRecord = async () => {
     const collection = params.collection!;
     const rkey = params.rkey!;
-    rpc = new Client({ handler: agent()! });
-    await rpc.post("com.atproto.repo.deleteRecord", {
+    const authRpc = new Client({ handler: agent()! });
+    await authRpc.post("com.atproto.repo.deleteRecord", {
       input: {
         repo: params.repo as ActorIdentifier,
         collection: collection as `${string}.${string}.${string}`,
