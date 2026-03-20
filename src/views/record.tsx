@@ -28,7 +28,6 @@ import {
   resolvePDS,
 } from "../utils/api.js";
 import { addToClipboard } from "../utils/copy.js";
-import { clearCollectionCache } from "../utils/route-cache.js";
 import { AtUri, uriTemplates } from "../utils/templates.js";
 import { lexicons } from "../utils/types/lexicons.js";
 
@@ -234,6 +233,8 @@ export const RecordView = () => {
   let rpc: Client;
 
   const fetchRecord = async () => {
+    const collection = params.collection!;
+    const rkey = params.rkey!;
     setValidRecord(undefined);
     setValidSchema(undefined);
     const pds = await resolvePDS(did!);
@@ -241,8 +242,8 @@ export const RecordView = () => {
     const res = await rpc.get("com.atproto.repo.getRecord", {
       params: {
         repo: did as ActorIdentifier,
-        collection: params.collection as `${string}.${string}.${string}`,
-        rkey: params.rkey!,
+        collection: collection as `${string}.${string}.${string}`,
+        rkey,
       },
     });
     if (!res.ok) {
@@ -252,23 +253,23 @@ export const RecordView = () => {
     }
     setPlaceholder(res.data.value);
     setExternalLink(checkUri(res.data.uri, res.data.value));
-    resolveLexicon(params.collection as Nsid);
-    verifyRecordIntegrity();
-    validateLocalSchema(res.data.value);
+    resolveLexicon(collection as Nsid, collection);
+    verifyRecordIntegrity(collection, rkey);
+    validateLocalSchema(collection, res.data.value);
 
     return res.data;
   };
 
-  const [record, { refetch }] = createResource(fetchRecord);
+  const [record, { refetch }] = createResource(() => params.rkey, fetchRecord);
 
-  const validateLocalSchema = async (record: Record<string, unknown>) => {
+  const validateLocalSchema = async (collection: string, record: Record<string, unknown>) => {
     try {
-      if (params.collection === "com.atproto.lexicon.schema") {
+      if (collection === "com.atproto.lexicon.schema") {
         setLexiconNotFound(false);
         lexiconDoc.parse(record, { mode: "passthrough" });
         setValidSchema(true);
-      } else if (params.collection && params.collection in lexicons) {
-        if (is(lexicons[params.collection], record)) setValidSchema(true);
+      } else if (collection in lexicons) {
+        if (is(lexicons[collection], record)) setValidSchema(true);
         else setValidSchema(false);
       }
     } catch (err: any) {
@@ -279,9 +280,11 @@ export const RecordView = () => {
   };
 
   const validateRemoteSchema = async (record: Record<string, unknown>) => {
+    const collection = params.collection!;
+    const rkey = params.rkey!;
     try {
       setRemoteValidation(true);
-      const { resolved, failed } = await resolveAllLexicons(params.collection as Nsid);
+      const { resolved, failed } = await resolveAllLexicons(collection as Nsid);
 
       if (failed.size > 0) {
         console.error(`Failed to resolve ${failed.size} documents:`, Array.from(failed));
@@ -292,9 +295,9 @@ export const RecordView = () => {
 
       const lexiconDocs = Object.fromEntries(resolved);
 
-      const validator = new RecordValidator(lexiconDocs, params.collection as Nsid);
+      const validator = new RecordValidator(lexiconDocs, collection as Nsid);
       validator.parse({
-        key: params.rkey ?? null,
+        key: rkey ?? null,
         object: record,
       });
 
@@ -307,13 +310,13 @@ export const RecordView = () => {
     setRemoteValidation(false);
   };
 
-  const verifyRecordIntegrity = async () => {
+  const verifyRecordIntegrity = async (collection: string, rkey: string) => {
     try {
       const { ok, data } = await rpc.get("com.atproto.sync.getRecord", {
         params: {
           did: did as Did,
-          collection: params.collection as Nsid,
-          rkey: params.rkey!,
+          collection: collection as Nsid,
+          rkey,
         },
         as: "bytes",
       });
@@ -321,8 +324,8 @@ export const RecordView = () => {
 
       await verifyRecord({
         did: did as AtprotoDid,
-        collection: params.collection!,
-        rkey: params.rkey!,
+        collection,
+        rkey,
         carBytes: data as Uint8Array<ArrayBufferLike>,
       });
 
@@ -334,11 +337,11 @@ export const RecordView = () => {
     }
   };
 
-  const resolveLexicon = async (nsid: Nsid) => {
+  const resolveLexicon = async (nsid: Nsid, collection: string) => {
     try {
       const authority = await resolveLexiconAuthority(nsid);
       setLexiconAuthority(authority);
-      if (params.collection !== "com.atproto.lexicon.schema") {
+      if (collection !== "com.atproto.lexicon.schema") {
         const schema = await resolveLexiconSchema(authority, nsid);
         setSchema(schema);
         setLexiconNotFound(false);
@@ -349,12 +352,14 @@ export const RecordView = () => {
   };
 
   const deleteRecord = async () => {
+    const collection = params.collection!;
+    const rkey = params.rkey!;
     rpc = new Client({ handler: agent()! });
     await rpc.post("com.atproto.repo.deleteRecord", {
       input: {
         repo: params.repo as ActorIdentifier,
-        collection: params.collection as `${string}.${string}.${string}`,
-        rkey: params.rkey!,
+        collection: collection as `${string}.${string}.${string}`,
+        rkey,
       },
     });
     const id = addNotification({
@@ -362,7 +367,6 @@ export const RecordView = () => {
       type: "success",
     });
     setTimeout(() => removeNotification(id), 3000);
-    clearCollectionCache(`${params.pds}/${params.repo}/${params.collection}`);
     navigate(`/at://${params.repo}/${params.collection}`);
   };
 

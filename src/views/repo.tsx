@@ -1,7 +1,7 @@
 import { Client, simpleFetchHandler } from "@atcute/client";
 import { DidDocument } from "@atcute/identity";
 import { ActorIdentifier, Did, Handle, Nsid } from "@atcute/lexicons";
-import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
+import { A, type RouteSectionProps, useLocation, useNavigate, useParams } from "@solidjs/router";
 import {
   createEffect,
   createResource,
@@ -12,6 +12,8 @@ import {
   Show,
   Suspense,
 } from "solid-js";
+import { NestedLayout } from "../components/nested-layout.jsx";
+import { Spinner } from "../components/spinner.jsx";
 import { createStore } from "solid-js/store";
 import { Backlinks } from "../components/backlinks.jsx";
 import {
@@ -45,7 +47,17 @@ import { BlobView } from "./blob.jsx";
 import { PlcLogView } from "./logs.jsx";
 import { plcDirectory } from "./settings.jsx";
 
-export const RepoView = () => {
+export const RepoLayout = (props: RouteSectionProps) => {
+  const params = useParams();
+  const hasChild = () => !!params.collection;
+  return (
+    <NestedLayout key={params.repo} hasChild={hasChild()} view={() => <RepoView hidden={hasChild()} />}>
+      {props.children}
+    </NestedLayout>
+  );
+};
+
+const RepoView = (props: { hidden: boolean }) => {
   const params = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -129,12 +141,12 @@ export const RepoView = () => {
         } catch {}
       } else if (!did.startsWith("did:")) {
         try {
-          const did = await resolveHandle(params.repo as Handle);
-          navigate(location.pathname.replace(params.repo!, did), { replace: true });
+          const resolvedDid = await resolveHandle(did as Handle);
+          navigate(location.pathname.replace(did, resolvedDid), { replace: true });
           return;
         } catch {
           try {
-            const nsid = params.repo as Nsid;
+            const nsid = did as Nsid;
             const res = await resolveLexiconAuthority(nsid);
             navigate(`/at://${res}/com.atproto.lexicon.schema/${nsid}`, { replace: true });
             return;
@@ -192,7 +204,7 @@ export const RepoView = () => {
     }
   };
 
-  const [repo] = createResource(fetchRepo);
+  const [repo] = createResource(() => (props.hidden ? undefined : true), fetchRepo);
 
   const toggleCollapsed = (authority: string) => {
     setNsids((prev) => ({
@@ -319,17 +331,19 @@ export const RepoView = () => {
     setDownloading(false);
   };
 
-  document.title = `${params.repo} - PDSls`;
-
   createEffect(() => {
+    if (props.hidden) return;
     const handle = didDoc()
       ?.alsoKnownAs?.find((alias) => alias.startsWith("at://"))
       ?.replace("at://", "");
-    if (handle) document.title = `${handle} - PDSls`;
+    document.title = handle ? `${handle} - PDSls` : `${params.repo} - PDSls`;
   });
 
   return (
-    <>
+    <Show when={!props.hidden}>
+      <Show when={repo.loading}>
+        <Spinner />
+      </Show>
       <Show when={repo()}>
         <div class="flex w-full flex-col gap-3 wrap-break-word">
           <div class="flex justify-between px-2 text-sm sm:text-base">
@@ -801,52 +815,52 @@ export const RepoView = () => {
             </Show>
           </div>
         </div>
-      </Show>
 
-      <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
-        <div class="dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 border-t border-neutral-200 bg-neutral-100 px-3 pt-3 pb-6 dark:border-neutral-700">
-          <div
-            class="dark:bg-dark-200 flex w-full max-w-lg cursor-text items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 dark:border-neutral-700"
-            onClick={(e) => {
-              const input = e.currentTarget.querySelector("input");
-              if (e.target !== input) input?.focus();
-            }}
-          >
-            <span class="iconify lucide--filter text-neutral-500 dark:text-neutral-400"></span>
-            <input
-              ref={filterInputRef}
-              type="text"
-              spellcheck={false}
-              autocapitalize="off"
-              autocomplete="off"
-              class="grow py-2 select-none placeholder:text-sm focus:outline-none"
-              name="filter"
-              placeholder="Filter collections..."
-              value={filter() ?? ""}
-              onInput={(e) => setFilter(e.currentTarget.value.toLowerCase())}
-            />
-            <Show when={canHover && !filter()}>
-              <kbd class="rounded border border-neutral-200 bg-neutral-50 px-1.5 py-0.5 font-mono text-xs text-neutral-400 select-none dark:border-neutral-600 dark:bg-neutral-700">
-                /
-              </kbd>
-            </Show>
-          </div>
-          <div class="flex w-full max-w-lg justify-end gap-1">
-            <button
-              class="rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
-              onClick={expandAll}
+        <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
+          <div class="dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 border-t border-neutral-200 bg-neutral-100 px-3 pt-3 pb-6 dark:border-neutral-700">
+            <div
+              class="dark:bg-dark-200 flex w-full max-w-lg cursor-text items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 dark:border-neutral-700"
+              onClick={(e) => {
+                const input = e.currentTarget.querySelector("input");
+                if (e.target !== input) input?.focus();
+              }}
             >
-              Expand all
-            </button>
-            <button
-              class="rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
-              onClick={collapseAll}
-            >
-              Collapse all
-            </button>
+              <span class="iconify lucide--filter text-neutral-500 dark:text-neutral-400"></span>
+              <input
+                ref={filterInputRef}
+                type="text"
+                spellcheck={false}
+                autocapitalize="off"
+                autocomplete="off"
+                class="grow py-2 select-none placeholder:text-sm focus:outline-none"
+                name="filter"
+                placeholder="Filter collections..."
+                value={filter() ?? ""}
+                onInput={(e) => setFilter(e.currentTarget.value.toLowerCase())}
+              />
+              <Show when={canHover && !filter()}>
+                <kbd class="rounded border border-neutral-200 bg-neutral-50 px-1.5 py-0.5 font-mono text-xs text-neutral-400 select-none dark:border-neutral-600 dark:bg-neutral-700">
+                  /
+                </kbd>
+              </Show>
+            </div>
+            <div class="flex w-full max-w-lg justify-end gap-1">
+              <button
+                class="rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
+                onClick={expandAll}
+              >
+                Expand all
+              </button>
+              <button
+                class="rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
+                onClick={collapseAll}
+              >
+                Collapse all
+              </button>
+            </div>
           </div>
-        </div>
+        </Show>
       </Show>
-    </>
+    </Show>
   );
 };

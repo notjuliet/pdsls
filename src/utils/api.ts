@@ -143,7 +143,6 @@ const validateHandle = async (handle: Handle, did: Did) => {
 
 const resolvePDS = async (did: string) => {
   try {
-    setPDS(undefined);
     const pds = await getPDS(did);
     if (!pds) throw new Error("No PDS found");
     setPDS(pds.replace("https://", "").replace("http://", ""));

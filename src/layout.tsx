@@ -1,6 +1,6 @@
 import { Handle } from "@atcute/lexicons";
 import { A, RouteSectionProps, useLocation, useNavigate } from "@solidjs/router";
-import { createEffect, ErrorBoundary, onCleanup, onMount, Show, Suspense } from "solid-js";
+import { createEffect, ErrorBoundary, on, onCleanup, onMount, Show, Suspense } from "solid-js";
 import { AccountManager } from "./auth/account.jsx";
 import { agent } from "./auth/state.js";
 import { RecordEditor } from "./components/create";
@@ -9,6 +9,7 @@ import { NavBar } from "./components/navbar.jsx";
 import { NotificationContainer } from "./components/notification.jsx";
 import { PermissionPromptContainer } from "./components/permission-prompt.jsx";
 import { Search, SearchButton } from "./components/search.jsx";
+import { Spinner } from "./components/spinner.jsx";
 import { themeEvent } from "./components/theme.jsx";
 import { resolveHandle } from "./utils/api.js";
 import { plcDirectory } from "./views/settings.jsx";
@@ -168,19 +169,24 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         <Show when={props.params.pds}>
           <NavBar params={props.params} />
         </Show>
-        <Show keyed when={location.pathname}>
-          <ErrorBoundary
-            fallback={(err) => <div class="mt-3 wrap-anywhere">Error: {err.message}</div>}
+        <ErrorBoundary
+          fallback={(err, reset) => {
+            createEffect(
+              on(
+                () => location.pathname,
+                () => reset(),
+                { defer: true },
+              ),
+            );
+            return <div class="mt-3 wrap-anywhere">Error: {err.message}</div>;
+          }}
+        >
+          <Suspense
+            fallback={<Spinner />}
           >
-            <Suspense
-              fallback={
-                <span class="iconify lucide--loader-circle mt-3 animate-spin text-xl"></span>
-              }
-            >
-              {props.children}
-            </Suspense>
-          </ErrorBoundary>
-        </Show>
+            {props.children}
+          </Suspense>
+        </ErrorBoundary>
       </div>
       <NotificationContainer />
       <PermissionPromptContainer />

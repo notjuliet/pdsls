@@ -2,9 +2,11 @@ import { ComAtprotoServerDescribeServer, ComAtprotoSyncListRepos } from "@atcute
 import { Client, simpleFetchHandler } from "@atcute/client";
 import { InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
-import { A, useLocation, useParams } from "@solidjs/router";
+import { A, type RouteSectionProps, useLocation, useParams } from "@solidjs/router";
 import { createWindowVirtualizer } from "@tanstack/solid-virtual";
 import { createEffect, createResource, createSignal, For, on, onCleanup, Show } from "solid-js";
+import { NestedLayout } from "../components/nested-layout.jsx";
+import { Spinner } from "../components/spinner.jsx";
 import { Button } from "../components/button";
 import { setPDS } from "../components/navbar";
 import { canHover } from "../layout";
@@ -178,7 +180,17 @@ const InfoField = (props: { label: string; children: any }) => (
   </div>
 );
 
-export const PdsView = () => {
+export const PdsLayout = (props: RouteSectionProps) => {
+  const params = useParams();
+  const hasChild = () => !!params.repo;
+  return (
+    <NestedLayout key={params.pds} hasChild={hasChild()} view={() => <PdsView hidden={hasChild()} />}>
+      {props.children}
+    </NestedLayout>
+  );
+};
+
+const PdsView = (props: { hidden: boolean }) => {
   const params = useParams();
   const location = useLocation();
   const [version, setVersion] = createSignal<string>();
@@ -206,8 +218,10 @@ export const PdsView = () => {
     else setServerInfos(res.data);
   };
 
-  getVersion();
-  describeServer();
+  if (!props.hidden) {
+    getVersion();
+    describeServer();
+  }
 
   const fetchRepos = async () => {
     const res = await rpc.get("com.atproto.sync.listRepos", {
@@ -219,7 +233,7 @@ export const PdsView = () => {
     return res.data;
   };
 
-  const [response, { refetch }] = createResource(fetchRepos);
+  const [response, { refetch }] = createResource(() => (props.hidden ? undefined : true), fetchRepos);
   const [repos, setRepos] = createSignal<ComAtprotoSyncListRepos.Repo[]>();
 
   const [expandedIndex, setExpandedIndex] = createSignal<number | null>(null);
@@ -272,10 +286,14 @@ export const PdsView = () => {
     </A>
   );
 
-  document.title = `${params.pds} - PDSls`;
+  if (!props.hidden) document.title = `${params.pds} - PDSls`;
 
   return (
-    <Show when={repos() || response()}>
+    <>
+    <Show when={!props.hidden && response.loading}>
+      <Spinner />
+    </Show>
+    <Show when={!props.hidden && (repos() || response())}>
       <div class="flex w-full flex-col px-2">
         <div class="mb-3 flex gap-4 text-sm sm:text-base">
           <Tab tab="repos" label="Repositories" />
@@ -423,5 +441,6 @@ export const PdsView = () => {
         </div>
       </Show>
     </Show>
+    </>
   );
 };
