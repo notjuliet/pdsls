@@ -1,6 +1,6 @@
 import * as TID from "@atcute/tid";
 import { createResource, createSignal, For, onMount, Show } from "solid-js";
-import { getAllBacklinks, getRecordBacklinks, LinksWithRecords } from "../utils/api.js";
+import { getAllBacklinks, getRecordBacklinks, LinksWithRecords } from "../lib/api.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { Button } from "./button.jsx";
 import { Favicon } from "./favicon.jsx";

@@ -12,7 +12,7 @@ import {
   useContext,
 } from "solid-js";
 import { Portal } from "solid-js/web";
-import { resolveLexiconAuthority } from "../utils/api";
+import { resolveLexiconAuthority } from "../lib/api";
 import { formatFileSize } from "../utils/format";
 import { hideMedia } from "../views/settings";
 import DidHoverCard from "./hover-card/did";

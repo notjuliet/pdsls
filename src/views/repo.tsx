@@ -48,11 +48,11 @@ import {
   resolveHandleDetailed,
   resolveLexiconAuthority,
   validateHandle,
-} from "../utils/api.js";
+} from "../lib/api.js";
 import { addToClipboard } from "../utils/copy.js";
-import { createLatch } from "../utils/create-latch.js";
-import { detectDidKeyType, detectKeyType } from "../utils/key.js";
-import { useFilterShortcut } from "../utils/keyboard.js";
+import { createLatch } from "../lib/create-latch.js";
+import { detectDidKeyType, detectKeyType } from "../lib/key.js";
+import { useFilterShortcut } from "../lib/keyboard.js";
 import { BlobView } from "./blob.jsx";
 import { PlcLogView } from "./logs.jsx";
 import { plcDirectory } from "./settings.jsx";

@@ -10,8 +10,8 @@ import { setPDS } from "../components/navbar";
 import { NestedLayout } from "../components/nested-layout.jsx";
 import { Spinner } from "../components/spinner.jsx";
 import { canHover } from "../layout";
-import { didDocCache, resolveDidDoc } from "../utils/api";
-import { createLatch } from "../utils/create-latch.js";
+import { didDocCache, resolveDidDoc } from "../lib/api";
+import { createLatch } from "../lib/create-latch.js";
 import { localDateFromTimestamp } from "../utils/date";
 
 const LIMIT = 1000;

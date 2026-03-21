@@ -25,10 +25,10 @@ import {
   didDocumentResolver,
   resolveLexiconAuthority,
   resolveLexiconSchema,
-} from "../utils/api.js";
+} from "../lib/api.js";
 import { addToClipboard } from "../utils/copy.js";
-import { AtUri, uriTemplates } from "../utils/templates.js";
-import { lexicons } from "../utils/types/lexicons.js";
+import { AtUri, uriTemplates } from "../lib/templates.js";
+import { lexicons } from "../lib/types/lexicons.js";
 
 const faviconWrapper = (children: any) => (
   <div class="flex size-4 items-center justify-center">{children}</div>

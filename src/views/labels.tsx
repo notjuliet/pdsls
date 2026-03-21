@@ -9,9 +9,9 @@ import DidHoverCard from "../components/hover-card/did.jsx";
 import RecordHoverCard from "../components/hover-card/record.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import { canHover } from "../layout.jsx";
-import { getPDS, labelerCache, resolveHandle } from "../utils/api.js";
+import { getPDS, labelerCache, resolveHandle } from "../lib/api.js";
+import { useFilterShortcut } from "../lib/keyboard.js";
 import { localDateFromTimestamp } from "../utils/date.js";
-import { useFilterShortcut } from "../utils/keyboard.js";
 
 const LABELS_PER_PAGE = 50;
 const DEFAULT_LABELER_DID = "did:plc:ar7c4by46qjdydhdevvrndac";

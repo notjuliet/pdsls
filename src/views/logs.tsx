@@ -7,8 +7,8 @@ import {
 import { useLocation } from "@solidjs/router";
 import { createEffect, createResource, createSignal, For, onCleanup, Show } from "solid-js";
 import Tooltip from "../components/tooltip.jsx";
+import { createOperationHistory, DiffEntry, groupBy } from "../lib/plc-logs.js";
 import { localDateFromTimestamp } from "../utils/date.js";
-import { createOperationHistory, DiffEntry, groupBy } from "../utils/plc-logs.js";
 import PlcValidateWorker from "../workers/plc-validate.ts?worker";
 import { plcDirectory } from "./settings.jsx";
 
