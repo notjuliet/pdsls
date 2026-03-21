@@ -16,10 +16,15 @@ import { localDateFromTimestamp } from "../utils/date";
 
 const LIMIT = 1000;
 
-const pdsReposCache = new Map<
-  string,
-  { repos: ComAtprotoSyncListRepos.Repo[]; cursor: string | undefined }
->();
+let pdsCache:
+  | {
+      pds: string;
+      repos: ComAtprotoSyncListRepos.Repo[];
+      cursor: string | undefined;
+      version?: string;
+      serverInfos?: InferXRPCBodyOutput<ComAtprotoServerDescribeServer.mainSchema["output"]>;
+    }
+  | undefined;
 
 const RepoCard = (props: {
   repo: ComAtprotoSyncListRepos.Repo;
@@ -200,14 +205,15 @@ const PdsView = () => {
   const params = useParams();
   const hidden = () => !!params.repo;
   const location = useLocation();
-  const [version, setVersion] = createSignal<string>();
-  const [serverInfos, setServerInfos] =
-    createSignal<InferXRPCBodyOutput<ComAtprotoServerDescribeServer.mainSchema["output"]>>();
   setPDS(params.pds);
   const pds =
     params.pds!.startsWith("localhost") ? `http://${params.pds}` : `https://${params.pds}`;
   const rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
-  const cached = pdsReposCache.get(pds);
+  const cached = pdsCache?.pds === pds ? pdsCache : undefined;
+  const [version, setVersion] = createSignal<string | undefined>(cached?.version);
+  const [serverInfos, setServerInfos] = createSignal<
+    InferXRPCBodyOutput<ComAtprotoServerDescribeServer.mainSchema["output"]> | undefined
+  >(cached?.serverInfos);
   const [cursor, setCursor] = createSignal<string | undefined>(cached?.cursor);
   const [isLoadingMore, setIsLoadingMore] = createSignal(false);
 
@@ -215,7 +221,9 @@ const PdsView = () => {
     try {
       // @ts-expect-error: undocumented endpoint
       const res = await rpc.get("_health", {});
-      setVersion((res.data as any).version);
+      const v = (res.data as any).version as string;
+      setVersion(v);
+      if (pdsCache) pdsCache.version = v;
     } catch (err) {
       console.error("Failed to fetch version:", err);
     }
@@ -224,13 +232,14 @@ const PdsView = () => {
   const describeServer = async () => {
     const res = await rpc.get("com.atproto.server.describeServer");
     if (!res.ok) console.error(res.data.error);
-    else setServerInfos(res.data);
+    else {
+      setServerInfos(res.data);
+      if (pdsCache) pdsCache.serverInfos = res.data;
+    }
   };
 
-  let sideEffectsDone = false;
   createEffect(() => {
-    if (hidden() || sideEffectsDone) return;
-    sideEffectsDone = true;
+    if (hidden() || version() || serverInfos()) return;
     getVersion();
     describeServer();
   });
@@ -249,7 +258,7 @@ const PdsView = () => {
     const newRepos = repos()?.concat(res.data.repos) ?? res.data.repos;
     setCursor(newCursor);
     setRepos(newRepos);
-    pdsReposCache.set(pds, { repos: newRepos, cursor: newCursor });
+    pdsCache = { ...pdsCache, pds, repos: newRepos, cursor: newCursor };
     return res.data;
   };
 
