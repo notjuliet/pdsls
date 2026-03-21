@@ -11,9 +11,9 @@ import {
   Show,
 } from "solid-js";
 import { canHover } from "../layout";
-import { resolveLexiconAuthority, resolveLexiconAuthorityDirect } from "../utils/api";
-import { appHandleLink, appList, AppUrl } from "../utils/app-urls";
-import { createDebouncedValue } from "../utils/hooks/debounced";
+import { resolveLexiconAuthority, resolveLexiconAuthorityDirect } from "../lib/api";
+import { appHandleLink, appList, AppUrl } from "../lib/app-urls";
+import { createDebouncedValue } from "../lib/debounced";
 import { Button } from "./button";
 import { Modal } from "./modal";
 

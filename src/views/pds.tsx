@@ -2,16 +2,29 @@ import { ComAtprotoServerDescribeServer, ComAtprotoSyncListRepos } from "@atcute
 import { Client, simpleFetchHandler } from "@atcute/client";
 import { InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
-import { A, useLocation, useParams } from "@solidjs/router";
+import { A, type RouteSectionProps, useLocation, useParams } from "@solidjs/router";
 import { createWindowVirtualizer } from "@tanstack/solid-virtual";
 import { createEffect, createResource, createSignal, For, on, onCleanup, Show } from "solid-js";
 import { Button } from "../components/button";
 import { setPDS } from "../components/navbar";
+import { NestedLayout } from "../components/nested-layout.jsx";
+import { Spinner } from "../components/spinner.jsx";
 import { canHover } from "../layout";
-import { didDocCache, resolveDidDoc } from "../utils/api";
+import { didDocCache, resolveDidDoc } from "../lib/api";
+import { createLatch } from "../lib/create-latch.js";
 import { localDateFromTimestamp } from "../utils/date";
 
 const LIMIT = 1000;
+
+let pdsCache:
+  | {
+      pds: string;
+      repos: ComAtprotoSyncListRepos.Repo[];
+      cursor: string | undefined;
+      version?: string;
+      serverInfos?: InferXRPCBodyOutput<ComAtprotoServerDescribeServer.mainSchema["output"]>;
+    }
+  | undefined;
 
 const RepoCard = (props: {
   repo: ComAtprotoSyncListRepos.Repo;
@@ -178,23 +191,39 @@ const InfoField = (props: { label: string; children: any }) => (
   </div>
 );
 
-export const PdsView = () => {
+export const PdsLayout = (props: RouteSectionProps) => {
   const params = useParams();
+  const hasChild = () => !!params.repo;
+  return (
+    <NestedLayout key={params.pds} hasChild={hasChild()} view={() => <PdsView />}>
+      {props.children}
+    </NestedLayout>
+  );
+};
+
+const PdsView = () => {
+  const params = useParams();
+  const hidden = () => !!params.repo;
   const location = useLocation();
-  const [version, setVersion] = createSignal<string>();
-  const [serverInfos, setServerInfos] =
-    createSignal<InferXRPCBodyOutput<ComAtprotoServerDescribeServer.mainSchema["output"]>>();
-  const [cursor, setCursor] = createSignal<string>();
   setPDS(params.pds);
   const pds =
     params.pds!.startsWith("localhost") ? `http://${params.pds}` : `https://${params.pds}`;
   const rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
+  const cached = pdsCache?.pds === pds ? pdsCache : undefined;
+  const [version, setVersion] = createSignal<string | undefined>(cached?.version);
+  const [serverInfos, setServerInfos] = createSignal<
+    InferXRPCBodyOutput<ComAtprotoServerDescribeServer.mainSchema["output"]> | undefined
+  >(cached?.serverInfos);
+  const [cursor, setCursor] = createSignal<string | undefined>(cached?.cursor);
+  const [isLoadingMore, setIsLoadingMore] = createSignal(false);
 
   const getVersion = async () => {
     try {
       // @ts-expect-error: undocumented endpoint
       const res = await rpc.get("_health", {});
-      setVersion((res.data as any).version);
+      const v = (res.data as any).version as string;
+      setVersion(v);
+      if (pdsCache) pdsCache.version = v;
     } catch (err) {
       console.error("Failed to fetch version:", err);
     }
@@ -203,24 +232,39 @@ export const PdsView = () => {
   const describeServer = async () => {
     const res = await rpc.get("com.atproto.server.describeServer");
     if (!res.ok) console.error(res.data.error);
-    else setServerInfos(res.data);
+    else {
+      setServerInfos(res.data);
+      if (pdsCache) pdsCache.serverInfos = res.data;
+    }
   };
 
-  getVersion();
-  describeServer();
+  createEffect(() => {
+    if (hidden() || version() || serverInfos()) return;
+    getVersion();
+    describeServer();
+  });
+
+  const [repos, setRepos] = createSignal<ComAtprotoSyncListRepos.Repo[] | undefined>(cached?.repos);
 
   const fetchRepos = async () => {
+    const loadingMore = isLoadingMore();
+    setIsLoadingMore(false);
+    if (!loadingMore && repos()) return;
     const res = await rpc.get("com.atproto.sync.listRepos", {
       params: { limit: LIMIT, cursor: cursor() },
     });
     if (!res.ok) throw new Error(res.data.error);
-    setCursor(res.data.repos.length < LIMIT ? undefined : res.data.cursor);
-    setRepos(repos()?.concat(res.data.repos) ?? res.data.repos);
+    const newCursor = res.data.repos.length < LIMIT ? undefined : res.data.cursor;
+    const newRepos = repos()?.concat(res.data.repos) ?? res.data.repos;
+    setCursor(newCursor);
+    setRepos(newRepos);
+    pdsCache = { ...pdsCache, pds, repos: newRepos, cursor: newCursor };
     return res.data;
   };
 
-  const [response, { refetch }] = createResource(fetchRepos);
-  const [repos, setRepos] = createSignal<ComAtprotoSyncListRepos.Repo[]>();
+  const shouldFetch = createLatch(() => !hidden());
+
+  const [response, { refetch }] = createResource(shouldFetch, fetchRepos);
 
   const [expandedIndex, setExpandedIndex] = createSignal<number | null>(null);
 
@@ -272,156 +316,164 @@ export const PdsView = () => {
     </A>
   );
 
-  document.title = `${params.pds} - PDSls`;
+  if (!hidden()) document.title = `${params.pds} - PDSls`;
 
   return (
-    <Show when={repos() || response()}>
-      <div class="flex w-full flex-col px-2">
-        <div class="mb-3 flex gap-4 text-sm sm:text-base">
-          <Tab tab="repos" label="Repositories" />
-          <Tab tab="info" label="Info" />
-          <Tab tab="firehose" label="Firehose" />
+    <>
+      <Show when={!hidden() && !repos() && (response.state === "unresolved" || response.loading)}>
+        <Spinner />
+      </Show>
+      <Show when={!hidden() && (repos() || response.state === "ready")}>
+        <div class="flex w-full flex-col px-2">
+          <div class="mb-3 flex gap-4 text-sm sm:text-base">
+            <Tab tab="repos" label="Repositories" />
+            <Tab tab="info" label="Info" />
+            <Tab tab="firehose" label="Firehose" />
+          </div>
+          <Show when={!location.hash || location.hash === "#repos"}>
+            <div
+              class="-mx-2 mb-9"
+              ref={containerRef}
+              style={{ height: `${virtualizer.getTotalSize()}px`, position: "relative" }}
+            >
+              <For each={virtualizer.getVirtualItems()}>
+                {(virtualItem) => {
+                  const isExpanded = () => expandedIndex() === virtualItem.index;
+                  return (
+                    <div
+                      data-index={virtualItem.index}
+                      ref={virtualizer.measureElement}
+                      style={{
+                        position: "absolute",
+                        top: `${virtualItem.start - virtualizer.options.scrollMargin}px`,
+                        left: 0,
+                        width: "100%",
+                        overflow: "visible",
+                      }}
+                    >
+                      <RepoCard
+                        repo={repos()![virtualItem.index]}
+                        expanded={isExpanded()}
+                        onToggle={() => setExpandedIndex(isExpanded() ? null : virtualItem.index)}
+                      />
+                    </div>
+                  );
+                }}
+              </For>
+            </div>
+          </Show>
+          <div class="flex flex-col gap-3">
+            <Show when={location.hash === "#info"}>
+              <Show when={version()}>
+                {(version) => (
+                  <InfoField label="Version">
+                    <span class="text-sm text-neutral-700 dark:text-neutral-300">{version()}</span>
+                  </InfoField>
+                )}
+              </Show>
+              <Show when={serverInfos()}>
+                {(server) => (
+                  <>
+                    <InfoField label="DID">
+                      <span class="text-sm text-neutral-700 dark:text-neutral-300">
+                        {server().did}
+                      </span>
+                    </InfoField>
+                    <div class="flex items-center gap-1">
+                      <span class="font-semibold">Invite Code Required</span>
+                      <span
+                        classList={{
+                          "iconify lucide--check text-green-500 dark:text-green-400":
+                            server().inviteCodeRequired === true,
+                          "iconify lucide--x text-red-500 dark:text-red-400":
+                            !server().inviteCodeRequired,
+                        }}
+                      ></span>
+                    </div>
+                    <Show when={server().phoneVerificationRequired}>
+                      <div class="flex items-center gap-1">
+                        <span class="font-semibold">Captcha Verification Required</span>
+                        <span class="iconify lucide--check text-green-500 dark:text-green-400"></span>
+                      </div>
+                    </Show>
+                    <Show when={server().availableUserDomains.length}>
+                      <InfoField label="Available User Domains">
+                        <For each={server().availableUserDomains}>
+                          {(domain) => (
+                            <span class="text-sm wrap-anywhere text-neutral-700 dark:text-neutral-300">
+                              {domain}
+                            </span>
+                          )}
+                        </For>
+                      </InfoField>
+                    </Show>
+                    <For
+                      each={[
+                        { label: "Privacy Policy", url: server().links?.privacyPolicy },
+                        { label: "Terms of Service", url: server().links?.termsOfService },
+                        {
+                          label: "Contact",
+                          url:
+                            server().contact?.email ?
+                              `mailto:${server().contact?.email}`
+                            : undefined,
+                          display: server().contact?.email,
+                        },
+                      ].filter((l) => l.url)}
+                    >
+                      {(link) => (
+                        <InfoField label={link.label}>
+                          <a
+                            href={link.url}
+                            class="text-sm text-neutral-700 hover:underline dark:text-neutral-300"
+                            target="_blank"
+                            rel="noopener"
+                          >
+                            {link.display ?? link.url}
+                          </a>
+                        </InfoField>
+                      )}
+                    </For>
+                  </>
+                )}
+              </Show>
+            </Show>
+          </div>
         </div>
         <Show when={!location.hash || location.hash === "#repos"}>
-          <div
-            class="-mx-2 mb-9"
-            ref={containerRef}
-            style={{ height: `${virtualizer.getTotalSize()}px`, position: "relative" }}
-          >
-            <For each={virtualizer.getVirtualItems()}>
-              {(virtualItem) => {
-                const isExpanded = () => expandedIndex() === virtualItem.index;
-                return (
-                  <div
-                    data-index={virtualItem.index}
-                    ref={virtualizer.measureElement}
-                    style={{
-                      position: "absolute",
-                      top: `${virtualItem.start - virtualizer.options.scrollMargin}px`,
-                      left: 0,
-                      width: "100%",
-                      overflow: "visible",
-                    }}
+          <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center border-t border-neutral-200 bg-neutral-100 pt-3 pb-6 dark:border-neutral-700">
+            <div class="flex items-center gap-3">
+              <p>
+                {repos()?.length} loaded
+                <Show when={repos()?.some((r) => !r.active)}>
+                  {" · "}
+                  <span class="text-neutral-500 dark:text-neutral-400">
+                    {repos()?.filter((r) => !r.active).length} inactive
+                  </span>
+                </Show>
+              </p>
+              <Show when={cursor()}>
+                <Button
+                  onClick={() => {
+                    setIsLoadingMore(true);
+                    setExpandedIndex(null);
+                    refetch();
+                  }}
+                  disabled={response.loading}
+                  classList={{ "w-20 h-7.5 justify-center": true }}
+                >
+                  <Show
+                    when={!response.loading}
+                    fallback={<span class="iconify lucide--loader-circle animate-spin text-base" />}
                   >
-                    <RepoCard
-                      repo={repos()![virtualItem.index]}
-                      expanded={isExpanded()}
-                      onToggle={() => setExpandedIndex(isExpanded() ? null : virtualItem.index)}
-                    />
-                  </div>
-                );
-              }}
-            </For>
+                    Load more
+                  </Show>
+                </Button>
+              </Show>
+            </div>
           </div>
         </Show>
-        <div class="flex flex-col gap-3">
-          <Show when={location.hash === "#info"}>
-            <Show when={version()}>
-              {(version) => (
-                <InfoField label="Version">
-                  <span class="text-sm text-neutral-700 dark:text-neutral-300">{version()}</span>
-                </InfoField>
-              )}
-            </Show>
-            <Show when={serverInfos()}>
-              {(server) => (
-                <>
-                  <InfoField label="DID">
-                    <span class="text-sm text-neutral-700 dark:text-neutral-300">
-                      {server().did}
-                    </span>
-                  </InfoField>
-                  <div class="flex items-center gap-1">
-                    <span class="font-semibold">Invite Code Required</span>
-                    <span
-                      classList={{
-                        "iconify lucide--check text-green-500 dark:text-green-400":
-                          server().inviteCodeRequired === true,
-                        "iconify lucide--x text-red-500 dark:text-red-400":
-                          !server().inviteCodeRequired,
-                      }}
-                    ></span>
-                  </div>
-                  <Show when={server().phoneVerificationRequired}>
-                    <div class="flex items-center gap-1">
-                      <span class="font-semibold">Captcha Verification Required</span>
-                      <span class="iconify lucide--check text-green-500 dark:text-green-400"></span>
-                    </div>
-                  </Show>
-                  <Show when={server().availableUserDomains.length}>
-                    <InfoField label="Available User Domains">
-                      <For each={server().availableUserDomains}>
-                        {(domain) => (
-                          <span class="text-sm wrap-anywhere text-neutral-700 dark:text-neutral-300">
-                            {domain}
-                          </span>
-                        )}
-                      </For>
-                    </InfoField>
-                  </Show>
-                  <For
-                    each={[
-                      { label: "Privacy Policy", url: server().links?.privacyPolicy },
-                      { label: "Terms of Service", url: server().links?.termsOfService },
-                      {
-                        label: "Contact",
-                        url:
-                          server().contact?.email ? `mailto:${server().contact?.email}` : undefined,
-                        display: server().contact?.email,
-                      },
-                    ].filter((l) => l.url)}
-                  >
-                    {(link) => (
-                      <InfoField label={link.label}>
-                        <a
-                          href={link.url}
-                          class="text-sm text-neutral-700 hover:underline dark:text-neutral-300"
-                          target="_blank"
-                          rel="noopener"
-                        >
-                          {link.display ?? link.url}
-                        </a>
-                      </InfoField>
-                    )}
-                  </For>
-                </>
-              )}
-            </Show>
-          </Show>
-        </div>
-      </div>
-      <Show when={!location.hash || location.hash === "#repos"}>
-        <div class="dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center border-t border-neutral-200 bg-neutral-100 pt-3 pb-6 dark:border-neutral-700">
-          <div class="flex items-center gap-3">
-            <p>
-              {repos()?.length} loaded
-              <Show when={repos()?.some((r) => !r.active)}>
-                {" · "}
-                <span class="text-neutral-500 dark:text-neutral-400">
-                  {repos()?.filter((r) => !r.active).length} inactive
-                </span>
-              </Show>
-            </p>
-            <Show when={cursor()}>
-              <Button
-                onClick={() => {
-                  setExpandedIndex(null);
-                  refetch();
-                }}
-                disabled={response.loading}
-                classList={{ "w-20 h-7.5 justify-center": true }}
-              >
-                <Show
-                  when={!response.loading}
-                  fallback={<span class="iconify lucide--loader-circle animate-spin text-base" />}
-                >
-                  Load more
-                </Show>
-              </Button>
-            </Show>
-          </div>
-        </div>
       </Show>
-    </Show>
+    </>
   );
 };

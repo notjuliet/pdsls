@@ -1,5 +1,5 @@
 import { onCleanup, onMount } from "solid-js";
-import { pds } from "./navbar";
+import { useRepo } from "../lib/repo-context.jsx";
 
 export interface VideoPlayerProps {
   did: string;
@@ -7,13 +7,14 @@ export interface VideoPlayerProps {
 }
 
 const VideoPlayer = (props: VideoPlayerProps) => {
+  const repo = useRepo();
   let video!: HTMLVideoElement;
   let objectUrl: string | undefined;
 
   onMount(async () => {
     // thanks bf <3
     const res = await fetch(
-      `https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${props.did}&cid=${props.cid}`,
+      `${repo.pds()}/xrpc/com.atproto.sync.getBlob?did=${props.did}&cid=${props.cid}`,
     );
     if (!res.ok) throw new Error(res.statusText);
     const blob = await res.blob();

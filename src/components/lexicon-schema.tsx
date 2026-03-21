@@ -2,7 +2,7 @@ import { Nsid } from "@atcute/lexicons";
 import { AtprotoDid } from "@atcute/lexicons/syntax";
 import { A, useLocation, useNavigate } from "@solidjs/router";
 import { createEffect, For, Show } from "solid-js";
-import { resolveLexiconAuthority } from "../utils/api.js";
+import { resolveLexiconAuthority } from "../lib/api.js";
 import Tooltip from "./tooltip.jsx";
 
 // Style constants

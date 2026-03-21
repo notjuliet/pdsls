@@ -1,8 +1,8 @@
 import { ComAtprotoRepoApplyWrites, ComAtprotoRepoGetRecord } from "@atcute/atproto";
-import { Client, simpleFetchHandler } from "@atcute/client";
+import { Client } from "@atcute/client";
 import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
-import { A, useBeforeLeave, useParams, useSearchParams } from "@solidjs/router";
+import { A, type RouteSectionProps, useParams, useSearchParams } from "@solidjs/router";
 import { createMemo, createResource, createSignal, For, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { agent } from "../auth/state";
@@ -10,18 +10,16 @@ import { Button } from "../components/button.jsx";
 import HoverCard from "../components/hover-card/base";
 import { JSONType, JSONValue } from "../components/json.jsx";
 import { Modal } from "../components/modal.jsx";
+import { NestedLayout } from "../components/nested-layout.jsx";
 import { addNotification, removeNotification } from "../components/notification.jsx";
 import { PermissionButton } from "../components/permission-button.jsx";
+import { Spinner } from "../components/spinner.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import { canHover } from "../layout.jsx";
-import { resolvePDS } from "../utils/api.js";
+import { useRepo } from "../lib/repo-context.jsx";
+import { createLatch } from "../lib/create-latch.js";
 import { localDateFromTimestamp } from "../utils/date.js";
-import { useFilterShortcut } from "../utils/keyboard.js";
-import {
-  clearCollectionCache,
-  getCollectionCache,
-  setCollectionCache,
-} from "../utils/route-cache.js";
+import { useFilterShortcut } from "../lib/keyboard.js";
 
 interface AtprotoRecord {
   rkey: string;
@@ -63,8 +61,24 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
   );
 };
 
-const CollectionView = () => {
+export const CollectionLayout = (props: RouteSectionProps) => {
   const params = useParams();
+  const hasChild = () => !!params.rkey;
+  return (
+    <NestedLayout
+      key={`${params.repo}/${params.collection}`}
+      hasChild={hasChild()}
+      view={() => <CollectionView />}
+    >
+      {props.children}
+    </NestedLayout>
+  );
+};
+
+const CollectionView = () => {
+  const repo = useRepo();
+  const params = useParams();
+  const hidden = () => !!params.rkey;
   const [searchParams, setSearchParams] = useSearchParams();
   const [cursor, setCursor] = createSignal<string>();
   const [records, setRecords] = createStore<AtprotoRecord[]>([]);
@@ -80,65 +94,24 @@ const CollectionView = () => {
   };
   const [recreate, setRecreate] = createSignal(false);
   const [openDelete, setOpenDelete] = createSignal(false);
-  const [restoredFromCache, setRestoredFromCache] = createSignal(false);
-  const did = params.repo;
-  let pds: string;
-  let rpc: Client;
+  const [isLoadingMore, setIsLoadingMore] = createSignal(false);
+  const did = repo.did();
   let filterInputRef: HTMLInputElement | undefined;
 
-  const cacheKey = () => `${params.pds}/${params.repo}/${params.collection}`;
-
   onMount(() => {
-    const cached = getCollectionCache(cacheKey());
-    if (cached) {
-      setRecords(cached.records as AtprotoRecord[]);
-      setCursor(cached.cursor);
-      setReverse(cached.reverse);
-      setSearchParams({
-        reverse: cached.reverse ? "true" : undefined,
-        limit: cached.limit !== DEFAULT_LIMIT ? cached.limit.toString() : undefined,
-      });
-      setRestoredFromCache(true);
-      requestAnimationFrame(() => {
-        window.scrollTo(0, cached.scrollY);
-      });
-    }
-
     useFilterShortcut(() => filterInputRef);
   });
 
-  useBeforeLeave((e) => {
-    const recordPathPrefix = `/at://${did}/${params.collection}/`;
-    const isNavigatingToRecord = typeof e.to === "string" && e.to.startsWith(recordPathPrefix);
-
-    if (isNavigatingToRecord && records.length > 0) {
-      setCollectionCache(cacheKey(), {
-        records: [...records],
-        cursor: cursor(),
-        scrollY: window.scrollY,
-        reverse: reverse(),
-        limit: limit(),
-      });
-    } else {
-      clearCollectionCache(cacheKey());
-    }
-  });
-
   const fetchRecords = async () => {
-    if (restoredFromCache() && records.length > 0 && !cursor()) {
-      setRestoredFromCache(false);
-      return records;
-    }
-    if (restoredFromCache()) setRestoredFromCache(false);
+    const rpc = repo.rpc()!;
+    const collection = params.collection!;
+    const isLoadMore = isLoadingMore();
+    setIsLoadingMore(false);
 
-    const isLoadMore = cursor() !== undefined;
-
-    if (!pds) pds = await resolvePDS(did!);
-    if (!rpc) rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
     const res = await rpc.get("com.atproto.repo.listRecords", {
       params: {
         repo: did as ActorIdentifier,
-        collection: params.collection as `${string}.${string}.${string}`,
+        collection: collection as `${string}.${string}.${string}`,
         limit: limit(),
         cursor: cursor(),
         reverse: reverse(),
@@ -161,7 +134,9 @@ const CollectionView = () => {
     return res.data.records;
   };
 
-  const [response, { refetch }] = createResource(fetchRecords);
+  const shouldFetch = createLatch(() => !hidden() && !!repo.rpc());
+
+  const [response, { refetch }] = createResource(shouldFetch, fetchRecords);
 
   const filteredRecords = createMemo(() =>
     records.filter((rec) =>
@@ -192,9 +167,9 @@ const CollectionView = () => {
     });
 
     const BATCHSIZE = 200;
-    rpc = new Client({ handler: agent()! });
+    const authRpc = new Client({ handler: agent()! });
     for (let i = 0; i < writes.length; i += BATCHSIZE) {
-      await rpc.post("com.atproto.repo.applyWrites", {
+      await authRpc.post("com.atproto.repo.applyWrites", {
         input: {
           repo: agent()!.sub,
           writes: writes.slice(i, i + BATCHSIZE),
@@ -211,7 +186,6 @@ const CollectionView = () => {
     setCursor(undefined);
     setOpenDelete(false);
     setRecreate(false);
-    clearCollectionCache(cacheKey());
     refetch();
   };
 
@@ -239,11 +213,14 @@ const CollectionView = () => {
       true,
     );
 
-  document.title = `${params.collection} - PDSls`;
+  if (!hidden()) document.title = `${params.collection} - PDSls`;
 
   return (
     <>
-      <Show when={records.length || response()}>
+      <Show when={!hidden() && !records.length && (response.state === "unresolved" || response.loading)}>
+        <Spinner />
+      </Show>
+      <Show when={!hidden() && (records.length || response.state === "ready")}>
         <div class="flex w-full flex-col items-center">
           {/* Tab bar */}
           <div class="mb-2 flex min-h-7 w-full items-center justify-between px-2 text-sm sm:text-base">
@@ -423,8 +400,7 @@ const CollectionView = () => {
                   setReverse(newReverse);
                   setSearchParams({ reverse: newReverse ? "true" : undefined });
                   setCursor(undefined);
-                  setRestoredFromCache(false);
-                  clearCollectionCache(cacheKey());
+                  setRecords([]);
                   refetch();
                 }}
                 classList={{
@@ -451,7 +427,10 @@ const CollectionView = () => {
               <div class="flex w-20 items-center justify-end">
                 <Show when={cursor()}>
                   <Button
-                    onClick={() => refetch()}
+                    onClick={() => {
+                      setIsLoadingMore(true);
+                      refetch();
+                    }}
                     disabled={response.loading}
                     classList={{ "w-20 h-7.5 justify-center": true }}
                   >
@@ -473,5 +452,3 @@ const CollectionView = () => {
     </>
   );
 };
-
-export { CollectionView };

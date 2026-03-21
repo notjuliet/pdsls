@@ -1,6 +1,6 @@
 import { LocalActorResolver } from "@atcute/identity-resolver";
 import { configureOAuth } from "@atcute/oauth-browser-client";
-import { didDocumentResolver, handleResolver } from "../utils/api";
+import { didDocumentResolver, handleResolver } from "../lib/api";
 
 const reactiveDidDocumentResolver = {
   resolve: async (did: string) => didDocumentResolver().resolve(did as any),

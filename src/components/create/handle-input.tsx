@@ -1,6 +1,6 @@
 import { Handle } from "@atcute/lexicons";
 import { createSignal, Show } from "solid-js";
-import { resolveHandle } from "../../utils/api";
+import { resolveHandle } from "../../lib/api";
 import { Button } from "../button.jsx";
 import { TextInput } from "../text-input.jsx";
 import { editorInstance } from "./state";

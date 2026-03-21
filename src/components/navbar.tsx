@@ -2,7 +2,7 @@ import * as TID from "@atcute/tid";
 import { A, Params } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, JSX, Match, Show, Switch } from "solid-js";
 import { canHover } from "../layout";
-import { didDocCache } from "../utils/api";
+import { didDocCache } from "../lib/api";
 import { addToClipboard } from "../utils/copy";
 import { localDateFromTimestamp } from "../utils/date";
 import Tooltip from "./tooltip";

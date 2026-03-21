@@ -12,17 +12,17 @@ import {
   useContext,
 } from "solid-js";
 import { Portal } from "solid-js/web";
-import { resolveLexiconAuthority } from "../utils/api";
+import { resolveLexiconAuthority } from "../lib/api";
 import { formatFileSize } from "../utils/format";
 import { hideMedia } from "../views/settings";
 import DidHoverCard from "./hover-card/did";
 import RecordHoverCard from "./hover-card/record";
-import { pds } from "./navbar";
 import { addNotification, removeNotification } from "./notification";
 import VideoPlayer from "./video-player";
 
 interface JSONContext {
   repo: string;
+  pds?: string;
   truncate?: boolean;
   parentIsBlob?: boolean;
   newTab?: boolean;
@@ -104,7 +104,7 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
                 class="text-blue-500 hover:underline active:underline dark:text-blue-400"
                 rel="noopener"
                 target="_blank"
-                href={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${params.repo}&cid=${part}`}
+                href={`${ctx.pds}/xrpc/com.atproto.sync.getBlob?did=${params.repo}&cid=${part}`}
               >
                 {part}
               </A>
@@ -312,7 +312,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
 
   const blob: AtBlob = props.data as any;
   const canShowMedia = () =>
-    pds() &&
+    ctx.pds &&
     !ctx.hideBlobs &&
     (blob.mimeType.startsWith("image/") ||
       blob.mimeType === "video/mp4" ||
@@ -341,7 +341,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
     const [imageUrl] = createResource(
       () => (blob.mimeType.startsWith("image/") ? blob.ref.$link : null),
       async (cid) => {
-        const url = `https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${ctx.repo}&cid=${cid}`;
+        const url = `${ctx.pds}/xrpc/com.atproto.sync.getBlob?did=${ctx.repo}&cid=${cid}`;
 
         await new Promise<void>((resolve) => {
           const img = new Image();
@@ -397,7 +397,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
             <Show when={blob.mimeType.startsWith("audio/")}>
               <audio class="my-0.5 max-w-96" controls>
                 <source
-                  src={`https://${pds()}/xrpc/com.atproto.sync.getBlob?did=${ctx.repo}&cid=${blob.ref.$link}`}
+                  src={`${ctx.pds}/xrpc/com.atproto.sync.getBlob?did=${ctx.repo}&cid=${blob.ref.$link}`}
                   type={blob.mimeType === "audio/x-flac" ? "audio/flac" : blob.mimeType}
                 />
               </audio>
@@ -464,6 +464,7 @@ const JSONValueInner = (props: {
 export const JSONValue = (props: {
   data: JSONType;
   repo: string;
+  pds?: string;
   truncate?: boolean;
   newTab?: boolean;
   hideBlobs?: boolean;
@@ -473,6 +474,7 @@ export const JSONValue = (props: {
     <JSONCtx.Provider
       value={{
         repo: props.repo,
+        pds: props.pds,
         truncate: props.truncate,
         newTab: props.newTab,
         hideBlobs: props.hideBlobs,

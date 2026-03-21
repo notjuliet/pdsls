@@ -18,7 +18,6 @@ import { Did, Handle } from "@atcute/lexicons";
 import { AtprotoDid, isHandle, Nsid } from "@atcute/lexicons/syntax";
 import { createMemo } from "solid-js";
 import { createStore } from "solid-js/store";
-import { setPDS } from "../components/navbar";
 import { plcDirectory } from "../views/settings";
 
 const proxyFetch = (rewrite: (url: URL) => string): typeof fetch => {
@@ -139,19 +138,6 @@ const validateHandle = async (handle: Handle, did: Did) => {
   }
   if (resolvedDid !== did) return false;
   return true;
-};
-
-const resolvePDS = async (did: string) => {
-  try {
-    setPDS(undefined);
-    const pds = await getPDS(did);
-    if (!pds) throw new Error("No PDS found");
-    setPDS(pds.replace("https://", "").replace("http://", ""));
-    return pds;
-  } catch (err) {
-    setPDS("Missing PDS");
-    throw err;
-  }
 };
 
 const resolveLexiconAuthority = async (nsid: Nsid) => {
@@ -283,7 +269,6 @@ export {
   resolveLexiconAuthority,
   resolveLexiconAuthorityDirect,
   resolveLexiconSchema,
-  resolvePDS,
   validateHandle,
   type LinkData,
   type LinksWithRecords,

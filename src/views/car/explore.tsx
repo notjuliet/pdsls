@@ -20,9 +20,9 @@ import { Favicon } from "../../components/favicon.jsx";
 import HoverCard from "../../components/hover-card/base";
 import { JSONValue } from "../../components/json.jsx";
 import { TextInput } from "../../components/text-input.jsx";
-import { didDocCache, resolveDidDoc } from "../../utils/api.js";
+import { didDocCache, resolveDidDoc } from "../../lib/api.js";
+import { createDebouncedValue } from "../../lib/debounced.js";
 import { localDateFromTimestamp } from "../../utils/date.js";
-import { createDebouncedValue } from "../../utils/hooks/debounced.js";
 import { createDropHandler, createFileChangeHandler, handleDragOver } from "./file-handlers.js";
 import {
   type Archive,

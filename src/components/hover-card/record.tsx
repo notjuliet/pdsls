@@ -1,7 +1,7 @@
 import { Client, simpleFetchHandler } from "@atcute/client";
 import { ActorIdentifier } from "@atcute/lexicons";
 import { createSignal, Show } from "solid-js";
-import { getPDS } from "../../utils/api";
+import { getPDS } from "../../lib/api";
 import { JSONValue } from "../json";
 import HoverCard from "./base";
 
