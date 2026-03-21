@@ -205,7 +205,7 @@ const PdsView = () => {
   const params = useParams();
   const hidden = () => !!params.repo;
   const location = useLocation();
-  setPDS(params.pds);
+  if (params.pds !== "at:") setPDS(params.pds);
   const pds =
     params.pds!.startsWith("localhost") ? `http://${params.pds}` : `https://${params.pds}`;
   const rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });

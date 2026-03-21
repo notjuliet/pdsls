@@ -40,9 +40,9 @@ import { createLatch } from "../../lib/create-latch.js";
 import { useFilterShortcut } from "../../lib/keyboard.js";
 import { RepoProvider, useRepo } from "../../lib/repo-context.jsx";
 import { BlobView } from "../blob.jsx";
+import { plcDirectory } from "../settings.jsx";
 import { IdentityView } from "./identity.jsx";
 import { PlcLogView } from "./logs.jsx";
-import { plcDirectory } from "../settings.jsx";
 
 export const repoPreload: RoutePreloadFunc = ({ params }) => {
   if (params.repo?.startsWith("did:")) void getPDS(params.repo);
@@ -83,6 +83,7 @@ export const RepoLayout = (props: RouteSectionProps) => {
       return id?.startsWith("did:") ? id : undefined;
     },
     async (did) => {
+      setPDS(undefined);
       try {
         const pdsUrl = await getPDS(did);
         const rpc = new Client({ handler: simpleFetchHandler({ service: pdsUrl }) });
