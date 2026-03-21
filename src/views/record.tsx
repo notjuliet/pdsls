@@ -17,7 +17,6 @@ import { Favicon } from "../components/favicon.jsx";
 import { JSONValue } from "../components/json.jsx";
 import { LexiconSchemaView } from "../components/lexicon-schema.jsx";
 import { Modal } from "../components/modal.jsx";
-import { pds } from "../components/navbar.jsx";
 import { addNotification, removeNotification } from "../components/notification.jsx";
 import { PermissionButton } from "../components/permission-button.jsx";
 import { canHover } from "../layout.jsx";
@@ -532,7 +531,7 @@ export const RecordView = () => {
                       icon="lucide--copy"
                     />
                     <NavMenu
-                      href={`https://${pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
+                      href={`${repo.pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
                       icon="lucide--external-link"
                       label="Record on PDS"
                       newTab
@@ -546,6 +545,7 @@ export const RecordView = () => {
                 <JSONValue
                   data={record()?.value as any}
                   repo={record()!.uri.split("/")[2]}
+                  pds={repo.pds()}
                   keyLinks
                 />
               </div>
