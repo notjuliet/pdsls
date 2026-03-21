@@ -4,7 +4,16 @@ import { InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
 import { A, type RouteSectionProps, useLocation, useParams } from "@solidjs/router";
 import { createWindowVirtualizer } from "@tanstack/solid-virtual";
-import { createEffect, createResource, createSignal, For, on, onCleanup, Show } from "solid-js";
+import {
+  createEffect,
+  createMemo,
+  createResource,
+  createSignal,
+  For,
+  on,
+  onCleanup,
+  Show,
+} from "solid-js";
 import { Button } from "../components/button";
 import { setPDS } from "../components/navbar";
 import { NestedLayout } from "../components/nested-layout.jsx";
@@ -14,6 +23,11 @@ import { didDocCache, resolveDidDoc } from "../utils/api";
 import { localDateFromTimestamp } from "../utils/date";
 
 const LIMIT = 1000;
+
+const pdsReposCache = new Map<
+  string,
+  { repos: ComAtprotoSyncListRepos.Repo[]; cursor: string | undefined }
+>();
 
 const RepoCard = (props: {
   repo: ComAtprotoSyncListRepos.Repo;
@@ -197,11 +211,13 @@ const PdsView = () => {
   const [version, setVersion] = createSignal<string>();
   const [serverInfos, setServerInfos] =
     createSignal<InferXRPCBodyOutput<ComAtprotoServerDescribeServer.mainSchema["output"]>>();
-  const [cursor, setCursor] = createSignal<string>();
   setPDS(params.pds);
   const pds =
     params.pds!.startsWith("localhost") ? `http://${params.pds}` : `https://${params.pds}`;
   const rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
+  const cached = pdsReposCache.get(pds);
+  const [cursor, setCursor] = createSignal<string | undefined>(cached?.cursor);
+  const [isLoadingMore, setIsLoadingMore] = createSignal(false);
 
   const getVersion = async () => {
     try {
@@ -219,23 +235,38 @@ const PdsView = () => {
     else setServerInfos(res.data);
   };
 
-  if (!hidden()) {
+  let sideEffectsDone = false;
+  createEffect(() => {
+    if (hidden() || sideEffectsDone) return;
+    sideEffectsDone = true;
     getVersion();
     describeServer();
-  }
+  });
+
+  const [repos, setRepos] = createSignal<ComAtprotoSyncListRepos.Repo[] | undefined>(cached?.repos);
 
   const fetchRepos = async () => {
+    const loadingMore = isLoadingMore();
+    setIsLoadingMore(false);
+    if (!loadingMore && repos()) return;
     const res = await rpc.get("com.atproto.sync.listRepos", {
       params: { limit: LIMIT, cursor: cursor() },
     });
     if (!res.ok) throw new Error(res.data.error);
-    setCursor(res.data.repos.length < LIMIT ? undefined : res.data.cursor);
-    setRepos(repos()?.concat(res.data.repos) ?? res.data.repos);
+    const newCursor = res.data.repos.length < LIMIT ? undefined : res.data.cursor;
+    const newRepos = repos()?.concat(res.data.repos) ?? res.data.repos;
+    setCursor(newCursor);
+    setRepos(newRepos);
+    pdsReposCache.set(pds, { repos: newRepos, cursor: newCursor });
     return res.data;
   };
 
-  const [response, { refetch }] = createResource(() => true, fetchRepos);
-  const [repos, setRepos] = createSignal<ComAtprotoSyncListRepos.Repo[]>();
+  const shouldFetch = createMemo<true | undefined>((prev) => {
+    if (prev) return prev;
+    return hidden() ? undefined : true;
+  });
+
+  const [response, { refetch }] = createResource(shouldFetch, fetchRepos);
 
   const [expandedIndex, setExpandedIndex] = createSignal<number | null>(null);
 
@@ -291,10 +322,10 @@ const PdsView = () => {
 
   return (
     <>
-      <Show when={!hidden() && response.loading}>
+      <Show when={!hidden() && !repos() && (response.state === "unresolved" || response.loading)}>
         <Spinner />
       </Show>
-      <Show when={!hidden() && (repos() || response())}>
+      <Show when={!hidden() && (repos() || response.state === "ready")}>
         <div class="flex w-full flex-col px-2">
           <div class="mb-3 flex gap-4 text-sm sm:text-base">
             <Tab tab="repos" label="Repositories" />
@@ -426,6 +457,7 @@ const PdsView = () => {
               <Show when={cursor()}>
                 <Button
                   onClick={() => {
+                    setIsLoadingMore(true);
                     setExpandedIndex(null);
                     refetch();
                   }}

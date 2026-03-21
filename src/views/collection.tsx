@@ -133,10 +133,14 @@ const CollectionView = () => {
     return res.data.records;
   };
 
-  const [response, { refetch }] = createResource(
-    () => (repo.rpc() ? true : undefined),
-    fetchRecords,
-  );
+  const shouldFetch = createMemo<true | undefined>((prev) => {
+    if (prev) return prev;
+    if (hidden()) return undefined;
+    if (!repo.rpc()) return undefined;
+    return true;
+  });
+
+  const [response, { refetch }] = createResource(shouldFetch, fetchRecords);
 
   const filteredRecords = createMemo(() =>
     records.filter((rec) =>
@@ -217,10 +221,10 @@ const CollectionView = () => {
 
   return (
     <>
-      <Show when={!hidden() && response.loading}>
+      <Show when={!hidden() && (response.state === "unresolved" || response.loading)}>
         <Spinner />
       </Show>
-      <Show when={!hidden() && (records.length || response())}>
+      <Show when={!hidden() && (records.length || response.state === "ready")}>
         <div class="flex w-full flex-col items-center">
           {/* Tab bar */}
           <div class="mb-2 flex min-h-7 w-full items-center justify-between px-2 text-sm sm:text-base">

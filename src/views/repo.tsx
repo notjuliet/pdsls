@@ -11,6 +11,7 @@ import {
 } from "@solidjs/router";
 import {
   createEffect,
+  createMemo,
   createResource,
   createSignal,
   ErrorBoundary,
@@ -261,10 +262,14 @@ const RepoView = () => {
     }
   };
 
-  const [repoData] = createResource(() => {
+  const shouldFetch = createMemo<true | undefined>((prev) => {
+    if (prev) return prev;
+    if (hidden()) return undefined;
     if (!repo.rpc() && !repo.error()) return undefined;
     return true;
-  }, fetchRepo);
+  });
+
+  const [repoData] = createResource(shouldFetch, fetchRepo);
 
   const toggleCollapsed = (authority: string) => {
     setNsids((prev) => ({
@@ -404,10 +409,10 @@ const RepoView = () => {
 
   return (
     <Show when={!hidden()}>
-      <Show when={repoData.loading || (!repoData() && !repo.rpc() && !repo.error())}>
+      <Show when={repoData.state === "unresolved" || repoData.loading}>
         <Spinner />
       </Show>
-      <Show when={repoData() || repo.error()}>
+      <Show when={repoData.state === "ready" || repo.error()}>
         <div class="flex w-full flex-col gap-3 wrap-break-word">
           <div class="flex justify-between px-2 text-sm sm:text-base">
             <div class="flex items-center gap-3 sm:gap-4">
