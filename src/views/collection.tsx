@@ -217,7 +217,7 @@ const CollectionView = () => {
 
   return (
     <>
-      <Show when={!hidden() && (response.state === "unresolved" || response.loading)}>
+      <Show when={!hidden() && !records.length && (response.state === "unresolved" || response.loading)}>
         <Spinner />
       </Show>
       <Show when={!hidden() && (records.length || response.state === "ready")}>
