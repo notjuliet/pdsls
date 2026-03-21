@@ -39,8 +39,8 @@ import {
 import { createLatch } from "../../lib/create-latch.js";
 import { useFilterShortcut } from "../../lib/keyboard.js";
 import { RepoProvider, useRepo } from "../../lib/repo-context.jsx";
-import { BlobView } from "../blob.jsx";
 import { plcDirectory } from "../settings.jsx";
+import { BlobView } from "./blob.jsx";
 import { IdentityView } from "./identity.jsx";
 import { PlcLogView } from "./logs.jsx";
 

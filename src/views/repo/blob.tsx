@@ -1,6 +1,6 @@
 import { Client, simpleFetchHandler } from "@atcute/client";
 import { createResource, createSignal, For, Show } from "solid-js";
-import { Button } from "../components/button";
+import { Button } from "../../components/button";
 
 const LIMIT = 1000;
 

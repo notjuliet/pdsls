@@ -33,17 +33,17 @@ importers:
         specifier: ^0.3.2
         version: 0.3.2
       '@atcute/identity':
-        specifier: ^1.1.3
-        version: 1.1.3
+        specifier: ^1.1.4
+        version: 1.1.4
       '@atcute/identity-resolver':
         specifier: ^1.2.2
-        version: 1.2.2(@atcute/identity@1.1.3)
+        version: 1.2.2(@atcute/identity@1.1.4)
       '@atcute/lexicon-doc':
         specifier: ^2.1.2
         version: 2.1.2
       '@atcute/lexicon-resolver':
         specifier: ^0.1.6
-        version: 0.1.6(@atcute/identity-resolver@1.2.2(@atcute/identity@1.1.3))(@atcute/identity@1.1.3)
+        version: 0.1.6(@atcute/identity-resolver@1.2.2(@atcute/identity@1.1.4))(@atcute/identity@1.1.4)
       '@atcute/lexicons':
         specifier: ^1.2.9
         version: 1.2.9
@@ -52,7 +52,7 @@ importers:
         version: 1.2.0
       '@atcute/oauth-browser-client':
         specifier: ^3.0.0
-        version: 3.0.0(@atcute/identity@1.1.3)
+        version: 3.0.0(@atcute/identity@1.1.4)
       '@atcute/repo':
         specifier: ^0.1.3
         version: 0.1.3
@@ -179,8 +179,8 @@ packages:
     peerDependencies:
       '@atcute/identity': ^1.0.0
 
-  '@atcute/identity@1.1.3':
-    resolution: {integrity: sha512-oIqPoI8TwWeQxvcLmFEZLdN2XdWcaLVtlm8pNk0E72As9HNzzD9pwKPrLr3rmTLRIoULPPFmq9iFNsTeCIU9ng==}
+  '@atcute/identity@1.1.4':
+    resolution: {integrity: sha512-RCw1IqflfuSYCxK5m0lZCm0UnvIzcUnuhngiBhJEJb9a9Mc2SEf1xP3H8N5r8pvEH1LoAYd6/zrvCNU+uy9esw==}
 
   '@atcute/lexicon-doc@2.1.2':
     resolution: {integrity: sha512-jTLcOka7b8BIn2SnIZm2m7l6unlJ0gpgW1MnRpSqNbly/AvyRUR/GREduh/QmjT4SGasDm8vdhrM0kOSPFpDLQ==}
@@ -345,8 +345,8 @@ packages:
   '@codemirror/view@6.40.0':
     resolution: {integrity: sha512-WA0zdU7xfF10+5I3HhUUq3kqOx3KjqmtQ9lqZjfK7jtYk4G72YW9rezcSywpaUMCWOMlq+6E0pO1IWg1TNIhtg==}
 
-  '@cyberalien/svg-utils@1.2.7':
-    resolution: {integrity: sha512-A9fS8TdWGUvhvzcNRQXyiV0Q3dLz/z2eRHufe5k7t5tbB9Hfr9Pk0pdonwuaeJa6nLIcqDO+vfvrWSdWqiKbyw==}
+  '@cyberalien/svg-utils@1.2.8':
+    resolution: {integrity: sha512-ILHRhyyv7WamaiKjPPUqriQKySGnl/r+A6YddAmtvW6xC/f0TksPmhljo/qvqaq7FPJ/ZHvZKsBJeuKOAEGXKA==}
 
   '@emnapi/core@1.9.1':
     resolution: {integrity: sha512-mukuNALVsoix/w1BJwFzwXBN/dHeejQtuVzcDsfOEsdpCumXb/E9j8w11h5S54tT1xhifGfbbSm/ICrObRb3KA==}
@@ -1061,8 +1061,8 @@ packages:
       solid-js:
         optional: true
 
-  baseline-browser-mapping@2.10.9:
-    resolution: {integrity: sha512-OZd0e2mU11ClX8+IdXe3r0dbqMEznRiT4TfbhYIbcRPZkqJ7Qwer8ij3GZAmLsRKa+II9V1v5czCkvmHH3XZBg==}
+  baseline-browser-mapping@2.10.10:
+    resolution: {integrity: sha512-sUoJ3IMxx4AyRqO4MLeHlnGDkyXRoUG0/AI9fjK+vS72ekpV0yWVY7O0BVjmBcRtkNcsAO2QDZ4tdKKGoI6YaQ==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -1314,8 +1314,8 @@ packages:
     resolution: {integrity: sha512-eRtbOb1N5iyH0tkQDAoQ4Ipsp/5qSR79Dzrz8hEPxRX10RWWR/iQXdoKmBSRCThY1Fh5EhISDtpSc93fpxUniQ==}
     engines: {node: '>=12.13'}
 
-  mlly@1.8.1:
-    resolution: {integrity: sha512-SnL6sNutTwRWWR/vcmCYHSADjiEesp5TGQQ0pXyLhW5IoeibRlF/CbSLailbB3CNqJUk9cVJ9dUDnbD7GrcHBQ==}
+  mlly@1.8.2:
+    resolution: {integrity: sha512-d+ObxMQFmbt10sretNDytwt85VrbkhhUA/JBGm1MPaWJ65Cl4wOgLaB1NYvJSZ0Ef03MMEU/0xpPMXUIQ29UfA==}
 
   modern-tar@0.7.6:
     resolution: {integrity: sha512-sweCIVXzx1aIGTCdzcMlSZt1h8k5Tmk08VNAuRk3IU28XamGiOH5ypi11g6De2CH7PhYqSSnGy2A/EFhbWnVKg==}
@@ -1641,7 +1641,7 @@ snapshots:
 
   '@atcute/client@4.2.1':
     dependencies:
-      '@atcute/identity': 1.1.3
+      '@atcute/identity': 1.1.4
       '@atcute/lexicons': 1.2.9
 
   '@atcute/crypto@2.4.1':
@@ -1655,38 +1655,38 @@ snapshots:
       '@atcute/cbor': 2.3.2
       '@atcute/cid': 2.4.1
       '@atcute/crypto': 2.4.1
-      '@atcute/identity': 1.1.3
+      '@atcute/identity': 1.1.4
       '@atcute/lexicons': 1.2.9
       '@atcute/multibase': 1.2.0
       '@atcute/uint8array': 1.1.1
       '@atcute/util-fetch': 1.0.5
       '@badrap/valita': 0.4.6
 
-  '@atcute/identity-resolver@1.2.2(@atcute/identity@1.1.3)':
+  '@atcute/identity-resolver@1.2.2(@atcute/identity@1.1.4)':
     dependencies:
-      '@atcute/identity': 1.1.3
+      '@atcute/identity': 1.1.4
       '@atcute/lexicons': 1.2.9
       '@atcute/util-fetch': 1.0.5
       '@badrap/valita': 0.4.6
 
-  '@atcute/identity@1.1.3':
+  '@atcute/identity@1.1.4':
     dependencies:
       '@atcute/lexicons': 1.2.9
       '@badrap/valita': 0.4.6
 
   '@atcute/lexicon-doc@2.1.2':
     dependencies:
-      '@atcute/identity': 1.1.3
+      '@atcute/identity': 1.1.4
       '@atcute/lexicons': 1.2.9
       '@atcute/uint8array': 1.1.1
       '@atcute/util-text': 1.2.0
       '@badrap/valita': 0.4.6
 
-  '@atcute/lexicon-resolver@0.1.6(@atcute/identity-resolver@1.2.2(@atcute/identity@1.1.3))(@atcute/identity@1.1.3)':
+  '@atcute/lexicon-resolver@0.1.6(@atcute/identity-resolver@1.2.2(@atcute/identity@1.1.4))(@atcute/identity@1.1.4)':
     dependencies:
       '@atcute/crypto': 2.4.1
-      '@atcute/identity': 1.1.3
-      '@atcute/identity-resolver': 1.2.2(@atcute/identity@1.1.3)
+      '@atcute/identity': 1.1.4
+      '@atcute/identity-resolver': 1.2.2(@atcute/identity@1.1.4)
       '@atcute/lexicon-doc': 2.1.2
       '@atcute/lexicons': 1.2.9
       '@atcute/repo': 0.1.3
@@ -1710,10 +1710,10 @@ snapshots:
     dependencies:
       '@atcute/uint8array': 1.1.1
 
-  '@atcute/oauth-browser-client@3.0.0(@atcute/identity@1.1.3)':
+  '@atcute/oauth-browser-client@3.0.0(@atcute/identity@1.1.4)':
     dependencies:
       '@atcute/client': 4.2.1
-      '@atcute/identity-resolver': 1.2.2(@atcute/identity@1.1.3)
+      '@atcute/identity-resolver': 1.2.2(@atcute/identity@1.1.4)
       '@atcute/lexicons': 1.2.9
       '@atcute/multibase': 1.2.0
       '@atcute/oauth-crypto': 0.1.0
@@ -1735,7 +1735,7 @@ snapshots:
 
   '@atcute/oauth-types@0.1.1':
     dependencies:
-      '@atcute/identity': 1.1.3
+      '@atcute/identity': 1.1.4
       '@atcute/lexicons': 1.2.9
       '@atcute/oauth-keyset': 0.1.0
       '@badrap/valita': 0.4.6
@@ -1934,7 +1934,7 @@ snapshots:
       style-mod: 4.1.3
       w3c-keyname: 2.2.8
 
-  '@cyberalien/svg-utils@1.2.7':
+  '@cyberalien/svg-utils@1.2.8':
     dependencies:
       '@iconify/types': 2.0.0
 
@@ -2131,7 +2131,7 @@ snapshots:
 
   '@iconify/tools@5.0.6':
     dependencies:
-      '@cyberalien/svg-utils': 1.2.7
+      '@cyberalien/svg-utils': 1.2.8
       '@iconify/types': 2.0.0
       '@iconify/utils': 3.1.0
       fflate: 0.8.2
@@ -2145,7 +2145,7 @@ snapshots:
     dependencies:
       '@antfu/install-pkg': 1.1.0
       '@iconify/types': 2.0.0
-      mlly: 1.8.1
+      mlly: 1.8.2
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -2446,13 +2446,13 @@ snapshots:
     optionalDependencies:
       solid-js: 1.9.11
 
-  baseline-browser-mapping@2.10.9: {}
+  baseline-browser-mapping@2.10.10: {}
 
   boolbase@1.0.0: {}
 
   browserslist@4.28.1:
     dependencies:
-      baseline-browser-mapping: 2.10.9
+      baseline-browser-mapping: 2.10.10
       caniuse-lite: 1.0.30001780
       electron-to-chromium: 1.5.321
       node-releases: 2.0.36
@@ -2695,7 +2695,7 @@ snapshots:
     dependencies:
       is-what: 4.1.16
 
-  mlly@1.8.1:
+  mlly@1.8.2:
     dependencies:
       acorn: 8.16.0
       pathe: 2.0.3
@@ -2733,7 +2733,7 @@ snapshots:
   pkg-types@1.3.1:
     dependencies:
       confbox: 0.1.8
-      mlly: 1.8.1
+      mlly: 1.8.2
       pathe: 2.0.3
 
   postcss@8.5.8:

@@ -32,7 +32,7 @@
     "@atcute/client": "^4.2.1",
     "@atcute/crypto": "^2.4.1",
     "@atcute/did-plc": "^0.3.2",
-    "@atcute/identity": "^1.1.3",
+    "@atcute/identity": "^1.1.4",
     "@atcute/identity-resolver": "^1.2.2",
     "@atcute/lexicon-doc": "^2.1.2",
     "@atcute/lexicon-resolver": "^0.1.6",
