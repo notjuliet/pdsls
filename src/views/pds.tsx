@@ -4,22 +4,14 @@ import { InferXRPCBodyOutput } from "@atcute/lexicons";
 import * as TID from "@atcute/tid";
 import { A, type RouteSectionProps, useLocation, useParams } from "@solidjs/router";
 import { createWindowVirtualizer } from "@tanstack/solid-virtual";
-import {
-  createEffect,
-  createMemo,
-  createResource,
-  createSignal,
-  For,
-  on,
-  onCleanup,
-  Show,
-} from "solid-js";
+import { createEffect, createResource, createSignal, For, on, onCleanup, Show } from "solid-js";
 import { Button } from "../components/button";
 import { setPDS } from "../components/navbar";
 import { NestedLayout } from "../components/nested-layout.jsx";
 import { Spinner } from "../components/spinner.jsx";
 import { canHover } from "../layout";
 import { didDocCache, resolveDidDoc } from "../utils/api";
+import { createLatch } from "../utils/create-latch.js";
 import { localDateFromTimestamp } from "../utils/date";
 
 const LIMIT = 1000;
@@ -261,10 +253,7 @@ const PdsView = () => {
     return res.data;
   };
 
-  const shouldFetch = createMemo<true | undefined>((prev) => {
-    if (prev) return prev;
-    return hidden() ? undefined : true;
-  });
+  const shouldFetch = createLatch(() => !hidden());
 
   const [response, { refetch }] = createResource(shouldFetch, fetchRepos);
 

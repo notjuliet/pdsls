@@ -17,6 +17,7 @@ import { Spinner } from "../components/spinner.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import { canHover } from "../layout.jsx";
 import { useRepo } from "../lib/repo-context.jsx";
+import { createLatch } from "../utils/create-latch.js";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { useFilterShortcut } from "../utils/keyboard.js";
 
@@ -133,12 +134,7 @@ const CollectionView = () => {
     return res.data.records;
   };
 
-  const shouldFetch = createMemo<true | undefined>((prev) => {
-    if (prev) return prev;
-    if (hidden()) return undefined;
-    if (!repo.rpc()) return undefined;
-    return true;
-  });
+  const shouldFetch = createLatch(() => !hidden() && !!repo.rpc());
 
   const [response, { refetch }] = createResource(shouldFetch, fetchRecords);
 

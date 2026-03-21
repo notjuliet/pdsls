@@ -11,7 +11,6 @@ import {
 } from "@solidjs/router";
 import {
   createEffect,
-  createMemo,
   createResource,
   createSignal,
   ErrorBoundary,
@@ -51,6 +50,7 @@ import {
   validateHandle,
 } from "../utils/api.js";
 import { addToClipboard } from "../utils/copy.js";
+import { createLatch } from "../utils/create-latch.js";
 import { detectDidKeyType, detectKeyType } from "../utils/key.js";
 import { useFilterShortcut } from "../utils/keyboard.js";
 import { BlobView } from "./blob.jsx";
@@ -262,12 +262,7 @@ const RepoView = () => {
     }
   };
 
-  const shouldFetch = createMemo<true | undefined>((prev) => {
-    if (prev) return prev;
-    if (hidden()) return undefined;
-    if (!repo.rpc() && !repo.error()) return undefined;
-    return true;
-  });
+  const shouldFetch = createLatch(() => !hidden() && (!!repo.rpc() || !!repo.error()));
 
   const [repoData] = createResource(shouldFetch, fetchRepo);
 
