@@ -178,7 +178,15 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           }}
         >
           <Suspense fallback={<Spinner />}>
-            <Show when={!isRouting() || location.pathname === stablePath} fallback={<Spinner />}>
+            <Show
+              when={
+                !isRouting() ||
+                location.pathname === stablePath ||
+                stablePath.startsWith(location.pathname) ||
+                location.pathname.startsWith(stablePath)
+              }
+              fallback={<Spinner />}
+            >
               {props.children}
             </Show>
           </Suspense>
