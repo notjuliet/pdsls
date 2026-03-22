@@ -28,6 +28,10 @@ const Layout = (props: RouteSectionProps<unknown>) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isRouting = useIsRouting();
+  let stablePath = location.pathname;
+  createEffect(() => {
+    if (!isRouting()) stablePath = location.pathname;
+  });
 
   if (location.search.includes("hrt=true")) localStorage.setItem("hrt", "true");
   else if (location.search.includes("hrt=false")) localStorage.setItem("hrt", "false");
@@ -174,7 +178,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           }}
         >
           <Suspense fallback={<Spinner />}>
-            <Show when={!isRouting()} fallback={<Spinner />}>
+            <Show when={!isRouting() || location.pathname === stablePath} fallback={<Spinner />}>
               {props.children}
             </Show>
           </Suspense>
