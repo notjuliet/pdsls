@@ -1,5 +1,5 @@
 import * as TID from "@atcute/tid";
-import { A, Params } from "@solidjs/router";
+import { A, useParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, JSX, Match, Show, Switch } from "solid-js";
 import { canHover } from "../layout";
 import { didDocCache } from "../lib/api";
@@ -85,26 +85,27 @@ const HoverFavicon = (props: { domain: string; hovered: boolean; children: JSX.E
   );
 };
 
-export const NavBar = (props: { params: Params }) => {
-  const [handle, setHandle] = createSignal(props.params.repo);
+export const NavBar = () => {
+  const params = useParams();
+  const [handle, setHandle] = createSignal(params.repo);
   const [pdsHovered, setPdsHovered] = createSignal(false);
   const [repoHovered, setRepoHovered] = createSignal(false);
   const [collectionHovered, setCollectionHovered] = createSignal(false);
   const isCustomDomain = () => handle() && !handle()!.endsWith(".bsky.social");
 
   createEffect(() => {
-    if (pds() !== undefined && props.params.repo) {
-      const hdl =
-        didDocCache[props.params.repo]?.alsoKnownAs
-          ?.filter((alias) => alias.startsWith("at://"))[0]
-          ?.split("at://")[1] ?? props.params.repo;
-      if (hdl !== handle()) setHandle(hdl);
-    }
+    pds();
+    if (!params.repo) return;
+    const hdl =
+      didDocCache[params.repo]?.alsoKnownAs
+        ?.filter((alias) => alias.startsWith("at://"))[0]
+        ?.split("at://")[1] ?? params.repo;
+    setHandle(hdl);
   });
 
   const rkeyTimestamp = createMemo(() => {
-    if (!props.params.rkey || !TID.validate(props.params.rkey)) return undefined;
-    const timestamp = TID.parse(props.params.rkey).timestamp / 1000;
+    if (!params.rkey || !TID.validate(params.rkey)) return undefined;
+    const timestamp = TID.parse(params.rkey).timestamp / 1000;
     return timestamp <= Date.now() ? timestamp : undefined;
   });
 
@@ -130,21 +131,18 @@ export const NavBar = (props: { params: Params }) => {
                 classList={{
                   "iconify shrink-0 transition-colors duration-200": true,
                   "lucide--unplug text-red-500 dark:text-red-400":
-                    pds() === "Missing PDS" && props.params.repo?.startsWith("did:"),
+                    pds() === "Missing PDS" && params.repo?.startsWith("did:"),
                   "lucide--hard-drive text-neutral-500 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200":
-                    pds() !== "Missing PDS" || !props.params.repo?.startsWith("did:"),
+                    pds() !== "Missing PDS" || !params.repo?.startsWith("did:"),
                 }}
               ></span>
             </HoverFavicon>
           </Tooltip>
-          <Show when={pds() && (pds() !== "Missing PDS" || props.params.repo?.startsWith("did:"))}>
+          <Show when={pds() && (pds() !== "Missing PDS" || params.repo?.startsWith("did:"))}>
             <Show
               when={pds() === "Missing PDS"}
               fallback={
-                <Show
-                  when={props.params.repo}
-                  fallback={<span class="py-0.5 font-medium">{pds()}</span>}
-                >
+                <Show when={params.repo} fallback={<span class="py-0.5 font-medium">{pds()}</span>}>
                   <A
                     end
                     href={pds()!}
@@ -165,7 +163,7 @@ export const NavBar = (props: { params: Params }) => {
       </div>
 
       <div class="flex flex-col">
-        <Show when={props.params.repo}>
+        <Show when={params.repo}>
           {/* Repository Level */}
           <div
             class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40"
@@ -183,16 +181,16 @@ export const NavBar = (props: { params: Params }) => {
                 </HoverFavicon>
               </Tooltip>
               <Show
-                when={props.params.collection}
+                when={params.collection}
                 fallback={
                   <span class="flex min-w-0 gap-1 py-0.5 font-medium">
                     <Show
-                      when={handle() !== props.params.repo}
-                      fallback={<span class="truncate">{props.params.repo}</span>}
+                      when={handle() !== params.repo}
+                      fallback={<span class="truncate">{params.repo}</span>}
                     >
                       <span class="max-w-full shrink-0 truncate">{handle()}</span>
                       <span class="truncate text-neutral-500 dark:text-neutral-400">
-                        ({props.params.repo})
+                        ({params.repo})
                       </span>
                     </Show>
                   </span>
@@ -200,25 +198,25 @@ export const NavBar = (props: { params: Params }) => {
               >
                 <A
                   end
-                  href={`/at://${props.params.repo}`}
+                  href={`/at://${params.repo}`}
                   inactiveClass="flex grow min-w-0 gap-1 py-0.5 font-medium text-blue-500 hover:text-blue-600 transition-colors duration-150 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                   <Show
-                    when={handle() !== props.params.repo}
-                    fallback={<span class="truncate">{props.params.repo}</span>}
+                    when={handle() !== params.repo}
+                    fallback={<span class="truncate">{params.repo}</span>}
                   >
                     <span class="max-w-full shrink-0 truncate">{handle()}</span>
-                    <span class="truncate">({props.params.repo})</span>
+                    <span class="truncate">({params.repo})</span>
                   </Show>
                 </A>
               </Show>
             </div>
-            <CopyButton content={props.params.repo!} label="Copy DID" />
+            <CopyButton content={params.repo!} label="Copy DID" />
           </div>
         </Show>
 
         {/* Collection Level */}
-        <Show when={props.params.collection}>
+        <Show when={params.collection}>
           <div
             class="group flex items-center justify-between gap-2 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40"
             onMouseEnter={() => {
@@ -231,41 +229,38 @@ export const NavBar = (props: { params: Params }) => {
             <div class="flex basis-full items-center gap-2">
               <Tooltip text="Collection">
                 <HoverFavicon
-                  domain={props.params.collection!.split(".").slice(0, 2).reverse().join(".")}
+                  domain={params.collection!.split(".").slice(0, 2).reverse().join(".")}
                   hovered={collectionHovered()}
                 >
                   <span class="iconify lucide--folder-open text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
                 </HoverFavicon>
               </Tooltip>
               <Show
-                when={props.params.rkey}
-                fallback={<span class="py-0.5 font-medium">{props.params.collection}</span>}
+                when={params.rkey}
+                fallback={<span class="py-0.5 font-medium">{params.collection}</span>}
               >
                 <A
                   end
-                  href={`/at://${props.params.repo}/${props.params.collection}`}
+                  href={`/at://${params.repo}/${params.collection}`}
                   inactiveClass="text-blue-500 dark:text-blue-400 grow py-0.5 font-medium hover:text-blue-600 transition-colors duration-150 dark:hover:text-blue-300"
                 >
-                  {props.params.collection}
+                  {params.collection}
                 </A>
               </Show>
             </div>
-            <CopyButton
-              content={`at://${props.params.repo}/${props.params.collection}`}
-              label="Copy AT URI"
-            />
+            <CopyButton content={`at://${params.repo}/${params.collection}`} label="Copy AT URI" />
           </div>
         </Show>
 
         {/* Record Level */}
-        <Show when={props.params.rkey}>
+        <Show when={params.rkey}>
           <div class="group flex items-center justify-between gap-2 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
             <div class="flex basis-full items-center gap-2">
               <Tooltip text="Record">
                 <span class="iconify lucide--file-json text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
               </Tooltip>
               <div class="flex min-w-0 gap-1 py-0.5 font-medium">
-                <span>{props.params.rkey}</span>
+                <span>{params.rkey}</span>
                 <Show when={rkeyTimestamp()}>
                   <span class="truncate text-neutral-500 dark:text-neutral-400">
                     ({localDateFromTimestamp(rkeyTimestamp()!)})
@@ -274,7 +269,7 @@ export const NavBar = (props: { params: Params }) => {
               </div>
             </div>
             <CopyButton
-              content={`at://${props.params.repo}/${props.params.collection}/${props.params.rkey}`}
+              content={`at://${params.repo}/${params.collection}/${params.rkey}`}
               label="Copy AT URI"
             />
           </div>

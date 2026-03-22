@@ -1,4 +1,4 @@
-import { A, RouteSectionProps, useLocation, useNavigate } from "@solidjs/router";
+import { A, RouteSectionProps, useIsRouting, useLocation, useNavigate } from "@solidjs/router";
 import { createEffect, ErrorBoundary, on, onCleanup, onMount, Show, Suspense } from "solid-js";
 import { AccountManager } from "./auth/account.jsx";
 import { agent } from "./auth/state.js";
@@ -27,6 +27,7 @@ const headers: Record<string, string> = {
 const Layout = (props: RouteSectionProps<unknown>) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const isRouting = useIsRouting();
 
   if (location.search.includes("hrt=true")) localStorage.setItem("hrt", "true");
   else if (location.search.includes("hrt=false")) localStorage.setItem("hrt", "false");
@@ -158,7 +159,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
       <div class="flex w-full flex-col items-center gap-3 text-pretty">
         <Search />
         <Show when={props.params.pds}>
-          <NavBar params={props.params} />
+          <NavBar />
         </Show>
         <ErrorBoundary
           fallback={(err, reset) => {
@@ -172,7 +173,11 @@ const Layout = (props: RouteSectionProps<unknown>) => {
             return <div class="mt-3 wrap-anywhere">Error: {err.message}</div>;
           }}
         >
-          <Suspense fallback={<Spinner />}>{props.children}</Suspense>
+          <Suspense fallback={<Spinner />}>
+            <Show when={!isRouting()} fallback={<Spinner />}>
+              {props.children}
+            </Show>
+          </Suspense>
         </ErrorBoundary>
       </div>
       <NotificationContainer />
