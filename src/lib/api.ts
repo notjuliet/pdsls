@@ -78,37 +78,43 @@ const schemaResolver = createMemo(
     }),
 );
 
-const didPDSCache: Record<string, string> = {};
+const didPDSCache: Record<string, Promise<string>> = {};
 const [labelerCache, setLabelerCache] = createStore<Record<string, string>>({});
 const didDocCache: Record<string, DidDocument> = {};
-const getPDS = async (did: string) => {
+const getPDS = (did: string): Promise<string> => {
   if (did in didPDSCache) return didPDSCache[did];
 
   if (!isAtprotoDid(did)) {
-    throw new Error("Not a valid DID identifier");
+    return Promise.reject(new Error("Not a valid DID identifier"));
   }
 
-  let doc: DidDocument;
-  try {
-    doc = await didDocumentResolver().resolve(did);
-    didDocCache[did] = doc;
-  } catch (e) {
-    console.error(e);
-    throw new Error("Error during did document resolution");
-  }
+  didPDSCache[did] = (async () => {
+    let doc: DidDocument;
+    try {
+      doc = await didDocumentResolver().resolve(did);
+      didDocCache[did] = doc;
+    } catch (e) {
+      console.error(e);
+      delete didPDSCache[did];
+      throw new Error("Error during did document resolution");
+    }
 
-  const pds = getPdsEndpoint(doc);
-  const labeler = getLabelerEndpoint(doc);
+    const pds = getPdsEndpoint(doc);
+    const labeler = getLabelerEndpoint(doc);
 
-  if (labeler) {
-    setLabelerCache(did, labeler);
-  }
+    if (labeler) {
+      setLabelerCache(did, labeler);
+    }
 
-  if (!pds) {
-    throw new Error("No PDS found");
-  }
+    if (!pds) {
+      delete didPDSCache[did];
+      throw new Error("No PDS found");
+    }
 
-  return (didPDSCache[did] = pds);
+    return pds;
+  })();
+
+  return didPDSCache[did];
 };
 
 const resolveHandle = async (handle: Handle) => {
