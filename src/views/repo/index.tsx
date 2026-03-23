@@ -467,7 +467,7 @@ const RepoView = () => {
               </LazyTab>
             </Show>
             <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
-              <div class="flex flex-col pb-20 text-sm wrap-anywhere">
+              <div class="flex flex-col pb-22 text-sm wrap-anywhere">
                 <Show
                   when={Object.keys(nsids() ?? {}).length != 0}
                   fallback={<span class="mt-3 text-center text-base">No collections found.</span>}
