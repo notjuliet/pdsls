@@ -332,7 +332,7 @@ const PdsView = () => {
           </div>
           <Show when={!location.hash || location.hash === "#repos"}>
             <div
-              class="-mx-2 mb-9"
+              class="-mx-2 mb-10"
               ref={containerRef}
               style={{ height: `${virtualizer.getTotalSize()}px`, position: "relative" }}
             >
