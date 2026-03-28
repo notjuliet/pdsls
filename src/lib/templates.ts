@@ -51,4 +51,8 @@ export const uriTemplates: TemplateMap = {
     label: "Popfeed",
     link: `https://popfeed.social/list/at:/${uri.repo}/${uri.collection}/${uri.rkey}`,
   }),
+  "app.sonasky.ref": (uri) => ({
+    label: "SonaSky REF",
+    link: `https://ref.sonasky.app/profile/${uri.repo}/${uri.rkey}`,
+  }),
 };

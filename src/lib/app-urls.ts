@@ -7,6 +7,7 @@ export enum App {
   Blento,
   Popfeed,
   GreenGale,
+  SonaskyREF,
 }
 
 export const appName = {
@@ -16,6 +17,7 @@ export const appName = {
   [App.Blento]: "Blento",
   [App.Popfeed]: "Popfeed",
   [App.GreenGale]: "GreenGale",
+  [App.SonaskyREF]: "SonaSky REF",
 };
 
 export const appList: Record<AppUrl, App> = {
@@ -33,6 +35,7 @@ export const appList: Record<AppUrl, App> = {
   "blento.app": App.Blento,
   "popfeed.social": App.Popfeed,
   "greengale.app": App.GreenGale,
+  "ref.sonasky.app": App.SonaskyREF,
 };
 
 export const appHandleLink: Record<App, (url: string[]) => string> = {
@@ -119,5 +122,11 @@ export const appHandleLink: Record<App, (url: string[]) => string> = {
   },
   [App.GreenGale]: (path) => {
     return `at://${path[0]}/site.standard.document/${path[1]}`;
+  },
+  [App.SonaskyREF]: (path) => {
+    if (path.length === 3 && path[0] === "profile") {
+      return `at://${path[1]}/app.sonasky.ref/${path[2]}`;
+    }
+    return `at://${path[1]}`;
   },
 };
