@@ -11,7 +11,7 @@
     "serve": "vite preview"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.99",
+    "@iconify-json/lucide": "^1.2.101",
     "@iconify/tailwind4": "^1.2.3",
     "@tailwindcss/vite": "^4.2.2",
     "esbuild": "^0.27.4",
@@ -45,7 +45,7 @@
     "@codemirror/lang-json": "^6.0.2",
     "@codemirror/lint": "^6.9.5",
     "@codemirror/state": "^6.6.0",
-    "@codemirror/view": "^6.40.0",
+    "@codemirror/view": "^6.41.0",
     "@fsegurai/codemirror-theme-basic-dark": "^6.2.3",
     "@fsegurai/codemirror-theme-basic-light": "^6.2.3",
     "@mary/exif-rm": "jsr:^0.2.2",

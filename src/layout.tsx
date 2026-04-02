@@ -54,7 +54,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
     window.addEventListener("keydown", handleGoToRepo);
     onCleanup(() => window.removeEventListener("keydown", handleGoToRepo));
 
-    if (true || localStorage.getItem("sailor") === "true") {
+    if (localStorage.getItem("sailor") === "true") {
       const style = document.createElement("style");
       style.textContent = `
           html, * {
