@@ -157,7 +157,7 @@ export const DropdownMenu = (props: {
     <div class="relative">
       <button
         class={
-          "flex items-center hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 " +
+          "flex items-center hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700 " +
           props.buttonClass
         }
         ref={setMenuButton}

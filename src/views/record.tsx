@@ -390,6 +390,7 @@ export const RecordView = () => {
       if (props.tab === "record") return !location.hash || location.hash.startsWith("#record");
       if (location.hash === `#${props.tab}`) return true;
       if (props.tab === "schema" && location.hash.startsWith("#schema:")) return true;
+      if (props.tab === "backlinks" && location.hash.startsWith("#backlinks:")) return true;
       return false;
     };
 
@@ -566,7 +567,7 @@ export const RecordView = () => {
                 </ErrorBoundary>
               </Show>
             </Show>
-            <Show when={location.hash === "#backlinks"}>
+            <Show when={location.hash === "#backlinks" || location.hash.startsWith("#backlinks:")}>
               <ErrorBoundary
                 fallback={(err) => <div class="wrap-break-word">Error: {err.message}</div>}
               >

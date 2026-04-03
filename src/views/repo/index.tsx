@@ -456,7 +456,7 @@ const RepoView = () => {
                 <PlcLogView did={did} />
               </LazyTab>
             </Show>
-            <Show when={location.hash === "#backlinks"}>
+            <Show when={location.hash === "#backlinks" || location.hash.startsWith("#backlinks:")}>
               <LazyTab>
                 <Backlinks target={did} />
               </LazyTab>
