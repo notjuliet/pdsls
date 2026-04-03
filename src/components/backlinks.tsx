@@ -24,7 +24,6 @@ type CollectionGroup = {
   collection: string;
   entries: BacklinkEntry[];
   totalRecords: number;
-  totalDids: number;
 };
 
 const flattenLinks = (links: Record<string, any>): BacklinkEntry[] => {
@@ -58,7 +57,6 @@ const groupByCollection = (entries: BacklinkEntry[]): CollectionGroup[] => {
     collection,
     entries,
     totalRecords: entries.reduce((sum, e) => sum + e.counts.records, 0),
-    totalDids: entries.reduce((sum, e) => sum + e.counts.distinct_dids, 0),
   }));
 };
 
@@ -156,8 +154,7 @@ const BacklinkDirectory = (props: { groups: CollectionGroup[]; pathname: string 
               </div>
               <div class="flex shrink-0 items-center gap-2 text-neutral-600 dark:text-neutral-400">
                 <span class="text-xs">
-                  {group.totalRecords} from {group.totalDids} repo
-                  {group.totalDids > 1 ? "s" : ""}
+                  {group.totalRecords} record{group.totalRecords !== 1 ? "s" : ""}
                 </span>
                 <span class="iconify lucide--chevron-right" />
               </div>
