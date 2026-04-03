@@ -148,7 +148,7 @@ const BacklinkDirectory = (props: { groups: CollectionGroup[]; pathname: string 
           return (
             <A
               href={`${props.pathname}#backlinks:${group.collection}`}
-              class="flex items-center justify-between gap-3 rounded-lg border border-neutral-200 px-3 py-2 text-left hover:bg-neutral-200/50 dark:border-neutral-700 dark:hover:bg-neutral-800"
+              class="flex items-center justify-between gap-3 rounded-lg border border-neutral-300 px-3 py-2 text-left hover:bg-neutral-200/50 dark:border-neutral-700 dark:hover:bg-neutral-800"
             >
               <div class="flex min-w-0 flex-1 items-center gap-2">
                 <Favicon domain={authority()} reverse />
@@ -193,8 +193,8 @@ const BacklinkCollectionDetail = (props: {
       </div>
       <For each={props.entries}>
         {(entry) => (
-          <div class="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700">
-            <div class="flex items-center justify-between gap-3 border-b border-neutral-200 px-3 py-2 text-sm dark:border-neutral-700">
+          <div class="overflow-hidden rounded-lg border border-neutral-300 dark:border-neutral-700">
+            <div class="flex items-center justify-between gap-3 border-b border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700">
               <span class="min-w-0 truncate text-neutral-700 dark:text-neutral-300">
                 {entry.path.slice(1)}
               </span>
