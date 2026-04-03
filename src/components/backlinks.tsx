@@ -240,17 +240,19 @@ const Backlinks = (props: { target: string }) => {
 
   return (
     <div class="flex w-full flex-col gap-3 text-sm">
-      <Show when={response()} fallback={<p class="text-neutral-500">Loading…</p>}>
-        <Show
-          when={selectedCollection()}
-          fallback={<BacklinkDirectory groups={groups()} pathname={location.pathname} />}
-        >
-          <BacklinkCollectionDetail
-            target={props.target}
-            collection={selectedCollection()!}
-            entries={selectedEntries()}
-            pathname={location.pathname}
-          />
+      <Show when={!response.error} fallback={<p class="text-red-500">Failed to load backlinks.</p>}>
+        <Show when={response()} fallback={<p class="text-neutral-500">Loading…</p>}>
+          <Show
+            when={selectedCollection()}
+            fallback={<BacklinkDirectory groups={groups()} pathname={location.pathname} />}
+          >
+            <BacklinkCollectionDetail
+              target={props.target}
+              collection={selectedCollection()!}
+              entries={selectedEntries()}
+              pathname={location.pathname}
+            />
+          </Show>
         </Show>
       </Show>
     </div>
