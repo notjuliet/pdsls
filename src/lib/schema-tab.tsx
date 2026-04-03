@@ -39,14 +39,7 @@ export const useLexiconSchema = (collection: () => string | undefined) => {
 
   createEffect(() => {
     const col = collection();
-    if (
-      showSchema() &&
-      !schema() &&
-      !loading() &&
-      !error() &&
-      col &&
-      col !== "com.atproto.lexicon.schema"
-    ) {
+    if (showSchema() && !schema() && !loading() && !error() && col) {
       setLoading(true);
       resolve(col as Nsid).then(
         (result) => {
@@ -73,7 +66,7 @@ export const SchemaTabContent = (props: {
   fallbackSchema?: any;
 }) => (
   <>
-    <Show when={props.error}>
+    <Show when={props.error && !props.fallbackSchema}>
       <span class="mt-2">Lexicon schema could not be resolved.</span>
     </Show>
     <Show when={props.loading && !props.fallbackSchema}>
@@ -82,7 +75,7 @@ export const SchemaTabContent = (props: {
     <Show when={props.schema || props.fallbackSchema}>
       <ErrorBoundary fallback={(err) => <div>Error: {err.message}</div>}>
         <LexiconSchemaView
-          schema={props.schema?.rawSchema ?? props.fallbackSchema}
+          schema={props.fallbackSchema ?? props.schema?.rawSchema}
           authority={props.authority}
         />
       </ErrorBoundary>
