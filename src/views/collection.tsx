@@ -16,10 +16,11 @@ import { PermissionButton } from "../components/permission-button.jsx";
 import { Spinner } from "../components/spinner.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import { canHover } from "../layout.jsx";
-import { useRepo } from "../lib/repo-context.jsx";
 import { createLatch } from "../lib/create-latch.js";
-import { localDateFromTimestamp } from "../utils/date.js";
 import { useFilterShortcut } from "../lib/keyboard.js";
+import { SchemaTabContent, useLexiconSchema } from "../lib/lexicon-schema.jsx";
+import { useRepo } from "../lib/repo-context.jsx";
+import { localDateFromTimestamp } from "../utils/date.js";
 
 interface AtprotoRecord {
   rkey: string;
@@ -96,6 +97,8 @@ const CollectionView = () => {
   const [openDelete, setOpenDelete] = createSignal(false);
   const [isLoadingMore, setIsLoadingMore] = createSignal(false);
   const did = repo.did();
+  const lexicon = useLexiconSchema(() => (hidden() ? undefined : params.collection));
+
   let filterInputRef: HTMLInputElement | undefined;
 
   onMount(() => {
@@ -217,15 +220,36 @@ const CollectionView = () => {
 
   return (
     <>
-      <Show when={!hidden() && !records.length && (response.state === "unresolved" || response.loading)}>
+      <Show
+        when={!hidden() && !records.length && (response.state === "unresolved" || response.loading)}
+      >
         <Spinner />
       </Show>
       <Show when={!hidden() && (records.length || response.state === "ready")}>
         <div class="flex w-full flex-col items-center">
           {/* Tab bar */}
           <div class="mb-2 flex min-h-7 w-full items-center justify-between px-2 text-sm sm:text-base">
-            <div class="flex gap-4">
-              <span class="border-b-2 font-medium">Records</span>
+            <div class="flex gap-3 sm:gap-4">
+              <A
+                href={`/at://${did}/${params.collection}`}
+                classList={{
+                  "border-b-2 font-medium transition-colors": true,
+                  "border-transparent not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80":
+                    lexicon.showSchema(),
+                }}
+              >
+                Records
+              </A>
+              <A
+                href={`/at://${did}/${params.collection}#schema`}
+                classList={{
+                  "border-b-2 font-medium transition-colors": true,
+                  "border-transparent not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80":
+                    !lexicon.showSchema(),
+                }}
+              >
+                Schema
+              </A>
               <A
                 href={`/jetstream?collections=${params.collection}&dids=${params.repo}`}
                 class="border-b-2 border-transparent font-medium transition-colors not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80"
@@ -233,8 +257,8 @@ const CollectionView = () => {
                 Jetstream
               </A>
             </div>
-            <Show when={agent() && agent()?.sub === did}>
-              <div class="flex items-center text-sm">
+            <Show when={!lexicon.showSchema() && agent() && agent()?.sub === did}>
+              <div class="flex items-center text-sm sm:gap-1">
                 <Show when={batchDelete()}>
                   <Tooltip text="Select all">
                     <button
@@ -270,7 +294,7 @@ const CollectionView = () => {
                 </Show>
                 <PermissionButton
                   scope="delete"
-                  class="flex items-center gap-1 rounded-md px-2 py-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                  class="flex items-center gap-1 rounded-md border border-neutral-300 px-2 py-0.75 transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
                   disabledClass="flex items-center gap-1 rounded-md px-2 py-1 opacity-40"
                   onClick={() => {
                     setRecords({ from: 0, to: records.length - 1 }, "toDelete", false);
@@ -278,64 +302,73 @@ const CollectionView = () => {
                     setBatchDelete(!batchDelete());
                   }}
                 >
-                  <span
-                    class={`iconify ${batchDelete() ? "lucide--x" : "lucide--square-check-big"}`}
-                  ></span>
                   {batchDelete() ? "Cancel" : "Manage"}
                 </PermissionButton>
               </div>
             </Show>
           </div>
 
+          {/* Schema view */}
+          <Show when={lexicon.showSchema()}>
+            <SchemaTabContent
+              schema={lexicon.schema()}
+              authority={lexicon.authority()}
+              loading={lexicon.loading()}
+              error={lexicon.error()}
+            />
+          </Show>
+
           {/* Record list */}
-          <div class="flex max-w-full flex-col px-2 pb-20 font-mono">
-            <Show
-              when={filteredRecords().length > 0}
-              fallback={
-                <span class="font-sans text-neutral-500 dark:text-neutral-400">
-                  {filter() ? "No records match filter" : "No records"}
-                </span>
-              }
-            >
-              <For each={filteredRecords()}>
-                {(record, index) => {
-                  const rounding = () => {
-                    const recs = filteredRecords();
-                    const prevSelected = recs[index() - 1]?.toDelete;
-                    const nextSelected = recs[index() + 1]?.toDelete;
-                    return `${!prevSelected ? "rounded-t" : ""} ${!nextSelected ? "rounded-b" : ""}`;
-                  };
-                  return (
-                    <>
-                      <Show when={batchDelete()}>
-                        <div
-                          class={`select-none ${
-                            record.toDelete ?
-                              `bg-blue-200 hover:bg-blue-300/80 active:bg-blue-300 dark:bg-blue-700/30 dark:hover:bg-blue-700/50 dark:active:bg-blue-700/70 ${rounding()}`
-                            : "rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                          }`}
-                          onclick={(e) => {
-                            handleSelectionClick(e, index());
-                            setRecords(index(), "toDelete", !record.toDelete);
-                          }}
-                        >
-                          <RecordLink record={record} />
-                        </div>
-                      </Show>
-                      <Show when={!batchDelete()}>
-                        <A
-                          href={`/at://${did}/${params.collection}/${record.rkey}`}
-                          class="rounded select-none hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                        >
-                          <RecordLink record={record} />
-                        </A>
-                      </Show>
-                    </>
-                  );
-                }}
-              </For>
-            </Show>
-          </div>
+          <Show when={!lexicon.showSchema()}>
+            <div class="flex max-w-full flex-col px-2 pb-20 font-mono">
+              <Show
+                when={filteredRecords().length > 0}
+                fallback={
+                  <span class="font-sans text-neutral-500 dark:text-neutral-400">
+                    {filter() ? "No records match filter" : "No records"}
+                  </span>
+                }
+              >
+                <For each={filteredRecords()}>
+                  {(record, index) => {
+                    const rounding = () => {
+                      const recs = filteredRecords();
+                      const prevSelected = recs[index() - 1]?.toDelete;
+                      const nextSelected = recs[index() + 1]?.toDelete;
+                      return `${!prevSelected ? "rounded-t" : ""} ${!nextSelected ? "rounded-b" : ""}`;
+                    };
+                    return (
+                      <>
+                        <Show when={batchDelete()}>
+                          <div
+                            class={`select-none ${
+                              record.toDelete ?
+                                `bg-blue-200 hover:bg-blue-300/80 active:bg-blue-300 dark:bg-blue-700/30 dark:hover:bg-blue-700/50 dark:active:bg-blue-700/70 ${rounding()}`
+                              : "rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                            }`}
+                            onclick={(e) => {
+                              handleSelectionClick(e, index());
+                              setRecords(index(), "toDelete", !record.toDelete);
+                            }}
+                          >
+                            <RecordLink record={record} />
+                          </div>
+                        </Show>
+                        <Show when={!batchDelete()}>
+                          <A
+                            href={`/at://${did}/${params.collection}/${record.rkey}`}
+                            class="rounded select-none hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                          >
+                            <RecordLink record={record} />
+                          </A>
+                        </Show>
+                      </>
+                    );
+                  }}
+                </For>
+              </Show>
+            </div>
+          </Show>
         </div>
 
         {/* Confirm delete/recreate modal */}
@@ -364,7 +397,7 @@ const CollectionView = () => {
         </Modal>
 
         {/* Fixed bottom panel */}
-        <Show when={records.length > 1}>
+        <Show when={!lexicon.showSchema() && records.length > 1}>
           <div class="dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 border-t border-neutral-200 bg-neutral-100 px-3 pt-3 pb-6 dark:border-neutral-700">
             {/* Filter */}
             <div

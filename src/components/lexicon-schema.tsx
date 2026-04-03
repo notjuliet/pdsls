@@ -713,7 +713,7 @@ export const LexiconSchemaView = (props: { schema: LexiconSchema; authority?: At
   });
 
   return (
-    <div class="w-full max-w-4xl px-2">
+    <div class="w-full px-2">
       {/* Header */}
       <div class="flex flex-col gap-2 border-b border-neutral-300 pb-3 dark:border-neutral-700">
         <div class="flex items-center gap-0.5">

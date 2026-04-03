@@ -2,7 +2,7 @@ import { Client, simpleFetchHandler } from "@atcute/client";
 import { DidDocument, getPdsEndpoint } from "@atcute/identity";
 import { lexiconDoc } from "@atcute/lexicon-doc";
 import { RecordValidator } from "@atcute/lexicon-doc/validations";
-import { FailedLexiconResolutionError, ResolvedSchema } from "@atcute/lexicon-resolver";
+import { FailedLexiconResolutionError } from "@atcute/lexicon-resolver";
 import { ActorIdentifier, is, Nsid } from "@atcute/lexicons";
 import { AtprotoDid, Did, isNsid } from "@atcute/lexicons/syntax";
 import { verifyRecord } from "@atcute/repo";
@@ -15,20 +15,16 @@ import { RecordEditor, setPlaceholder } from "../components/create";
 import { CopyMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
 import { Favicon } from "../components/favicon.jsx";
 import { JSONValue } from "../components/json.jsx";
-import { LexiconSchemaView } from "../components/lexicon-schema.jsx";
 import { Modal } from "../components/modal.jsx";
 import { addNotification, removeNotification } from "../components/notification.jsx";
 import { PermissionButton } from "../components/permission-button.jsx";
 import { canHover } from "../layout.jsx";
+import { didDocumentResolver, resolveLexiconAuthority } from "../lib/api.js";
+import { SchemaTabContent, useLexiconSchema } from "../lib/lexicon-schema.jsx";
 import { useRepo } from "../lib/repo-context.jsx";
-import {
-  didDocumentResolver,
-  resolveLexiconAuthority,
-  resolveLexiconSchema,
-} from "../lib/api.js";
-import { addToClipboard } from "../utils/copy.js";
 import { AtUri, uriTemplates } from "../lib/templates.js";
 import { lexicons } from "../lib/types/lexicons.js";
+import { addToClipboard } from "../utils/copy.js";
 
 const faviconWrapper = (children: any) => (
   <div class="flex size-4 items-center justify-center">{children}</div>
@@ -223,12 +219,10 @@ export const RecordView = () => {
   const [externalLink, setExternalLink] = createSignal<
     { label: string; link: string; icon?: string } | undefined
   >();
-  const [lexiconAuthority, setLexiconAuthority] = createSignal<AtprotoDid>();
   const [validRecord, setValidRecord] = createSignal<boolean | undefined>(undefined);
   const [validSchema, setValidSchema] = createSignal<boolean | undefined>(undefined);
-  const [schema, setSchema] = createSignal<ResolvedSchema>();
-  const [lexiconNotFound, setLexiconNotFound] = createSignal<boolean>();
   const [remoteValidation, setRemoteValidation] = createSignal<boolean>();
+  const lexicon = useLexiconSchema(() => params.collection);
   const did = repo.did();
 
   const fetchRecord = async () => {
@@ -251,7 +245,6 @@ export const RecordView = () => {
     }
     setPlaceholder(res.data.value);
     setExternalLink(checkUri(res.data.uri, res.data.value));
-    resolveLexicon(collection as Nsid, collection);
     verifyRecordIntegrity(rpc, collection, rkey);
     validateLocalSchema(collection, res.data.value);
 
@@ -266,7 +259,6 @@ export const RecordView = () => {
   const validateLocalSchema = async (collection: string, record: Record<string, unknown>) => {
     try {
       if (collection === "com.atproto.lexicon.schema") {
-        setLexiconNotFound(false);
         lexiconDoc.parse(record, { mode: "passthrough" });
         setValidSchema(true);
       } else if (collection in lexicons) {
@@ -335,20 +327,6 @@ export const RecordView = () => {
       console.error("Record verification error:", err);
       setVerifyError(err.message);
       setValidRecord(false);
-    }
-  };
-
-  const resolveLexicon = async (nsid: Nsid, collection: string) => {
-    try {
-      const authority = await resolveLexiconAuthority(nsid);
-      setLexiconAuthority(authority);
-      if (collection !== "com.atproto.lexicon.schema") {
-        const schema = await resolveLexiconSchema(authority, nsid);
-        setSchema(schema);
-        setLexiconNotFound(false);
-      }
-    } catch {
-      setLexiconNotFound(true);
     }
   };
 
@@ -551,21 +529,18 @@ export const RecordView = () => {
                 />
               </div>
             </Show>
-            <Show when={location.hash === "#schema" || location.hash.startsWith("#schema:")}>
-              <Show when={lexiconNotFound() === true}>
-                <span class="w-full px-2 text-sm">Lexicon schema could not be resolved.</span>
-              </Show>
-              <Show when={lexiconNotFound() === undefined}>
-                <span class="w-full px-2 text-sm">Resolving lexicon schema...</span>
-              </Show>
-              <Show when={schema() || params.collection === "com.atproto.lexicon.schema"}>
-                <ErrorBoundary fallback={(err) => <div>Error: {err.message}</div>}>
-                  <LexiconSchemaView
-                    schema={schema()?.rawSchema ?? (record()?.value as any)}
-                    authority={lexiconAuthority()}
-                  />
-                </ErrorBoundary>
-              </Show>
+            <Show when={lexicon.showSchema()}>
+              <SchemaTabContent
+                schema={lexicon.schema()}
+                authority={lexicon.authority()}
+                loading={lexicon.loading()}
+                error={lexicon.error()}
+                fallbackSchema={
+                  params.collection === "com.atproto.lexicon.schema" ?
+                    (record()?.value as any)
+                  : undefined
+                }
+              />
             </Show>
             <Show when={location.hash === "#backlinks" || location.hash.startsWith("#backlinks:")}>
               <ErrorBoundary
