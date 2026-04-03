@@ -254,6 +254,16 @@ const Backlinks = (props: { target: string }) => {
             />
           </Show>
         </Show>
+        <p class="text-center text-xs text-neutral-400 dark:text-neutral-500">
+          data from{" "}
+          <a
+            href="https://www.microcosm.blue/"
+            target="_blank"
+            class="hover:text-neutral-600 hover:underline dark:hover:text-neutral-300"
+          >
+            microcosm
+          </a>
+        </p>
       </Show>
     </div>
   );
