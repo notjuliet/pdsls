@@ -20,8 +20,8 @@ import { addNotification, removeNotification } from "../components/notification.
 import { PermissionButton } from "../components/permission-button.jsx";
 import { canHover } from "../layout.jsx";
 import { didDocumentResolver, resolveLexiconAuthority } from "../lib/api.js";
-import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
 import { useRepo } from "../lib/repo-context.jsx";
+import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
 import { AtUri, uriTemplates } from "../lib/templates.js";
 import { lexicons } from "../lib/types/lexicons.js";
 import { addToClipboard } from "../utils/copy.js";
