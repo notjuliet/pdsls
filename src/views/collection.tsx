@@ -18,7 +18,7 @@ import Tooltip from "../components/tooltip.jsx";
 import { canHover } from "../layout.jsx";
 import { createLatch } from "../lib/create-latch.js";
 import { useFilterShortcut } from "../lib/keyboard.js";
-import { SchemaTabContent, useLexiconSchema } from "../lib/lexicon-schema.jsx";
+import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
 import { useRepo } from "../lib/repo-context.jsx";
 import { localDateFromTimestamp } from "../utils/date.js";
 
