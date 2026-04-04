@@ -34,41 +34,6 @@ const Settings = () => {
         </div>
         <ThemeSelection />
         <div class="flex flex-col gap-1">
-          <label class="font-medium select-none">Blob media preview</label>
-          <div class="flex gap-2">
-            <button
-              classList={{
-                "flex min-w-21 items-center justify-center gap-1 rounded-xl border px-3 py-2": true,
-                "border-neutral-300 bg-neutral-200/60 dark:border-neutral-500 dark:bg-neutral-700":
-                  !hideMedia(),
-                "border-neutral-200 hover:bg-neutral-200/30 dark:border-neutral-600 dark:hover:bg-neutral-800":
-                  hideMedia(),
-              }}
-              onClick={() => {
-                localStorage.hideMedia = "false";
-                setHideMedia(false);
-              }}
-            >
-              Show
-            </button>
-            <button
-              classList={{
-                "flex min-w-21 items-center justify-center gap-1 rounded-xl border px-3 py-2": true,
-                "border-neutral-300 bg-neutral-200/60 dark:border-neutral-500 dark:bg-neutral-700":
-                  hideMedia(),
-                "border-neutral-200 hover:bg-neutral-200/30 dark:border-neutral-600 dark:hover:bg-neutral-800":
-                  !hideMedia(),
-              }}
-              onClick={() => {
-                localStorage.hideMedia = "true";
-                setHideMedia(true);
-              }}
-            >
-              Hide
-            </button>
-          </div>
-        </div>
-        <div class="flex flex-col gap-1">
           <label class="font-medium select-none">Version</label>
           <div class="text-sm text-neutral-600 dark:text-neutral-400">
             {import.meta.env.VITE_APP_VERSION}

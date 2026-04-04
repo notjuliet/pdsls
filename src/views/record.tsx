@@ -12,7 +12,13 @@ import { agent } from "../auth/state";
 import { Backlinks } from "../components/backlinks.jsx";
 import { Button } from "../components/button.jsx";
 import { RecordEditor, setPlaceholder } from "../components/create";
-import { CopyMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
+import {
+  ActionMenu,
+  CopyMenu,
+  DropdownMenu,
+  MenuProvider,
+  NavMenu,
+} from "../components/dropdown.jsx";
 import { Favicon } from "../components/favicon.jsx";
 import { JSONValue } from "../components/json.jsx";
 import { Modal } from "../components/modal.jsx";
@@ -25,6 +31,7 @@ import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
 import { AtUri, uriTemplates } from "../lib/templates.js";
 import { lexicons } from "../lib/types/lexicons.js";
 import { addToClipboard } from "../utils/copy.js";
+import { hideMedia, setHideMedia } from "./settings.jsx";
 
 const faviconWrapper = (children: any) => (
   <div class="flex size-4 items-center justify-center">{children}</div>
@@ -514,6 +521,15 @@ export const RecordView = () => {
                       icon="lucide--external-link"
                       label="Record on PDS"
                       newTab
+                    />
+                    <ActionMenu
+                      label={hideMedia() ? "Show media" : "Hide media"}
+                      icon={hideMedia() ? "lucide--eye" : "lucide--eye-off"}
+                      onClick={() => {
+                        const next = !hideMedia();
+                        localStorage.hideMedia = String(next);
+                        setHideMedia(next);
+                      }}
                     />
                   </DropdownMenu>
                 </MenuProvider>

@@ -283,13 +283,6 @@ const CollapsibleItem = (props: {
 
 const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
   const ctx = useJSONCtx();
-  const params = useParams();
-  const [hide, setHide] = createSignal(
-    localStorage.hideMedia === "true" || params.rkey === undefined,
-  );
-  createEffect(() => {
-    if (hideMedia()) setHide(hideMedia());
-  });
 
   const isBlob = props.data.$type === "blob";
   const isBlobContext = isBlob || ctx.parentIsBlob;
@@ -319,6 +312,8 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
       blob.mimeType.startsWith("audio/"));
 
   const MediaDisplay = () => {
+    const [overrideShow, setOverrideShow] = createSignal(false);
+    const hidden = () => hideMedia() && !overrideShow();
     const [expanded, setExpanded] = createSignal(false);
     const [closing, setClosing] = createSignal(false);
 
@@ -357,7 +352,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
     return (
       <div>
         <span class="group/media relative my-0.5 flex w-fit">
-          <Show when={!hide()}>
+          <Show when={!hidden()}>
             <Show when={blob.mimeType.startsWith("image/")}>
               <Show
                 when={!imageUrl.loading && imageUrl()}
@@ -403,9 +398,9 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
               </audio>
             </Show>
           </Show>
-          <Show when={hide()}>
+          <Show when={hidden()}>
             <button
-              onclick={() => setHide(false)}
+              onclick={() => setOverrideShow(true)}
               class="flex items-center gap-1 rounded-md bg-neutral-200 px-2 py-1.5 text-sm transition-colors hover:bg-neutral-300 active:bg-neutral-400 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:active:bg-neutral-500"
             >
               <span class="iconify lucide--image"></span>
