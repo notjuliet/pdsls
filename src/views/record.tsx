@@ -525,6 +525,7 @@ export const RecordView = () => {
                     <ActionMenu
                       label={hideMedia() ? "Show media" : "Hide media"}
                       icon={hideMedia() ? "lucide--eye" : "lucide--eye-off"}
+                      keepOpen
                       onClick={() => {
                         const next = !hideMedia();
                         localStorage.hideMedia = String(next);
