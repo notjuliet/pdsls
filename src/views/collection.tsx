@@ -320,7 +320,7 @@ const CollectionView = () => {
 
           {/* Record list */}
           <Show when={!lexicon.showSchema()}>
-            <div class="flex max-w-full flex-col px-1 pb-20 font-mono">
+            <div class="flex w-full max-w-full flex-col px-1 pb-20 font-mono">
               <Show
                 when={filteredRecords().length > 0}
                 fallback={
