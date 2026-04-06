@@ -7,6 +7,7 @@ import { createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { Button } from "../components/button.jsx";
 import DidHoverCard from "../components/hover-card/did.jsx";
 import RecordHoverCard from "../components/hover-card/record.jsx";
+import { TagInput } from "../components/tag-input.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import { canHover } from "../layout.jsx";
 import { getPDS, labelerCache, resolveHandle } from "../lib/api.js";
@@ -129,12 +130,7 @@ export const LabelView = () => {
 
   const fetchLabels = async (formData: FormData, reset?: boolean) => {
     let did = formData.get("did")?.toString()?.trim() || DEFAULT_LABELER_DID;
-    const uriPatterns = formData.get("uriPatterns")?.toString()?.trim();
-
-    if (!uriPatterns) {
-      setError("Please provide both DID and URI patterns");
-      return;
-    }
+    const uriPatterns = formData.get("uriPatterns")?.toString()?.trim() || "*";
 
     if (reset) {
       setLabels([]);
@@ -219,16 +215,16 @@ export const LabelView = () => {
 
           <label class="flex w-full flex-col gap-y-1">
             <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              URI patterns (comma-separated)
+              URI patterns
             </span>
-            <textarea
-              id="uriPatterns"
+            <TagInput
               name="uriPatterns"
-              spellcheck={false}
-              rows={2}
-              value={searchParams.uriPatterns ?? "*"}
               placeholder="at://did:web:example.com/app.bsky.feed.post/*"
-              class="dark:bg-dark-100 grow rounded-lg bg-white px-2 py-1.5 text-sm outline-1 outline-neutral-200 focus:outline-neutral-400 dark:outline-neutral-600 dark:focus:outline-neutral-400"
+              initialValues={
+                (searchParams.uriPatterns as string)
+                  ?.split(",")
+                  .filter((v) => v.trim().length > 0) ?? []
+              }
             />
           </label>
         </div>

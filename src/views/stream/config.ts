@@ -5,7 +5,7 @@ export type StreamType = "jetstream" | "firehose" | "spacedust";
 export type FormField = {
   name: string;
   label: string;
-  type: "text" | "textarea" | "checkbox";
+  type: "text" | "checkbox" | "tags";
   placeholder?: string;
   searchParam: string;
 };
@@ -45,15 +45,15 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
       {
         name: "collections",
         label: "Collections",
-        type: "textarea",
-        placeholder: "Comma-separated list of collections",
+        type: "tags",
+        placeholder: "app.bsky.feed.post",
         searchParam: "collections",
       },
       {
         name: "dids",
         label: "DIDs",
-        type: "textarea",
-        placeholder: "Comma-separated list of DIDs",
+        type: "tags",
+        placeholder: "did:plc:xyz...",
         searchParam: "dids",
       },
       {
@@ -145,22 +145,22 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
       {
         name: "sources",
         label: "Sources",
-        type: "textarea",
-        placeholder: "e.g. app.bsky.graph.follow:subject",
+        type: "tags",
+        placeholder: "app.bsky.graph.follow:subject",
         searchParam: "sources",
       },
       {
         name: "subjectDids",
         label: "Subject DIDs",
-        type: "textarea",
-        placeholder: "Comma-separated list of DIDs",
+        type: "tags",
+        placeholder: "did:plc:xyz...",
         searchParam: "subjectDids",
       },
       {
         name: "subjects",
         label: "Subjects",
-        type: "textarea",
-        placeholder: "Comma-separated list of AT URIs",
+        type: "tags",
+        placeholder: "at://did:plc:xyz.../app.bsky.feed.post/abc",
         searchParam: "subjects",
       },
       {

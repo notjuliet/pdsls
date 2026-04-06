@@ -10,6 +10,7 @@ export interface TextInputProps {
   spellcheck?: boolean;
   value?: string | string[];
   onInput?: (ev: InputEvent & { currentTarget: HTMLInputElement }) => void;
+  onKeyDown?: (ev: KeyboardEvent & { currentTarget: HTMLInputElement }) => void;
 }
 
 export const TextInput = (props: TextInputProps) => {
@@ -29,6 +30,7 @@ export const TextInput = (props: TextInputProps) => {
         props.class
       }
       onInput={props.onInput}
+      onKeyDown={props.onKeyDown}
     />
   );
 };

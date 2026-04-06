@@ -4,6 +4,7 @@ import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { Button } from "../../components/button";
 import DidHoverCard from "../../components/hover-card/did";
 import { JSONValue } from "../../components/json";
+import { TagInput } from "../../components/tag-input";
 import { TextInput } from "../../components/text-input";
 import { addToClipboard } from "../../utils/copy";
 import { websocketCloseReasons } from "../../utils/websocket";
@@ -366,7 +367,7 @@ export const StreamView = () => {
 
             <For each={config().fields}>
               {(field) => (
-                <label class="flex items-center justify-end gap-x-1">
+                <label class={`flex justify-end gap-x-1 ${field.type === "tags" ? "items-start" : "items-center"}`}>
                   <Show when={field.type === "checkbox"}>
                     <input
                       type="checkbox"
@@ -375,16 +376,19 @@ export const StreamView = () => {
                       checked={searchParams[field.searchParam] === "on"}
                     />
                   </Show>
-                  <span class="min-w-21 select-none">{field.label}</span>
-                  <Show when={field.type === "textarea"}>
-                    <textarea
+                  <span class={`min-w-21 select-none ${field.type === "tags" ? "mt-1" : ""}`}>{field.label}</span>
+                  <Show when={field.type === "tags"}>
+                    <TagInput
                       name={field.name}
-                      spellcheck={false}
                       placeholder={field.placeholder}
-                      value={(searchParams[field.searchParam] as string) ?? ""}
-                      class="dark:bg-dark-100 grow rounded-lg bg-white px-2 py-1 outline-1 outline-neutral-200 focus:outline-neutral-400 dark:outline-neutral-600 dark:focus:outline-neutral-400"
+                      initialValues={
+                        (searchParams[field.searchParam] as string)
+                          ?.split(",")
+                          .filter((v) => v.trim().length > 0) ?? []
+                      }
                     />
                   </Show>
+
                   <Show when={field.type === "text"}>
                     <TextInput
                       name={field.name}
