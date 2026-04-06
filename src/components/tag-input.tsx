@@ -30,7 +30,11 @@ export const TagInput = (props: {
 
   return (
     <div class="flex min-w-0 grow flex-col gap-1.5">
-      <input type="hidden" name={props.name} value={tags().join(",")} />
+      <input
+        type="hidden"
+        name={props.name}
+        value={[...tags(), inputValue().trim()].filter(Boolean).join(",")}
+      />
       <div class="flex gap-1.5">
         <TextInput
           value={inputValue()}
