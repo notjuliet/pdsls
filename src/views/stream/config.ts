@@ -6,6 +6,7 @@ export type FormField = {
   name: string;
   label: string;
   type: "text" | "checkbox" | "tags";
+  datetimePicker?: boolean;
   placeholder?: string;
   searchParam: string;
 };
@@ -62,6 +63,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
         type: "text",
         placeholder: "Leave empty for live-tail",
         searchParam: "cursor",
+        datetimePicker: true,
       },
       {
         name: "allEvents",

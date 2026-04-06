@@ -13,6 +13,19 @@ import { StreamStats, StreamStatsPanel } from "./stats";
 
 const LIMIT = 20;
 
+const microsToDatetimeLocal = (micros: string): string => {
+  const ms = Math.floor(Number(micros) / 1000);
+  if (isNaN(ms)) return "";
+  const d = new Date(ms);
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+};
+
+const datetimeLocalToMicros = (dt: string): string => {
+  if (!dt) return "";
+  return (new Date(dt).getTime() * 1000).toString();
+};
+
 const TYPE_COLORS: Record<string, string> = {
   create: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
   update: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
@@ -366,39 +379,64 @@ export const StreamView = () => {
             </label>
 
             <For each={config().fields}>
-              {(field) => (
-                <label class={`flex justify-end gap-x-1 ${field.type === "tags" ? "items-start" : "items-center"}`}>
-                  <Show when={field.type === "checkbox"}>
-                    <input
-                      type="checkbox"
-                      name={field.name}
-                      id={field.name}
-                      checked={searchParams[field.searchParam] === "on"}
-                    />
-                  </Show>
-                  <span class={`min-w-21 select-none ${field.type === "tags" ? "mt-1" : ""}`}>{field.label}</span>
-                  <Show when={field.type === "tags"}>
-                    <TagInput
-                      name={field.name}
-                      placeholder={field.placeholder}
-                      initialValues={
-                        (searchParams[field.searchParam] as string)
-                          ?.split(",")
-                          .filter((v) => v.trim().length > 0) ?? []
-                      }
-                    />
-                  </Show>
+              {(field) => {
+                let inputRef!: HTMLInputElement;
+                return (
+                  <label
+                    class={`flex justify-end gap-x-1 ${field.type === "tags" ? "items-start" : "items-center"}`}
+                  >
+                    <Show when={field.type === "checkbox"}>
+                      <input
+                        type="checkbox"
+                        name={field.name}
+                        id={field.name}
+                        checked={searchParams[field.searchParam] === "on"}
+                      />
+                    </Show>
+                    <span class={`min-w-21 select-none ${field.type === "tags" ? "mt-1" : ""}`}>
+                      {field.label}
+                    </span>
+                    <Show when={field.type === "tags"}>
+                      <TagInput
+                        name={field.name}
+                        placeholder={field.placeholder}
+                        initialValues={
+                          (searchParams[field.searchParam] as string)
+                            ?.split(",")
+                            .filter((v) => v.trim().length > 0) ?? []
+                        }
+                      />
+                    </Show>
 
-                  <Show when={field.type === "text"}>
-                    <TextInput
-                      name={field.name}
-                      placeholder={field.placeholder}
-                      value={(searchParams[field.searchParam] as string) ?? ""}
-                      class="grow"
-                    />
-                  </Show>
-                </label>
-              )}
+                    <Show when={field.type === "text"}>
+                      <div class="flex grow flex-col gap-1 sm:flex-row sm:items-center">
+                        <TextInput
+                          ref={inputRef}
+                          name={field.name}
+                          placeholder={field.placeholder}
+                          value={(searchParams[field.searchParam] as string) ?? ""}
+                          class="grow"
+                        />
+                        <Show when={field.datetimePicker}>
+                          <input
+                            type="datetime-local"
+                            step="1"
+                            value={microsToDatetimeLocal(
+                              (searchParams[field.searchParam] as string) ??
+                                (Date.now() * 1000).toString(),
+                            )}
+                            class="dark:bg-dark-100 rounded-md bg-white px-2 py-1 text-sm outline-1 outline-neutral-200 select-none focus:outline-neutral-400 dark:scheme-dark dark:outline-neutral-600 dark:focus:outline-neutral-400"
+                            onInput={(e) => {
+                              const micros = datetimeLocalToMicros(e.currentTarget.value);
+                              inputRef.value = micros;
+                            }}
+                          />
+                        </Show>
+                      </div>
+                    </Show>
+                  </label>
+                );
+              }}
             </For>
 
             <div class="flex justify-end gap-2">
