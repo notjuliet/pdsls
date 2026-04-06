@@ -365,16 +365,8 @@ const STATIC_ROUTES = {
   },
   "/labels": { title: "Labels", description: "Query labels applied to accounts and records." },
   "/car": {
-    title: "Archive tools",
-    description: "Tools for working with CAR (Content Addressable aRchive) files.",
-  },
-  "/car/explore": {
-    title: "Explore archive",
-    description: "Upload a CAR file to explore its contents.",
-  },
-  "/car/unpack": {
-    title: "Unpack archive",
-    description: "Upload a CAR file to extract all records into a ZIP archive.",
+    title: "CAR explorer",
+    description: "Upload an archive to explore or export its contents.",
   },
   "/settings": { title: "Settings", description: "Browse the public data on atproto" },
 };

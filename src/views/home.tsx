@@ -188,7 +188,7 @@ export const Home = () => {
             href="/car"
             icon="lucide--folder-archive"
             title="Archive"
-            description="Unpack CAR files"
+            description="Explore CAR files"
             accent="violet"
           />
         </div>

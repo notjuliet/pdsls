@@ -4,6 +4,7 @@ import * as CID from "@atcute/cid";
 import { Did } from "@atcute/lexicons";
 import { fromStream, isCommit } from "@atcute/repo";
 import * as TID from "@atcute/tid";
+import { zip, type ZipEntry } from "@mary/zip";
 import { useLocation, useNavigate } from "@solidjs/router";
 import {
   createEffect,
@@ -18,20 +19,146 @@ import {
 import { Button } from "../../components/button.jsx";
 import { Favicon } from "../../components/favicon.jsx";
 import HoverCard from "../../components/hover-card/base";
-import { JSONValue } from "../../components/json.jsx";
+import { JSONValue, type JSONType } from "../../components/json.jsx";
 import { TextInput } from "../../components/text-input.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
 import { createDebouncedValue } from "../../lib/debounced.js";
 import { localDateFromTimestamp } from "../../utils/date.js";
 import { createDropHandler, createFileChangeHandler, handleDragOver } from "./file-handlers.js";
-import {
-  type Archive,
-  type CollectionEntry,
-  type RecordEntry,
-  type View,
-  toJsonValue,
-  WelcomeView,
-} from "./shared.jsx";
+
+const isIOS =
+  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+const toJsonValue = (obj: unknown): JSONType => {
+  if (obj === null || obj === undefined) return null;
+
+  if (CID.isCidLink(obj)) {
+    return { $link: obj.$link };
+  }
+
+  if (
+    obj &&
+    typeof obj === "object" &&
+    "version" in obj &&
+    "codec" in obj &&
+    "digest" in obj &&
+    "bytes" in obj
+  ) {
+    try {
+      return { $link: CID.toString(obj as CID.Cid) };
+    } catch {}
+  }
+
+  if (CBOR.isBytes(obj)) {
+    return { $bytes: obj.$bytes };
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(toJsonValue);
+  }
+
+  if (typeof obj === "object") {
+    const result: Record<string, JSONType> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      result[key] = toJsonValue(value);
+    }
+    return result;
+  }
+
+  return obj as JSONType;
+};
+
+interface Archive {
+  file: File;
+  did: string;
+  entries: CollectionEntry[];
+}
+
+interface CollectionEntry {
+  name: string;
+  entries: RecordEntry[];
+}
+
+interface RecordEntry {
+  key: string;
+  cid: string;
+  record: JSONType;
+}
+
+type View =
+  | { type: "repo" }
+  | { type: "collection"; collection: CollectionEntry }
+  | { type: "record"; collection: CollectionEntry; record: RecordEntry };
+
+const WelcomeView = (props: {
+  title: string;
+  subtitle: string;
+  loading: boolean;
+  progress?: number;
+  error?: string;
+  onFileChange: (e: Event) => void;
+  onDrop: (e: DragEvent) => void;
+  onDragOver: (e: DragEvent) => void;
+}) => {
+  return (
+    <div class="flex w-full max-w-3xl flex-col gap-y-4 px-2">
+      <div class="flex flex-col gap-y-1">
+        <div class="flex items-center gap-2 text-lg">
+          <h1 class="font-semibold">{props.title}</h1>
+        </div>
+        <p class="text-sm text-neutral-600 dark:text-neutral-400">{props.subtitle}</p>
+      </div>
+
+      <div
+        class="dark:bg-dark-300 flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-neutral-300 bg-neutral-50 p-8 transition-colors hover:border-neutral-400 dark:border-neutral-600 dark:hover:border-neutral-500"
+        onDrop={props.onDrop}
+        onDragOver={props.onDragOver}
+      >
+        <Show
+          when={!props.loading}
+          fallback={
+            <div class="flex flex-col items-center gap-2">
+              <span class="iconify lucide--loader-circle animate-spin text-3xl text-neutral-400" />
+              <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                Reading CAR file...
+              </span>
+              <Show when={props.progress && props.progress > 0}>
+                <span class="text-xs text-neutral-500 dark:text-neutral-400">
+                  {props.progress?.toLocaleString()} records processed
+                </span>
+              </Show>
+            </div>
+          }
+        >
+          <span class="iconify lucide--folder-archive text-3xl text-neutral-400" />
+          <div class="text-center">
+            <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              Drag and drop a CAR file here
+            </p>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400">or</p>
+          </div>
+          <label class="dark:bg-dark-300 dark:hover:bg-dark-200 dark:active:bg-dark-100 flex items-center gap-1 rounded-md border border-neutral-300 bg-neutral-50 px-2.5 py-1.5 text-sm text-neutral-700 transition-colors select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:text-neutral-300">
+            <input
+              type="file"
+              accept={isIOS ? undefined : ".car,application/vnd.ipld.car"}
+              onChange={props.onFileChange}
+              class="hidden"
+            />
+            <span class="iconify lucide--upload text-sm" />
+            Choose file
+          </label>
+        </Show>
+      </div>
+
+      <Show when={props.error}>
+        <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
+          {props.error}
+        </div>
+      </Show>
+    </div>
+  );
+};
 
 const viewToHash = (view: View): string => {
   switch (view.type) {
@@ -68,7 +195,19 @@ const hashToView = (hash: string, archive: Archive): View => {
   return { type: "repo" };
 };
 
-export const ExploreToolView = () => {
+// Check if browser natively supports File System Access API
+const hasNativeFileSystemAccess = "showSaveFilePicker" in window;
+
+// HACK: Disable compression on WebKit due to an error being thrown
+const isWebKit =
+  isIOS || (/AppleWebKit/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent));
+
+const INVALID_CHAR_RE = /[<>:"/\\|?*\x00-\x1F]/g;
+const filenamify = (name: string) => {
+  return name.replace(INVALID_CHAR_RE, "~");
+};
+
+export const CarView = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -187,15 +326,15 @@ export const ExploreToolView = () => {
     if (location.hash) navigate(location.pathname, { replace: true });
   };
 
-  document.title = "Explore archive - PDSls";
+  document.title = "CAR explorer - PDSls";
   return (
     <>
       <Show
         when={archive()}
         fallback={
           <WelcomeView
-            title="Explore archive"
-            subtitle="Upload a CAR file to explore its contents."
+            title="CAR explorer"
+            subtitle="Upload an archive to explore or export its contents."
             loading={loading()}
             progress={progress()}
             error={error()}
@@ -213,12 +352,111 @@ export const ExploreToolView = () => {
   );
 };
 
+const exportToZip = async (
+  archive: Archive,
+  onProgress: (count: number) => void,
+  onSaving: () => void,
+) => {
+  const filename = archive.file.name.replace(/\.car$/, "");
+
+  const entryGenerator = async function* (): AsyncGenerator<ZipEntry> {
+    let count = 0;
+    for (const collection of archive.entries) {
+      for (const record of collection.entries) {
+        const path = `${collection.name}/${filenamify(record.key)}.json`;
+        const data = JSON.stringify(record.record, null, 2);
+        yield { filename: path, data, compress: isWebKit ? false : "deflate" };
+        if (++count % 500 === 0) {
+          onProgress(count);
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+        }
+      }
+    }
+    onProgress(count);
+  };
+
+  if (hasNativeFileSystemAccess) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fd = await (window as any)
+      .showSaveFilePicker({
+        suggestedName: `${filename}.zip`,
+        id: "car-unpack",
+        startIn: "downloads",
+        types: [
+          {
+            description: "ZIP archive",
+            accept: { "application/zip": [".zip"] },
+          },
+        ],
+      })
+      .catch(() => undefined);
+
+    if (!fd) return;
+
+    const writable = await fd.createWritable();
+    if (!writable) return;
+
+    let writeCount = 0;
+    for await (const chunk of zip(entryGenerator())) {
+      writeCount++;
+      if (writeCount % 100 === 0) {
+        await writable.write(chunk as BufferSource);
+      } else {
+        writable.write(chunk as BufferSource);
+      }
+    }
+
+    onSaving();
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    await writable.close();
+  } else {
+    const chunks: BlobPart[] = [];
+    for await (const chunk of zip(entryGenerator())) {
+      chunks.push(chunk as BlobPart);
+    }
+
+    onSaving();
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    const blob = new Blob(chunks, { type: "application/zip" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${filename}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+};
+
 const ExploreView = (props: {
   archive: Archive;
   view: () => View;
   setView: (view: View) => void;
   onClose: () => void;
 }) => {
+  const [exporting, setExporting] = createSignal(false);
+  const [exportCount, setExportCount] = createSignal(0);
+  const [exportSaving, setExportSaving] = createSignal(false);
+
+  const totalRecords = createMemo(() =>
+    props.archive.entries.reduce((sum, entry) => sum + entry.entries.length, 0),
+  );
+
+  const handleExport = async () => {
+    setExporting(true);
+    setExportCount(0);
+    setExportSaving(false);
+    try {
+      await exportToZip(props.archive, setExportCount, () => {
+        setExportSaving(true);
+      });
+    } finally {
+      setExporting(false);
+      setExportSaving(false);
+    }
+  };
+
   const handle =
     didDocCache[props.archive.did]?.alsoKnownAs
       ?.filter((alias) => alias.startsWith("at://"))[0]
@@ -265,14 +503,34 @@ const ExploreView = (props: {
               </span>
             </button>
           </Show>
-          <button
-            type="button"
-            onClick={props.onClose}
-            title="Close and upload a different file"
-            class="flex shrink-0 items-center rounded px-2 py-1 text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70"
-          >
-            <span class="iconify lucide--x" />
-          </button>
+          <div class="flex shrink-0 items-center gap-0.5">
+            <Show
+              when={exporting()}
+              fallback={
+                <button
+                  type="button"
+                  onClick={handleExport}
+                  class="flex shrink-0 items-center rounded px-2 py-1 text-xs text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70"
+                >
+                  Export ZIP
+                </button>
+              }
+            >
+              <div class="flex items-center gap-2 px-2 py-1 sm:py-1.5">
+                <span class="iconify lucide--loader-circle animate-spin text-neutral-400" />
+                <span class="w-[4ch] text-right text-xs text-neutral-500 dark:text-neutral-400">
+                  {exportSaving() ? "" : `${Math.round((exportCount() / totalRecords()) * 100)}%`}
+                </span>
+              </div>
+            </Show>
+            <button
+              type="button"
+              onClick={props.onClose}
+              class="flex shrink-0 items-center rounded px-2 py-1 text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70"
+            >
+              <span class="iconify lucide--x" />
+            </button>
+          </div>
         </div>
 
         {/* Collection Level */}

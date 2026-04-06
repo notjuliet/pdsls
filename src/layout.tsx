@@ -153,7 +153,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
               <NavMenu href="/spacedust" label="Spacedust" icon="lucide--sparkles" />
               <MenuSeparator />
               <NavMenu href="/labels" label="Labels" icon="lucide--tag" />
-              <NavMenu href="/car" label="Archive tools" icon="lucide--folder-archive" />
+              <NavMenu href="/car" label="CAR explorer" icon="lucide--folder-archive" />
               <MenuSeparator />
               <NavMenu href="/settings" label="Settings" icon="lucide--settings" />
             </DropdownMenu>
