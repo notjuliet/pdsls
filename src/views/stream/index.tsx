@@ -410,7 +410,7 @@ export const StreamView = () => {
                     </Show>
 
                     <Show when={field.type === "text"}>
-                      <div class="flex grow flex-col gap-1.5 sm:flex-row sm:items-center">
+                      <div class="flex grow flex-col flex-wrap gap-1.5 sm:flex-row sm:items-center">
                         <TextInput
                           ref={inputRef}
                           name={field.name}
