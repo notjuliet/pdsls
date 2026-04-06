@@ -369,8 +369,8 @@ export const StreamView = () => {
         {/* Connection Form */}
         <Show when={!connected()}>
           <form ref={formRef} class="flex w-full flex-col gap-2 p-2 text-sm">
-            <label class="flex items-center justify-end gap-x-1">
-              <span class="min-w-21 select-none">Instance</span>
+            <label class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-end sm:gap-x-1">
+              <span class="select-none sm:min-w-21">Instance</span>
               <TextInput
                 name="instance"
                 value={searchParams.instance ?? config().defaultInstance}
@@ -384,7 +384,7 @@ export const StreamView = () => {
                 let pickerRef!: HTMLInputElement;
                 return (
                   <label
-                    class={`flex justify-end gap-x-1 ${field.type === "tags" ? "items-start" : "items-center"}`}
+                    class={`flex gap-x-1 ${field.type === "checkbox" ? "items-center justify-end" : `flex-col gap-1 sm:flex-row sm:justify-end ${field.type === "tags" ? "sm:items-start" : "sm:items-center"}`}`}
                   >
                     <Show when={field.type === "checkbox"}>
                       <input
@@ -394,7 +394,9 @@ export const StreamView = () => {
                         checked={searchParams[field.searchParam] === "on"}
                       />
                     </Show>
-                    <span class={`min-w-21 select-none ${field.type === "tags" ? "mt-1" : ""}`}>
+                    <span
+                      class={`select-none ${field.type === "checkbox" ? "min-w-21" : "sm:min-w-21"} ${field.type === "tags" ? "sm:mt-1" : ""}`}
+                    >
                       {field.label}
                     </span>
                     <Show when={field.type === "tags"}>
@@ -410,7 +412,7 @@ export const StreamView = () => {
                     </Show>
 
                     <Show when={field.type === "text"}>
-                      <div class="flex grow flex-col flex-wrap gap-1.5 sm:flex-row sm:items-center">
+                      <div class="flex grow flex-wrap items-center gap-1.5">
                         <TextInput
                           ref={inputRef}
                           name={field.name}
