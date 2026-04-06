@@ -30,6 +30,8 @@ export const appList: Record<AppUrl, App> = {
   "deer.aylac.top": App.Bluesky,
   "main.bsky.dev": App.Bluesky,
   "witchsky.app": App.Bluesky,
+  "reddwarf.app": App.Bluesky,
+  "cope.works": App.Bluesky,
   "tangled.org": App.Tangled,
   "pinksea.art": App.Pinksea,
   "blento.app": App.Blento,
