@@ -381,6 +381,7 @@ export const StreamView = () => {
             <For each={config().fields}>
               {(field) => {
                 let inputRef!: HTMLInputElement;
+                let pickerRef!: HTMLInputElement;
                 return (
                   <label
                     class={`flex justify-end gap-x-1 ${field.type === "tags" ? "items-start" : "items-center"}`}
@@ -416,9 +417,15 @@ export const StreamView = () => {
                           placeholder={field.placeholder}
                           value={(searchParams[field.searchParam] as string) ?? ""}
                           class="grow"
+                          onInput={() => {
+                            if (field.datetimePicker && pickerRef) {
+                              pickerRef.value = microsToDatetimeLocal(inputRef.value);
+                            }
+                          }}
                         />
                         <Show when={field.datetimePicker}>
                           <input
+                            ref={pickerRef}
                             type="datetime-local"
                             step="1"
                             value={microsToDatetimeLocal(
