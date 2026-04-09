@@ -32,14 +32,14 @@ export const useLexiconSchema = (collection: () => string | undefined) => {
   const location = useLocation();
   const [schema, setSchema] = createSignal<ResolvedSchema>();
   const [authority, setAuthority] = createSignal<AtprotoDid>();
-  const [error, setError] = createSignal(false);
+  const [error, setError] = createSignal<string>();
   const [loading, setLoading] = createSignal(false);
 
   const showSchema = () => location.hash === "#schema" || location.hash.startsWith("#schema:");
 
   createEffect(() => {
     const col = collection();
-    if (showSchema() && !schema() && !loading() && !error() && col) {
+    if (showSchema() && !schema() && !loading() && error() === undefined && col) {
       setLoading(true);
       resolve(col as Nsid).then(
         (result) => {
@@ -47,8 +47,8 @@ export const useLexiconSchema = (collection: () => string | undefined) => {
           setSchema(result.schema);
           setLoading(false);
         },
-        () => {
-          setError(true);
+        (err) => {
+          setError(err instanceof Error ? err.message : "Unknown error");
           setLoading(false);
         },
       );
@@ -62,12 +62,12 @@ export const SchemaTabContent = (props: {
   schema?: ResolvedSchema;
   authority?: AtprotoDid;
   loading: boolean;
-  error: boolean;
+  error?: string;
   fallbackSchema?: any;
 }) => (
   <>
     <Show when={props.error && !props.fallbackSchema}>
-      <span class="mt-2">Lexicon schema could not be resolved.</span>
+      <span class="mx-2 mt-2">Error during resolution: {props.error}</span>
     </Show>
     <Show when={props.loading && !props.fallbackSchema}>
       <span class="mt-2 text-neutral-700 dark:text-neutral-300">Resolving lexicon schema...</span>
