@@ -13,7 +13,7 @@ await build({
   format: "esm",
   platform: "browser",
   target: "es2022",
-  external: ["*.wasm"],
+  external: ["*.wasm", "@takumi-rs/core", "@takumi-rs/wasm/auto", "@takumi-rs/wasm/next"],
   minify: true,
 });
 

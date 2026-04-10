@@ -36,7 +36,6 @@ async function getFonts() {
         "Noto Sans KR",
         "https://fonts.bunny.net/noto-sans-kr/files/noto-sans-kr-korean-400-normal.woff2",
       ],
-      ["Noto Emoji", "https://fonts.bunny.net/noto-emoji/files/noto-emoji-emoji-400-normal.woff2"],
     ];
     const results = await Promise.all(
       urls.map(([name, url]) =>
@@ -177,6 +176,7 @@ function renderLine(line, guideMargin) {
     guides.push(
       h("div", {
         style: {
+          display: "flex",
           width: 1,
           backgroundColor: C.guide,
           marginRight: guideMargin,
@@ -192,7 +192,9 @@ function renderLine(line, guideMargin) {
     ...line.segments.map((seg) =>
       h(
         "div",
-        { style: { color: seg.color, ...(seg.mr ? { marginRight: seg.mr } : {}) } },
+        {
+          style: { display: "flex", color: seg.color, ...(seg.mr ? { marginRight: seg.mr } : {}) },
+        },
         seg.text,
       ),
     ),
@@ -239,7 +241,7 @@ function OgImage({ record }) {
         height: "100%",
         background: "#1f1f1f",
         padding: "50px 50px",
-        fontFamily: "Roboto Mono, Noto Sans JP, Noto Sans SC, Noto Sans KR, Noto Emoji",
+        fontFamily: "Roboto Mono, Noto Sans JP, Noto Sans SC, Noto Sans KR",
         fontSize,
         lineHeight: 1.5,
         color: "#e2e8f0",
