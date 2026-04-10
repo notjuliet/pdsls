@@ -237,7 +237,7 @@ const RepoView = () => {
   // Handle scrolling to a collection group when hash is like #collections:app.bsky
   createEffect(() => {
     const hash = location.hash;
-    if (hash.startsWith("#collections:")) {
+    if (hash.startsWith("#collections:") && nsids()) {
       const authority = hash.slice(13);
       requestAnimationFrame(() => {
         const element = document.getElementById(`collection-${authority}`);
