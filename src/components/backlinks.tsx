@@ -138,7 +138,7 @@ const BacklinkDirectory = (props: { groups: CollectionGroup[]; pathname: string 
   return (
     <div class="flex w-full flex-col gap-1.5">
       <Show when={props.groups.length === 0}>
-        <p class="text-neutral-500">No backlinks found.</p>
+        <p class="text-center text-neutral-500 dark:text-neutral-400">No backlinks found.</p>
       </Show>
       <For each={props.groups}>
         {(group) => {
