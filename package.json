@@ -52,8 +52,8 @@
     "@mary/zip": "jsr:^0.1.1",
     "@skyware/firehose": "^0.5.2",
     "@solidjs/router": "^0.16.1",
-    "@takumi-rs/image-response": "^1.0.1",
-    "@takumi-rs/wasm": "^1.0.1",
+    "@takumi-rs/image-response": "^1.0.3",
+    "@takumi-rs/wasm": "^1.0.3",
     "@tanstack/solid-virtual": "^3.13.23",
     "codemirror": "^6.0.2",
     "solid-js": "^1.9.12"

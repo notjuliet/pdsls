@@ -74,7 +74,7 @@ export const ConfirmSubmit = (props: {
             "bg-blue-500! text-white! border-none! hover:bg-blue-600! active:bg-blue-700! dark:bg-blue-600! dark:hover:bg-blue-500! dark:active:bg-blue-400!": true,
           }}
         >
-          {props.isCreate ? "Create" : "Edit"}
+          Confirm
         </Button>
       </div>
     </div>
