@@ -1,4 +1,4 @@
-import { createSignal, For, Show } from "solid-js";
+import { For, Show } from "solid-js";
 import { hasUserScope } from "../../auth/scope-utils";
 import { Button } from "../button.jsx";
 
@@ -13,15 +13,15 @@ const inactiveClass = "hover:bg-neutral-100 dark:hover:bg-neutral-700";
 
 export const ConfirmSubmit = (props: {
   isCreate: boolean;
-  onConfirm: (validate: boolean | undefined, recreate: boolean) => void;
+  validate: boolean | undefined;
+  setValidate: (v: boolean | undefined) => void;
+  recreate: boolean;
+  setRecreate: (v: boolean) => void;
   onClose: () => void;
 }) => {
-  const [validate, setValidate] = createSignal<boolean | undefined>(undefined);
-  const [recreate, setRecreate] = createSignal(false);
-
   return (
     <div class="flex flex-col gap-3 text-sm">
-      <h2 class="font-semibold">{props.isCreate ? "Create" : "Edit"} record</h2>
+      <h2 class="font-semibold">Advanced options</h2>
 
       <div class="flex flex-col gap-1.5">
         <div class="flex items-center justify-between gap-2">
@@ -31,8 +31,8 @@ export const ConfirmSubmit = (props: {
               {(opt) => (
                 <button
                   type="button"
-                  onClick={() => setValidate(opt.value)}
-                  class={`border-r border-neutral-200 px-2.5 py-1.5 transition-colors last:border-r-0 dark:border-neutral-600 ${validate() === opt.value ? activeClass : inactiveClass}`}
+                  onClick={() => props.setValidate(opt.value)}
+                  class={`border-r border-neutral-200 px-2.5 py-1.5 transition-colors last:border-r-0 dark:border-neutral-600 ${props.validate === opt.value ? activeClass : inactiveClass}`}
                 >
                   {opt.label}
                 </button>
@@ -53,9 +53,9 @@ export const ConfirmSubmit = (props: {
           >
             <input
               type="checkbox"
-              checked={recreate()}
+              checked={props.recreate}
               disabled={!hasUserScope("create")}
-              onChange={(e) => setRecreate(e.currentTarget.checked)}
+              onChange={(e) => props.setRecreate(e.currentTarget.checked)}
               class="h-3.5 w-3.5 accent-blue-500"
             />
             Recreate{!hasUserScope("create") ? " (create permission needed)" : ""}
@@ -66,16 +66,8 @@ export const ConfirmSubmit = (props: {
         </div>
       </Show>
 
-      <div class="flex justify-between gap-2">
-        <Button onClick={props.onClose}>Cancel</Button>
-        <Button
-          onClick={() => props.onConfirm(validate(), recreate())}
-          classList={{
-            "bg-blue-500! text-white! border-none! hover:bg-blue-600! active:bg-blue-700! dark:bg-blue-600! dark:hover:bg-blue-500! dark:active:bg-blue-400!": true,
-          }}
-        >
-          Confirm
-        </Button>
+      <div class="flex justify-end gap-2">
+        <Button onClick={props.onClose}>Done</Button>
       </div>
     </div>
   );
