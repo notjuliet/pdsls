@@ -111,6 +111,8 @@ export const RecordEditor = (props: {
     if (openDialog()) {
       setCollectionError("");
       setRkeyError("");
+      setValidate(undefined);
+      setRecreate(false);
     }
   });
 
