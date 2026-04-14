@@ -247,8 +247,8 @@ const CollapsibleItem = (props: {
           <button
             type="button"
             classList={{
-              "flex items-center gap-0.5 rounded px-1 text-xs whitespace-nowrap text-neutral-500 sm:py-0.5 dark:text-neutral-400": true,
-              "bg-neutral-200 hover:bg-neutral-300 hover:text-neutral-700 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:hover:text-neutral-200":
+              "flex items-center gap-0.5 rounded text-xs whitespace-nowrap text-neutral-500 dark:text-neutral-400": true,
+              "bg-neutral-200 px-1 hover:bg-neutral-300 hover:text-neutral-700 sm:py-0.5 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:hover:text-neutral-200":
                 !ctx.preview,
             }}
             onclick={() => setShow(true)}
