@@ -29,6 +29,7 @@ interface JSONContext {
   hideBlobs?: boolean;
   keyLinks?: boolean;
   path?: string;
+  preview?: boolean;
 }
 
 const JSONCtx = createContext<JSONContext>();
@@ -161,7 +162,12 @@ const CollapsibleItem = (props: {
 }) => {
   const ctx = useJSONCtx();
   const location = useLocation();
-  const [show, setShow] = createSignal(true);
+  const isObject = () => props.value === Object(props.value);
+  const isEmpty = () =>
+    Array.isArray(props.value) ?
+      (props.value as JSONType[]).length === 0
+    : Object.keys(props.value as object).length === 0;
+  const [show, setShow] = createSignal(!(ctx.preview && isObject() && !isEmpty()));
   const isBlobContext = props.parentIsBlob ?? ctx.parentIsBlob;
 
   const labelStr = () => {
@@ -181,11 +187,6 @@ const CollapsibleItem = (props: {
     }
   });
 
-  const isObject = () => props.value === Object(props.value);
-  const isEmpty = () =>
-    Array.isArray(props.value) ?
-      (props.value as JSONType[]).length === 0
-    : Object.keys(props.value as object).length === 0;
   const summary = () => {
     if (Array.isArray(props.value)) {
       const len = (props.value as JSONType[]).length;
@@ -245,10 +246,16 @@ const CollapsibleItem = (props: {
         <Show when={!show() && summary()}>
           <button
             type="button"
-            class="flex items-center gap-0.5 rounded bg-neutral-200 px-1 text-xs whitespace-nowrap text-neutral-500 hover:bg-neutral-300 hover:text-neutral-700 sm:py-0.5 dark:bg-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-600 dark:hover:text-neutral-200"
+            classList={{
+              "flex items-center gap-0.5 rounded px-1 text-xs whitespace-nowrap text-neutral-500 sm:py-0.5 dark:text-neutral-400": true,
+              "bg-neutral-200 hover:bg-neutral-300 hover:text-neutral-700 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:hover:text-neutral-200":
+                !ctx.preview,
+            }}
             onclick={() => setShow(true)}
           >
-            <span class="iconify lucide--chevron-right"></span>
+            <Show when={!ctx.preview}>
+              <span class="iconify lucide--chevron-right"></span>
+            </Show>
             {summary()}
           </button>
         </Show>
@@ -269,12 +276,14 @@ const CollapsibleItem = (props: {
           </span>
         </Show>
         <JSONCtx.Provider value={{ ...ctx, parentIsBlob: isBlobContext, path: fullPath() }}>
-          <JSONValueInner
-            data={props.value}
-            isType={props.isType}
-            isLink={props.isLink}
-            isSize={props.isSize}
-          />
+          <Show when={!ctx.preview || show()}>
+            <JSONValueInner
+              data={props.value}
+              isType={props.isType}
+              isLink={props.isLink}
+              isSize={props.isSize}
+            />
+          </Show>
         </JSONCtx.Provider>
       </span>
     </span>
@@ -464,6 +473,7 @@ export const JSONValue = (props: {
   newTab?: boolean;
   hideBlobs?: boolean;
   keyLinks?: boolean;
+  preview?: boolean;
 }) => {
   return (
     <JSONCtx.Provider
@@ -474,6 +484,7 @@ export const JSONValue = (props: {
         newTab: props.newTab,
         hideBlobs: props.hideBlobs,
         keyLinks: props.keyLinks,
+        preview: props.preview,
       }}
     >
       <JSONValueInner data={props.data} />

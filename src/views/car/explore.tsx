@@ -853,7 +853,13 @@ const CollectionSubview = (props: {
                   </button>
                 }
               >
-                <JSONValue data={entry.record} repo={props.archive.did} truncate hideBlobs />
+                <JSONValue
+                  data={entry.record}
+                  repo={props.archive.did}
+                  truncate
+                  hideBlobs
+                  preview
+                />
               </HoverCard>
             );
           }}

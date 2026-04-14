@@ -109,6 +109,7 @@ const RecordHoverCard = (props: RecordHoverCardProps) => {
             truncate
             newTab
             hideBlobs
+            preview
           />
         </div>
       </Show>

@@ -57,6 +57,7 @@ const RecordLink = (props: { record: AtprotoRecord }) => {
         repo={props.record.record.uri.split("/")[2]}
         truncate
         hideBlobs
+        preview
       />
     </HoverCard>
   );
