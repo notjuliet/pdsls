@@ -52,24 +52,18 @@ export const StreamStatsPanel = (props: {
     <Show when={props.stats.connectedAt !== undefined}>
       <div class="w-full text-sm">
         <div class="mb-1 font-semibold">Statistics</div>
-        <div class="flex flex-wrap justify-between gap-x-4 gap-y-2">
+        <div class="grid grid-cols-3 gap-x-4 gap-y-2">
           <div>
             <div class="text-xs text-neutral-500 dark:text-neutral-400">Uptime</div>
             <div class="font-mono">{formatUptime(uptime())}</div>
           </div>
-          <div>
+          <div class="text-center">
             <div class="text-xs text-neutral-500 dark:text-neutral-400">Total Events</div>
             <div class="font-mono">{props.stats.totalEvents.toLocaleString()}</div>
           </div>
-          <div>
+          <div class="text-right">
             <div class="text-xs text-neutral-500 dark:text-neutral-400">Events/sec</div>
             <div class="font-mono">{props.stats.eventsPerSecond.toFixed(1)}</div>
-          </div>
-          <div>
-            <div class="text-xs text-neutral-500 dark:text-neutral-400">Avg/sec</div>
-            <div class="font-mono">
-              {uptime() > 0 ? ((props.stats.totalEvents / uptime()) * 1000).toFixed(1) : "0.0"}
-            </div>
           </div>
         </div>
 
