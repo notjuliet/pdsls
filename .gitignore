@@ -6,3 +6,4 @@ public/oauth-client-metadata.json
 public/opensearch.xml
 public/_worker.js
 .wrangler
+.claude
