@@ -52,7 +52,7 @@ export const RepoLayout = (props: RouteSectionProps) => {
   const params = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const hasChild = () => !!params.collection;
+  const hasChild = () => !!params.collection || !!params.cid;
 
   // Redirect non-DID identifiers (handles, NSIDs) via effect — must be separate from
   // the resource because navigate inside a resource fetcher doesn't reliably re-trigger it
@@ -224,7 +224,7 @@ const downloadRepo = async (pdsUrl: string, did: string) => {
 const RepoView = () => {
   const repo = useRepo();
   const params = useParams();
-  const hidden = () => !!params.collection;
+  const hidden = () => !!params.collection || !!params.cid;
   const location = useLocation();
   const [error, setError] = createSignal<string>();
   const [downloading, setDownloading] = createSignal(false);

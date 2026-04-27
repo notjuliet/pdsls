@@ -9,6 +9,7 @@ import { Home } from "./views/home.tsx";
 import { LabelView } from "./views/labels.tsx";
 import { PdsLayout } from "./views/pds.tsx";
 import { RecordView } from "./views/record.tsx";
+import { BlobDebugView } from "./views/repo/blob-debug.tsx";
 import { RepoLayout, repoPreload } from "./views/repo/index.tsx";
 import { Settings } from "./views/settings.tsx";
 import { StreamView } from "./views/stream";
@@ -25,6 +26,7 @@ render(
         <Route path="/" />
         <Route path="/:repo" component={RepoLayout} preload={repoPreload}>
           <Route path="/" />
+          <Route path="/blob/:cid" component={BlobDebugView} />
           <Route path="/:collection" component={CollectionLayout}>
             <Route path="/" />
             <Route path="/:rkey" component={RecordView} />

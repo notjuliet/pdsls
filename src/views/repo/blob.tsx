@@ -1,4 +1,5 @@
 import { Client, simpleFetchHandler } from "@atcute/client";
+import { A } from "@solidjs/router";
 import { createResource, createSignal, For, Show } from "solid-js";
 import { Button } from "../../components/button";
 
@@ -33,14 +34,14 @@ export const BlobView = (props: { pds: string; repo: string }) => {
         <div class="flex w-full flex-col gap-0.5 pb-20 font-mono text-xs sm:text-sm">
           <For each={blobs()}>
             {(cid) => (
-              <a
-                href={`${props.pds}/xrpc/com.atproto.sync.getBlob?did=${props.repo}&cid=${cid}`}
-                target="_blank"
+              <A
+                href={`/at://${props.repo}/blob/${cid}`}
+                state={{ from: `/at://${props.repo}#blobs`, label: "Back to blobs" }}
                 class="truncate rounded px-0.5 text-left text-blue-500 hover:bg-neutral-200 active:bg-neutral-300 dark:text-blue-400 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                 dir="rtl"
               >
                 {cid}
-              </a>
+              </A>
             )}
           </For>
         </div>
