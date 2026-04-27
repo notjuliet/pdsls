@@ -1,5 +1,5 @@
-import { OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { Did } from "@atcute/lexicons";
+import { OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 

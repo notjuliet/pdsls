@@ -37,7 +37,5 @@ export const PermissionButton = (props: PermissionButtonProps) => {
     </button>
   );
 
-  return props.tooltip ?
-      <Tooltip text={tooltip()!}>{button}</Tooltip>
-    : button;
+  return props.tooltip ? <Tooltip text={tooltip()!}>{button}</Tooltip> : button;
 };
