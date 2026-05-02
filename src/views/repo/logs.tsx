@@ -14,6 +14,14 @@ import { plcDirectory } from "../settings.jsx";
 
 type PlcEvent = "handle" | "rotation_key" | "service" | "verification_method";
 
+const plcEventFilters: { event?: PlcEvent; icon: string; label: string }[] = [
+  { icon: "lucide--list-filter", label: "All" },
+  { event: "handle", icon: "lucide--at-sign", label: "Alias" },
+  { event: "service", icon: "lucide--hard-drive", label: "Service" },
+  { event: "verification_method", icon: "lucide--shield-check", label: "Verification" },
+  { event: "rotation_key", icon: "lucide--key-round", label: "Rotation" },
+];
+
 export const PlcLogView = (props: { did: string }) => {
   const location = useLocation();
   const [activePlcEvent, setActivePlcEvent] = createSignal<PlcEvent | undefined>();
@@ -67,24 +75,51 @@ export const PlcLogView = (props: { did: string }) => {
     }
   });
 
-  const FilterButton = (props: { event: PlcEvent; label: string }) => {
+  const FilterButton = (props: { event?: PlcEvent; icon: string; label: string }) => {
     const isActive = () => activePlcEvent() === props.event;
     const toggleFilter = () => setActivePlcEvent(isActive() ? undefined : props.event);
 
     return (
       <button
+        type="button"
+        aria-label={`${props.label} logs`}
+        aria-pressed={isActive()}
+        class="flex h-7 shrink-0 items-center rounded-md border text-xs font-medium transition-colors sm:w-auto sm:justify-start sm:gap-1 sm:px-2"
         classList={{
-          "font-medium rounded-lg px-2 py-1.5 text-xs sm:text-sm transition-colors": true,
-          "bg-neutral-700 text-white dark:bg-neutral-300 dark:text-neutral-900": isActive(),
-          "bg-neutral-200 text-neutral-700 hover:bg-neutral-300 dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-600":
+          "w-auto justify-start gap-1 px-2": isActive(),
+          "w-7 justify-center px-0": !isActive(),
+          "border-neutral-300 bg-neutral-50 text-neutral-900 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200":
+            isActive(),
+          "border-transparent text-neutral-500 hover:bg-neutral-200 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-700/50 dark:hover:text-neutral-200":
             !isActive(),
         }}
         onclick={toggleFilter}
       >
-        {props.label}
+        <span class={`iconify ${props.icon}`} />
+        <span class={isActive() ? "inline" : "hidden sm:inline"}>{props.label}</span>
       </button>
     );
   };
+
+  const ValidationStatus = () => (
+    <div class="mr-1.5 flex shrink-0 items-center justify-center text-sm">
+      <Show when={validLog() === true}>
+        <Tooltip text="Valid log">
+          <span class="iconify lucide--check text-green-600 dark:text-green-400"></span>
+        </Tooltip>
+      </Show>
+      <Show when={validLog() === false}>
+        <Tooltip text="Validation failed">
+          <span class="iconify lucide--x text-red-500 dark:text-red-400"></span>
+        </Tooltip>
+      </Show>
+      <Show when={validLog() === undefined}>
+        <Tooltip text="Validating...">
+          <span class="iconify lucide--loader-circle animate-spin text-neutral-500 dark:text-neutral-400"></span>
+        </Tooltip>
+      </Show>
+    </div>
+  );
 
   const DiffItem = (props: { diff: DiffEntry }) => {
     const diff = props.diff;
@@ -261,34 +296,15 @@ export const PlcLogView = (props: { did: string }) => {
 
   return (
     <div class="flex w-full flex-col gap-3 wrap-anywhere">
-      <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-1.5 text-sm font-medium text-neutral-700 dark:text-neutral-300">
-          <div class="iconify lucide--filter" />
-          <p>Filter by type</p>
-          <div class="mr-1.5 ml-auto">
-            <Show when={validLog() === true}>
-              <Tooltip text="Valid log">
-                <span class="iconify lucide--check text-green-600 dark:text-green-400"></span>
-              </Tooltip>
-            </Show>
-            <Show when={validLog() === false}>
-              <Tooltip text="Validation failed">
-                <span class="iconify lucide--x text-red-500 dark:text-red-400"></span>
-              </Tooltip>
-            </Show>
-            <Show when={validLog() === undefined}>
-              <Tooltip text="Validating...">
-                <span class="iconify lucide--loader-circle animate-spin"></span>
-              </Tooltip>
-            </Show>
-          </div>
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex min-w-0 flex-1 items-center gap-1">
+          <For each={plcEventFilters}>
+            {(filter) => (
+              <FilterButton event={filter.event} icon={filter.icon} label={filter.label} />
+            )}
+          </For>
         </div>
-        <div class="flex flex-wrap gap-1">
-          <FilterButton event="handle" label="Alias" />
-          <FilterButton event="service" label="Service" />
-          <FilterButton event="verification_method" label="Verification" />
-          <FilterButton event="rotation_key" label="Rotation Key" />
-        </div>
+        <ValidationStatus />
       </div>
       <div class="flex flex-col gap-3">
         <For each={plcOps()}>
