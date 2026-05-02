@@ -88,7 +88,7 @@ const AliasEntry = (props: { alias: string; did: string; valid: boolean | undefi
         </button>
 
         <Show when={expanded()}>
-          <div class="mb-2 ml-2.5 border-l border-neutral-200 pl-2.5 dark:border-neutral-700">
+          <div class="mb-2 ml-2.5 border-l-[1.5px] border-neutral-300 pl-2.5 dark:border-neutral-600">
             <div class="mb-1.5 text-xs font-medium text-neutral-500 dark:text-neutral-400">
               Resolution
             </div>
