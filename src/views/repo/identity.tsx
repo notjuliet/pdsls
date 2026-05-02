@@ -8,7 +8,7 @@ import { detectDidKeyType, detectKeyType } from "../../lib/key.js";
 import { addToClipboard } from "../../utils/copy.js";
 
 const HandleResult = (props: {
-  label: string;
+  method: string;
   result: HandleResolveResult;
   expectedDid: string;
 }) => {
@@ -16,27 +16,35 @@ const HandleResult = (props: {
   const mismatch = () => props.result.success && props.result.did !== props.expectedDid;
 
   return (
-    <>
-      <span
-        classList={{
-          "iconify lucide--check text-green-600 dark:text-green-400": ok(),
-          "iconify lucide--x text-red-500 dark:text-red-400": !ok(),
-        }}
-      ></span>
-      <span class="font-medium">{props.label}</span>
-      <span></span>
-      <div class="mb-2 text-sm wrap-anywhere text-neutral-500 dark:text-neutral-400">
-        <Show
-          when={props.result.success}
-          fallback={<div class="text-red-500 dark:text-red-400">{props.result.error}</div>}
-        >
-          <div>{props.result.did}</div>
-          <Show when={mismatch()}>
-            <div class="text-red-500 dark:text-red-400">Expected: {props.expectedDid}</div>
-          </Show>
-        </Show>
+    <div class="grid grid-cols-[7rem_minmax(0,1fr)] items-start gap-x-3 gap-y-0.5 text-sm">
+      <div class="flex items-center gap-1.5 font-medium whitespace-nowrap">
+        <span
+          classList={{
+            "iconify lucide--check text-green-600 dark:text-green-400": ok(),
+            "iconify lucide--x text-red-500 dark:text-red-400": !ok(),
+          }}
+        ></span>
+        <span>{props.method}</span>
       </div>
-    </>
+      <Show
+        when={props.result.success}
+        fallback={
+          <div class="min-w-0 wrap-anywhere text-red-500 dark:text-red-400">
+            {props.result.error}
+          </div>
+        }
+      >
+        <div class="min-w-0 truncate text-neutral-500 dark:text-neutral-400">
+          {props.result.did}
+        </div>
+      </Show>
+      <Show when={mismatch()}>
+        <span></span>
+        <div class="min-w-0 wrap-anywhere text-red-500 dark:text-red-400">
+          Expected: {props.expectedDid}
+        </div>
+      </Show>
+    </div>
   );
 };
 
@@ -52,9 +60,10 @@ const AliasEntry = (props: { alias: string; did: string; valid: boolean | undefi
       when={props.alias.startsWith("at://")}
       fallback={<div class="text-sm text-neutral-700 dark:text-neutral-300">{props.alias}</div>}
     >
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-1">
         <button
-          class="-ml-1 flex w-fit items-center gap-1 rounded px-1 py-0.5 text-left text-sm text-neutral-700 hover:bg-neutral-200 active:bg-neutral-200 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+          class="-ml-1 flex w-fit max-w-full items-center gap-1 rounded px-1 py-0.5 text-left text-sm text-neutral-700 hover:bg-neutral-200 active:bg-neutral-200 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+          aria-expanded={expanded()}
           onClick={async () => {
             if (expanded()) {
               setExpanded(false);
@@ -67,7 +76,7 @@ const AliasEntry = (props: { alias: string; did: string; valid: boolean | undefi
             }
           }}
         >
-          <span>{props.alias}</span>
+          <span class="truncate">{props.alias}</span>
           <span
             classList={{
               "iconify text-base shrink-0 lucide--check text-green-600 dark:text-green-400":
@@ -79,24 +88,23 @@ const AliasEntry = (props: { alias: string; did: string; valid: boolean | undefi
         </button>
 
         <Show when={expanded()}>
-          <div class="mb-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div class="mb-2 ml-2.5 border-l border-neutral-200 pl-2.5 dark:border-neutral-700">
+            <div class="mb-1.5 text-xs font-medium text-neutral-500 dark:text-neutral-400">
+              Resolution
+            </div>
             <Show
               when={result()}
               fallback={
-                <div class="flex items-center gap-2 py-2 text-sm">
+                <div class="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
                   <span class="iconify lucide--loader-circle animate-spin"></span>
                   <span>Resolving handle...</span>
                 </div>
               }
             >
               {(r) => (
-                <div class="grid grid-cols-[auto_1fr] items-center gap-x-1.5 text-sm">
-                  <HandleResult label="DNS (TXT record)" result={r().dns} expectedDid={props.did} />
-                  <HandleResult
-                    label="HTTP (.well-known)"
-                    result={r().http}
-                    expectedDid={props.did}
-                  />
+                <div class="flex flex-col gap-1.5">
+                  <HandleResult method="DNS TXT" result={r().dns} expectedDid={props.did} />
+                  <HandleResult method="/.well-known" result={r().http} expectedDid={props.did} />
                 </div>
               )}
             </Show>
