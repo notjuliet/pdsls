@@ -5,7 +5,6 @@ export type StreamStats = {
   connectedAt?: number;
   totalEvents: number;
   eventsPerSecond: number;
-  eventTypes: Record<string, number>;
   collections: Record<string, number>;
 };
 
@@ -27,24 +26,12 @@ export const StreamStatsPanel = (props: {
   stats: StreamStats;
   currentTime: number;
   streamType: StreamType;
-  showAllEvents?: boolean;
 }) => {
   const config = () => STREAM_CONFIGS[props.streamType];
   const uptime = () => (props.stats.connectedAt ? props.currentTime - props.stats.connectedAt : 0);
 
-  const shouldShowEventTypes = () => {
-    if (!config().showEventTypes) return false;
-    if (props.streamType === "jetstream") return props.showAllEvents === true;
-    return true;
-  };
-
   const topCollections = () =>
     Object.entries(props.stats.collections)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 5);
-
-  const topEventTypes = () =>
-    Object.entries(props.stats.eventTypes)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 5);
 
@@ -66,30 +53,6 @@ export const StreamStatsPanel = (props: {
             <div class="font-mono">{props.stats.eventsPerSecond.toFixed(1)}</div>
           </div>
         </div>
-
-        <Show when={topEventTypes().length > 0 && shouldShowEventTypes()}>
-          <div class="mt-2">
-            <div class="mb-1 text-xs text-neutral-500 dark:text-neutral-400">Event Types</div>
-            <div class="grid grid-cols-[1fr_5rem_3rem] gap-x-1 gap-y-0.5 font-mono text-xs sm:gap-x-4">
-              <For each={topEventTypes()}>
-                {([type, count]) => {
-                  const percentage = ((count / props.stats.totalEvents) * 100).toFixed(1);
-                  return (
-                    <>
-                      <span class="text-neutral-700 dark:text-neutral-300">{type}</span>
-                      <span class="text-right text-neutral-600 tabular-nums dark:text-neutral-400">
-                        {count.toLocaleString()}
-                      </span>
-                      <span class="text-right text-neutral-400 tabular-nums dark:text-neutral-500">
-                        {percentage}%
-                      </span>
-                    </>
-                  );
-                }}
-              </For>
-            </div>
-          </div>
-        </Show>
 
         <Show when={topCollections().length > 0}>
           <div class="mt-2">

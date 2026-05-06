@@ -125,7 +125,6 @@ export const StreamView = () => {
   const [stats, setStats] = createSignal<StreamStats>({
     totalEvents: 0,
     eventsPerSecond: 0,
-    eventTypes: {},
     collections: {},
   });
   const [currentTime, setCurrentTime] = createSignal(Date.now());
@@ -139,7 +138,6 @@ export const StreamView = () => {
   let statsUpdateIntervalId: number | null = null;
   let currentSecondEventCount = 0;
   let totalEventsCount = 0;
-  let eventTypesMap: Record<string, number> = {};
   let collectionsMap: Record<string, number> = {};
 
   const addRecord = (record: any) => {
@@ -148,7 +146,6 @@ export const StreamView = () => {
 
     const rawEventType = record.kind || record.$type || "unknown";
     const eventType = rawEventType.includes("#") ? rawEventType.split("#").pop() : rawEventType;
-    eventTypesMap[eventType] = (eventTypesMap[eventType] || 0) + 1;
 
     if (eventType !== "account" && eventType !== "identity" && eventType !== "sync") {
       const collection =
@@ -190,7 +187,6 @@ export const StreamView = () => {
 
     pendingRecords = [];
     totalEventsCount = 0;
-    eventTypesMap = {};
     collectionsMap = {};
     setConnected(false);
     setPaused(false);
@@ -239,14 +235,12 @@ export const StreamView = () => {
     setCurrentTime(now);
 
     totalEventsCount = 0;
-    eventTypesMap = {};
     collectionsMap = {};
 
     setStats({
       connectedAt: now,
       totalEvents: 0,
       eventsPerSecond: 0,
-      eventTypes: {},
       collections: {},
     });
 
@@ -254,7 +248,6 @@ export const StreamView = () => {
       setStats((prev) => ({
         ...prev,
         totalEvents: totalEventsCount,
-        eventTypes: { ...eventTypesMap },
         collections: { ...collectionsMap },
       }));
     }, 50);
@@ -470,12 +463,7 @@ export const StreamView = () => {
                 )}
               </For>
             </div>
-            <StreamStatsPanel
-              stats={stats()}
-              currentTime={currentTime()}
-              streamType={streamType}
-              showAllEvents={searchParams.allEvents === "on"}
-            />
+            <StreamStatsPanel stats={stats()} currentTime={currentTime()} streamType={streamType} />
             <div class="flex justify-end gap-2">
               <Button
                 ontouchstart={(e) => {

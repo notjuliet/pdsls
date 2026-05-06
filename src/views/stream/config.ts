@@ -29,7 +29,6 @@ export type StreamConfig = {
   useFirehoseLib: boolean;
   buildUrl: (instance: string, formData: FormData) => string;
   parseRecord: (record: any) => RecordInfo;
-  showEventTypes: boolean;
   collectionsLabel: string;
 };
 
@@ -40,7 +39,6 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
     icon: "lucide--radio-tower",
     defaultInstance: "wss://jetstream1.us-east.bsky.network/subscribe",
     useFirehoseLib: false,
-    showEventTypes: true,
     collectionsLabel: "Top Collections",
     fields: [
       {
@@ -105,7 +103,6 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
     icon: "lucide--rss",
     defaultInstance: "wss://bsky.network",
     useFirehoseLib: true,
-    showEventTypes: true,
     collectionsLabel: "Top Collections",
     fields: [
       {
@@ -141,7 +138,6 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
     icon: "lucide--link",
     defaultInstance: "wss://spacedust.microcosm.blue/subscribe",
     useFirehoseLib: false,
-    showEventTypes: false,
     collectionsLabel: "Top Sources",
     fields: [
       {
