@@ -1,6 +1,8 @@
 import { For, Show } from "solid-js";
 import { STREAM_CONFIGS, StreamType } from "./config";
 
+const TOP_COLLECTION_LIMIT = 5;
+
 export type StreamStats = {
   connectedAt?: number;
   totalEvents: number;
@@ -33,7 +35,7 @@ export const StreamStatsPanel = (props: {
   const topCollections = () =>
     Object.entries(props.stats.collections)
       .sort(([, a], [, b]) => b - a)
-      .slice(0, 5);
+      .slice(0, TOP_COLLECTION_LIMIT);
 
   return (
     <Show when={props.stats.connectedAt !== undefined}>
@@ -54,33 +56,31 @@ export const StreamStatsPanel = (props: {
           </div>
         </div>
 
-        <Show when={topCollections().length > 0}>
-          <div class="mt-2">
-            <div class="mb-1 text-xs text-neutral-500 dark:text-neutral-400">
-              {config().collectionsLabel}
-            </div>
-            <div class="grid grid-cols-[1fr_5rem_3rem] gap-x-1 gap-y-0.5 font-mono text-xs sm:gap-x-4">
-              <For each={topCollections()}>
-                {([collection, count]) => {
-                  const percentage = ((count / props.stats.totalEvents) * 100).toFixed(1);
-                  return (
-                    <>
-                      <span class="min-w-0 truncate text-neutral-700 dark:text-neutral-300">
-                        {collection}
-                      </span>
-                      <span class="text-right text-neutral-600 tabular-nums dark:text-neutral-400">
-                        {count.toLocaleString()}
-                      </span>
-                      <span class="text-right text-neutral-400 tabular-nums dark:text-neutral-500">
-                        {percentage}%
-                      </span>
-                    </>
-                  );
-                }}
-              </For>
-            </div>
+        <div class="mt-2">
+          <div class="mb-1 text-xs text-neutral-500 dark:text-neutral-400">
+            {config().collectionsLabel}
           </div>
-        </Show>
+          <div class="grid min-h-22 grid-cols-[1fr_5rem_3rem] content-start gap-x-1 gap-y-0.5 font-mono text-xs sm:gap-x-4">
+            <For each={topCollections()}>
+              {([collection, count]) => {
+                const percentage = ((count / props.stats.totalEvents) * 100).toFixed(1);
+                return (
+                  <>
+                    <span class="min-w-0 truncate text-neutral-700 dark:text-neutral-300">
+                      {collection}
+                    </span>
+                    <span class="text-right text-neutral-600 tabular-nums dark:text-neutral-400">
+                      {count.toLocaleString()}
+                    </span>
+                    <span class="text-right text-neutral-400 tabular-nums dark:text-neutral-500">
+                      {percentage}%
+                    </span>
+                  </>
+                );
+              }}
+            </For>
+          </div>
+        </div>
       </div>
     </Show>
   );
