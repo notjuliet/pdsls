@@ -28,6 +28,7 @@ export const StreamStatsPanel = (props: {
   stats: StreamStats;
   currentTime: number;
   streamType: StreamType;
+  showCollections?: boolean;
 }) => {
   const config = () => STREAM_CONFIGS[props.streamType];
   const uptime = () => (props.stats.connectedAt ? props.currentTime - props.stats.connectedAt : 0);
@@ -56,31 +57,33 @@ export const StreamStatsPanel = (props: {
           </div>
         </div>
 
-        <div class="mt-2">
-          <div class="mb-1 text-xs text-neutral-500 dark:text-neutral-400">
-            {config().collectionsLabel}
+        <Show when={props.showCollections !== false}>
+          <div class="mt-2">
+            <div class="mb-1 text-xs text-neutral-500 dark:text-neutral-400">
+              {config().collectionsLabel}
+            </div>
+            <div class="grid min-h-22 grid-cols-[1fr_5rem_3rem] content-start gap-x-1 gap-y-0.5 font-mono text-xs sm:gap-x-4">
+              <For each={topCollections()}>
+                {([collection, count]) => {
+                  const percentage = ((count / props.stats.totalEvents) * 100).toFixed(1);
+                  return (
+                    <>
+                      <span class="min-w-0 truncate text-neutral-700 dark:text-neutral-300">
+                        {collection}
+                      </span>
+                      <span class="text-right text-neutral-600 tabular-nums dark:text-neutral-400">
+                        {count.toLocaleString()}
+                      </span>
+                      <span class="text-right text-neutral-400 tabular-nums dark:text-neutral-500">
+                        {percentage}%
+                      </span>
+                    </>
+                  );
+                }}
+              </For>
+            </div>
           </div>
-          <div class="grid min-h-22 grid-cols-[1fr_5rem_3rem] content-start gap-x-1 gap-y-0.5 font-mono text-xs sm:gap-x-4">
-            <For each={topCollections()}>
-              {([collection, count]) => {
-                const percentage = ((count / props.stats.totalEvents) * 100).toFixed(1);
-                return (
-                  <>
-                    <span class="min-w-0 truncate text-neutral-700 dark:text-neutral-300">
-                      {collection}
-                    </span>
-                    <span class="text-right text-neutral-600 tabular-nums dark:text-neutral-400">
-                      {count.toLocaleString()}
-                    </span>
-                    <span class="text-right text-neutral-400 tabular-nums dark:text-neutral-500">
-                      {percentage}%
-                    </span>
-                  </>
-                );
-              }}
-            </For>
-          </div>
-        </div>
+        </Show>
       </div>
     </Show>
   );

@@ -140,6 +140,10 @@ export const StreamView = () => {
   let totalEventsCount = 0;
   let collectionsMap: Record<string, number> = {};
 
+  const shouldShowTopCollections = () =>
+    streamType !== "jetstream" ||
+    searchParams.collections?.split(",").filter((collection) => collection.trim()).length !== 1;
+
   const addRecord = (record: any) => {
     currentSecondEventCount++;
     totalEventsCount++;
@@ -463,7 +467,12 @@ export const StreamView = () => {
                 )}
               </For>
             </div>
-            <StreamStatsPanel stats={stats()} currentTime={currentTime()} streamType={streamType} />
+            <StreamStatsPanel
+              stats={stats()}
+              currentTime={currentTime()}
+              streamType={streamType}
+              showCollections={shouldShowTopCollections()}
+            />
             <div class="flex justify-end gap-2">
               <Button
                 ontouchstart={(e) => {
