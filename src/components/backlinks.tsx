@@ -2,6 +2,7 @@ import * as TID from "@atcute/tid";
 import { A, useLocation } from "@solidjs/router";
 import { createResource, createSignal, For, onMount, Show } from "solid-js";
 import { getAllBacklinks, getRecordBacklinks, LinksWithRecords } from "../lib/api.js";
+import { useRepo } from "../lib/repo-context.jsx";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { Button } from "./button.jsx";
 import { Favicon } from "./favicon.jsx";
@@ -12,6 +13,7 @@ type BacklinksProps = {
   target: string;
   collection: string;
   path: string;
+  repoDid: string;
 };
 
 type BacklinkEntry = {
@@ -73,9 +75,12 @@ const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
     <Show when={links()} fallback={<p class="px-3 py-2 text-center text-neutral-500">Loading…</p>}>
       <For each={links()!.linking_records}>
         {({ did, collection, rkey }) => {
-          const timestamp =
-            TID.validate(rkey) ? localDateFromTimestamp(TID.parse(rkey).timestamp / 1000) : null;
           const uri = `at://${did}/${collection}/${rkey}`;
+          const rkeyIsRepo = rkey === props.repoDid;
+          const timestamp =
+            !rkeyIsRepo && TID.validate(rkey) ?
+              localDateFromTimestamp(TID.parse(rkey).timestamp / 1000)
+            : null;
           return (
             <RecordHoverCard
               uri={uri}
@@ -83,25 +88,31 @@ const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
               trigger={
                 <a
                   href={`/${uri}`}
-                  class="grid grid-cols-[auto_1fr_auto] items-center gap-x-1 px-2 py-1.5 font-mono text-xs select-none hover:bg-neutral-200/50 sm:gap-x-3 sm:px-3 dark:hover:bg-neutral-700/50"
+                  class={`grid items-center gap-x-1 px-2 py-1.5 font-mono text-xs select-none hover:bg-neutral-200/50 sm:gap-x-3 sm:px-3 dark:hover:bg-neutral-700/50 ${rkeyIsRepo ? "grid-cols-[minmax(0,1fr)_auto]" : "grid-cols-[auto_1fr_auto]"}`}
                 >
-                  <span class="text-blue-500 dark:text-blue-400">{rkey}</span>
+                  <span
+                    class={`text-blue-500 dark:text-blue-400 ${rkeyIsRepo ? "block min-w-0 truncate" : ""}`}
+                  >
+                    {rkey}
+                  </span>
                   <DidHoverCard
                     did={did}
-                    class="min-w-0"
+                    class={rkeyIsRepo ? "block" : "min-w-0"}
                     trigger={
                       <a
                         href={`/at://${did}`}
-                        class="block truncate text-neutral-700 hover:underline dark:text-neutral-300"
+                        class={`block text-neutral-700 hover:underline dark:text-neutral-300 ${rkeyIsRepo ? "" : "truncate"}`}
                         onClick={(e) => e.stopPropagation()}
                       >
                         {did}
                       </a>
                     }
                   />
-                  <span class="text-neutral-500 tabular-nums dark:text-neutral-400">
-                    {timestamp ?? ""}
-                  </span>
+                  <Show when={!rkeyIsRepo}>
+                    <span class="text-neutral-500 tabular-nums dark:text-neutral-400">
+                      {timestamp ?? ""}
+                    </span>
+                  </Show>
                 </a>
               }
             />
@@ -126,6 +137,7 @@ const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
             target={props.target}
             collection={props.collection}
             path={props.path}
+            repoDid={props.repoDid}
             cursor={links()!.cursor}
           />
         </Show>
@@ -171,6 +183,7 @@ const BacklinkCollectionDetail = (props: {
   collection: string;
   entries: BacklinkEntry[];
   pathname: string;
+  repoDid: string;
 }) => {
   const authority = () => props.collection.split(".").slice(0, 2).join(".");
 
@@ -205,6 +218,7 @@ const BacklinkCollectionDetail = (props: {
                 target={props.target}
                 collection={entry.collection}
                 path={entry.path}
+                repoDid={props.repoDid}
               />
             </div>
           </div>
@@ -215,6 +229,7 @@ const BacklinkCollectionDetail = (props: {
 };
 
 const Backlinks = (props: { target: string }) => {
+  const repo = useRepo();
   const location = useLocation();
 
   const [response] = createResource(async () => {
@@ -251,6 +266,7 @@ const Backlinks = (props: { target: string }) => {
               collection={selectedCollection()!}
               entries={selectedEntries()}
               pathname={location.pathname}
+              repoDid={repo.did()}
             />
           </Show>
         </Show>
