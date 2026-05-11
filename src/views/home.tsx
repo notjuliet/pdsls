@@ -141,7 +141,7 @@ export const Home = () => {
                 avatars[agent()!.sub] ?
                   <img
                     src={avatars[agent()!.sub].replace("img/avatar/", "img/avatar_thumbnail/")}
-                    class="size-4 shrink-0 rounded-full sm:size-5"
+                    class="size-3.75 shrink-0 rounded-full sm:size-5"
                   />
                 : "lucide--user-round"
               }
