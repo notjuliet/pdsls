@@ -6,6 +6,7 @@ import {
 } from "@atcute/did-plc";
 import { useLocation } from "@solidjs/router";
 import { createEffect, createResource, createSignal, For, onCleanup, Show } from "solid-js";
+import * as v from "valibot";
 import Tooltip from "../../components/tooltip.jsx";
 import { createOperationHistory, DiffEntry, groupBy } from "../../lib/plc-logs.js";
 import { localDateFromTimestamp } from "../../utils/date.js";
@@ -37,7 +38,7 @@ export const PlcLogView = (props: { did: string }) => {
   const fetchPlcLogs = async () => {
     const res = await fetch(`${plcDirectory()}/${props.did}/log/audit`);
     const json = await res.json();
-    const logs = defs.indexedEntryLog.parse(json);
+    const logs = v.parse(defs.indexedEntryLog, json);
     setRawLogs(logs);
     const opHistory = createOperationHistory(logs).reverse();
     return Array.from(groupBy(opHistory, (item) => item.orig));

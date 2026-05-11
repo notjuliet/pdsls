@@ -8,6 +8,7 @@ import { AtprotoDid, Did, isNsid } from "@atcute/lexicons/syntax";
 import { verifyRecord } from "@atcute/repo";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from "solid-js";
+import * as v from "valibot";
 import { agent } from "../auth/state";
 import { Backlinks } from "../components/backlinks.jsx";
 import { Button } from "../components/button.jsx";
@@ -266,7 +267,7 @@ export const RecordView = () => {
   const validateLocalSchema = async (collection: string, record: Record<string, unknown>) => {
     try {
       if (collection === "com.atproto.lexicon.schema") {
-        lexiconDoc.parse(record, { mode: "passthrough" });
+        v.safeParse(lexiconDoc, record);
         setValidSchema(true);
       } else if (collection in lexicons) {
         if (is(lexicons[collection], record)) setValidSchema(true);

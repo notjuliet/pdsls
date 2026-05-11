@@ -142,7 +142,10 @@ export const StreamView = () => {
 
   const shouldShowTopCollections = () =>
     streamType !== "jetstream" ||
-    searchParams.collections?.split(",").filter((collection) => collection.trim()).length !== 1;
+    searchParams.collections
+      ?.toString()
+      .split(",")
+      .filter((collection) => collection.trim()).length !== 1;
 
   const addRecord = (record: any) => {
     currentSecondEventCount++;
