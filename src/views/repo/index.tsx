@@ -574,7 +574,7 @@ const RepoView = () => {
         <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
           <div class="dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 border-t border-neutral-200 bg-neutral-100 px-3 pt-3 pb-6 dark:border-neutral-700">
             <div
-              class="dark:bg-dark-200 flex w-full max-w-lg cursor-text items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 dark:border-neutral-700"
+              class="dark:bg-dark-200 flex w-full max-w-lg cursor-text items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 text-sm dark:border-neutral-700"
               onClick={(e) => {
                 const input = e.currentTarget.querySelector("input");
                 if (e.target !== input) input?.focus();
@@ -587,17 +587,12 @@ const RepoView = () => {
                 spellcheck={false}
                 autocapitalize="off"
                 autocomplete="off"
-                class="grow py-2 select-none placeholder:text-sm focus:outline-none"
+                class="grow py-1.5 select-none placeholder:text-xs focus:outline-none"
                 name="filter"
                 placeholder="Filter collections..."
                 value={filter() ?? ""}
                 onInput={(e) => setFilter(e.currentTarget.value.toLowerCase())}
               />
-              <Show when={canHover && !filter()}>
-                <kbd class="rounded border border-neutral-200 bg-neutral-50 px-1.5 py-0.5 font-mono text-xs text-neutral-400 select-none dark:border-neutral-600 dark:bg-neutral-700">
-                  /
-                </kbd>
-              </Show>
             </div>
             <div class="flex w-full max-w-lg justify-end gap-1">
               <button
