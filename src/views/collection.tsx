@@ -629,7 +629,7 @@ const CollectionView = () => {
 
         {/* Fixed bottom panel */}
         <Show when={!lexicon.showSchema() && records.length > 1}>
-          <div class="dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 border-t border-neutral-200 bg-neutral-100 px-3 pt-3 pb-6 dark:border-neutral-700">
+          <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
             <div class="flex w-full max-w-lg items-center gap-2">
               {/* Filter */}
               <div
