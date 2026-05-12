@@ -90,9 +90,7 @@ export const appHandleLink: Record<App, (url: string[]) => string> = {
         return `at://${user}/sh.tangled.string`;
       }
     } else if (path.length === 2) {
-      // no way to convert the repo name to an rkey afaik
-      // same reason why there's nothing related to issues in here
-      return `at://${user}/sh.tangled.repo`;
+      return `at://${user}/sh.tangled.repo/${path[1]}`;
     }
 
     return `at://${user}`;
