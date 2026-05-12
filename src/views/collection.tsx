@@ -630,7 +630,7 @@ const CollectionView = () => {
         {/* Fixed bottom panel */}
         <Show when={!lexicon.showSchema() && records.length > 1}>
           <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
-            <div class="flex w-full max-w-lg items-center gap-2">
+            <div class="flex w-full max-w-120 items-center gap-2">
               {/* Filter */}
               <div
                 class="dark:bg-dark-200 flex min-w-0 grow cursor-text items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 text-sm dark:border-neutral-700"
@@ -659,7 +659,7 @@ const CollectionView = () => {
             </div>
 
             {/* Pagination */}
-            <div class="flex min-h-7.5 w-full max-w-lg items-center justify-between gap-2">
+            <div class="flex min-h-7.5 w-full max-w-120 items-center justify-between gap-2">
               <Button
                 onClick={() => {
                   const newReverse = !reverse();

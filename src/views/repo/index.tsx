@@ -574,7 +574,7 @@ const RepoView = () => {
         <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
           <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
             <div
-              class="dark:bg-dark-200 flex w-full max-w-lg cursor-text items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 text-sm dark:border-neutral-700"
+              class="dark:bg-dark-200 flex w-full max-w-120 cursor-text items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 text-sm dark:border-neutral-700"
               onClick={(e) => {
                 const input = e.currentTarget.querySelector("input");
                 if (e.target !== input) input?.focus();
@@ -594,7 +594,7 @@ const RepoView = () => {
                 onInput={(e) => setFilter(e.currentTarget.value.toLowerCase())}
               />
             </div>
-            <div class="flex w-full max-w-lg justify-end gap-1">
+            <div class="flex w-full max-w-120 justify-end gap-1">
               <button
                 class="rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
                 onClick={expandAll}
