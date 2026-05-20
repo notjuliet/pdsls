@@ -7,6 +7,7 @@ import { basicDark } from "@fsegurai/codemirror-theme-basic-dark";
 import { basicLight } from "@fsegurai/codemirror-theme-basic-light";
 import { basicSetup, EditorView } from "codemirror";
 import { onCleanup, onMount } from "solid-js";
+
 import { editorInstance } from "./create/state";
 
 const Editor = (props: { content: string }) => {

@@ -15,6 +15,7 @@ import {
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Portal } from "solid-js/web";
+
 import { agent } from "../auth/state";
 import { Button } from "../components/button.jsx";
 import HoverCard from "../components/hover-card/base";
@@ -86,9 +87,11 @@ const formatPreviewValue = (value: JSONType | undefined) => {
   if (value === undefined) return;
 
   const str =
-    typeof value === "string" ? JSON.stringify(value)
-    : typeof value === "number" || typeof value === "boolean" || value === null ? String(value)
-    : JSON.stringify(value);
+    typeof value === "string"
+      ? JSON.stringify(value)
+      : typeof value === "number" || typeof value === "boolean" || value === null
+        ? String(value)
+        : JSON.stringify(value);
 
   if (str.length <= PREVIEW_VALUE_MAX_LENGTH) return str;
 
@@ -304,8 +307,9 @@ const CollectionView = () => {
   const [reverse, setReverse] = createSignal(searchParams.reverse === "true");
   const previewField = () => getSearchParam(searchParams.preview);
   const limit = () => {
-    const limitParam =
-      Array.isArray(searchParams.limit) ? searchParams.limit[0] : searchParams.limit;
+    const limitParam = Array.isArray(searchParams.limit)
+      ? searchParams.limit[0]
+      : searchParams.limit;
     const paramLimit = parseInt(limitParam || "");
     return !isNaN(paramLimit) && paramLimit > 0 && paramLimit <= 100 ? paramLimit : DEFAULT_LIMIT;
   };
@@ -573,9 +577,9 @@ const CollectionView = () => {
                         <Show when={batchDelete()}>
                           <div
                             class={`select-none ${
-                              record.toDelete ?
-                                `bg-blue-200 hover:bg-blue-300/80 active:bg-blue-300 dark:bg-blue-700/30 dark:hover:bg-blue-700/50 dark:active:bg-blue-700/70 ${rounding()}`
-                              : "rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                              record.toDelete
+                                ? `bg-blue-200 hover:bg-blue-300/80 active:bg-blue-300 dark:bg-blue-700/30 dark:hover:bg-blue-700/50 dark:active:bg-blue-700/70 ${rounding()}`
+                                : "rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                             }`}
                             onclick={(e) => {
                               handleSelectionClick(e, index());

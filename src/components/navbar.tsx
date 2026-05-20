@@ -1,6 +1,7 @@
 import * as TID from "@atcute/tid";
 import { A, useParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, JSX, Match, Show, Switch } from "solid-js";
+
 import { canHover } from "../layout";
 import { didDocCache } from "../lib/api";
 import { addToClipboard } from "../utils/copy";

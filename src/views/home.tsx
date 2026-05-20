@@ -1,5 +1,6 @@
 import { A } from "@solidjs/router";
 import { JSX, Show } from "solid-js";
+
 import { agent, avatars, sessions, setOpenManager, setShowAddAccount } from "../auth/state";
 import { setShowSearch } from "../components/search";
 
@@ -30,9 +31,11 @@ const CardContent = (props: {
 }) => (
   <>
     <span class="flex min-w-0 items-center gap-1.5 text-xs sm:text-base">
-      {typeof props.icon === "string" ?
+      {typeof props.icon === "string" ? (
         <span class={`${props.icon} iconify shrink-0 ${accentIcon[props.accent]}`} />
-      : props.icon}
+      ) : (
+        props.icon
+      )}
       <span class="truncate font-medium">{props.title}</span>
     </span>
     <span class="text-xs text-neutral-500 sm:text-sm dark:text-neutral-400">
@@ -138,12 +141,14 @@ export const Home = () => {
             <LinkCard
               href={`/at://${agent()!.sub}`}
               icon={
-                avatars[agent()!.sub] ?
+                avatars[agent()!.sub] ? (
                   <img
                     src={avatars[agent()!.sub].replace("img/avatar/", "img/avatar_thumbnail/")}
                     class="size-3.75 shrink-0 rounded-full sm:size-5"
                   />
-                : "lucide--user-round"
+                ) : (
+                  "lucide--user-round"
+                )
               }
               title={sessions[agent()!.sub]?.handle ?? agent()!.sub}
               description="View your repository"

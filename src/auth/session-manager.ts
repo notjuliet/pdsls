@@ -6,6 +6,7 @@ import {
   OAuthUserAgent,
   type Session,
 } from "@atcute/oauth-browser-client";
+
 import { resolveDidDoc } from "../lib/api";
 import { Sessions, setAgent, setSessions } from "./state";
 

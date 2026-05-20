@@ -1,5 +1,6 @@
 import { A, RouteSectionProps, useIsRouting, useLocation, useNavigate } from "@solidjs/router";
 import { createEffect, ErrorBoundary, on, onCleanup, onMount, Show, Suspense } from "solid-js";
+
 import { AccountManager } from "./auth/account.jsx";
 import { agent } from "./auth/state.js";
 import { RecordEditor } from "./components/create";
@@ -118,9 +119,9 @@ const Layout = (props: RouteSectionProps<unknown>) => {
         class={`dark:shadow-dark-700 mb-3 flex h-13 w-full items-center justify-between rounded-xl border-[0.5px] border-neutral-300 bg-neutral-50 bg-size-[95%] bg-right bg-no-repeat p-2 pl-3 shadow-xs [--header-bg:#fafafa] [--trans-blue:#5BCEFA90] [--trans-pink:#F5A9B890] [--trans-white:#FFFFFF90] dark:border-neutral-700 dark:bg-neutral-800 dark:[--header-bg:#262626] dark:[--trans-blue:#5BCEFAa0] dark:[--trans-pink:#F5A9B8a0] dark:[--trans-white:#FFFFFFa0] ${localStorage.getItem("hrt") === "true" ? "bg-[linear-gradient(to_left,transparent_10%,var(--header-bg)_85%),linear-gradient(to_bottom,var(--trans-blue)_0%,var(--trans-blue)_20%,var(--trans-pink)_20%,var(--trans-pink)_40%,var(--trans-white)_40%,var(--trans-white)_60%,var(--trans-pink)_60%,var(--trans-pink)_80%,var(--trans-blue)_80%,var(--trans-blue)_100%)]" : ""}`}
         style={{
           "background-image":
-            props.params.repo && props.params.repo in headers ?
-              `linear-gradient(to left, transparent 20%, var(--header-bg) 85%), url(/headers/${headers[props.params.repo]})`
-            : undefined,
+            props.params.repo && props.params.repo in headers
+              ? `linear-gradient(to left, transparent 20%, var(--header-bg) 85%), url(/headers/${headers[props.params.repo]})`
+              : undefined,
         }}
       >
         <A

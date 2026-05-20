@@ -1,4 +1,5 @@
 import { ImageResponse } from "@takumi-rs/image-response/wasm";
+
 import wasmModule from "./takumi_wasm_bg.wasm";
 
 // Minimal createElement helper — avoids pulling in React
@@ -8,10 +9,7 @@ function h(type, props, ...children) {
     type,
     props: {
       ...props,
-      children:
-        flat.length === 0 ? undefined
-        : flat.length === 1 ? flat[0]
-        : flat,
+      children: flat.length === 0 ? undefined : flat.length === 1 ? flat[0] : flat,
     },
   };
 }
@@ -82,18 +80,16 @@ function truncateToWidth(str, maxWidth) {
   for (; i < chars.length; i++) {
     const cp = chars[i].codePointAt(0);
     const cw =
-      (
-        (cp >= 0x1100 && cp <= 0x115f) ||
-        (cp >= 0x2e80 && cp <= 0x9fff) ||
-        (cp >= 0xac00 && cp <= 0xd7af) ||
-        (cp >= 0xf900 && cp <= 0xfaff) ||
-        (cp >= 0xfe10 && cp <= 0xfe6f) ||
-        (cp >= 0xff01 && cp <= 0xff60) ||
-        (cp >= 0xffe0 && cp <= 0xffe6) ||
-        (cp >= 0x20000 && cp <= 0x2fa1f)
-      ) ?
-        2
-      : 1;
+      (cp >= 0x1100 && cp <= 0x115f) ||
+      (cp >= 0x2e80 && cp <= 0x9fff) ||
+      (cp >= 0xac00 && cp <= 0xd7af) ||
+      (cp >= 0xf900 && cp <= 0xfaff) ||
+      (cp >= 0xfe10 && cp <= 0xfe6f) ||
+      (cp >= 0xff01 && cp <= 0xff60) ||
+      (cp >= 0xffe0 && cp <= 0xffe6) ||
+      (cp >= 0x20000 && cp <= 0x2fa1f)
+        ? 2
+        : 1;
     if (w + cw > maxWidth) break;
     w += cw;
   }
@@ -460,9 +456,8 @@ class HeadEndRewriter {
     const d = esc(this.ogData.description);
     const i = this.imageUrl ? esc(this.imageUrl) : null;
 
-    const imageTags =
-      i ?
-        `\n  <meta property="og:image" content="${i}" />
+    const imageTags = i
+      ? `\n  <meta property="og:image" content="${i}" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="${i}" />`
       : `\n  <meta name="twitter:card" content="summary" />`;
@@ -661,9 +656,8 @@ export default {
       return env.ASSETS.fetch(request);
     }
 
-    const imageUrl =
-      ogData.generateImage ?
-        `${url.origin}/og-image?` +
+    const imageUrl = ogData.generateImage
+      ? `${url.origin}/og-image?` +
         new URLSearchParams({ did: ogData.did, collection: ogData.collection, rkey: ogData.rkey })
       : null;
 

@@ -8,21 +8,9 @@
     "dev": "vite",
     "prebuild": "node scripts/generate-metadata.js",
     "build": "vite build && node scripts/build-worker.js",
-    "serve": "vite preview"
-  },
-  "devDependencies": {
-    "@iconify-json/lucide": "^1.2.106",
-    "@iconify/tailwind4": "^1.2.3",
-    "@tailwindcss/vite": "^4.3.0",
-    "@types/node": "^25.7.0",
-    "esbuild": "^0.28.0",
-    "prettier": "^3.8.3",
-    "prettier-plugin-organize-imports": "^4.3.0",
-    "prettier-plugin-tailwindcss": "^0.8.0",
-    "tailwindcss": "^4.3.0",
-    "typescript": "^6.0.3",
-    "vite": "^8.0.12",
-    "vite-plugin-solid": "^2.11.12"
+    "serve": "vite preview",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
   },
   "dependencies": {
     "@atcute/atproto": "^4.0.0",
@@ -59,6 +47,18 @@
     "codemirror": "^6.0.2",
     "solid-js": "^1.9.12",
     "valibot": "^1.4.0"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.106",
+    "@iconify/tailwind4": "^1.2.3",
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/node": "^25.7.0",
+    "esbuild": "^0.28.0",
+    "oxfmt": "^0.51.0",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.12",
+    "vite-plugin-solid": "^2.11.12"
   },
   "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be"
 }

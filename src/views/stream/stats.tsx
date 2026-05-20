@@ -1,4 +1,5 @@
 import { For, Show } from "solid-js";
+
 import { STREAM_CONFIGS, StreamType } from "./config";
 
 const TOP_COLLECTION_LIMIT = 5;

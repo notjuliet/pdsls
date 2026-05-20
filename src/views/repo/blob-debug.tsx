@@ -11,6 +11,7 @@ import {
   Show,
   Switch,
 } from "solid-js";
+
 import { Button } from "../../components/button.jsx";
 import { Spinner } from "../../components/spinner.jsx";
 import VideoPlayer from "../../components/video-player.jsx";
@@ -89,9 +90,9 @@ export const BlobDebugView = () => {
       const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
       const parsed = parsedCid();
       const expected =
-        parsed.ok && parsed.cid.digest.codec === CID.HASH_SHA256 ?
-          parsed.cid.digest.contents
-        : new Uint8Array();
+        parsed.ok && parsed.cid.digest.codec === CID.HASH_SHA256
+          ? parsed.cid.digest.contents
+          : new Uint8Array();
       const matches =
         expected.length === digest.length && digest.every((b, i) => b === expected[i]);
 
@@ -128,10 +129,13 @@ export const BlobDebugView = () => {
   });
 
   const previewKind = (mime: string) =>
-    mime.startsWith("image/") ? "image"
-    : mime === "video/mp4" ? "video"
-    : mime.startsWith("audio/") ? "audio"
-    : "none";
+    mime.startsWith("image/")
+      ? "image"
+      : mime === "video/mp4"
+        ? "video"
+        : mime.startsWith("audio/")
+          ? "audio"
+          : "none";
 
   const unsupportedHash = () => {
     const p = parsedCid();
@@ -248,11 +252,11 @@ export const BlobDebugView = () => {
                           }}
                         />
                         <span>
-                          {unsupported !== undefined ?
-                            "Unsupported"
-                          : b().matches ?
-                            "Valid"
-                          : "Mismatch"}
+                          {unsupported !== undefined
+                            ? "Unsupported"
+                            : b().matches
+                              ? "Valid"
+                              : "Mismatch"}
                         </span>
                       </span>
                       <Show when={unsupported === undefined && !b().matches}>

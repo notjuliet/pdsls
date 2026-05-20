@@ -1,6 +1,7 @@
 import { Firehose } from "@skyware/firehose";
 import { A, useLocation, useSearchParams } from "@solidjs/router";
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
+
 import { Button } from "../../components/button";
 import DidHoverCard from "../../components/hover-card/did";
 import { JSONValue } from "../../components/json";
@@ -59,9 +60,11 @@ const StreamRecordItem = (props: { record: any; streamType: StreamType }) => {
           class="dark:hover:bg-dark-200 flex min-w-0 flex-1 items-start gap-2 rounded p-1 text-left hover:bg-neutral-200/70"
         >
           <span class="mt-0.5 shrink-0 text-neutral-400 dark:text-neutral-500">
-            {expanded() ?
+            {expanded() ? (
               <span class="iconify lucide--chevron-down"></span>
-            : <span class="iconify lucide--chevron-right"></span>}
+            ) : (
+              <span class="iconify lucide--chevron-right"></span>
+            )}
           </span>
           <div class="flex min-w-0 flex-1 flex-col gap-0.5">
             <div class="flex items-center gap-x-1.5 sm:gap-x-2">

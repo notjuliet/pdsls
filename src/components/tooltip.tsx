@@ -1,4 +1,5 @@
 import { JSX, Show } from "solid-js";
+
 import { canHover } from "../layout";
 
 const Tooltip = (props: { text: string; shortcut?: string; children: JSX.Element }) => (

@@ -9,6 +9,7 @@ import { verifyRecord } from "@atcute/repo";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from "solid-js";
 import * as v from "valibot";
+
 import { agent } from "../auth/state";
 import { Backlinks } from "../components/backlinks.jsx";
 import { Button } from "../components/button.jsx";
@@ -459,9 +460,12 @@ export const RecordView = () => {
                 <Show when={externalLink()}>
                   {(link) => {
                     const bskyAlts = () =>
-                      link().link.startsWith("https://bsky.app") ?
-                        bskyAltClients.map((alt) => ({ ...alt, link: alt.transform(link().link) }))
-                      : [];
+                      link().link.startsWith("https://bsky.app")
+                        ? bskyAltClients.map((alt) => ({
+                            ...alt,
+                            link: alt.transform(link().link),
+                          }))
+                        : [];
                     return (
                       <div
                         class="relative"
@@ -498,9 +502,11 @@ export const RecordView = () => {
                                   title={`Open on ${alt.label}`}
                                   class="flex p-1.5 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                                 >
-                                  {alt.icon ?
+                                  {alt.icon ? (
                                     <img src={alt.icon} class="size-4" />
-                                  : <Favicon domain={alt.hostname} wrapper={faviconWrapper} />}
+                                  ) : (
+                                    <Favicon domain={alt.hostname} wrapper={faviconWrapper} />
+                                  )}
                                 </a>
                               )}
                             </For>
@@ -554,9 +560,9 @@ export const RecordView = () => {
                 loading={lexicon.loading()}
                 error={lexicon.error()}
                 fallbackSchema={
-                  params.collection === "com.atproto.lexicon.schema" ?
-                    (record()?.value as any)
-                  : undefined
+                  params.collection === "com.atproto.lexicon.schema"
+                    ? (record()?.value as any)
+                    : undefined
                 }
               />
             </Show>

@@ -7,6 +7,7 @@ import {
 import { useLocation } from "@solidjs/router";
 import { createEffect, createResource, createSignal, For, onCleanup, Show } from "solid-js";
 import * as v from "valibot";
+
 import Tooltip from "../../components/tooltip.jsx";
 import { createOperationHistory, DiffEntry, groupBy } from "../../lib/plc-logs.js";
 import { localDateFromTimestamp } from "../../utils/date.js";

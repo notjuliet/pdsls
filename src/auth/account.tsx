@@ -3,6 +3,7 @@ import { deleteStoredSession, getSession, OAuthUserAgent } from "@atcute/oauth-b
 import { A } from "@solidjs/router";
 import { createEffect, For, onMount, Show } from "solid-js";
 import { produce } from "solid-js/store";
+
 import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../components/dropdown.jsx";
 import { Modal } from "../components/modal.jsx";
 import { Login } from "./login.jsx";
@@ -200,9 +201,11 @@ export const AccountManager = () => {
         onclick={() => setOpenManager(true)}
         class={`flex items-center rounded-md ${agent() && avatars[agent()!.sub] ? "p-1.25" : "p-1.5"} hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700`}
       >
-        {agent() && avatars[agent()!.sub] ?
+        {agent() && avatars[agent()!.sub] ? (
           <img src={getThumbnailUrl(avatars[agent()!.sub])} class="size-5 rounded-full" />
-        : <span class="iconify lucide--circle-user-round text-lg"></span>}
+        ) : (
+          <span class="iconify lucide--circle-user-round text-lg"></span>
+        )}
       </button>
     </>
   );

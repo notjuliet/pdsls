@@ -46,9 +46,9 @@ export const useOAuthScopeFlow = (options: UseOAuthScopeFlowOptions = {}) => {
       const authUrl = await createAuthorizationUrl({
         scope: scopeString,
         target:
-          isHandle(account) || isDid(account) ?
-            { type: "account", identifier: account }
-          : { type: "pds", serviceUrl: account },
+          isHandle(account) || isDid(account)
+            ? { type: "account", identifier: account }
+            : { type: "pds", serviceUrl: account },
       });
 
       await new Promise((resolve) => setTimeout(resolve, 250));

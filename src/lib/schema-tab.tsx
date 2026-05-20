@@ -3,6 +3,7 @@ import { Nsid } from "@atcute/lexicons";
 import { AtprotoDid } from "@atcute/lexicons/syntax";
 import { useLocation } from "@solidjs/router";
 import { createEffect, createSignal, ErrorBoundary, Show } from "solid-js";
+
 import { LexiconSchemaView } from "../components/lexicon-schema.jsx";
 import { resolveLexiconAuthority, resolveLexiconSchema } from "./api.js";
 

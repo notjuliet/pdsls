@@ -18,6 +18,7 @@ import { Did, Handle } from "@atcute/lexicons";
 import { AtprotoDid, isHandle, Nsid } from "@atcute/lexicons/syntax";
 import { createMemo } from "solid-js";
 import { createStore } from "solid-js/store";
+
 import { plcDirectory } from "../views/settings";
 
 const proxyFetch = (rewrite: (url: URL) => string): typeof fetch => {
@@ -27,9 +28,7 @@ const proxyFetch = (rewrite: (url: URL) => string): typeof fetch => {
     } catch (err) {
       if (init?.signal?.aborted) throw err;
       const url = new URL(
-        typeof input === "string" ? input
-        : input instanceof URL ? input.href
-        : input.url,
+        typeof input === "string" ? input : input instanceof URL ? input.href : input.url,
       );
       return fetch(rewrite(url));
     }

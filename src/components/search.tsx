@@ -10,6 +10,7 @@ import {
   onMount,
   Show,
 } from "solid-js";
+
 import { canHover } from "../layout";
 import { resolveLexiconAuthority, resolveLexiconAuthorityDirect } from "../lib/api";
 import { appHandleLink, appList, AppUrl } from "../lib/app-urls";
@@ -335,9 +336,9 @@ export const Search = () => {
               } else if (e.key === "ArrowUp") {
                 e.preventDefault();
                 setSelectedIndex((prev) =>
-                  prev === -1 ?
-                    totalSuggestions - 1
-                  : (prev - 1 + totalSuggestions) % totalSuggestions,
+                  prev === -1
+                    ? totalSuggestions - 1
+                    : (prev - 1 + totalSuggestions) % totalSuggestions,
                 );
               } else if (e.key === "Enter") {
                 const index = selectedIndex();
@@ -426,18 +427,23 @@ export const Search = () => {
               <For each={getRecentSuggestions()}>
                 {(recent, index) => {
                   const icon =
-                    recent.type === "handle" ? "lucide--at-sign"
-                    : recent.type === "did" ? "lucide--user-round"
-                    : recent.type === "at-uri" ? "lucide--link"
-                    : recent.type === "lexicon" ? "lucide--book-open"
-                    : recent.type === "pds" ? "lucide--hard-drive"
-                    : "lucide--globe";
+                    recent.type === "handle"
+                      ? "lucide--at-sign"
+                      : recent.type === "did"
+                        ? "lucide--user-round"
+                        : recent.type === "at-uri"
+                          ? "lucide--link"
+                          : recent.type === "lexicon"
+                            ? "lucide--book-open"
+                            : recent.type === "pds"
+                              ? "lucide--hard-drive"
+                              : "lucide--globe";
                   return (
                     <div
                       class={`group flex items-center ${
-                        index() === selectedIndex() ?
-                          "bg-neutral-200 dark:bg-neutral-700"
-                        : "dark:hover:bg-dark-100 hover:bg-neutral-100"
+                        index() === selectedIndex()
+                          ? "bg-neutral-200 dark:bg-neutral-700"
+                          : "dark:hover:bg-dark-100 hover:bg-neutral-100"
                       }`}
                     >
                       <A
@@ -478,9 +484,9 @@ export const Search = () => {
                 return (
                   <A
                     class={`flex items-center gap-2 px-3 py-1.5 ${
-                      adjustedIndex === selectedIndex() ?
-                        "bg-neutral-200 dark:bg-neutral-700"
-                      : "dark:hover:bg-dark-100 hover:bg-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-700"
+                      adjustedIndex === selectedIndex()
+                        ? "bg-neutral-200 dark:bg-neutral-700"
+                        : "dark:hover:bg-dark-100 hover:bg-neutral-100 active:bg-neutral-200 dark:active:bg-neutral-700"
                     }`}
                     href={path}
                     onClick={() => {

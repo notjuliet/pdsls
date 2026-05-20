@@ -38,7 +38,9 @@ export const Favicon = (props: {
     </Switch>
   );
 
-  return props.wrapper ?
-      props.wrapper(content)
-    : <div class="flex h-5 w-4 shrink-0 items-center justify-center">{content}</div>;
+  return props.wrapper ? (
+    props.wrapper(content)
+  ) : (
+    <div class="flex h-5 w-4 shrink-0 items-center justify-center">{content}</div>
+  );
 };

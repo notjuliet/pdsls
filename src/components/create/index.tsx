@@ -13,6 +13,7 @@ import {
   Show,
   Suspense,
 } from "solid-js";
+
 import { hasUserScope } from "../../auth/scope-utils";
 import { agent, sessions } from "../../auth/state";
 import { Button } from "../button.jsx";
@@ -334,9 +335,7 @@ export const RecordEditor = (props: {
             >
               <Editor
                 content={JSON.stringify(
-                  !props.create ? props.record
-                  : params.rkey ? placeholder()
-                  : defaultPlaceholder(),
+                  !props.create ? props.record : params.rkey ? placeholder() : defaultPlaceholder(),
                   null,
                   2,
                 )}
@@ -368,9 +367,9 @@ export const RecordEditor = (props: {
                     <button
                       type="button"
                       class={
-                        hasUserScope("blob") ?
-                          "flex items-center gap-2 rounded-md p-2 text-left text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                        : "flex items-center gap-2 rounded-md p-2 text-left text-xs opacity-40"
+                        hasUserScope("blob")
+                          ? "flex items-center gap-2 rounded-md p-2 text-left text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                          : "flex items-center gap-2 rounded-md p-2 text-left text-xs opacity-40"
                       }
                       onClick={() => {
                         if (hasUserScope("blob")) {
@@ -460,25 +459,19 @@ export const RecordEditor = (props: {
       </Show>
       <Tooltip
         text={
-          hasPermission() ?
-            props.create ?
-              "Create record"
-            : "Edit record"
-          : `${props.create ? "Create record" : "Edit record"} (permission required)`
+          hasPermission()
+            ? props.create
+              ? "Create record"
+              : "Edit record"
+            : `${props.create ? "Create record" : "Edit record"} (permission required)`
         }
-        shortcut={
-          hasPermission() ?
-            props.create ?
-              "N"
-            : "E"
-          : undefined
-        }
+        shortcut={hasPermission() ? (props.create ? "N" : "E") : undefined}
       >
         <button
           class={
-            hasPermission() ?
-              `flex items-center p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700 ${props.create ? "rounded-md" : "rounded-sm"}`
-            : `flex items-center p-1.5 opacity-40 ${props.create ? "rounded-md" : "rounded-sm"}`
+            hasPermission()
+              ? `flex items-center p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700 ${props.create ? "rounded-md" : "rounded-sm"}`
+              : `flex items-center p-1.5 opacity-40 ${props.create ? "rounded-md" : "rounded-sm"}`
           }
           onclick={() => {
             if (hasPermission()) {

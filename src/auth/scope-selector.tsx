@@ -1,4 +1,5 @@
 import { createSignal, For } from "solid-js";
+
 import { buildScopeString, GRANULAR_SCOPES, scopeIdsToString } from "./scope-utils";
 
 interface ScopeSelectorProps {

@@ -8,9 +8,11 @@ export const themeEvent = () => {
 
 export const ThemeSelection = () => {
   const [theme, setTheme] = createSignal(
-    localStorage.getItem("theme") === null ? "auto"
-    : localStorage.theme === "dark" ? "dark"
-    : "light",
+    localStorage.getItem("theme") === null
+      ? "auto"
+      : localStorage.theme === "dark"
+        ? "dark"
+        : "light",
   );
 
   const updateTheme = (newTheme: string) => {

@@ -1,6 +1,7 @@
 import { Client } from "@atcute/client";
 import { remove } from "@mary/exif-rm";
 import { createSignal, onCleanup, Show } from "solid-js";
+
 import { agent } from "../../auth/state";
 import { formatFileSize } from "../../utils/format";
 import { Button } from "../button.jsx";

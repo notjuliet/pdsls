@@ -10,6 +10,7 @@ import {
   Show,
   useContext,
 } from "solid-js";
+
 import { resolveLexiconAuthority } from "../lib/api";
 import { formatFileSize } from "../utils/format";
 import { hideMedia } from "../views/settings";
@@ -88,11 +89,11 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
       <For each={displayData().split(/(\s)/)}>
         {(part) => (
           <>
-            {isResourceUri(part) ?
+            {isResourceUri(part) ? (
               <RecordHoverCard uri={part} newTab={ctx.newTab} />
-            : isDid(part) ?
+            ) : isDid(part) ? (
               <DidHoverCard did={part} newTab={ctx.newTab} />
-            : isNsid(part.split("#")[0]) && props.isType ?
+            ) : isNsid(part.split("#")[0]) && props.isType ? (
               <button
                 type="button"
                 onClick={() => handleClick(part)}
@@ -100,7 +101,7 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
               >
                 {part}
               </button>
-            : isCid(part) && props.isLink && ctx.parentIsBlob && params.repo ?
+            ) : isCid(part) && props.isLink && ctx.parentIsBlob && params.repo ? (
               <A
                 class="text-blue-500 hover:underline active:underline dark:text-blue-400"
                 href={`/at://${params.repo}/blob/${part}`}
@@ -108,11 +109,9 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
               >
                 {part}
               </A>
-            : (
-              isURL(part) &&
+            ) : isURL(part) &&
               ["http:", "https:", "web+at:"].includes(new URL(part).protocol) &&
-              part.split("\n").length === 1
-            ) ?
+              part.split("\n").length === 1 ? (
               <a
                 class="underline hover:text-blue-500 dark:hover:text-blue-400"
                 href={part}
@@ -121,7 +120,9 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
               >
                 {part}
               </a>
-            : part}
+            ) : (
+              part
+            )}
           </>
         )}
       </For>
@@ -163,9 +164,9 @@ const CollapsibleItem = (props: {
   const location = useLocation();
   const isObject = () => props.value === Object(props.value);
   const isEmpty = () =>
-    Array.isArray(props.value) ?
-      (props.value as JSONType[]).length === 0
-    : Object.keys(props.value as object).length === 0;
+    Array.isArray(props.value)
+      ? (props.value as JSONType[]).length === 0
+      : Object.keys(props.value as object).length === 0;
   const [show, setShow] = createSignal(!(ctx.preview && isObject() && !isEmpty()));
   const isBlobContext = props.parentIsBlob ?? ctx.parentIsBlob;
 

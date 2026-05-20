@@ -2,6 +2,7 @@ import { Nsid } from "@atcute/lexicons";
 import { AtprotoDid } from "@atcute/lexicons/syntax";
 import { A, useLocation, useNavigate } from "@solidjs/router";
 import { createEffect, For, Show } from "solid-js";
+
 import { resolveLexiconAuthority } from "../lib/api.js";
 import Tooltip from "./tooltip.jsx";
 
@@ -136,10 +137,11 @@ interface LexiconProperty {
 
 const TypeBadge = (props: { type: string; format?: string; refType?: string }) => {
   const navigate = useNavigate();
-  const displayType =
-    props.refType ? props.refType.replace(/^#/, "")
-    : props.format ? `${props.type}:${props.format}`
-    : props.type;
+  const displayType = props.refType
+    ? props.refType.replace(/^#/, "")
+    : props.format
+      ? `${props.type}:${props.format}`
+      : props.type;
 
   const isLocalRef = () => props.refType?.startsWith("#");
   const isExternalRef = () => props.refType && !props.refType.startsWith("#");

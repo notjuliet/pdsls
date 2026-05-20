@@ -4,6 +4,7 @@ import { isAtprotoDid } from "@atcute/identity";
 import { Handle } from "@atcute/lexicons";
 import { useSearchParams } from "@solidjs/router";
 import { createMemo, createSignal, For, onMount, Show } from "solid-js";
+
 import { Button } from "../components/button.jsx";
 import DidHoverCard from "../components/hover-card/did.jsx";
 import RecordHoverCard from "../components/hover-card/record.jsx";

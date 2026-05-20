@@ -1,6 +1,7 @@
 import * as TID from "@atcute/tid";
 import { A, useLocation } from "@solidjs/router";
 import { createResource, createSignal, For, onMount, Show } from "solid-js";
+
 import { getAllBacklinks, getRecordBacklinks, LinksWithRecords } from "../lib/api.js";
 import { useRepo } from "../lib/repo-context.jsx";
 import { localDateFromTimestamp } from "../utils/date.js";
@@ -78,9 +79,9 @@ const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
           const uri = `at://${did}/${collection}/${rkey}`;
           const rkeyIsRepo = rkey === props.repoDid;
           const timestamp =
-            !rkeyIsRepo && TID.validate(rkey) ?
-              localDateFromTimestamp(TID.parse(rkey).timestamp / 1000)
-            : null;
+            !rkeyIsRepo && TID.validate(rkey)
+              ? localDateFromTimestamp(TID.parse(rkey).timestamp / 1000)
+              : null;
           return (
             <RecordHoverCard
               uri={uri}

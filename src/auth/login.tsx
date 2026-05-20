@@ -1,4 +1,5 @@
 import { createSignal, Show } from "solid-js";
+
 import "./oauth-config";
 import { useOAuthScopeFlow } from "./scope-flow";
 import { ScopeSelector } from "./scope-selector";

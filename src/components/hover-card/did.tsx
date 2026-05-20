@@ -1,5 +1,6 @@
 import { getPdsEndpoint, type DidDocument } from "@atcute/identity";
 import { createSignal, Show } from "solid-js";
+
 import { resolveDidDoc } from "../../lib/api";
 import HoverCard from "./base";
 

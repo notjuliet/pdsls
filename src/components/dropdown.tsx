@@ -11,6 +11,7 @@ import {
   useContext,
 } from "solid-js";
 import { Portal } from "solid-js/web";
+
 import { addToClipboard } from "../utils/copy";
 
 const MenuContext = createContext<{

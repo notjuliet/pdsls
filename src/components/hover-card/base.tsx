@@ -1,6 +1,7 @@
 import { A } from "@solidjs/router";
 import { createSignal, JSX, onCleanup, Show } from "solid-js";
 import { Portal } from "solid-js/web";
+
 import { canHover } from "../../layout";
 
 interface HoverCardProps {

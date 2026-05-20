@@ -10,6 +10,7 @@ import {
   useParams,
 } from "@solidjs/router";
 import { createEffect, createResource, createSignal, For, onMount, Show } from "solid-js";
+
 import { Backlinks } from "../../components/backlinks.jsx";
 import {
   ActionMenu,
@@ -396,9 +397,11 @@ const RepoView = () => {
                 <div class="flex items-center gap-1 rounded-md border border-red-500 px-1.5 py-0.5 text-xs font-medium text-red-500 sm:text-sm dark:border-red-400 dark:text-red-400">
                   <span
                     class={`iconify ${
-                      error() === "Deactivated" ? "lucide--user-round-x"
-                      : error() === "Taken down" ? "lucide--shield-ban"
-                      : "lucide--unplug"
+                      error() === "Deactivated"
+                        ? "lucide--user-round-x"
+                        : error() === "Taken down"
+                          ? "lucide--shield-ban"
+                          : "lucide--unplug"
                     }`}
                   ></span>
                   <span>{error()}</span>
@@ -430,9 +433,9 @@ const RepoView = () => {
                   <MenuSeparator />
                   <NavMenu
                     href={
-                      did.startsWith("did:plc") ?
-                        `${plcDirectory()}/${did}`
-                      : `https://${did.split("did:web:")[1]}/.well-known/did.json`
+                      did.startsWith("did:plc")
+                        ? `${plcDirectory()}/${did}`
+                        : `https://${did.split("did:web:")[1]}/.well-known/did.json`
                     }
                     newTab
                     label="DID document"
@@ -474,12 +477,12 @@ const RepoView = () => {
                 >
                   <For
                     each={Object.keys(nsids() ?? {}).filter((authority) =>
-                      filter() ?
-                        authority.includes(filter()!) ||
-                        nsids()?.[authority].nsids.some((nsid) =>
-                          `${authority}.${nsid}`.includes(filter()!),
-                        )
-                      : true,
+                      filter()
+                        ? authority.includes(filter()!) ||
+                          nsids()?.[authority].nsids.some((nsid) =>
+                            `${authority}.${nsid}`.includes(filter()!),
+                          )
+                        : true,
                     )}
                   >
                     {(authority) => {

@@ -1,7 +1,9 @@
 /* @refresh reload */
 import { Route, Router } from "@solidjs/router";
 import { render } from "solid-js/web";
+
 import { Layout } from "./layout.tsx";
+
 import "./styles/index.css";
 import { CarView } from "./views/car/explore.tsx";
 import { CollectionLayout } from "./views/collection.tsx";

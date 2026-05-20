@@ -1,7 +1,8 @@
-import { build } from "esbuild";
 import { copyFileSync } from "fs";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
+
+import { build } from "esbuild";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const wasmSrc = resolve(__dirname, "../node_modules/@takumi-rs/wasm/pkg/takumi_wasm_bg.wasm");

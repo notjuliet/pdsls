@@ -5,6 +5,7 @@ import * as TID from "@atcute/tid";
 import { A, type RouteSectionProps, useLocation, useParams } from "@solidjs/router";
 import { createWindowVirtualizer } from "@tanstack/solid-virtual";
 import { createEffect, createResource, createSignal, For, on, onCleanup, Show } from "solid-js";
+
 import { Button } from "../components/button";
 import { setPDS } from "../components/navbar";
 import { NestedLayout } from "../components/nested-layout.jsx";
@@ -129,9 +130,11 @@ const RepoCard = (props: {
               <span class="flex shrink-0 items-center gap-1 text-red-500 dark:text-red-400">
                 <span
                   class={`iconify ${
-                    props.repo.status === "deactivated" ? "lucide--user-round-x"
-                    : props.repo.status === "takendown" ? "lucide--shield-ban"
-                    : "lucide--unplug"
+                    props.repo.status === "deactivated"
+                      ? "lucide--user-round-x"
+                      : props.repo.status === "takendown"
+                        ? "lucide--shield-ban"
+                        : "lucide--unplug"
                   }`}
                 ></span>
                 {props.repo.status ?? "inactive"}
@@ -206,8 +209,9 @@ const PdsView = () => {
   const hidden = () => !!params.repo;
   const location = useLocation();
   if (params.pds !== "at:") setPDS(params.pds);
-  const pds =
-    params.pds!.startsWith("localhost") ? `http://${params.pds}` : `https://${params.pds}`;
+  const pds = params.pds!.startsWith("localhost")
+    ? `http://${params.pds}`
+    : `https://${params.pds}`;
   const rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
   const cached = pdsCache?.pds === pds ? pdsCache : undefined;
   const [version, setVersion] = createSignal<string | undefined>(cached?.version);
@@ -307,9 +311,9 @@ const PdsView = () => {
           (!location.hash && props.tab !== "repos"),
       }}
       href={
-        props.tab === "firehose" ?
-          `/firehose?instance=wss://${params.pds}`
-        : `/${params.pds}#${props.tab}`
+        props.tab === "firehose"
+          ? `/firehose?instance=wss://${params.pds}`
+          : `/${params.pds}#${props.tab}`
       }
     >
       {props.label}
@@ -413,9 +417,8 @@ const PdsView = () => {
                         { label: "Terms of Service", url: server().links?.termsOfService },
                         {
                           label: "Contact",
-                          url:
-                            server().contact?.email ?
-                              `mailto:${server().contact?.email}`
+                          url: server().contact?.email
+                            ? `mailto:${server().contact?.email}`
                             : undefined,
                           display: server().contact?.email,
                         },

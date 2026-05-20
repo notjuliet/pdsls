@@ -1,4 +1,5 @@
 import { For, Show } from "solid-js";
+
 import { hasUserScope } from "../../auth/scope-utils";
 import { Button } from "../button.jsx";
 

@@ -1,4 +1,5 @@
 import { createEffect, createSignal } from "solid-js";
+
 import { GRANULAR_SCOPES } from "../auth/scope-utils";
 import { agent, setOpenManager, setPendingPermissionEdit } from "../auth/state";
 import { Button } from "./button";

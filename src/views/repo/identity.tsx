@@ -2,6 +2,7 @@ import { DidDocument } from "@atcute/identity";
 import { Did, Handle } from "@atcute/lexicons";
 import { createSignal, For, Show } from "solid-js";
 import { createStore } from "solid-js/store";
+
 import { canHover } from "../../layout.jsx";
 import { type HandleResolveResult, resolveHandleDetailed, validateHandle } from "../../lib/api.js";
 import { detectDidKeyType, detectKeyType } from "../../lib/key.js";
