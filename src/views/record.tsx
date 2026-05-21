@@ -55,16 +55,6 @@ const bskyAltClients = [
     hostname: "reddwarf.app",
     transform: (url: string) => url.replace("https://bsky.app", "https://reddwarf.app"),
   },
-  {
-    label: "Anartia",
-    hostname: "kelinci.net",
-    icon: "https://kelinci.net/rabbit.svg",
-    transform: (url: string) =>
-      url
-        .replace("https://bsky.app/profile", "https://anartia.kelinci.net")
-        .replace("/post/", "/")
-        .replace("/feed/", "/feeds/"),
-  },
 ];
 
 const authorityCache = new Map<string, Promise<AtprotoDid>>();
@@ -502,11 +492,7 @@ export const RecordView = () => {
                                   title={`Open on ${alt.label}`}
                                   class="flex p-1.5 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                                 >
-                                  {alt.icon ? (
-                                    <img src={alt.icon} class="size-4" />
-                                  ) : (
-                                    <Favicon domain={alt.hostname} wrapper={faviconWrapper} />
-                                  )}
+                                  <Favicon domain={alt.hostname} wrapper={faviconWrapper} />
                                 </a>
                               )}
                             </For>
