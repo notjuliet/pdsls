@@ -10,17 +10,16 @@ dependencies:
   nixpkgs/nixpkgs-unstable:
     - git
     - nodejs
-    - pnpm
 
 steps:
   - name: "Install dependencies"
-    command: "pnpm install --frozen-lockfile"
+    command: "npm install --prefix .ci-tools --no-save pnpm@10.32.1 && node .ci-tools/node_modules/pnpm/bin/pnpm.cjs install --frozen-lockfile --store-dir .pnpm-store"
 
   - name: "Check formatting"
-    command: "pnpm format:check"
+    command: "node .ci-tools/node_modules/pnpm/bin/pnpm.cjs format:check"
 
   - name: "Typecheck"
-    command: "pnpm typecheck"
+    command: "node .ci-tools/node_modules/pnpm/bin/pnpm.cjs typecheck"
 
   - name: "Build"
-    command: "pnpm build"
+    command: "node .ci-tools/node_modules/pnpm/bin/pnpm.cjs build"

@@ -1,5 +1,6 @@
 node_modules
 .pnpm-store/
+.ci-tools/
 dist
 .env
 .DS_Store
