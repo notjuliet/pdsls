@@ -11,6 +11,7 @@
     "serve": "vite preview",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
+    "pretypecheck": "node scripts/generate-metadata.js",
     "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json"
   },
   "dependencies": {
