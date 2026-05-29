@@ -10,7 +10,8 @@
     "build": "vite build && node scripts/build-worker.js",
     "serve": "vite preview",
     "format": "oxfmt",
-    "format:check": "oxfmt --check"
+    "format:check": "oxfmt --check",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json"
   },
   "dependencies": {
     "@atcute/atproto": "^4.0.0",

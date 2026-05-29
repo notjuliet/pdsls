@@ -1,0 +1,26 @@
+when:
+  - event: ["push", "manual"]
+    branch: ["**"]
+  - event: ["pull_request"]
+    branch: ["**"]
+
+engine: "nixery"
+
+dependencies:
+  nixpkgs/nixpkgs-unstable:
+    - git
+    - nodejs
+    - pnpm
+
+steps:
+  - name: "Install dependencies"
+    command: "pnpm install --frozen-lockfile"
+
+  - name: "Check formatting"
+    command: "pnpm format:check"
+
+  - name: "Typecheck"
+    command: "pnpm typecheck"
+
+  - name: "Build"
+    command: "pnpm build"
