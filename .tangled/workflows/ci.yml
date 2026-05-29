@@ -9,6 +9,7 @@ engine: "nixery"
 dependencies:
   nixpkgs/nixpkgs-unstable:
     - git
+    - gnused
     - nodejs
 
 steps:
