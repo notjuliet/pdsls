@@ -23,6 +23,19 @@ const accentIcon = {
 
 type Accent = "blue" | "orange" | "violet";
 
+const defaultAtProtocolUrl = "https://atproto.com";
+const atProtoRefererUrl = "https://at-proto.com";
+
+const getAtProtocolUrl = () => {
+  try {
+    return new URL(document.referrer).hostname === "at-proto.com"
+      ? atProtoRefererUrl
+      : defaultAtProtocolUrl;
+  } catch {
+    return defaultAtProtocolUrl;
+  }
+};
+
 const CardContent = (props: {
   icon: string | JSX.Element;
   title: string;
@@ -104,7 +117,7 @@ export const Home = () => {
           <p>
             Browse the public data on the{" "}
             <a
-              href="https://atproto.com"
+              href={getAtProtocolUrl()}
               target="_blank"
               class="underline decoration-neutral-400 transition-colors hover:text-blue-500 hover:decoration-blue-500 dark:decoration-neutral-500 dark:hover:text-blue-400"
             >
