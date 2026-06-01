@@ -15,8 +15,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json"
   },
   "dependencies": {
-    "@atcute/atproto": "^4.0.0",
-    "@atcute/bluesky": "^4.0.2",
+    "@atcute/atproto": "^4.0.2",
+    "@atcute/bluesky": "^4.0.5",
     "@atcute/car": "^6.0.0",
     "@atcute/cbor": "^2.3.3",
     "@atcute/cid": "^2.4.1",
@@ -40,26 +40,26 @@
     "@fsegurai/codemirror-theme-basic-dark": "^6.2.5",
     "@fsegurai/codemirror-theme-basic-light": "^6.2.5",
     "@mary/exif-rm": "jsr:^0.2.2",
-    "@mary/zip": "jsr:^0.1.2",
+    "@mary/zip": "jsr:^0.2.1",
     "@skyware/firehose": "^0.5.2",
     "@solidjs/router": "^0.16.1",
-    "@takumi-rs/image-response": "^1.3.0",
-    "@takumi-rs/wasm": "^1.3.0",
-    "@tanstack/solid-virtual": "^3.13.25",
+    "@takumi-rs/image-response": "^1.6.0",
+    "@takumi-rs/wasm": "^1.6.0",
+    "@tanstack/solid-virtual": "^3.13.26",
     "codemirror": "^6.0.2",
     "solid-js": "^1.9.13",
-    "valibot": "^1.4.0"
+    "valibot": "^1.4.1"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.109",
+    "@iconify-json/lucide": "^1.2.111",
     "@iconify/tailwind4": "^1.2.3",
     "@tailwindcss/vite": "^4.3.0",
     "@types/node": "^25.9.1",
     "esbuild": "^0.28.0",
-    "oxfmt": "^0.51.0",
+    "oxfmt": "^0.52.0",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",
-    "vite": "^8.0.14",
+    "vite": "^8.0.15",
     "vite-plugin-solid": "^2.11.12"
   },
   "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be"

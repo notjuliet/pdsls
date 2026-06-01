@@ -314,7 +314,7 @@ export const Search = () => {
             autocapitalize="off"
             autocomplete="off"
             placeholder="Search or paste a link..."
-            ref={searchInput}
+            ref={(el) => (searchInput = el)}
             id="input"
             class="grow py-2.5 select-none placeholder:text-sm focus:outline-none"
             value={input() ?? ""}
