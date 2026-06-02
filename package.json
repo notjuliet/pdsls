@@ -3,16 +3,17 @@
   "license": "0BSD",
   "type": "module",
   "scripts": {
-    "start": "vite",
-    "predev": "node scripts/generate-metadata.js",
-    "dev": "vite",
-    "prebuild": "node scripts/generate-metadata.js",
-    "build": "vite build && node scripts/build-worker.js",
-    "serve": "vite preview",
-    "format": "oxfmt",
-    "format:check": "oxfmt --check",
-    "pretypecheck": "node scripts/generate-metadata.js",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json"
+    "start": "bun node_modules/vite/bin/vite.js",
+    "predev": "bun scripts/generate-metadata.js",
+    "dev": "bun node_modules/vite/bin/vite.js",
+    "prebuild": "bun scripts/generate-metadata.js",
+    "build": "bun node_modules/vite/bin/vite.js build && bun scripts/build-worker.js",
+    "pages:build": "bun install --frozen-lockfile && bun run build",
+    "serve": "bun node_modules/vite/bin/vite.js preview",
+    "format": "bun node_modules/oxfmt/bin/oxfmt",
+    "format:check": "bun node_modules/oxfmt/bin/oxfmt --check",
+    "pretypecheck": "bun scripts/generate-metadata.js",
+    "typecheck": "bun node_modules/typescript/bin/tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@atcute/atproto": "^4.0.2",
@@ -39,13 +40,13 @@
     "@codemirror/view": "^6.43.0",
     "@fsegurai/codemirror-theme-basic-dark": "^6.2.5",
     "@fsegurai/codemirror-theme-basic-light": "^6.2.5",
-    "@mary/exif-rm": "jsr:^0.2.2",
-    "@mary/zip": "jsr:^0.2.1",
+    "@mary/exif-rm": "https://npm.jsr.io/~/11/@jsr/mary__exif-rm/0.2.2.tgz",
+    "@mary/zip": "https://npm.jsr.io/~/11/@jsr/mary__zip/0.2.1.tgz",
     "@skyware/firehose": "^0.5.2",
     "@solidjs/router": "^0.16.1",
     "@takumi-rs/image-response": "^1.6.0",
     "@takumi-rs/wasm": "^1.6.0",
-    "@tanstack/solid-virtual": "^3.13.26",
+    "@tanstack/solid-virtual": "^3.13.28",
     "codemirror": "^6.0.2",
     "solid-js": "^1.9.13",
     "valibot": "^1.4.1"
@@ -56,11 +57,11 @@
     "@tailwindcss/vite": "^4.3.0",
     "@types/node": "^25.9.1",
     "esbuild": "^0.28.0",
-    "oxfmt": "^0.52.0",
+    "oxfmt": "^0.53.0",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",
-    "vite": "^8.0.15",
+    "vite": "^8.0.16",
     "vite-plugin-solid": "^2.11.12"
   },
-  "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be"
+  "packageManager": "bun@1.3.14"
 }
