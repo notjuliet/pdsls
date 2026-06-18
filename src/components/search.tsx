@@ -399,8 +399,8 @@ export const Search = () => {
                     onClick={() => setShowSearch(false)}
                   >
                     <span class="truncate">
-                      <span class="text-neutral-500 dark:text-neutral-400">{example.prefix}</span>
-                      {example.label}
+                      <span class="font-medium">{example.prefix}</span>
+                      <span class="text-neutral-500 dark:text-neutral-400">{example.label}</span>
                     </span>
                   </A>
                 )}
