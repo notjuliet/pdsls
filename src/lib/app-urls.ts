@@ -31,6 +31,7 @@ export const appList: Record<AppUrl, App> = {
   "main.bsky.dev": App.Bluesky,
   "witchsky.app": App.Bluesky,
   "reddwarf.app": App.Bluesky,
+  "mu.social": App.Bluesky,
   "cope.works": App.Bluesky,
   "tangled.org": App.Tangled,
   "pinksea.art": App.Pinksea,
