@@ -1,9 +1,7 @@
-import { Nsid } from "@atcute/lexicons";
 import { AtprotoDid } from "@atcute/lexicons/syntax";
-import { A, useLocation, useNavigate } from "@solidjs/router";
-import { createEffect, For, Show } from "solid-js";
+import { A, useLocation } from "@solidjs/router";
+import { createEffect, For, type JSX, Show } from "solid-js";
 
-import { resolveLexiconAuthority } from "../lib/api.js";
 import Tooltip from "./tooltip.jsx";
 
 // Style constants
@@ -45,6 +43,42 @@ const hasConstraints = (property: LexiconProperty | LexiconDef) =>
   property.default !== undefined ||
   property.knownValues ||
   property.closed;
+
+const schemaDefId = (defName: string) => `schema:${defName}`;
+const schemaHash = (defName?: string) => (defName ? `#${schemaDefId(defName)}` : "#schema");
+const schemaHref = (nsid: string, defName?: string) => `/lexicon/${nsid}${schemaHash(defName)}`;
+const refHref = (refType: string) => {
+  if (refType.startsWith("#")) return schemaHash(refType.slice(1));
+
+  const [nsid, defName] = refType.split("#");
+  return schemaHref(nsid, defName);
+};
+const SCHEMA_LINK_CLASS =
+  "inline-block cursor-pointer truncate font-mono text-xs text-blue-500 hover:underline dark:text-blue-400";
+
+const keepLocalHashNavigationNative = (event: MouseEvent) => event.stopPropagation();
+
+const LocalSchemaLink = (props: { defName: string; class: string; children: JSX.Element }) => (
+  <a href={schemaHash(props.defName)} on:click={keepLocalHashNavigationNative} class={props.class}>
+    {props.children}
+  </a>
+);
+
+const SchemaRefLink = (props: { refType: string; children: JSX.Element }) => {
+  if (props.refType.startsWith("#")) {
+    return (
+      <LocalSchemaLink defName={props.refType.slice(1)} class={SCHEMA_LINK_CLASS}>
+        {props.children}
+      </LocalSchemaLink>
+    );
+  }
+
+  return (
+    <A href={refHref(props.refType)} class={SCHEMA_LINK_CLASS}>
+      {props.children}
+    </A>
+  );
+};
 
 interface LexiconSchema {
   lexicon: number;
@@ -136,36 +170,11 @@ interface LexiconProperty {
 }
 
 const TypeBadge = (props: { type: string; format?: string; refType?: string }) => {
-  const navigate = useNavigate();
   const displayType = props.refType
     ? props.refType.replace(/^#/, "")
     : props.format
       ? `${props.type}:${props.format}`
       : props.type;
-
-  const isLocalRef = () => props.refType?.startsWith("#");
-  const isExternalRef = () => props.refType && !props.refType.startsWith("#");
-
-  const handleClick = async () => {
-    if (isLocalRef()) {
-      const defName = props.refType!.slice(1);
-      window.history.replaceState(null, "", `#schema:${defName}`);
-      const element = document.getElementById(`def-${defName}`);
-      if (element) {
-        element.scrollIntoView({ behavior: "instant", block: "start" });
-      }
-    } else if (isExternalRef()) {
-      try {
-        const [nsid, anchor] = props.refType!.split("#");
-        const authority = await resolveLexiconAuthority(nsid as Nsid);
-
-        const hash = anchor ? `#schema:${anchor}` : "#schema";
-        navigate(`/at://${authority}/com.atproto.lexicon.schema/${nsid}${hash}`);
-      } catch (err) {
-        console.error("Failed to resolve lexicon authority:", err);
-      }
-    }
-  };
 
   return (
     <Show
@@ -174,13 +183,7 @@ const TypeBadge = (props: { type: string; format?: string; refType?: string }) =
         <span class="font-mono text-xs text-neutral-600 dark:text-neutral-400">{displayType}</span>
       }
     >
-      <button
-        type="button"
-        onClick={handleClick}
-        class="inline-block cursor-pointer truncate font-mono text-xs text-blue-500 hover:underline dark:text-blue-400"
-      >
-        {displayType}
-      </button>
+      <SchemaRefLink refType={props.refType!}>{displayType}</SchemaRefLink>
     </Show>
   );
 };
@@ -329,25 +332,13 @@ const PropertyRow = (props: {
 };
 
 const NsidLink = (props: { nsid: string }) => {
-  const navigate = useNavigate();
-
-  const handleClick = async () => {
-    try {
-      const authority = await resolveLexiconAuthority(props.nsid as Nsid);
-      navigate(`/at://${authority}/com.atproto.lexicon.schema/${props.nsid}#schema`);
-    } catch (err) {
-      console.error("Failed to resolve lexicon authority:", err);
-    }
-  };
-
   return (
-    <button
-      type="button"
-      onClick={handleClick}
+    <A
+      href={schemaHref(props.nsid)}
       class="cursor-pointer font-mono text-xs text-blue-500 hover:underline dark:text-blue-400"
     >
       {props.nsid}
-    </button>
+    </A>
   );
 };
 
@@ -477,12 +468,15 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
   const hasDefContent = () => props.def.refs || props.def.items || hasConstraints(props.def);
 
   return (
-    <div class="flex scroll-mt-4 flex-col gap-3" id={`def-${props.name}`}>
+    <div class="flex scroll-mt-4 flex-col gap-3" id={schemaDefId(props.name)}>
       <div class="group flex items-center gap-2">
-        <a href={`#schema:${props.name}`} class="relative text-lg font-semibold hover:underline">
+        <LocalSchemaLink
+          defName={props.name}
+          class="relative text-lg font-semibold hover:underline"
+        >
           <span class="iconify lucide--link absolute top-1/2 -left-6 -translate-y-1/2 text-base opacity-0 transition-opacity group-hover:opacity-100" />
           {props.name === "main" ? "Main Definition" : props.name}
-        </a>
+        </LocalSchemaLink>
         <span class={`rounded px-2 py-0.5 text-xs font-semibold uppercase ${defTypeColor()}`}>
           {props.def.type.replace("-", " ")}
         </span>
@@ -708,7 +702,7 @@ export const LexiconSchemaView = (props: { schema: LexiconSchema; authority?: At
     if (hash.startsWith("#schema:")) {
       const defName = hash.slice(8);
       requestAnimationFrame(() => {
-        const element = document.getElementById(`def-${defName}`);
+        const element = document.getElementById(schemaDefId(defName));
         if (element) element.scrollIntoView({ behavior: "instant", block: "start" });
       });
     }

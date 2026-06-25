@@ -60,14 +60,15 @@ export const RepoLayout = (props: RouteSectionProps) => {
   createEffect(() => {
     const identifier = params.repo;
     if (!identifier || identifier.startsWith("did:")) return;
+    const hash = location.hash;
     resolveHandle(identifier as Handle)
       .then((resolvedDid) => {
-        navigate(location.pathname.replace(identifier, resolvedDid), { replace: true });
+        navigate(`${location.pathname.replace(identifier, resolvedDid)}${hash}`, { replace: true });
       })
       .catch(() => {
         resolveLexiconAuthority(identifier as Nsid)
           .then((authority) => {
-            navigate(`/at://${authority}/com.atproto.lexicon.schema/${identifier}`, {
+            navigate(`/at://${authority}/com.atproto.lexicon.schema/${identifier}${hash}`, {
               replace: true,
             });
           })

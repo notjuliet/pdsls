@@ -9,6 +9,7 @@ import { CarView } from "./views/car/explore.tsx";
 import { CollectionLayout } from "./views/collection.tsx";
 import { Home } from "./views/home.tsx";
 import { LabelView } from "./views/labels.tsx";
+import { LexiconRedirect } from "./views/lexicon-redirect.tsx";
 import { PdsLayout } from "./views/pds.tsx";
 import { RecordView } from "./views/record.tsx";
 import { BlobDebugView } from "./views/repo/blob-debug.tsx";
@@ -24,6 +25,7 @@ render(
       <Route path="/labels" component={LabelView} />
       <Route path="/car" component={CarView} />
       <Route path="/settings" component={Settings} />
+      <Route path="/lexicon/:nsid" component={LexiconRedirect} />
       <Route path="/:pds" component={PdsLayout}>
         <Route path="/" />
         <Route path="/:repo" component={RepoLayout} preload={repoPreload}>
