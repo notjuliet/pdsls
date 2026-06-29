@@ -129,7 +129,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           style='font-feature-settings: "cv05"'
           class="relative flex items-center gap-1 text-xl font-semibold"
         >
-          <span class="iconify tabler--binary-tree-filled text-[#76c4e5]"></span>
+          <img src="/pdsls-logo.svg" alt="" class="size-5" />
           <span>PDSls</span>
           <Show when={localStorage.getItem("hrt") === "true"}>
             <img
