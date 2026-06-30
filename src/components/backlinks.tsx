@@ -86,28 +86,30 @@ const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
             <RecordHoverCard
               uri={uri}
               class="block"
-              trigger={
+              renderTrigger={(state) => (
                 <a
                   href={`/${uri}`}
                   class={`grid items-center gap-x-1 px-2 py-1.5 font-mono text-xs select-none hover:bg-neutral-200/50 sm:gap-x-3 sm:px-3 dark:hover:bg-neutral-700/50 ${rkeyIsRepo ? "grid-cols-[minmax(0,1fr)_auto]" : "grid-cols-[auto_1fr_auto]"}`}
                 >
                   <span
                     class={`text-blue-500 dark:text-blue-400 ${rkeyIsRepo ? "block min-w-0 truncate" : ""}`}
+                    classList={{ "hover-card-trigger-loading": state.loading() }}
                   >
                     {rkey}
                   </span>
                   <DidHoverCard
                     did={did}
                     class={rkeyIsRepo ? "block" : "min-w-0"}
-                    trigger={
+                    renderTrigger={(didState) => (
                       <a
                         href={`/at://${did}`}
                         class={`block text-neutral-700 hover:underline dark:text-neutral-300 ${rkeyIsRepo ? "" : "truncate"}`}
+                        classList={{ "hover-card-trigger-loading": didState.loading() }}
                         onClick={(e) => e.stopPropagation()}
                       >
                         {did}
                       </a>
-                    }
+                    )}
                   />
                   <Show when={!rkeyIsRepo}>
                     <span class="text-neutral-500 tabular-nums dark:text-neutral-400">
@@ -115,7 +117,7 @@ const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
                     </span>
                   </Show>
                 </a>
-              }
+              )}
             />
           );
         }}

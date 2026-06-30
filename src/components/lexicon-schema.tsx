@@ -80,7 +80,7 @@ const SchemaRefLink = (props: { refType: string; children: JSX.Element }) => {
   );
 };
 
-interface LexiconSchema {
+export interface LexiconSchema {
   lexicon: number;
   id: string;
   description?: string;
@@ -461,24 +461,28 @@ const PermissionRow = (props: { permission: LexiconPermission; index: number }) 
   );
 };
 
-const DefSection = (props: { name: string; def: LexiconDef }) => {
+const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean }) => {
   const defTypeColor = () =>
     DEF_TYPE_COLORS[props.def.type as keyof typeof DEF_TYPE_COLORS] || DEF_TYPE_COLORS.default;
 
   const hasDefContent = () => props.def.refs || props.def.items || hasConstraints(props.def);
 
   return (
-    <div class="flex scroll-mt-4 flex-col gap-3" id={schemaDefId(props.name)}>
+    <div
+      class="flex scroll-mt-4 flex-col"
+      classList={{ "gap-3": !props.preview, "gap-2": props.preview }}
+      id={schemaDefId(props.name)}
+    >
       <div class="group flex items-center gap-2">
-        <LocalSchemaLink
-          defName={props.name}
-          class="relative text-lg font-semibold hover:underline"
-        >
+        <LocalSchemaLink defName={props.name} class="relative font-semibold hover:underline">
           <span class="iconify lucide--link absolute top-1/2 -left-6 -translate-y-1/2 text-base opacity-0 transition-opacity group-hover:opacity-100" />
           {props.name === "main" ? "Main Definition" : props.name}
         </LocalSchemaLink>
-        <span class={`rounded px-2 py-0.5 text-xs font-semibold uppercase ${defTypeColor()}`}>
-          {props.def.type.replace("-", " ")}
+        <span class={`rounded px-2 py-0.5 text-xs font-semibold ${defTypeColor()}`}>
+          <span class="uppercase">{props.def.type.replace("-", " ")}</span>
+          <Show when={props.def.key}>
+            <span class=""> · {props.def.key}</span>
+          </Show>
         </span>
       </div>
 
@@ -486,14 +490,6 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
         <p class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
           {props.def.description}
         </p>
-      </Show>
-
-      {/* Record key */}
-      <Show when={props.def.key}>
-        <div>
-          <span class="text-sm font-semibold">Record Key: </span>
-          <span class="font-mono text-sm">{props.def.key}</span>
-        </div>
       </Show>
 
       {/* Permission-set: Title and Detail */}
@@ -693,11 +689,39 @@ const DefSection = (props: { name: string; def: LexiconDef }) => {
   );
 };
 
-export const LexiconSchemaView = (props: { schema: LexiconSchema; authority?: AtprotoDid }) => {
+export const LexiconSchemaView = (props: {
+  schema: LexiconSchema;
+  authority?: AtprotoDid;
+  preview?: boolean;
+  focusDef?: string;
+}) => {
   const location = useLocation();
+
+  const allDefinitionEntries = () => Object.entries(props.schema.defs);
+  const visibleDefinitionEntries = () => {
+    const entries = allDefinitionEntries();
+    if (!props.preview) return entries;
+
+    if (props.focusDef && props.schema.defs[props.focusDef]) {
+      return [[props.focusDef, props.schema.defs[props.focusDef]]] as Array<[string, LexiconDef]>;
+    }
+
+    const visible = new Map<string, LexiconDef>();
+    if (props.schema.defs.main) visible.set("main", props.schema.defs.main);
+    for (const [name, def] of entries) {
+      if (visible.size >= 3) break;
+      visible.set(name, def);
+    }
+
+    return Array.from(visible.entries());
+  };
+
+  const hiddenDefinitionCount = () =>
+    allDefinitionEntries().length - visibleDefinitionEntries().length;
 
   // Handle scrolling to a definition when hash is like #schema:definitionName
   createEffect(() => {
+    if (props.preview) return;
     const hash = location.hash;
     if (hash.startsWith("#schema:")) {
       const defName = hash.slice(8);
@@ -709,28 +733,30 @@ export const LexiconSchemaView = (props: { schema: LexiconSchema; authority?: At
   });
 
   return (
-    <div class="w-full px-2">
+    <div class="w-full" classList={{ "px-2": !props.preview }}>
       {/* Header */}
-      <div class="flex flex-col gap-2 border-b border-neutral-300 pb-3 dark:border-neutral-700">
-        <div class="flex items-center gap-0.5">
-          <h2 class="text-lg font-semibold">{props.schema.id}</h2>
-          <Show when={props.authority}>
+      <div class="flex flex-col gap-2">
+        <div class="flex min-w-0 items-center gap-1.5">
+          <h2
+            class="min-w-0 truncate font-semibold"
+            classList={{ "text-lg": !props.preview, "text-base": props.preview }}
+          >
+            {props.schema.id}
+          </h2>
+          <span class="shrink-0 text-sm text-neutral-600 dark:text-neutral-400">
+            v{props.schema.lexicon}
+          </span>
+          <Show when={props.authority && !props.preview}>
             <Tooltip text="View record">
               <A
                 href={`/at://${props.authority}/com.atproto.lexicon.schema/${props.schema.id}`}
-                class="flex items-center p-1.5 text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"
+                class="flex shrink-0 items-center p-1 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"
                 target="_blank"
               >
                 <span class="iconify lucide--external-link text-sm"></span>
               </A>
             </Tooltip>
           </Show>
-        </div>
-        <div class="flex gap-4 text-sm text-neutral-600 dark:text-neutral-400">
-          <span>
-            <span class="font-medium">Lexicon version: </span>
-            <span>{props.schema.lexicon}</span>
-          </span>
         </div>
         <Show when={props.schema.description}>
           <p class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
@@ -740,10 +766,18 @@ export const LexiconSchemaView = (props: { schema: LexiconSchema; authority?: At
       </div>
 
       {/* Definitions */}
-      <div class="flex flex-col gap-6 pt-3">
-        <For each={Object.entries(props.schema.defs)}>
-          {([name, def]) => <DefSection name={name} def={def} />}
+      <div
+        class="flex flex-col pt-3"
+        classList={{ "gap-6": !props.preview, "gap-4": props.preview }}
+      >
+        <For each={visibleDefinitionEntries()}>
+          {([name, def]) => <DefSection name={name} def={def} preview={props.preview} />}
         </For>
+        <Show when={props.preview && hiddenDefinitionCount() > 0}>
+          <div class="text-xs text-neutral-500 dark:text-neutral-400">
+            +{hiddenDefinitionCount()} more definitions
+          </div>
+        </Show>
       </div>
     </div>
   );

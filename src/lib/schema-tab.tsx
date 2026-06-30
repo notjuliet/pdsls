@@ -14,7 +14,7 @@ interface CachedLexicon {
 
 const cache = new Map<string, Promise<CachedLexicon>>();
 
-const resolve = (nsid: Nsid): Promise<CachedLexicon> => {
+export const resolveLexicon = (nsid: Nsid): Promise<CachedLexicon> => {
   let cached = cache.get(nsid);
   if (cached) return cached;
 
@@ -42,7 +42,7 @@ export const useLexiconSchema = (collection: () => string | undefined) => {
     const col = collection();
     if (showSchema() && !schema() && !loading() && error() === undefined && col) {
       setLoading(true);
-      resolve(col as Nsid).then(
+      resolveLexicon(col as Nsid).then(
         (result) => {
           setAuthority(result.authority);
           setSchema(result.schema);

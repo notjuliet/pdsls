@@ -1,5 +1,5 @@
-import { isCid, isDid, isNsid, isResourceUri, Nsid } from "@atcute/lexicons/syntax";
-import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
+import { isCid, isDid, isNsid, isResourceUri } from "@atcute/lexicons/syntax";
+import { A, useLocation, useParams } from "@solidjs/router";
 import {
   createContext,
   createEffect,
@@ -11,12 +11,11 @@ import {
   useContext,
 } from "solid-js";
 
-import { resolveLexiconAuthority } from "../lib/api";
 import { formatFileSize } from "../utils/format";
 import { hideMedia } from "../views/settings";
 import DidHoverCard from "./hover-card/did";
+import LexiconHoverCard from "./hover-card/lexicon";
 import RecordHoverCard from "./hover-card/record";
-import { addNotification, removeNotification } from "./notification";
 import VideoPlayer from "./video-player";
 import { ZoomableImage } from "./zoomable-image";
 
@@ -55,28 +54,8 @@ const isURL =
 
 const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean }) => {
   const ctx = useJSONCtx();
-  const navigate = useNavigate();
   const params = useParams();
   const location = useLocation();
-
-  const handleClick = async (lex: string) => {
-    try {
-      const [nsid, anchor] = lex.split("#");
-      const authority = await resolveLexiconAuthority(nsid as Nsid);
-
-      const hash = anchor ? `#schema:${anchor}` : "#schema";
-      if (ctx.newTab)
-        window.open(`/at://${authority}/com.atproto.lexicon.schema/${nsid}${hash}`, "_blank");
-      else navigate(`/at://${authority}/com.atproto.lexicon.schema/${nsid}${hash}`);
-    } catch (err) {
-      console.error("Failed to resolve lexicon authority:", err);
-      const id = addNotification({
-        message: "Could not resolve schema",
-        type: "error",
-      });
-      setTimeout(() => removeNotification(id), 5000);
-    }
-  };
 
   const MAX_LENGTH = 200;
   const isTruncated = () => ctx.truncate && props.data.length > MAX_LENGTH;
@@ -94,13 +73,7 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
             ) : isDid(part) ? (
               <DidHoverCard did={part} newTab={ctx.newTab} />
             ) : isNsid(part.split("#")[0]) && props.isType ? (
-              <button
-                type="button"
-                onClick={() => handleClick(part)}
-                class="cursor-pointer text-blue-500 hover:underline active:underline dark:text-blue-400"
-              >
-                {part}
-              </button>
+              <LexiconHoverCard lexicon={part} newTab={ctx.newTab} />
             ) : isCid(part) && props.isLink && ctx.parentIsBlob && params.repo ? (
               <A
                 class="text-blue-500 hover:underline active:underline dark:text-blue-400"

@@ -1,21 +1,28 @@
 import { Client, simpleFetchHandler } from "@atcute/client";
-import { ActorIdentifier } from "@atcute/lexicons";
-import { createSignal, Show } from "solid-js";
+import type { ActorIdentifier } from "@atcute/lexicons";
+import { A } from "@solidjs/router";
+import { Show } from "solid-js";
 
 import { getPDS } from "../../lib/api";
 import { JSONValue } from "../json";
-import HoverCard from "./base";
+import HoverCard, { HoverCardError, type HoverTriggerRenderer } from "./base";
+import { createHoverResource } from "./resource";
 
 interface RecordHoverCardProps {
   uri: string;
   newTab?: boolean;
   class?: string;
   labelClass?: string;
-  trigger?: any;
+  renderTrigger?: HoverTriggerRenderer;
   hoverDelay?: number;
 }
 
-const recordCache = new Map<string, { value: unknown; loading: boolean; error?: string }>();
+interface RecordPreview {
+  repo: string;
+  value: Parameters<typeof JSONValue>[0]["data"];
+}
+
+const recordCache = new Map<string, Promise<RecordPreview>>();
 
 const parseAtUri = (uri: string) => {
   const match = uri.match(/^at:\/\/([^/]+)\/([^/]+)\/(.+)$/);
@@ -23,96 +30,72 @@ const parseAtUri = (uri: string) => {
   return { repo: match[1], collection: match[2], rkey: match[3] };
 };
 
-const prefetchRecord = async (uri: string) => {
-  if (recordCache.has(uri)) return;
-
+const fetchRecordPreview = async (uri: string): Promise<RecordPreview> => {
   const parsed = parseAtUri(uri);
-  if (!parsed) return;
+  if (!parsed) throw new Error("Invalid AT URI");
 
-  recordCache.set(uri, { value: null, loading: true });
+  const pds = await getPDS(parsed.repo);
+  const rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
+  const res = await rpc.get("com.atproto.repo.getRecord", {
+    params: {
+      repo: parsed.repo as ActorIdentifier,
+      collection: parsed.collection as `${string}.${string}.${string}`,
+      rkey: parsed.rkey,
+    },
+  });
 
-  try {
-    const pds = await getPDS(parsed.repo);
-    const rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
-    const res = await rpc.get("com.atproto.repo.getRecord", {
-      params: {
-        repo: parsed.repo as ActorIdentifier,
-        collection: parsed.collection as `${string}.${string}.${string}`,
-        rkey: parsed.rkey,
-      },
-    });
-
-    if (!res.ok) {
-      recordCache.set(uri, { value: null, loading: false, error: res.data.error });
-      return;
-    }
-
-    recordCache.set(uri, { value: res.data.value, loading: false });
-  } catch (err: any) {
-    recordCache.set(uri, { value: null, loading: false, error: err.message || "Failed to fetch" });
+  if (!res.ok) {
+    throw new Error(res.data.error);
   }
+
+  return { repo: parsed.repo, value: res.data.value as RecordPreview["value"] };
 };
 
 const RecordHoverCard = (props: RecordHoverCardProps) => {
-  const [record, setRecord] = createSignal<{
-    value: unknown;
-    loading: boolean;
-    error?: string;
-  } | null>(null);
+  const preview = createHoverResource(() => props.uri, fetchRecordPreview, {
+    cache: recordCache,
+    getErrorMessage: (err) => (err instanceof Error ? err.message : "Failed to fetch"),
+  });
 
   const parsed = () => parseAtUri(props.uri);
-
-  const handlePrefetch = () => {
-    prefetchRecord(props.uri);
-
-    // Start polling for cache updates
-    const cached = recordCache.get(props.uri);
-    setRecord(cached || { value: null, loading: true });
-
-    if (!cached || cached.loading) {
-      const pollInterval = setInterval(() => {
-        const updated = recordCache.get(props.uri);
-        if (updated && !updated.loading) {
-          setRecord(updated);
-          clearInterval(pollInterval);
-        }
-      }, 100);
-
-      setTimeout(() => clearInterval(pollInterval), 10000);
-    }
-  };
+  const loading = preview.visibleLoading;
+  const hasPreview = () => Boolean(preview.state().data || preview.state().error);
+  const trigger = () =>
+    props.renderTrigger?.({ loading }) ?? (
+      <A
+        class={`text-blue-500 hover:underline active:underline dark:text-blue-400 ${props.labelClass || ""}`}
+        classList={{ "hover-card-trigger-loading": loading() }}
+        href={`/${props.uri}`}
+        target={props.newTab ? "_blank" : undefined}
+      >
+        {props.uri}
+      </A>
+    );
 
   return (
     <HoverCard
-      href={`/${props.uri}`}
-      label={props.uri}
-      newTab={props.newTab}
-      onHover={handlePrefetch}
+      onHover={preview.load}
       hoverDelay={props.hoverDelay ?? 300}
-      trigger={props.trigger}
+      trigger={trigger()}
       class={props.class}
-      labelClass={props.labelClass}
+      showPreview={hasPreview()}
     >
-      <Show when={record()?.loading}>
-        <div class="flex items-center gap-2 font-sans text-sm text-neutral-500 dark:text-neutral-400">
-          <span class="iconify lucide--loader-circle animate-spin" />
-          Loading...
-        </div>
+      <Show when={preview.state().error}>
+        <HoverCardError message={preview.state().error} />
       </Show>
-      <Show when={record()?.error}>
-        <div class="font-sans text-sm text-red-500 dark:text-red-400">{record()?.error}</div>
-      </Show>
-      <Show when={record()?.value && !record()?.loading}>
-        <div class="font-mono text-xs wrap-break-word">
-          <JSONValue
-            data={record()?.value as any}
-            repo={parsed()?.repo || ""}
-            truncate
-            newTab
-            hideBlobs
-            preview
-          />
-        </div>
+      <Show when={preview.state().data}>
+        {(record) => (
+          <div class="font-mono text-xs wrap-break-word">
+            <JSONValue
+              data={record().value}
+              repo={record().repo || parsed()?.repo || ""}
+              truncate
+              newTab
+              hideBlobs
+              preview
+            />
+          </div>
+        )}
       </Show>
     </HoverCard>
   );

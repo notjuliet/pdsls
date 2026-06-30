@@ -1,28 +1,35 @@
-import { A } from "@solidjs/router";
-import { createSignal, JSX, onCleanup, Show } from "solid-js";
+import { createEffect, createSignal, onCleanup, Show } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { canHover } from "../../layout";
+import { getFloatingStyle, measureFloatingElement } from "./position";
+
+interface HoverTriggerState {
+  loading: Accessor<boolean>;
+}
+
+export type HoverTriggerRenderer = (state: HoverTriggerState) => JSX.Element;
+
+export const HoverCardError = (props: { message?: string }) => (
+  <div class="font-sans text-sm wrap-break-word text-red-500 dark:text-red-400">
+    {props.message}
+  </div>
+);
 
 interface HoverCardProps {
-  /** Link href - if provided, renders an A tag */
-  href?: string;
-  /** Link/trigger label text */
-  label?: string;
-  /** Open link in new tab */
-  newTab?: boolean;
   /** Called when hover starts (for prefetching) */
   onHover?: () => void;
   /** Delay in ms before showing card and calling onHover (default: 0) */
   hoverDelay?: number;
-  /** Custom trigger element - if provided, overrides href/label */
-  trigger?: JSX.Element;
+  /** Element that opens the preview on hover */
+  trigger: JSX.Element;
   /** Additional classes for the wrapper span */
   class?: string;
-  /** Additional classes for the link/label */
-  labelClass?: string;
   /** Additional classes for the preview container */
   previewClass?: string;
+  /** Whether the preview container should be visible once hover is active */
+  showPreview?: boolean;
   /** Preview content */
   children: JSX.Element;
 }
@@ -30,21 +37,38 @@ interface HoverCardProps {
 const HoverCard = (props: HoverCardProps) => {
   const [show, setShow] = createSignal(false);
 
-  const [previewHeight, setPreviewHeight] = createSignal(0);
+  const [previewSize, setPreviewSize] = createSignal({ width: 0, height: 0 });
   const [anchorRect, setAnchorRect] = createSignal<DOMRect | null>(null);
   let anchorRef!: HTMLSpanElement;
   let previewRef!: HTMLDivElement;
   let resizeObserver: ResizeObserver | null = null;
   let hoverTimeout: number | null = null;
 
+  const updateAnchorRect = () => {
+    if (anchorRef) setAnchorRect(anchorRef.getBoundingClientRect());
+  };
+
   const setupResizeObserver = (el: HTMLDivElement) => {
     resizeObserver?.disconnect();
     previewRef = el;
+    setPreviewSize(measureFloatingElement(el));
     resizeObserver = new ResizeObserver(() => {
-      if (previewRef) setPreviewHeight(previewRef.offsetHeight);
+      if (previewRef) setPreviewSize(measureFloatingElement(previewRef));
     });
     resizeObserver.observe(el);
   };
+
+  createEffect(() => {
+    if (!show()) return;
+
+    window.addEventListener("scroll", updateAnchorRect, true);
+    window.addEventListener("resize", updateAnchorRect);
+
+    onCleanup(() => {
+      window.removeEventListener("scroll", updateAnchorRect, true);
+      window.removeEventListener("resize", updateAnchorRect);
+    });
+  });
 
   onCleanup(() => {
     resizeObserver?.disconnect();
@@ -53,29 +77,16 @@ const HoverCard = (props: HoverCardProps) => {
     }
   });
 
-  const isOverflowing = (previewHeight: number) => {
-    const rect = anchorRect();
-    return rect && rect.top + previewHeight + 32 > window.innerHeight;
-  };
-
   const getPreviewStyle = () => {
-    const rect = anchorRect();
-    if (!rect) return {};
-
-    const left = rect.left + rect.width / 2;
-    const overflowing = isOverflowing(previewHeight());
-    const gap = 4;
-
-    return {
-      left: `${left}px`,
-      top: overflowing ? `${rect.top - gap}px` : `${rect.bottom + gap}px`,
-      transform: overflowing ? "translate(-50%, -100%)" : "translate(-50%, 0)",
-    };
+    return getFloatingStyle(anchorRect(), previewSize(), {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
   };
 
   const handleMouseEnter = () => {
     const delay = props.hoverDelay ?? 0;
-    setAnchorRect(anchorRef.getBoundingClientRect());
+    updateAnchorRect();
 
     if (delay > 0) {
       hoverTimeout = window.setTimeout(() => {
@@ -104,16 +115,8 @@ const HoverCard = (props: HoverCardProps) => {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {props.trigger ?? (
-        <A
-          class={`text-blue-500 hover:underline active:underline dark:text-blue-400 ${props.labelClass || ""}`}
-          href={props.href!}
-          target={props.newTab ? "_blank" : undefined}
-        >
-          {props.label}
-        </A>
-      )}
-      <Show when={show() && canHover}>
+      {props.trigger}
+      <Show when={show() && canHover && (props.showPreview ?? true)}>
         <Portal>
           <div
             ref={setupResizeObserver}

@@ -33,6 +33,34 @@ html {
   scrollbar-gutter: stable both-edges;
 }
 
+.hover-card-trigger-loading {
+  animation: hover-card-trigger-pulse 0.9s ease-in-out infinite;
+}
+
+@keyframes hover-card-trigger-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.58;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hover-card-trigger-loading {
+    animation: none;
+    opacity: 0.72;
+  }
+}
+
+@media (forced-colors: active) {
+  .hover-card-trigger-loading {
+    animation: none;
+    opacity: 1;
+  }
+}
+
 .bottom-controls-fade::before {
   @apply pointer-events-none absolute inset-x-0 -top-6 h-6 bg-linear-to-t from-neutral-100 to-transparent content-[''];
 }
