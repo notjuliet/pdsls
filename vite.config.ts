@@ -68,4 +68,16 @@ export default defineConfig({
   build: {
     target: "esnext",
   },
+  resolve: {
+    dedupe: [
+      "codemirror",
+      "@codemirror/state",
+      "@codemirror/view",
+      "@codemirror/language",
+      "@codemirror/lint",
+      "@codemirror/commands",
+      "@codemirror/search",
+      "@codemirror/autocomplete",
+    ],
+  },
 });
