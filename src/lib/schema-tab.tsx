@@ -5,29 +5,7 @@ import { useLocation } from "@solidjs/router";
 import { createEffect, createSignal, ErrorBoundary, Show } from "solid-js";
 
 import { LexiconSchemaView } from "../components/lexicon-schema.jsx";
-import { resolveLexiconAuthority, resolveLexiconSchema } from "./api.js";
-
-interface CachedLexicon {
-  authority: AtprotoDid;
-  schema: ResolvedSchema;
-}
-
-const cache = new Map<string, Promise<CachedLexicon>>();
-
-export const resolveLexicon = (nsid: Nsid): Promise<CachedLexicon> => {
-  let cached = cache.get(nsid);
-  if (cached) return cached;
-
-  const promise = (async () => {
-    const authority = await resolveLexiconAuthority(nsid);
-    const schema = await resolveLexiconSchema(authority, nsid);
-    return { authority, schema };
-  })();
-
-  cache.set(nsid, promise);
-  promise.catch(() => cache.delete(nsid));
-  return promise;
-};
+import { resolveLexicon } from "./lexicon.js";
 
 export const useLexiconSchema = (collection: () => string | undefined) => {
   const location = useLocation();

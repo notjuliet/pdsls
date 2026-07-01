@@ -1,7 +1,11 @@
-import { AtprotoDid } from "@atcute/lexicons/syntax";
+import type { Nsid } from "@atcute/lexicons";
+import type { AtprotoDid } from "@atcute/lexicons/syntax";
 import { A, useLocation } from "@solidjs/router";
-import { createEffect, For, type JSX, Show } from "solid-js";
+import { createContext, createEffect, For, type JSX, Show, useContext } from "solid-js";
 
+import { parseLexiconRef, resolveLexicon, schemaHash, schemaHref } from "../lib/lexicon";
+import HoverCard, { HoverCardError } from "./hover-card/base";
+import { createHoverResource } from "./hover-card/resource";
 import Tooltip from "./tooltip.jsx";
 
 // Style constants
@@ -44,17 +48,13 @@ const hasConstraints = (property: LexiconProperty | LexiconDef) =>
   property.knownValues ||
   property.closed;
 
-const schemaDefId = (defName: string) => `schema:${defName}`;
-const schemaHash = (defName?: string) => (defName ? `#${schemaDefId(defName)}` : "#schema");
-const schemaHref = (nsid: string, defName?: string) => `/lexicon/${nsid}${schemaHash(defName)}`;
-const refHref = (refType: string) => {
-  if (refType.startsWith("#")) return schemaHash(refType.slice(1));
+const LexiconSchemaContext = createContext<{ inertRefs?: boolean }>();
+const useLexiconSchemaContext = () => useContext(LexiconSchemaContext) ?? {};
 
-  const [nsid, defName] = refType.split("#");
-  return schemaHref(nsid, defName);
-};
-const SCHEMA_LINK_CLASS =
-  "inline-block cursor-pointer truncate font-mono text-xs text-blue-500 hover:underline dark:text-blue-400";
+const schemaDefId = (defName: string) => `schema:${defName}`;
+const SCHEMA_REF_TEXT_CLASS =
+  "inline-block truncate font-mono text-xs text-blue-500 dark:text-blue-400";
+const SCHEMA_LINK_CLASS = `${SCHEMA_REF_TEXT_CLASS} cursor-pointer hover:underline`;
 
 const keepLocalHashNavigationNative = (event: MouseEvent) => event.stopPropagation();
 
@@ -65,6 +65,12 @@ const LocalSchemaLink = (props: { defName: string; class: string; children: JSX.
 );
 
 const SchemaRefLink = (props: { refType: string; children: JSX.Element }) => {
+  const context = useLexiconSchemaContext();
+
+  if (context.inertRefs) {
+    return <span class={SCHEMA_REF_TEXT_CLASS}>{props.children}</span>;
+  }
+
   if (props.refType.startsWith("#")) {
     return (
       <LocalSchemaLink defName={props.refType.slice(1)} class={SCHEMA_LINK_CLASS}>
@@ -73,11 +79,7 @@ const SchemaRefLink = (props: { refType: string; children: JSX.Element }) => {
     );
   }
 
-  return (
-    <A href={refHref(props.refType)} class={SCHEMA_LINK_CLASS}>
-      {props.children}
-    </A>
-  );
+  return <SchemaRefHoverCard refType={props.refType}>{props.children}</SchemaRefHoverCard>;
 };
 
 export interface LexiconSchema {
@@ -87,6 +89,59 @@ export interface LexiconSchema {
   defs: {
     [key: string]: LexiconDef;
   };
+}
+
+interface LexiconPreviewState {
+  authority: AtprotoDid;
+  schema: LexiconSchema;
+}
+
+const fetchLexiconPreview = async (nsid: string): Promise<LexiconPreviewState> => {
+  const { authority, schema } = await resolveLexicon(nsid as Nsid);
+  return { authority, schema: schema.rawSchema as LexiconSchema };
+};
+
+function SchemaRefHoverCard(props: { refType: string; children: JSX.Element }) {
+  const parsed = () => parseLexiconRef(props.refType);
+  const preview = createHoverResource(() => parsed().nsid, fetchLexiconPreview, {
+    getErrorMessage: (err) => (err instanceof Error ? err.message : "Failed to resolve schema"),
+  });
+  const loading = preview.visibleLoading;
+  const hasPreview = () => Boolean(preview.state().data || preview.state().error);
+  const trigger = () => (
+    <A
+      href={schemaHref(parsed().nsid, parsed().defName)}
+      class={SCHEMA_LINK_CLASS}
+      classList={{ "hover-card-trigger-loading": loading() }}
+    >
+      {props.children}
+    </A>
+  );
+
+  return (
+    <HoverCard
+      onHover={preview.load}
+      hoverDelay={300}
+      trigger={trigger()}
+      previewClass="max-h-[32rem] w-[min(36rem,calc(100vw-2rem))] font-sans text-sm"
+      showPreview={hasPreview()}
+    >
+      <Show when={preview.state().error}>
+        <HoverCardError message={preview.state().error} />
+      </Show>
+      <Show when={preview.state().data}>
+        {(data) => (
+          <LexiconSchemaView
+            schema={data().schema}
+            authority={data().authority}
+            preview
+            inertRefs
+            focusDef={parsed().defName}
+          />
+        )}
+      </Show>
+    </HoverCard>
+  );
 }
 
 interface LexiconPermission {
@@ -332,14 +387,7 @@ const PropertyRow = (props: {
 };
 
 const NsidLink = (props: { nsid: string }) => {
-  return (
-    <A
-      href={schemaHref(props.nsid)}
-      class="cursor-pointer font-mono text-xs text-blue-500 hover:underline dark:text-blue-400"
-    >
-      {props.nsid}
-    </A>
-  );
+  return <SchemaRefLink refType={props.nsid}>{props.nsid}</SchemaRefLink>;
 };
 
 const resourceColor = (resource: string) =>
@@ -693,6 +741,7 @@ export const LexiconSchemaView = (props: {
   schema: LexiconSchema;
   authority?: AtprotoDid;
   preview?: boolean;
+  inertRefs?: boolean;
   focusDef?: string;
 }) => {
   const location = useLocation();
@@ -733,52 +782,54 @@ export const LexiconSchemaView = (props: {
   });
 
   return (
-    <div class="w-full" classList={{ "px-2": !props.preview }}>
-      {/* Header */}
-      <div class="flex flex-col gap-2">
-        <div class="flex min-w-0 items-center gap-1.5">
-          <h2
-            class="min-w-0 truncate font-semibold"
-            classList={{ "text-lg": !props.preview, "text-base": props.preview }}
-          >
-            {props.schema.id}
-          </h2>
-          <span class="shrink-0 text-sm text-neutral-600 dark:text-neutral-400">
-            v{props.schema.lexicon}
-          </span>
-          <Show when={props.authority && !props.preview}>
-            <Tooltip text="View record">
-              <A
-                href={`/at://${props.authority}/com.atproto.lexicon.schema/${props.schema.id}`}
-                class="flex shrink-0 items-center p-1 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"
-                target="_blank"
-              >
-                <span class="iconify lucide--external-link text-sm"></span>
-              </A>
-            </Tooltip>
+    <LexiconSchemaContext.Provider value={{ inertRefs: props.inertRefs }}>
+      <div class="w-full" classList={{ "px-2": !props.preview }}>
+        {/* Header */}
+        <div class="flex flex-col gap-2">
+          <div class="flex min-w-0 items-center gap-1.5">
+            <h2
+              class="min-w-0 truncate font-semibold"
+              classList={{ "text-lg": !props.preview, "text-base": props.preview }}
+            >
+              {props.schema.id}
+            </h2>
+            <span class="shrink-0 text-sm text-neutral-600 dark:text-neutral-400">
+              v{props.schema.lexicon}
+            </span>
+            <Show when={props.authority && !props.preview}>
+              <Tooltip text="View record">
+                <A
+                  href={`/at://${props.authority}/com.atproto.lexicon.schema/${props.schema.id}`}
+                  class="flex shrink-0 items-center p-1 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"
+                  target="_blank"
+                >
+                  <span class="iconify lucide--external-link text-sm"></span>
+                </A>
+              </Tooltip>
+            </Show>
+          </div>
+          <Show when={props.schema.description}>
+            <p class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
+              {props.schema.description}
+            </p>
           </Show>
         </div>
-        <Show when={props.schema.description}>
-          <p class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
-            {props.schema.description}
-          </p>
-        </Show>
-      </div>
 
-      {/* Definitions */}
-      <div
-        class="flex flex-col pt-3"
-        classList={{ "gap-6": !props.preview, "gap-4": props.preview }}
-      >
-        <For each={visibleDefinitionEntries()}>
-          {([name, def]) => <DefSection name={name} def={def} preview={props.preview} />}
-        </For>
-        <Show when={props.preview && hiddenDefinitionCount() > 0}>
-          <div class="text-xs text-neutral-500 dark:text-neutral-400">
-            +{hiddenDefinitionCount()} more definitions
-          </div>
-        </Show>
+        {/* Definitions */}
+        <div
+          class="flex flex-col pt-3"
+          classList={{ "gap-6": !props.preview, "gap-4": props.preview }}
+        >
+          <For each={visibleDefinitionEntries()}>
+            {([name, def]) => <DefSection name={name} def={def} preview={props.preview} />}
+          </For>
+          <Show when={props.preview && hiddenDefinitionCount() > 0}>
+            <div class="text-xs text-neutral-500 dark:text-neutral-400">
+              +{hiddenDefinitionCount()} more definitions
+            </div>
+          </Show>
+        </div>
       </div>
-    </div>
+    </LexiconSchemaContext.Provider>
   );
 };

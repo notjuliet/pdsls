@@ -3,7 +3,7 @@ import type { AtprotoDid } from "@atcute/lexicons/syntax";
 import { A } from "@solidjs/router";
 import { Show } from "solid-js";
 
-import { resolveLexicon } from "../../lib/schema-tab";
+import { parseLexiconRef, resolveLexicon, schemaHash } from "../../lib/lexicon";
 import { LexiconSchemaView, type LexiconSchema } from "../lexicon-schema";
 import HoverCard, { HoverCardError, type HoverTriggerRenderer } from "./base";
 import { createHoverResource } from "./resource";
@@ -21,15 +21,6 @@ interface LexiconState {
   schema: LexiconSchema;
 }
 
-const lexiconCache = new Map<string, Promise<LexiconState>>();
-
-const parseLexiconRef = (lexicon: string) => {
-  const [nsid, defName] = lexicon.split("#");
-  return { nsid, defName };
-};
-
-const schemaHash = (defName?: string) => (defName ? `#schema:${defName}` : "#schema");
-
 const fetchLexiconPreview = async (nsid: string): Promise<LexiconState> => {
   const { authority, schema } = await resolveLexicon(nsid as Nsid);
   return { authority, schema: schema.rawSchema as LexiconSchema };
@@ -39,7 +30,6 @@ const LexiconHoverCard = (props: LexiconHoverCardProps) => {
   const parsed = () => parseLexiconRef(props.lexicon);
   const href = () => `/lexicon/${parsed().nsid}${schemaHash(parsed().defName)}`;
   const preview = createHoverResource(() => parsed().nsid, fetchLexiconPreview, {
-    cache: lexiconCache,
     getErrorMessage: (err) => (err instanceof Error ? err.message : "Failed to resolve schema"),
   });
   const loading = preview.visibleLoading;
@@ -74,6 +64,7 @@ const LexiconHoverCard = (props: LexiconHoverCardProps) => {
             schema={data().schema}
             authority={data().authority}
             preview
+            inertRefs
             focusDef={parsed().defName}
           />
         )}

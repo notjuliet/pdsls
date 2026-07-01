@@ -48,14 +48,14 @@
     "@takumi-rs/wasm": "^1.8.7",
     "@tanstack/solid-virtual": "^3.13.31",
     "codemirror": "^6.0.2",
-    "solid-js": "^1.9.13",
+    "solid-js": "^1.9.14",
     "valibot": "^1.4.2"
   },
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.115",
     "@iconify/tailwind4": "^1.2.3",
     "@tailwindcss/vite": "^4.3.2",
-    "@types/node": "^26.0.1",
+    "@types/node": "^26.1.0",
     "esbuild": "^0.28.1",
     "oxfmt": "^0.57.0",
     "tailwindcss": "^4.3.2",
