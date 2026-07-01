@@ -52,8 +52,7 @@ const LexiconSchemaContext = createContext<{ inertRefs?: boolean }>();
 const useLexiconSchemaContext = () => useContext(LexiconSchemaContext) ?? {};
 
 const schemaDefId = (defName: string) => `schema:${defName}`;
-const SCHEMA_REF_TEXT_CLASS =
-  "inline-block truncate font-mono text-xs text-blue-500 dark:text-blue-400";
+const SCHEMA_REF_TEXT_CLASS = "font-mono text-xs wrap-break-word text-blue-500 dark:text-blue-400";
 const SCHEMA_LINK_CLASS = `${SCHEMA_REF_TEXT_CLASS} cursor-pointer hover:underline`;
 
 const keepLocalHashNavigationNative = (event: MouseEvent) => event.stopPropagation();
@@ -123,6 +122,7 @@ function SchemaRefHoverCard(props: { refType: string; children: JSX.Element }) {
       onHover={preview.load}
       hoverDelay={300}
       trigger={trigger()}
+      class="inline text-xs leading-4"
       previewClass="max-h-[32rem] w-[min(36rem,calc(100vw-2rem))] font-sans text-sm"
       showPreview={hasPreview()}
     >
