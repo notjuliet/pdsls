@@ -1,6 +1,6 @@
 export type AppUrl = `${string}.${string}` | `localhost:${number}`;
 
-export enum App {
+enum App {
   Bluesky,
   Tangled,
   Pinksea,
@@ -9,16 +9,6 @@ export enum App {
   GreenGale,
   SonaskyREF,
 }
-
-export const appName = {
-  [App.Bluesky]: "Bluesky",
-  [App.Tangled]: "Tangled",
-  [App.Pinksea]: "Pinksea",
-  [App.Blento]: "Blento",
-  [App.Popfeed]: "Popfeed",
-  [App.GreenGale]: "GreenGale",
-  [App.SonaskyREF]: "SonaSky REF",
-};
 
 export const appList: Record<AppUrl, App> = {
   "localhost:19006": App.Bluesky,

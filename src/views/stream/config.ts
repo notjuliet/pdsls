@@ -2,7 +2,7 @@ import { localDateFromTimestamp } from "../../utils/date";
 
 export type StreamType = "jetstream" | "firehose" | "spacedust";
 
-export type FormField = {
+type FormField = {
   name: string;
   label: string;
   type: "text" | "checkbox" | "tags";
@@ -11,7 +11,7 @@ export type FormField = {
   searchParam: string;
 };
 
-export type RecordInfo = {
+type RecordInfo = {
   type: string;
   did?: string;
   collection?: string;
@@ -20,7 +20,7 @@ export type RecordInfo = {
   time?: string;
 };
 
-export type StreamConfig = {
+type StreamConfig = {
   label: string;
   description: string;
   icon: string;

@@ -1,4 +1,4 @@
-export const isCarFile = (file: File): boolean => {
+const isCarFile = (file: File): boolean => {
   return file.name.endsWith(".car") || file.type === "application/vnd.ipld.car";
 };
 

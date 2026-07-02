@@ -4,7 +4,7 @@ import { hasUserScope } from "../auth/scope-utils";
 import { showPermissionPrompt } from "./permission-prompt";
 import Tooltip from "./tooltip";
 
-export interface PermissionButtonProps {
+interface PermissionButtonProps {
   scope: "create" | "update" | "delete" | "blob";
   tooltip?: string;
   class?: string;

@@ -1,7 +1,7 @@
 import { createSignal, For, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 
-export type Notification = {
+type Notification = {
   id: string;
   message: string;
   progress?: number;

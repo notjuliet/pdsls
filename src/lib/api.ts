@@ -222,7 +222,8 @@ const getConstellation = async (
   return await res.json();
 };
 
-const getAllBacklinks = (target: string) => getConstellation("/links/all", target);
+const getAllBacklinks = (target: string): Promise<LinkData> =>
+  getConstellation("/links/all", target);
 
 const getRecordBacklinks = (
   target: string,
@@ -275,6 +276,5 @@ export {
   resolveLexiconAuthorityDirect,
   resolveLexiconSchema,
   validateHandle,
-  type LinkData,
   type LinksWithRecords,
 };

@@ -1,6 +1,6 @@
 import { JSX } from "solid-js";
 
-export interface ButtonProps {
+interface ButtonProps {
   type?: "button" | "submit" | "reset" | "menu" | undefined;
   disabled?: boolean;
   class?: string;

@@ -2,7 +2,7 @@ import { Client } from "@atcute/client";
 import { DidDocument } from "@atcute/identity";
 import { Accessor, createContext, useContext } from "solid-js";
 
-export interface RepoContextValue {
+interface RepoContextValue {
   did: Accessor<string>;
   pds: Accessor<string | undefined>;
   rpc: Accessor<Client | undefined>;

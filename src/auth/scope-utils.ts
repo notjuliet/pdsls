@@ -23,7 +23,7 @@ export const GRANULAR_SCOPES = [
   },
 ];
 
-export const BASE_SCOPES = ["atproto"];
+const BASE_SCOPES = ["atproto"];
 
 export const buildScopeString = (selected: Set<string>): string => {
   const granular = GRANULAR_SCOPES.filter((s) => selected.has(s.id)).map((s) => s.scope);
@@ -40,7 +40,7 @@ export const parseScopeString = (scopeIdsString: string): Set<string> => {
   return new Set(ids.filter((id) => id !== "atproto"));
 };
 
-export const hasScope = (grantedScopes: string | undefined, scopeId: string): boolean => {
+const hasScope = (grantedScopes: string | undefined, scopeId: string): boolean => {
   if (!grantedScopes) return false;
   return grantedScopes.split(",").includes(scopeId);
 };

@@ -1,6 +1,6 @@
 import { ComponentProps, createEffect, createSignal, onCleanup, Show } from "solid-js";
 
-export interface ModalProps extends Pick<ComponentProps<"svg">, "children"> {
+interface ModalProps extends Pick<ComponentProps<"svg">, "children"> {
   open?: boolean;
   onClose?: () => void;
   onClosed?: () => void;
@@ -10,7 +10,7 @@ export interface ModalProps extends Pick<ComponentProps<"svg">, "children"> {
   contentClass?: string;
 }
 
-export const CLOSE_DURATION = 200;
+const CLOSE_DURATION = 200;
 
 export const Modal = (props: ModalProps) => {
   const [mounted, setMounted] = createSignal(props.open ?? false);

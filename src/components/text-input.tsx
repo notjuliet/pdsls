@@ -1,4 +1,4 @@
-export interface TextInputProps {
+interface TextInputProps {
   ref?: HTMLInputElement | ((el: HTMLInputElement) => void);
   class?: string;
   id?: string;
