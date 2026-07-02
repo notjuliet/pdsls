@@ -167,12 +167,9 @@ const BacklinkDirectory = (props: { groups: CollectionGroup[]; pathname: string 
                 <Favicon domain={authority()} reverse />
                 <span class="min-w-0 truncate">{group.collection}</span>
               </div>
-              <div class="flex shrink-0 items-center gap-2 text-neutral-600 dark:text-neutral-400">
-                <span class="text-xs">
-                  {group.totalRecords} record{group.totalRecords !== 1 ? "s" : ""}
-                </span>
-                <span class="iconify lucide--chevron-right" />
-              </div>
+              <span class="shrink-0 text-xs text-neutral-600 dark:text-neutral-400">
+                {group.totalRecords} record{group.totalRecords !== 1 ? "s" : ""}
+              </span>
             </A>
           );
         }}

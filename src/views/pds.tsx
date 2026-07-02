@@ -107,16 +107,8 @@ const RepoCard = (props: {
           onclick={() => {
             if (!canHover) props.onToggle();
           }}
-          class="flex min-w-0 flex-1 items-center gap-2 p-1.5"
+          class="flex min-w-0 flex-1 items-center px-2 py-1.5"
         >
-          <span
-            classList={{
-              "mt-0.5 flex shrink-0 items-center text-neutral-400 transition-transform duration-250 dark:text-neutral-500": true,
-              "rotate-90": expanded(),
-            }}
-          >
-            <span class="iconify lucide--chevron-right"></span>
-          </span>
           <div class="flex min-h-5 min-w-0 flex-1 items-center gap-x-2 text-xs sm:text-sm">
             <span class="min-w-0 truncate font-mono" onclick={(e) => e.stopPropagation()}>
               <A
@@ -163,7 +155,7 @@ const RepoCard = (props: {
         }}
       >
         <div class="overflow-hidden">
-          <div class="ml-7.5 flex flex-col gap-1.5 pb-1.5 font-mono text-xs text-neutral-500 dark:text-neutral-400">
+          <div class="ml-2 flex flex-col gap-1.5 pb-1.5 font-mono text-xs text-neutral-500 dark:text-neutral-400">
             <Show when={handle.loading}>
               <span class="animate-pulse">resolving...</span>
             </Show>
