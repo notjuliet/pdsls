@@ -344,7 +344,7 @@ const PropertyRow = (props: {
             <span class="font-mono text-xs text-neutral-600 dark:text-neutral-400">union</span>
           </Show>
           <Show when={props.required}>
-            <span class="text-xs font-semibold text-red-500 dark:text-red-400">required</span>
+            <span class="text-xs font-medium text-red-500 dark:text-red-400">required</span>
           </Show>
         </div>
       </Show>
@@ -526,7 +526,7 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
           <span class="iconify lucide--link absolute top-1/2 -left-6 -translate-y-1/2 text-base opacity-0 transition-opacity group-hover:opacity-100" />
           {props.name === "main" ? "Main Definition" : props.name}
         </LocalSchemaLink>
-        <span class={`rounded px-2 py-0.5 text-xs font-semibold ${defTypeColor()}`}>
+        <span class={`rounded px-1.5 py-0.5 text-xs font-semibold ${defTypeColor()}`}>
           <span class="uppercase">{props.def.type.replace("-", " ")}</span>
           <Show when={props.def.key}>
             <span class=""> · {props.def.key}</span>
