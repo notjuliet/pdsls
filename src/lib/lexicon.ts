@@ -1,6 +1,6 @@
-import { ResolvedSchema } from "@atcute/lexicon-resolver";
-import { Nsid } from "@atcute/lexicons";
-import { AtprotoDid } from "@atcute/lexicons/syntax";
+import type { ResolvedSchema } from "@atcute/lexicon-resolver";
+import type { Nsid } from "@atcute/lexicons";
+import type { AtprotoDid } from "@atcute/lexicons/syntax";
 
 import { resolveLexiconAuthority, resolveLexiconSchema } from "./api.js";
 
@@ -20,6 +20,8 @@ export const schemaHash = (defName?: string) => (defName ? `#schema:${defName}` 
 
 export const schemaHref = (nsid: string, defName?: string) =>
   `/lexicon/${nsid}${schemaHash(defName)}`;
+
+export const lexiconRecordHref = (nsid: string) => `/lexicon/${nsid}#record`;
 
 export const resolveLexicon = (nsid: Nsid): Promise<CachedLexicon> => {
   let cached = cache.get(nsid);

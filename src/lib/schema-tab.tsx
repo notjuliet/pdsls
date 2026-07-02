@@ -1,6 +1,5 @@
-import { ResolvedSchema } from "@atcute/lexicon-resolver";
-import { Nsid } from "@atcute/lexicons";
-import { AtprotoDid } from "@atcute/lexicons/syntax";
+import type { ResolvedSchema } from "@atcute/lexicon-resolver";
+import type { Nsid } from "@atcute/lexicons";
 import { useLocation } from "@solidjs/router";
 import { createEffect, createSignal, ErrorBoundary, Show } from "solid-js";
 
@@ -10,7 +9,6 @@ import { resolveLexicon } from "./lexicon.js";
 export const useLexiconSchema = (collection: () => string | undefined) => {
   const location = useLocation();
   const [schema, setSchema] = createSignal<ResolvedSchema>();
-  const [authority, setAuthority] = createSignal<AtprotoDid>();
   const [error, setError] = createSignal<string>();
   const [loading, setLoading] = createSignal(false);
 
@@ -22,7 +20,6 @@ export const useLexiconSchema = (collection: () => string | undefined) => {
       setLoading(true);
       resolveLexicon(col as Nsid).then(
         (result) => {
-          setAuthority(result.authority);
           setSchema(result.schema);
           setLoading(false);
         },
@@ -34,12 +31,11 @@ export const useLexiconSchema = (collection: () => string | undefined) => {
     }
   });
 
-  return { schema, authority, error, loading, showSchema };
+  return { schema, error, loading, showSchema };
 };
 
 export const SchemaTabContent = (props: {
   schema?: ResolvedSchema;
-  authority?: AtprotoDid;
   loading: boolean;
   error?: string;
   fallbackSchema?: any;
@@ -53,10 +49,7 @@ export const SchemaTabContent = (props: {
     </Show>
     <Show when={props.schema || props.fallbackSchema}>
       <ErrorBoundary fallback={(err) => <div>Error: {err.message}</div>}>
-        <LexiconSchemaView
-          schema={props.fallbackSchema ?? props.schema?.rawSchema}
-          authority={props.authority}
-        />
+        <LexiconSchemaView schema={props.fallbackSchema ?? props.schema?.rawSchema} />
       </ErrorBoundary>
     </Show>
   </>

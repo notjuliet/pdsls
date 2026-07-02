@@ -547,7 +547,6 @@ const CollectionView = () => {
           <Show when={lexicon.showSchema()}>
             <SchemaTabContent
               schema={lexicon.schema()}
-              authority={lexicon.authority()}
               loading={lexicon.loading()}
               error={lexicon.error()}
             />

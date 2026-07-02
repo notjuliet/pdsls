@@ -1,9 +1,8 @@
 import type { Nsid } from "@atcute/lexicons";
-import type { AtprotoDid } from "@atcute/lexicons/syntax";
 import { A } from "@solidjs/router";
 import { Show } from "solid-js";
 
-import { parseLexiconRef, resolveLexicon, schemaHash } from "../../lib/lexicon";
+import { parseLexiconRef, resolveLexicon, schemaHref } from "../../lib/lexicon";
 import { LexiconSchemaView, type LexiconSchema } from "../lexicon-schema";
 import HoverCard, { HoverCardError, type HoverTriggerRenderer } from "./base";
 import { createHoverResource } from "./resource";
@@ -16,19 +15,14 @@ interface LexiconHoverCardProps {
   hoverDelay?: number;
 }
 
-interface LexiconState {
-  authority: AtprotoDid;
-  schema: LexiconSchema;
-}
-
-const fetchLexiconPreview = async (nsid: string): Promise<LexiconState> => {
-  const { authority, schema } = await resolveLexicon(nsid as Nsid);
-  return { authority, schema: schema.rawSchema as LexiconSchema };
+const fetchLexiconPreview = async (nsid: string): Promise<LexiconSchema> => {
+  const { schema } = await resolveLexicon(nsid as Nsid);
+  return schema.rawSchema as LexiconSchema;
 };
 
 const LexiconHoverCard = (props: LexiconHoverCardProps) => {
   const parsed = () => parseLexiconRef(props.lexicon);
-  const href = () => `/lexicon/${parsed().nsid}${schemaHash(parsed().defName)}`;
+  const href = () => schemaHref(parsed().nsid, parsed().defName);
   const preview = createHoverResource(() => parsed().nsid, fetchLexiconPreview, {
     getErrorMessage: (err) => (err instanceof Error ? err.message : "Failed to resolve schema"),
   });
@@ -60,13 +54,7 @@ const LexiconHoverCard = (props: LexiconHoverCardProps) => {
       </Show>
       <Show when={preview.state().data}>
         {(data) => (
-          <LexiconSchemaView
-            schema={data().schema}
-            authority={data().authority}
-            preview
-            inertRefs
-            focusDef={parsed().defName}
-          />
+          <LexiconSchemaView schema={data()} preview inertRefs focusDef={parsed().defName} />
         )}
       </Show>
     </HoverCard>
