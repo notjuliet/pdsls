@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -50,6 +50,11 @@ const configs = {
 try {
   Object.values(configs).forEach((config) => {
     mkdirSync(dirname(config.path), { recursive: true });
+    if (existsSync(config.path) && readFileSync(config.path, "utf8") === config.content) {
+      console.log(`${config.name} already up to date for ${baseUrl}`);
+      return;
+    }
+
     writeFileSync(config.path, config.content);
     console.log(`Generated ${config.name} for ${baseUrl}`);
   });
