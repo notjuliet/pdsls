@@ -663,6 +663,7 @@ const CollectionView = () => {
                   autocomplete="off"
                   class="min-w-0 grow py-1 select-none placeholder:text-xs focus:outline-none"
                   placeholder="Filter records..."
+                  value={filter() ?? ""}
                   onInput={(e) => setFilter(e.currentTarget.value)}
                 />
               </div>
