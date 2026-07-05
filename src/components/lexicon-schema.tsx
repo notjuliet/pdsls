@@ -58,6 +58,7 @@ const useLexiconSchemaContext = () => useContext(LexiconSchemaContext) ?? {};
 const schemaDefId = (defName: string) => `schema:${defName}`;
 const SCHEMA_REF_TEXT_CLASS = "font-mono text-xs wrap-break-word text-blue-500 dark:text-blue-400";
 const SCHEMA_LINK_CLASS = `${SCHEMA_REF_TEXT_CLASS} cursor-pointer hover:underline`;
+const PREVIEW_DEFINITION_LIMIT = 6;
 
 const keepLocalHashNavigationNative = (event: MouseEvent) => event.stopPropagation();
 
@@ -750,7 +751,7 @@ export const LexiconSchemaView = (props: {
     const visible = new Map<string, LexiconDef>();
     if (props.schema.defs.main) visible.set("main", props.schema.defs.main);
     for (const [name, def] of entries) {
-      if (visible.size >= 3) break;
+      if (visible.size >= PREVIEW_DEFINITION_LIMIT) break;
       visible.set(name, def);
     }
 

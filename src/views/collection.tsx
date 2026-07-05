@@ -98,7 +98,11 @@ const formatPreviewValue = (value: JSONType | undefined) => {
   return `${str.slice(0, PREVIEW_VALUE_MAX_LENGTH)}...`;
 };
 
-const RecordLink = (props: { record: AtprotoRecord; previewField?: string }) => {
+const RecordLink = (props: {
+  record: AtprotoRecord;
+  previewField?: string;
+  activeClass?: string;
+}) => {
   const previewValue = () => {
     const field = props.previewField;
     const value = getRecordValue(props.record);
@@ -109,6 +113,8 @@ const RecordLink = (props: { record: AtprotoRecord; previewField?: string }) => 
   return (
     <HoverCard
       class="flex w-full min-w-0 flex-col rounded px-1 py-0.5"
+      activeClass={props.activeClass ?? "bg-neutral-200 dark:bg-neutral-700"}
+      previewPlacement="side"
       trigger={
         <>
           <span class="flex w-full min-w-0 items-baseline">
@@ -585,7 +591,13 @@ const CollectionView = () => {
                               setRecords(index(), "toDelete", !record.toDelete);
                             }}
                           >
-                            <RecordLink record={record} previewField={previewField()} />
+                            <RecordLink
+                              record={record}
+                              previewField={previewField()}
+                              activeClass={
+                                record.toDelete ? "bg-blue-300/80 dark:bg-blue-700/50" : undefined
+                              }
+                            />
                           </div>
                         </Show>
                         <Show when={!batchDelete()}>

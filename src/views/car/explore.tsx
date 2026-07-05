@@ -829,6 +829,8 @@ const CollectionSubview = (props: {
             return (
               <HoverCard
                 class="flex w-full items-baseline gap-1 rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                activeClass="bg-neutral-200 dark:bg-neutral-700"
+                previewPlacement="side"
                 trigger={
                   <button
                     onClick={() => {
@@ -843,12 +845,14 @@ const CollectionSubview = (props: {
                     <span class="max-w-full shrink-0 truncate text-sm text-blue-500 dark:text-blue-400">
                       {entry.key}
                     </span>
-                    <span class="truncate text-xs text-neutral-500 dark:text-neutral-400" dir="rtl">
+                    <span class="truncate text-xs text-neutral-400 dark:text-neutral-500" dir="rtl">
                       {entry.cid}
                     </span>
                     <Show when={timestamp}>
                       {(ts) => (
-                        <span class="ml-auto shrink-0 text-xs">{localDateFromTimestamp(ts())}</span>
+                        <span class="ml-auto shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
+                          {localDateFromTimestamp(ts())}
+                        </span>
                       )}
                     </Show>
                   </button>

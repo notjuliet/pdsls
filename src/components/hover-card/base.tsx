@@ -11,18 +11,31 @@ interface HoverTriggerState {
 
 export type HoverTriggerRenderer = (state: HoverTriggerState) => JSX.Element;
 
+interface HoverCardGroup {
+  active: (() => void) | null;
+}
+
+interface HoverCardContextValue {
+  group: HoverCardGroup;
+  suppress?: () => () => void;
+}
+
+const rootHoverCardGroup: HoverCardGroup = { active: null };
+
 /**
- * Lets a nested hover card suppress its ancestor's preview while the descendant
- * is being interacted with, so nested previews don't overlap. A card calls the
- * function on mouseenter and receives an unsubscribe to invoke on mouseleave.
+ * Lets hover cards nested in trigger content suppress an ancestor's preview.
+ * Portaled preview content sits outside this provider so links inside an open
+ * preview can be hovered without unmounting the preview that contains them.
  */
-const HoverCardContext = createContext<() => () => void>();
+const HoverCardContext = createContext<HoverCardContextValue>({ group: rootHoverCardGroup });
 
 export const HoverCardError = (props: { message?: string }) => (
   <div class="font-sans text-sm wrap-break-word text-red-500 dark:text-red-400">
     {props.message}
   </div>
 );
+
+const HIDE_DELAY_MS = 150;
 
 interface HoverCardProps {
   /** Called when hover starts (for prefetching) */
@@ -33,8 +46,12 @@ interface HoverCardProps {
   trigger: JSX.Element;
   /** Additional classes for the wrapper span */
   class?: string;
+  /** Additional classes for the wrapper span while the preview is visible */
+  activeClass?: string;
   /** Additional classes for the preview container */
   previewClass?: string;
+  /** Preview placement preference (default: auto) */
+  previewPlacement?: "auto" | "side";
   /** Whether the preview container should be visible once hover is active */
   showPreview?: boolean;
   /** Preview content */
@@ -53,12 +70,71 @@ const HoverCard = (props: HoverCardProps) => {
   let previewRef!: HTMLDivElement;
   let resizeObserver: ResizeObserver | null = null;
   let hoverTimeout: number | null = null;
+  let hideTimeout: number | null = null;
   let unsuppressParent: (() => void) | null = null;
 
-  const parentSuppress = useContext(HoverCardContext);
+  const parentContext = useContext(HoverCardContext);
+  const triggerDescendantGroup: HoverCardGroup = { active: null };
+  const previewDescendantGroup: HoverCardGroup = { active: null };
+
   const suppressAncestor = () => {
     setChildActive(true);
     return () => setChildActive(false);
+  };
+
+  const clearHoverTimeout = () => {
+    if (hoverTimeout === null) return;
+    clearTimeout(hoverTimeout);
+    hoverTimeout = null;
+  };
+
+  const clearHideTimeout = () => {
+    if (hideTimeout === null) return;
+    clearTimeout(hideTimeout);
+    hideTimeout = null;
+  };
+
+  const releaseParent = () => {
+    unsuppressParent?.();
+    unsuppressParent = null;
+  };
+
+  const suppressParent = () => {
+    if (unsuppressParent) return;
+    unsuppressParent = parentContext.suppress?.() ?? null;
+  };
+
+  const releaseGroup = () => {
+    if (parentContext.group.active !== hidePreview) return;
+    parentContext.group.active = null;
+  };
+
+  const claimGroup = () => {
+    if (parentContext.group.active === hidePreview) return;
+    parentContext.group.active?.();
+    parentContext.group.active = hidePreview;
+  };
+
+  const showPreview = () => {
+    claimGroup();
+    props.onHover?.();
+    setShow(true);
+  };
+
+  const hidePreview = () => {
+    clearHoverTimeout();
+    clearHideTimeout();
+    setShow(false);
+    releaseGroup();
+    releaseParent();
+  };
+
+  const scheduleHide = () => {
+    // The preview is portaled into <body>, separate from the trigger span. A
+    // short delay gives the cursor time to cross between the two surfaces.
+    clearHoverTimeout();
+    clearHideTimeout();
+    hideTimeout = window.setTimeout(hidePreview, HIDE_DELAY_MS);
   };
 
   const updateAnchorRect = () => {
@@ -89,73 +165,84 @@ const HoverCard = (props: HoverCardProps) => {
 
   onCleanup(() => {
     resizeObserver?.disconnect();
-    if (hoverTimeout !== null) {
-      clearTimeout(hoverTimeout);
-    }
-    unsuppressParent?.();
-    unsuppressParent = null;
+    clearHoverTimeout();
+    clearHideTimeout();
+    releaseGroup();
+    releaseParent();
   });
 
   const getPreviewStyle = () => {
-    return getFloatingStyle(anchorRect(), previewSize(), {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
+    return getFloatingStyle(
+      anchorRect(),
+      previewSize(),
+      {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      },
+      {
+        placement: props.previewPlacement,
+      },
+    );
   };
 
   const handleMouseEnter = () => {
     const delay = props.hoverDelay ?? 0;
     updateAnchorRect();
+    clearHoverTimeout();
+    clearHideTimeout();
 
     // Suppress any ancestor hover card while this one is (or will be) open, so
     // nested previews don't overlap. Done immediately, before the hover delay,
     // so the ancestor's own delayed preview never flashes underneath us.
-    unsuppressParent = parentSuppress?.() ?? null;
+    suppressParent();
+    claimGroup();
 
     if (delay > 0) {
       hoverTimeout = window.setTimeout(() => {
-        props.onHover?.();
-        setShow(true);
+        showPreview();
         hoverTimeout = null;
       }, delay);
     } else {
-      props.onHover?.();
-      setShow(true);
+      showPreview();
     }
   };
 
-  const handleMouseLeave = () => {
-    if (hoverTimeout !== null) {
-      clearTimeout(hoverTimeout);
-      hoverTimeout = null;
-    }
-    setShow(false);
-    unsuppressParent?.();
-    unsuppressParent = null;
-  };
+  const previewVisible = () => active() && canHover && (props.showPreview ?? true);
 
   return (
-    <HoverCardContext.Provider value={suppressAncestor}>
-      <span
-        ref={anchorRef}
-        class={`group/hover-card relative ${props.class || "inline"}`}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+    <>
+      <HoverCardContext.Provider
+        value={{ group: triggerDescendantGroup, suppress: suppressAncestor }}
       >
-        {props.trigger}
-        <Show when={active() && canHover && (props.showPreview ?? true)}>
-          <Portal>
-            <div
-              ref={setupResizeObserver}
-              style={getPreviewStyle()}
-              class={`dark:bg-dark-300 dark:shadow-dark-700 pointer-events-none fixed z-50 block overflow-hidden rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 shadow-md dark:border-neutral-700 ${props.previewClass ?? "max-h-80 w-max max-w-sm font-mono text-xs whitespace-pre-wrap sm:max-h-112 lg:max-w-lg"}`}
-            >
-              {props.children}
-            </div>
-          </Portal>
-        </Show>
-      </span>
-    </HoverCardContext.Provider>
+        <span
+          ref={anchorRef}
+          class={`group/hover-card relative ${props.class || "inline"} ${previewVisible() ? (props.activeClass ?? "") : ""}`}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={scheduleHide}
+        >
+          {props.trigger}
+        </span>
+      </HoverCardContext.Provider>
+      <Show when={previewVisible()}>
+        <Portal>
+          <div
+            style={getPreviewStyle()}
+            onMouseEnter={clearHideTimeout}
+            onMouseLeave={scheduleHide}
+            class={`dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto fixed z-50 block overflow-hidden rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 shadow-md dark:border-neutral-700 ${props.previewClass ?? "max-h-80 w-max max-w-sm font-mono text-xs whitespace-pre-wrap sm:max-h-112 lg:max-w-lg"}`}
+          >
+            <HoverCardContext.Provider value={{ group: previewDescendantGroup }}>
+              <div
+                ref={setupResizeObserver}
+                class="max-h-[inherit] overflow-y-auto overscroll-contain bg-inherit p-2"
+              >
+                {props.children}
+              </div>
+            </HoverCardContext.Provider>
+          </div>
+        </Portal>
+      </Show>
+    </>
   );
 };
 

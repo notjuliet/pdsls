@@ -29,10 +29,14 @@ interface JSONContext {
   keyLinks?: boolean;
   path?: string;
   preview?: boolean;
+  depth?: number;
 }
 
 const JSONCtx = createContext<JSONContext>();
 const useJSONCtx = () => useContext(JSONCtx)!;
+
+const PREVIEW_EXPANDED_DEPTH = 2;
+const PREVIEW_EXPANDED_CHILD_LIMIT = 8;
 
 interface AtBlob {
   $type: string;
@@ -140,7 +144,17 @@ const CollapsibleItem = (props: {
     Array.isArray(props.value)
       ? (props.value as JSONType[]).length === 0
       : Object.keys(props.value as object).length === 0;
-  const [show, setShow] = createSignal(!(ctx.preview && isObject() && !isEmpty()));
+  const childCount = () =>
+    Array.isArray(props.value)
+      ? (props.value as JSONType[]).length
+      : Object.keys(props.value as object).length;
+  const valueDepth = () => (ctx.depth ?? 0) + 1;
+  const shouldCollapsePreview = () =>
+    ctx.preview &&
+    isObject() &&
+    !isEmpty() &&
+    (valueDepth() > PREVIEW_EXPANDED_DEPTH || childCount() > PREVIEW_EXPANDED_CHILD_LIMIT);
+  const [show, setShow] = createSignal(!shouldCollapsePreview());
   const isBlobContext = props.parentIsBlob ?? ctx.parentIsBlob;
 
   const labelStr = () => {
@@ -219,16 +233,9 @@ const CollapsibleItem = (props: {
         <Show when={!show() && summary()}>
           <button
             type="button"
-            classList={{
-              "flex items-center gap-0.5 rounded text-xs whitespace-nowrap text-neutral-500 dark:text-neutral-400": true,
-              "bg-neutral-200 px-1 hover:bg-neutral-300 hover:text-neutral-700 sm:py-0.5 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:hover:text-neutral-200":
-                !ctx.preview,
-            }}
+            class="cursor-default rounded whitespace-nowrap text-neutral-500 transition-colors hover:text-neutral-700 focus-visible:ring-2 focus-visible:ring-blue-400/30 focus-visible:outline-none dark:text-neutral-400 dark:hover:text-neutral-200"
             onclick={() => setShow(true)}
           >
-            <Show when={!ctx.preview}>
-              <span class="iconify lucide--chevron-right"></span>
-            </Show>
             {summary()}
           </button>
         </Show>
@@ -248,7 +255,9 @@ const CollapsibleItem = (props: {
             <span class="h-full w-px bg-neutral-300 transition-colors group-hover/fold:bg-neutral-600 dark:bg-neutral-600 dark:group-hover/fold:bg-neutral-300" />
           </span>
         </Show>
-        <JSONCtx.Provider value={{ ...ctx, parentIsBlob: isBlobContext, path: fullPath() }}>
+        <JSONCtx.Provider
+          value={{ ...ctx, parentIsBlob: isBlobContext, path: fullPath(), depth: valueDepth() }}
+        >
           <Show when={!ctx.preview || show()}>
             <JSONValueInner
               data={props.value}
