@@ -20,18 +20,12 @@ export type DiffEntry =
       at: string;
     }
   | {
-      type: "rotation_key_added";
+      type: "rotation_key_updated";
       orig: IndexedEntry;
       nullified: boolean;
       at: string;
-      rotation_key: string;
-    }
-  | {
-      type: "rotation_key_removed";
-      orig: IndexedEntry;
-      nullified: boolean;
-      at: string;
-      rotation_key: string;
+      added_rotation_keys: string[];
+      removed_rotation_keys: string[];
     }
   | {
       type: "verification_method_added";
@@ -178,23 +172,14 @@ export const createOperationHistory = (entries: IndexedEntry[]): DiffEntry[] => 
         const additions = difference(op.rotationKeys, oldRotationKeys);
         const removals = difference(oldRotationKeys, op.rotationKeys);
 
-        for (const key of additions) {
+        if (additions.length > 0 || removals.length > 0) {
           history.push({
-            type: "rotation_key_added",
+            type: "rotation_key_updated",
             orig: entry,
             nullified: entry.nullified,
             at: entry.createdAt,
-            rotation_key: key,
-          });
-        }
-
-        for (const key of removals) {
-          history.push({
-            type: "rotation_key_removed",
-            orig: entry,
-            nullified: entry.nullified,
-            at: entry.createdAt,
-            rotation_key: key,
+            added_rotation_keys: additions,
+            removed_rotation_keys: removals,
           });
         }
       }

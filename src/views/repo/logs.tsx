@@ -153,19 +153,20 @@ export const PlcLogView = (props: { did: string }) => {
             oldValue: diff.prev_handle,
             newValue: diff.next_handle,
           };
-        case "rotation_key_added":
+        case "rotation_key_updated":
+          const addedRotationKeyCount = diff.added_rotation_keys.length;
+          const removedRotationKeyCount = diff.removed_rotation_keys.length;
+
           return {
             icon: "lucide--key-round",
-            title: "Rotation key added",
-            value: diff.rotation_key,
-            isAddition: true,
-          };
-        case "rotation_key_removed":
-          return {
-            icon: "lucide--key-round",
-            title: "Rotation key removed",
-            value: diff.rotation_key,
-            isRemoval: true,
+            title:
+              addedRotationKeyCount === 1 && removedRotationKeyCount === 0
+                ? "Rotation key added"
+                : removedRotationKeyCount === 1 && addedRotationKeyCount === 0
+                  ? "Rotation key removed"
+                  : "Rotation keys updated",
+            addedValues: diff.added_rotation_keys,
+            removedValues: diff.removed_rotation_keys,
           };
         case "service_added":
           return {
@@ -227,6 +228,8 @@ export const PlcLogView = (props: { did: string }) => {
       value = "",
       oldValue = "",
       newValue = "",
+      addedValues = [],
+      removedValues = [],
       badge = "",
       isAddition = false,
       isRemoval = false,
@@ -290,6 +293,27 @@ export const PlcLogView = (props: { did: string }) => {
               <span class="shrink-0">+</span>
               <span class="truncate">{newValue}</span>
             </div>
+          </div>
+        </Show>
+        <Show when={addedValues.length > 0 || removedValues.length > 0}>
+          <div></div>
+          <div class="flex min-w-0 flex-col text-sm">
+            <For each={removedValues}>
+              {(removedValue) => (
+                <div class="flex items-start gap-2 text-red-700 dark:text-red-300">
+                  <span class="shrink-0">−</span>
+                  <span class="truncate">{removedValue}</span>
+                </div>
+              )}
+            </For>
+            <For each={addedValues}>
+              {(addedValue) => (
+                <div class="flex items-start gap-2 text-green-700 dark:text-green-300">
+                  <span class="shrink-0">+</span>
+                  <span class="truncate">{addedValue}</span>
+                </div>
+              )}
+            </For>
           </div>
         </Show>
       </div>
