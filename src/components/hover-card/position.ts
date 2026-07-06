@@ -15,7 +15,15 @@ interface FloatingPositionOptions {
   padding?: number;
   minHeight?: number;
   placement?: "auto" | "side";
+  lockedPlacement?: FloatingPlacement;
   sideBreakpoint?: number;
+}
+
+export type FloatingPlacement = "above" | "below" | "left" | "right";
+
+interface FloatingPosition {
+  style: JSX.CSSProperties;
+  placement: FloatingPlacement | null;
 }
 
 const SIDE_PLACEMENT_BREAKPOINT = 1280;
@@ -25,13 +33,13 @@ export const measureFloatingElement = (element: HTMLElement): FloatingSize => ({
   height: element.scrollHeight,
 });
 
-export const getFloatingStyle = (
+export const getFloatingPosition = (
   anchorRect: DOMRect | null,
   floatingSize: FloatingSize,
   viewport: ViewportSize,
   options: FloatingPositionOptions = {},
-): JSX.CSSProperties => {
-  if (!anchorRect) return {};
+): FloatingPosition => {
+  if (!anchorRect) return { style: {}, placement: null };
 
   const gap = options.gap ?? 4;
   const padding = options.padding ?? 8;
@@ -42,14 +50,22 @@ export const getFloatingStyle = (
   const viewportMaxHeight = Math.max(minHeight, viewport.height - padding * 2);
   const preferredHeight = Math.min(floatingSize.height, viewportMaxHeight);
 
+  const lockedVertical = options.lockedPlacement === "above" || options.lockedPlacement === "below";
+
   if (
     options.placement === "side" &&
+    !lockedVertical &&
     effectiveWidth &&
     viewport.width >= (options.sideBreakpoint ?? SIDE_PLACEMENT_BREAKPOINT)
   ) {
     const rightSpace = Math.max(0, viewport.width - padding - anchorRect.right - gap);
     const leftSpace = Math.max(0, anchorRect.left - gap - padding);
-    const placeRight = rightSpace >= leftSpace;
+    const placeRight =
+      options.lockedPlacement === "right"
+        ? true
+        : options.lockedPlacement === "left"
+          ? false
+          : rightSpace >= leftSpace;
     const availableWidth = placeRight ? rightSpace : leftSpace;
 
     if (availableWidth > 0) {
@@ -62,11 +78,14 @@ export const getFloatingStyle = (
       );
 
       return {
-        left: `${placeRight ? anchorRect.right + gap : anchorRect.left - gap}px`,
-        top: `${top}px`,
-        ...(placeRight ? {} : { transform: "translateX(-100%)" }),
-        "max-width": `${availableWidth}px`,
-        "max-height": `${availableHeight}px`,
+        placement: placeRight ? "right" : "left",
+        style: {
+          left: `${placeRight ? anchorRect.right + gap : anchorRect.left - gap}px`,
+          top: `${top}px`,
+          ...(placeRight ? {} : { transform: "translateX(-100%)" }),
+          "max-width": `${availableWidth}px`,
+          "max-height": `${availableHeight}px`,
+        },
       };
     }
   }
@@ -81,16 +100,23 @@ export const getFloatingStyle = (
   const belowSpace = Math.max(0, viewport.height - padding - belowTop);
   const aboveSpace = Math.max(0, anchorRect.top - gap - padding);
   const placeBelow =
-    !floatingSize.height || belowSpace >= preferredHeight || belowSpace >= aboveSpace;
+    options.lockedPlacement === "below"
+      ? true
+      : options.lockedPlacement === "above"
+        ? false
+        : !floatingSize.height || belowSpace >= preferredHeight || belowSpace >= aboveSpace;
   const availableSpace = placeBelow ? belowSpace : aboveSpace;
   const availableHeight = Math.max(minHeight, Math.min(viewportMaxHeight, availableSpace));
   const visibleHeight = Math.min(floatingSize.height || availableHeight, availableHeight);
   const top = placeBelow ? belowTop : Math.max(padding, anchorRect.top - gap - visibleHeight);
 
   return {
-    left: `${left}px`,
-    top: `${top}px`,
-    transform: "translateX(-50%)",
-    "max-height": `${availableHeight}px`,
+    placement: placeBelow ? "below" : "above",
+    style: {
+      left: `${left}px`,
+      top: `${top}px`,
+      transform: "translateX(-50%)",
+      "max-height": `${availableHeight}px`,
+    },
   };
 };

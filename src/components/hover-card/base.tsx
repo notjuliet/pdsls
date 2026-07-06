@@ -3,7 +3,7 @@ import type { Accessor, JSX } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { canHover } from "../../layout";
-import { getFloatingStyle, measureFloatingElement } from "./position";
+import { getFloatingPosition, measureFloatingElement, type FloatingPlacement } from "./position";
 
 interface HoverTriggerState {
   loading: Accessor<boolean>;
@@ -66,6 +66,7 @@ const HoverCard = (props: HoverCardProps) => {
 
   const [previewSize, setPreviewSize] = createSignal({ width: 0, height: 0 });
   const [anchorRect, setAnchorRect] = createSignal<DOMRect | null>(null);
+  const [lockedPlacement, setLockedPlacement] = createSignal<FloatingPlacement | null>(null);
   let anchorRef!: HTMLSpanElement;
   let previewRef!: HTMLDivElement;
   let resizeObserver: ResizeObserver | null = null;
@@ -125,6 +126,7 @@ const HoverCard = (props: HoverCardProps) => {
     clearHoverTimeout();
     clearHideTimeout();
     setShow(false);
+    setLockedPlacement(null);
     releaseGroup();
     releaseParent();
   };
@@ -171,18 +173,29 @@ const HoverCard = (props: HoverCardProps) => {
     releaseParent();
   });
 
+  const getViewportSize = () => ({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  createEffect(() => {
+    if (!previewVisible() || lockedPlacement()) return;
+
+    const size = previewSize();
+    if (!anchorRect() || !size.height) return;
+
+    const position = getFloatingPosition(anchorRect(), size, getViewportSize(), {
+      placement: props.previewPlacement,
+    });
+
+    if (position.placement) setLockedPlacement(position.placement);
+  });
+
   const getPreviewStyle = () => {
-    return getFloatingStyle(
-      anchorRect(),
-      previewSize(),
-      {
-        width: window.innerWidth,
-        height: window.innerHeight,
-      },
-      {
-        placement: props.previewPlacement,
-      },
-    );
+    return getFloatingPosition(anchorRect(), previewSize(), getViewportSize(), {
+      placement: props.previewPlacement,
+      lockedPlacement: lockedPlacement() ?? undefined,
+    }).style;
   };
 
   const handleMouseEnter = () => {
