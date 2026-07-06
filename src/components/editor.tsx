@@ -1,14 +1,19 @@
 import { indentWithTab } from "@codemirror/commands";
 import { json, jsonParseLinter } from "@codemirror/lang-json";
 import { linter } from "@codemirror/lint";
+import type { LintSource } from "@codemirror/lint";
 import { Compartment } from "@codemirror/state";
 import { keymap } from "@codemirror/view";
+import type { KeyBinding } from "@codemirror/view";
 import { basicDark } from "@fsegurai/codemirror-theme-basic-dark";
 import { basicLight } from "@fsegurai/codemirror-theme-basic-light";
 import { basicSetup, EditorView } from "codemirror";
 import { onCleanup, onMount } from "solid-js";
 
 import { editorInstance } from "./create/state";
+
+const tabIndentKey = indentWithTab as unknown as KeyBinding;
+const jsonLinter = jsonParseLinter() as unknown as LintSource;
 
 const Editor = (props: { content: string }) => {
   let editorDiv!: HTMLDivElement;
@@ -46,8 +51,8 @@ const Editor = (props: { content: string }) => {
         basicSetup,
         theme,
         json(),
-        keymap.of([indentWithTab]),
-        linter(jsonParseLinter()),
+        keymap.of([tabIndentKey]),
+        linter(jsonLinter),
         themeColor.of(document.documentElement.classList.contains("dark") ? basicDark : basicLight),
         EditorView.lineWrapping,
       ],
