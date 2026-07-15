@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "include": ["/*"],
+  "exclude": [
+    "/",
+    "/assets/*",
+    "/fonts/*",
+    "/headers/*",
+    "/88x31.webp",
+    "/cursor.cur",
+    "/favicon.ico",
+    "/manifest.json",
+    "/oauth-client-metadata.json",
+    "/opensearch.xml",
+    "/pdsls-logo.svg",
+    "/pwa-maskable.png",
+    "/ribbon.webp",
+    "/takumi_wasm_bg.wasm"
+  ]
+}
