@@ -25,10 +25,74 @@ const headers: Record<string, string> = {
   "did:plc:q6ywj35eew5f3cdajho7bmq7": "dreary.jpg",
 };
 
+const SCROLL_POSITION_KEY = "pdsls:scroll-position";
+
+interface SavedScrollPosition {
+  url: string;
+  top: number;
+}
+
+const consumeSavedScrollPosition = (documentUrl: string): SavedScrollPosition | undefined => {
+  let saved: string | null;
+
+  try {
+    saved = sessionStorage.getItem(SCROLL_POSITION_KEY);
+    sessionStorage.removeItem(SCROLL_POSITION_KEY);
+  } catch {
+    return;
+  }
+
+  const navigation = performance.getEntriesByType("navigation")[0] as
+    | PerformanceNavigationTiming
+    | undefined;
+  if (!saved || navigation?.type !== "reload") return;
+
+  try {
+    const parsed = JSON.parse(saved) as SavedScrollPosition;
+    if (parsed.url !== documentUrl) return;
+    if (!Number.isFinite(parsed.top)) return;
+    return parsed;
+  } catch {
+    return;
+  }
+};
+
+const restoreScrollPosition = (saved: SavedScrollPosition, content: HTMLElement) => {
+  let frame: number | undefined;
+  let timeout: number | undefined;
+  const cancelEvents: (keyof WindowEventMap)[] = ["keydown", "pointerdown", "touchstart", "wheel"];
+
+  const cleanup = () => {
+    observer.disconnect();
+    if (frame !== undefined) cancelAnimationFrame(frame);
+    if (timeout !== undefined) clearTimeout(timeout);
+    for (const event of cancelEvents) window.removeEventListener(event, cleanup);
+  };
+
+  const attempt = () => {
+    frame = undefined;
+    window.scrollTo(0, saved.top);
+    if (Math.abs(window.scrollY - saved.top) <= 1) cleanup();
+  };
+
+  const schedule = () => {
+    if (frame === undefined) frame = requestAnimationFrame(attempt);
+  };
+
+  const observer = new ResizeObserver(schedule);
+  observer.observe(content);
+  for (const event of cancelEvents) window.addEventListener(event, cleanup, { once: true });
+  timeout = window.setTimeout(cleanup, 10_000);
+  schedule();
+
+  return cleanup;
+};
+
 const Layout = (props: RouteSectionProps<unknown>) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isRouting = useIsRouting();
+  const savedScroll = consumeSavedScrollPosition(window.location.href);
   let stablePath = location.pathname;
   createEffect(() => {
     if (!isRouting()) stablePath = location.pathname;
@@ -42,6 +106,26 @@ const Layout = (props: RouteSectionProps<unknown>) => {
   onMount(() => {
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeEvent);
 
+    const saveScrollPosition = () => {
+      try {
+        sessionStorage.setItem(
+          SCROLL_POSITION_KEY,
+          JSON.stringify({
+            url: window.location.href,
+            top: window.scrollY,
+          } satisfies SavedScrollPosition),
+        );
+      } catch {
+        // Storage may be unavailable in privacy-restricted browser contexts.
+      }
+    };
+
+    const stopRestoring = savedScroll
+      ? restoreScrollPosition(savedScroll, document.getElementById("main")!)
+      : undefined;
+
+    window.addEventListener("pagehide", saveScrollPosition);
+
     const handleGoToRepo = (ev: KeyboardEvent) => {
       if (document.querySelector("[data-modal]")) return;
       if (ev.target instanceof HTMLInputElement || ev.target instanceof HTMLTextAreaElement) return;
@@ -53,7 +137,11 @@ const Layout = (props: RouteSectionProps<unknown>) => {
     };
 
     window.addEventListener("keydown", handleGoToRepo);
-    onCleanup(() => window.removeEventListener("keydown", handleGoToRepo));
+    onCleanup(() => {
+      window.removeEventListener("pagehide", saveScrollPosition);
+      window.removeEventListener("keydown", handleGoToRepo);
+      stopRestoring?.();
+    });
 
     if (localStorage.getItem("sailor") === "true") {
       const style = document.createElement("style");
