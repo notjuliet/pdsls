@@ -48,7 +48,6 @@ const SpaceCollectionView = () => {
         collection: params.collection,
         cursor: reset ? undefined : cursor(),
         limit: RECORDS_PER_PAGE,
-        reverse: true,
       });
       if (version !== requestVersion) return;
       setRecords((current) => (reset ? result.records : [...current, ...result.records]));
