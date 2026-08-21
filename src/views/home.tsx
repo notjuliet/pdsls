@@ -39,6 +39,7 @@ const getAtProtocolUrl = () => {
 const CardContent = (props: {
   icon: string | JSX.Element;
   title: string;
+  badge?: JSX.Element;
   description: string;
   accent: Accent;
 }) => (
@@ -50,6 +51,7 @@ const CardContent = (props: {
         props.icon
       )}
       <span class="truncate font-medium">{props.title}</span>
+      <Show when={props.badge}>{props.badge}</Show>
     </span>
     <span class="text-xs text-neutral-500 sm:text-sm dark:text-neutral-400">
       {props.description}
@@ -78,6 +80,7 @@ const LinkCard = (props: {
   href: string;
   icon: string | JSX.Element;
   title: string;
+  badge?: JSX.Element;
   description: string;
   accent: Accent;
 }) => (
@@ -85,6 +88,7 @@ const LinkCard = (props: {
     <CardContent
       icon={props.icon}
       title={props.title}
+      badge={props.badge}
       description={props.description}
       accent={props.accent}
     />
@@ -169,6 +173,19 @@ export const Home = () => {
             />
           </Show>
         </div>
+
+        <LinkCard
+          href="/spaces"
+          icon="lucide--lock-keyhole"
+          title="Spaces"
+          badge={
+            <span class="shrink-0 rounded-sm border border-yellow-600 px-1.5 py-[3px] text-[8px] leading-none font-medium tracking-wide text-yellow-600 uppercase dark:border-amber-400 dark:text-amber-400">
+              Alpha
+            </span>
+          }
+          description="Preview your non-public records"
+          accent="blue"
+        />
 
         <div class="grid grid-cols-3 gap-2">
           <LinkCard

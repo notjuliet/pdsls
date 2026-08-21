@@ -8,6 +8,7 @@ import {
 } from "@atcute/oauth-browser-client";
 
 import { resolveDidDoc } from "../lib/api";
+import { oauthScopeStringToIds, scopeIdsToString } from "./scope-utils";
 import { Sessions, setAgent, setSessions } from "./state";
 
 export const saveSessionToStorage = (sessions: Sessions) => {
@@ -54,8 +55,7 @@ export const retrieveSession = async (): Promise<void> => {
 
       localStorage.setItem("lastSignedIn", did);
 
-      const grantedScopes = localStorage.getItem("pendingScopes") || "atproto";
-      localStorage.removeItem("pendingScopes");
+      const grantedScopes = scopeIdsToString(oauthScopeStringToIds(auth.session.token.scope));
 
       const sessions = loadSessionsFromStorage();
       const newSessions: Sessions = sessions || {};
@@ -73,6 +73,9 @@ export const retrieveSession = async (): Promise<void> => {
           const rpc = new Client({ handler: new OAuthUserAgent(session) });
           const res = await rpc.get("com.atproto.server.getSession");
           newSessions[lastSignedIn].signedIn = true;
+          newSessions[lastSignedIn].grantedScopes = scopeIdsToString(
+            oauthScopeStringToIds(session.token.scope),
+          );
           saveSessionToStorage(newSessions);
           if (!res.ok) throw res.data.error;
           return session;

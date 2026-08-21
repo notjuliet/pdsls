@@ -241,6 +241,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
               <NavMenu href="/firehose" label="Firehose" icon="lucide--rss" />
               <NavMenu href="/spacedust" label="Spacedust" icon="lucide--sparkles" />
               <MenuSeparator />
+              <NavMenu href="/spaces" label="Spaces" icon="lucide--lock-keyhole" />
               <NavMenu href="/labels" label="Labels" icon="lucide--tag" />
               <NavMenu href="/car" label="CAR explorer" icon="lucide--folder-archive" />
               <MenuSeparator />

@@ -7,6 +7,7 @@ import {
   createSignal,
   ErrorBoundary,
   For,
+  onCleanup,
   Show,
   useContext,
 } from "solid-js";
@@ -30,6 +31,7 @@ interface JSONContext {
   path?: string;
   preview?: boolean;
   depth?: number;
+  fetchBlob?: (cid: string) => Promise<Blob>;
 }
 
 const JSONCtx = createContext<JSONContext>();
@@ -296,7 +298,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
 
   const blob: AtBlob = props.data as any;
   const canShowMedia = () =>
-    ctx.pds &&
+    (ctx.pds || ctx.fetchBlob) &&
     !ctx.hideBlobs &&
     (blob.mimeType.startsWith("image/") ||
       blob.mimeType === "video/mp4" ||
@@ -304,52 +306,92 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
 
   const MediaDisplay = () => {
     const [overrideShow, setOverrideShow] = createSignal(false);
+    const [mediaError, setMediaError] = createSignal(false);
     const hidden = () => hideMedia() && !overrideShow();
+    let objectUrl: string | undefined;
 
-    const [imageUrl] = createResource(
-      () => (blob.mimeType.startsWith("image/") ? blob.ref.$link : null),
+    const [mediaUrl] = createResource(
+      () => blob.ref.$link,
       async (cid) => {
+        setMediaError(false);
+
+        if (ctx.fetchBlob) {
+          try {
+            const data = await ctx.fetchBlob(cid);
+            objectUrl = URL.createObjectURL(data);
+            return objectUrl;
+          } catch {
+            setMediaError(true);
+            return;
+          }
+        }
+
         const url = `${ctx.pds}/xrpc/com.atproto.sync.getBlob?did=${ctx.repo}&cid=${cid}`;
 
-        await new Promise<void>((resolve) => {
-          const img = new Image();
-          img.src = url;
-          img.onload = () => resolve();
-          img.onerror = () => resolve();
-        });
+        if (blob.mimeType.startsWith("image/")) {
+          await new Promise<void>((resolve) => {
+            const img = new Image();
+            img.src = url;
+            img.onload = () => resolve();
+            img.onerror = () => resolve();
+          });
+        }
 
         return url;
       },
+    );
+
+    onCleanup(() => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    });
+
+    const LoadingMedia = () => (
+      <div class="flex h-48 w-48 items-center justify-center rounded bg-neutral-200 dark:bg-neutral-800">
+        <span class="iconify lucide--loader-circle animate-spin text-xl text-neutral-400 dark:text-neutral-500" />
+      </div>
     );
 
     return (
       <div>
         <span class="group/media relative my-0.5 flex w-fit">
           <Show when={!hidden()}>
-            <Show when={blob.mimeType.startsWith("image/")}>
-              <Show
-                when={!imageUrl.loading && imageUrl()}
-                fallback={
-                  <div class="flex h-48 w-48 items-center justify-center rounded bg-neutral-200 dark:bg-neutral-800">
-                    <span class="iconify lucide--loader-circle animate-spin text-xl text-neutral-400 dark:text-neutral-500"></span>
-                  </div>
-                }
-              >
-                <ZoomableImage src={imageUrl()} class="h-auto max-h-48 max-w-64" />
+            <Show
+              when={!mediaError()}
+              fallback={
+                <span class="font-sans text-sm text-neutral-500 dark:text-neutral-400">
+                  Failed to load media
+                </span>
+              }
+            >
+              <Show when={blob.mimeType.startsWith("image/")}>
+                <Show when={!mediaUrl.loading && mediaUrl()} fallback={<LoadingMedia />}>
+                  <ZoomableImage src={mediaUrl()} class="h-auto max-h-48 max-w-64" />
+                </Show>
               </Show>
-            </Show>
-            <Show when={blob.mimeType === "video/mp4"}>
-              <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
-                <VideoPlayer did={ctx.repo} cid={blob.ref.$link} />
-              </ErrorBoundary>
-            </Show>
-            <Show when={blob.mimeType.startsWith("audio/")}>
-              <audio class="my-0.5 max-w-96" controls>
-                <source
-                  src={`${ctx.pds}/xrpc/com.atproto.sync.getBlob?did=${ctx.repo}&cid=${blob.ref.$link}`}
-                  type={blob.mimeType === "audio/x-flac" ? "audio/flac" : blob.mimeType}
-                />
-              </audio>
+              <Show when={blob.mimeType === "video/mp4"}>
+                <Show
+                  when={ctx.fetchBlob}
+                  fallback={
+                    <ErrorBoundary fallback={() => <span>Failed to load video</span>}>
+                      <VideoPlayer did={ctx.repo} cid={blob.ref.$link} />
+                    </ErrorBoundary>
+                  }
+                >
+                  <Show when={!mediaUrl.loading && mediaUrl()} fallback={<LoadingMedia />}>
+                    <video class="max-h-80 max-w-[20rem]" src={mediaUrl()} controls playsinline />
+                  </Show>
+                </Show>
+              </Show>
+              <Show when={blob.mimeType.startsWith("audio/")}>
+                <Show when={!mediaUrl.loading && mediaUrl()} fallback={<LoadingMedia />}>
+                  <audio class="my-0.5 max-w-96" controls>
+                    <source
+                      src={mediaUrl()}
+                      type={blob.mimeType === "audio/x-flac" ? "audio/flac" : blob.mimeType}
+                    />
+                  </audio>
+                </Show>
+              </Show>
             </Show>
           </Show>
           <Show when={hidden()}>
@@ -419,6 +461,7 @@ export const JSONValue = (props: {
   hideBlobs?: boolean;
   keyLinks?: boolean;
   preview?: boolean;
+  fetchBlob?: (cid: string) => Promise<Blob>;
 }) => {
   return (
     <JSONCtx.Provider
@@ -430,6 +473,7 @@ export const JSONValue = (props: {
         hideBlobs: props.hideBlobs,
         keyLinks: props.keyLinks,
         preview: props.preview,
+        fetchBlob: props.fetchBlob,
       }}
     >
       <JSONValueInner data={props.data} />

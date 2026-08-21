@@ -1,11 +1,9 @@
 import { createEffect, createSignal } from "solid-js";
 
-import { GRANULAR_SCOPES } from "../auth/scope-utils";
+import { GRANULAR_SCOPES, type ScopeId } from "../auth/scope-utils";
 import { agent, setOpenManager, setPendingPermissionEdit } from "../auth/state";
 import { Button } from "./button";
 import { Modal } from "./modal";
-
-type ScopeId = "create" | "update" | "delete" | "blob";
 
 const [requestedScope, setRequestedScope] = createSignal<ScopeId | null>(null);
 

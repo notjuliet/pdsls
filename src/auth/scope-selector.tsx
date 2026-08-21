@@ -1,15 +1,16 @@
 import { createSignal, For } from "solid-js";
 
-import { buildScopeString, GRANULAR_SCOPES, scopeIdsToString } from "./scope-utils";
+import { buildScopeString, GRANULAR_SCOPES } from "./scope-utils";
 
 interface ScopeSelectorProps {
-  onConfirm: (scopeString: string, scopeIds: string) => void;
+  onConfirm: (scopeString: string) => void;
   onCancel: () => void;
   initialScopes?: Set<string>;
 }
 
 export const ScopeSelector = (props: ScopeSelectorProps) => {
   const [selectedScopes, setSelectedScopes] = createSignal<Set<string>>(
+    // Space access is deliberately opt-in while the protocol is in alpha.
     props.initialScopes || new Set(["create", "update", "delete", "blob"]),
   );
 
@@ -38,10 +39,7 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
   };
 
   const handleConfirm = () => {
-    const scopes = selectedScopes();
-    const scopeString = buildScopeString(scopes);
-    const scopeIds = scopeIdsToString(scopes);
-    props.onConfirm(scopeString, scopeIds);
+    props.onConfirm(buildScopeString(selectedScopes()));
   };
 
   return (

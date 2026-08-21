@@ -1,11 +1,11 @@
 import { JSX } from "solid-js";
 
-import { hasUserScope } from "../auth/scope-utils";
+import { hasUserScope, type ScopeId } from "../auth/scope-utils";
 import { showPermissionPrompt } from "./permission-prompt";
 import Tooltip from "./tooltip";
 
 interface PermissionButtonProps {
-  scope: "create" | "update" | "delete" | "blob";
+  scope: ScopeId;
   tooltip?: string;
   class?: string;
   disabledClass?: string;
