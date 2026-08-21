@@ -1,4 +1,4 @@
-import { ImageResponse } from "@takumi-rs/image-response/wasm";
+import { ImageResponse } from "@takumi-rs/image-response";
 
 import wasmModule from "./takumi_wasm_bg.wasm";
 
