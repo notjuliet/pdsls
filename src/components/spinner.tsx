@@ -1,3 +1,5 @@
 export const Spinner = () => (
-  <span class="iconify lucide--loader-circle mt-3 animate-spin text-xl"></span>
+  <div class="mt-3 flex w-full justify-center" role="status" aria-label="Loading">
+    <span class="iconify lucide--loader-circle animate-spin text-xl" />
+  </div>
 );

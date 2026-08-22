@@ -21,6 +21,27 @@ export interface SpaceRepo {
   rev: string;
 }
 
+export type SimpleSpacePolicy =
+  | { kind: "public" }
+  | { kind: "member-list" }
+  | { kind: "managing-app"; managingApp: string }
+  | { kind: "unknown"; type: string };
+
+export type SimpleSpaceAppAccess =
+  | { kind: "open" }
+  | { kind: "allow-list"; allowed: string[] }
+  | { kind: "unknown"; type: string };
+
+export interface SimpleSpaceInfo {
+  uri: string;
+  policy: SimpleSpacePolicy;
+  appAccess: SimpleSpaceAppAccess;
+}
+
+export interface SimpleSpaceMember {
+  did: string;
+}
+
 interface ListSpacesResult {
   cursor?: string;
   spaces: SpaceView[];
@@ -34,6 +55,11 @@ interface ListSpaceRecordsResult {
 interface ListSpaceReposResult {
   cursor?: string;
   repos: SpaceRepo[];
+}
+
+interface ListSimpleSpaceMembersResult {
+  cursor?: string;
+  members: SimpleSpaceMember[];
 }
 
 export interface GetSpaceRecordResult {
@@ -58,6 +84,18 @@ const getErrorMessage = (data: unknown, status: number) => {
   }
   return `Spaces request failed with HTTP ${status}`;
 };
+
+class SpaceRequestError extends Error {
+  readonly code?: string;
+  readonly status: number;
+
+  constructor(data: unknown, status: number) {
+    super(getErrorMessage(data, status));
+    this.name = "SpaceRequestError";
+    this.status = status;
+    this.code = isObject(data) && typeof data.error === "string" ? data.error : undefined;
+  }
+}
 
 const readJson = async (response: Response): Promise<unknown> => {
   try {
@@ -84,7 +122,7 @@ const oauthQuery = async (
 
   const data = await readJson(response);
 
-  if (!response.ok) throw new Error(getErrorMessage(data, response.status));
+  if (!response.ok) throw new SpaceRequestError(data, response.status);
   return data;
 };
 
@@ -258,8 +296,111 @@ const credentialQuery = async (
     },
   });
   const data = await readJson(response);
-  if (!response.ok) throw new Error(getErrorMessage(data, response.status));
+  if (!response.ok) throw new SpaceRequestError(data, response.status);
   return data;
+};
+
+const parseSimpleSpacePolicy = (value: unknown): SimpleSpacePolicy => {
+  if (!isObject(value) || typeof value.$type !== "string") {
+    throw new Error("The Space authority returned an invalid SimpleSpace policy");
+  }
+
+  switch (value.$type) {
+    case "com.atproto.simplespace.defs#publicPolicy":
+      return { kind: "public" };
+    case "com.atproto.simplespace.defs#memberListPolicy":
+      return { kind: "member-list" };
+    case "com.atproto.simplespace.defs#managingAppPolicy":
+      if (typeof value.managingApp !== "string") {
+        throw new Error("The Space authority returned an invalid managing app policy");
+      }
+      return { kind: "managing-app", managingApp: value.managingApp };
+    default:
+      return { kind: "unknown", type: value.$type };
+  }
+};
+
+const parseSimpleSpaceAppAccess = (value: unknown): SimpleSpaceAppAccess => {
+  if (!isObject(value) || typeof value.$type !== "string") {
+    throw new Error("The Space authority returned an invalid SimpleSpace app policy");
+  }
+
+  switch (value.$type) {
+    case "com.atproto.simplespace.defs#open":
+      return { kind: "open" };
+    case "com.atproto.simplespace.defs#allowList":
+      if (
+        !Array.isArray(value.allowed) ||
+        !value.allowed.every((item) => typeof item === "string")
+      ) {
+        throw new Error("The Space authority returned an invalid application allow list");
+      }
+      return { kind: "allow-list", allowed: value.allowed };
+    default:
+      return { kind: "unknown", type: value.$type };
+  }
+};
+
+export const getSimpleSpace = async (
+  auth: OAuthUserAgent,
+  space: string,
+): Promise<SimpleSpaceInfo | undefined> => {
+  const host = await resolveSpaceHost(space);
+  let data: unknown;
+  try {
+    data = await credentialQuery(auth, space, host, "com.atproto.simplespace.getSpace", {
+      space,
+    });
+  } catch (err) {
+    if (
+      err instanceof SpaceRequestError &&
+      (err.status === 404 ||
+        err.code === "SpaceNotFound" ||
+        err.code === "XRPCNotSupported" ||
+        err.code === "MethodNotImplemented")
+    ) {
+      return undefined;
+    }
+    throw err;
+  }
+
+  if (!isObject(data) || data.uri !== space) {
+    throw new Error("The Space authority returned an invalid SimpleSpace response");
+  }
+
+  return {
+    uri: data.uri,
+    policy: parseSimpleSpacePolicy(data.policy),
+    appAccess: parseSimpleSpaceAppAccess(data.appAccess),
+  };
+};
+
+export const listSimpleSpaceMembers = async (
+  auth: OAuthUserAgent,
+  space: string,
+  options: { cursor?: string; limit?: number } = {},
+): Promise<ListSimpleSpaceMembersResult> => {
+  const limit = options.limit ?? 100;
+  const data = await oauthQuery(auth, "com.atproto.simplespace.listMembers", {
+    space,
+    cursor: options.cursor,
+    limit,
+  });
+
+  if (!isObject(data) || !Array.isArray(data.members)) {
+    throw new Error("The PDS returned an invalid SimpleSpace member list");
+  }
+
+  return {
+    // The alpha server can return the final member as a cursor even when the
+    // page is already exhausted.
+    cursor:
+      data.members.length >= limit && typeof data.cursor === "string" ? data.cursor : undefined,
+    members: data.members.flatMap((member): SimpleSpaceMember[] => {
+      if (!isObject(member) || typeof member.did !== "string") return [];
+      return [{ did: member.did }];
+    }),
+  };
 };
 
 export const parseSpaceUri = (uri: string): ParsedSpaceUri | undefined => {

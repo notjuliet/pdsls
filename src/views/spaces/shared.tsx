@@ -5,7 +5,7 @@ export const ErrorNotice = (props: { message: string }) => (
 );
 
 export const LoadingState = (props: { label: string }) => (
-  <div class="flex items-center justify-center gap-2 py-10 text-sm text-neutral-500 dark:text-neutral-400">
+  <div class="flex w-full items-center justify-center gap-2 py-10 text-center text-sm text-neutral-500 dark:text-neutral-400">
     <span class="iconify lucide--loader-circle animate-spin text-lg" />
     {props.label}
   </div>
