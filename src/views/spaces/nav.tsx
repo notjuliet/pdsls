@@ -86,38 +86,28 @@ const HierarchyRow = (props: {
     "group/row flex min-h-6 w-full min-w-0 items-center gap-2 rounded-md border-[0.5px] border-transparent px-2 text-left transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 sm:min-h-7 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40";
 
   const SplitContent = (splitProps: { detailHref: string }) => (
-    <div class={classes} onMouseLeave={() => setDetailHovered(false)}>
-      <Show keyed when={props.href} fallback={<Leading />}>
+    <div class={`${classes} relative`} onMouseLeave={() => setDetailHovered(false)}>
+      <Show keyed when={props.href}>
         {(href) => (
-          <A href={href} class="flex shrink-0">
-            <Leading />
+          <A href={href} class="absolute inset-0 rounded-md">
+            <span class="sr-only">Open {props.label}</span>
           </A>
         )}
       </Show>
+      <span class="pointer-events-none relative z-10 flex shrink-0">
+        <Leading />
+      </span>
       <span
-        class="flex min-w-0 flex-1 items-baseline"
+        class="pointer-events-none relative z-10 flex min-w-0 flex-1 items-baseline"
         classList={{ "gap-1": !!props.detailPrefix, "gap-2": !props.detailPrefix }}
       >
-        <Show
-          keyed
-          when={props.href}
-          fallback={
-            <span class="flex max-w-full min-w-0 shrink-0 items-baseline gap-2">
-              <Label linked={false} />
-              <DetailPrefix />
-            </span>
-          }
-        >
-          {(href) => (
-            <A href={href} class="flex max-w-full min-w-0 shrink-0 items-baseline gap-2">
-              <Label linked />
-              <DetailPrefix />
-            </A>
-          )}
-        </Show>
+        <span class="flex max-w-full min-w-0 shrink-0 items-baseline gap-2">
+          <Label linked={!!props.href} />
+          <DetailPrefix />
+        </span>
         <A
           href={splitProps.detailHref}
-          class="min-w-0 truncate text-xs text-neutral-500 hover:text-blue-500 hover:underline dark:text-neutral-400 dark:hover:text-blue-400"
+          class="pointer-events-auto relative z-20 min-w-0 truncate text-xs text-neutral-500 hover:text-blue-500 hover:underline dark:text-neutral-400 dark:hover:text-blue-400"
           onMouseEnter={() => setDetailHovered(true)}
           onMouseLeave={() => setDetailHovered(false)}
         >
