@@ -135,11 +135,6 @@ const SpaceView = () => {
           <Show when={error()}>{(message) => <ErrorNotice message={message()} />}</Show>
 
           <Show when={loaded() && (!error() || repos().length > 0)}>
-            <div class="px-2 text-sm text-neutral-600 dark:text-neutral-400">
-              {repos().length.toLocaleString()} {cursor() ? "loaded " : ""}writer
-              {repos().length === 1 ? "" : "s"}
-            </div>
-
             <ul class="flex flex-col">
               <For each={orderedRepos()}>
                 {(repo) => (
