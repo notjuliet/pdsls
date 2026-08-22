@@ -96,15 +96,16 @@ const SpaceView = () => {
   });
 
   createEffect(() => {
+    if (hidden()) return;
+
     const agent = auth();
     const spaceRef = space();
-    const key = hidden() ? "" : `${agent.sub}\n${spaceRef}`;
+    const key = `${agent.sub}\n${spaceRef}`;
     if (key === simpleSpaceKey) return;
 
     simpleSpaceKey = key;
     simpleSpaceVersion += 1;
     setSimpleSpaceInfo(undefined);
-    if (!key) return;
 
     const version = simpleSpaceVersion;
     void getSimpleSpace(agent, spaceRef)
