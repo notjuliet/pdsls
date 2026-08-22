@@ -16,6 +16,7 @@ export const SpaceRecordView = () => {
   let requestVersion = 0;
 
   const space = () => makeSpaceRef(params.spaceAuthority!, params.spaceType!, params.skey!);
+  const repo = () => params.spaceRepo!;
 
   createEffect(() => {
     requestVersion += 1;
@@ -25,7 +26,7 @@ export const SpaceRecordView = () => {
     setError(undefined);
 
     setLoading(true);
-    void getSpaceRecord(auth(), space(), auth().sub, params.collection!, params.rkey!)
+    void getSpaceRecord(auth(), space(), repo(), params.collection!, params.rkey!)
       .then((result) => {
         if (version === requestVersion) {
           setRecord(result);
@@ -57,9 +58,9 @@ export const SpaceRecordView = () => {
           <div class="w-full max-w-screen min-w-full px-2 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-max sm:text-sm md:max-w-3xl">
             <JSONValue
               data={value().value}
-              repo={auth().sub}
+              repo={repo()}
               newTab
-              fetchBlob={(cid) => getSpaceBlob(auth(), space(), auth().sub, cid)}
+              fetchBlob={(cid) => getSpaceBlob(auth(), space(), repo(), cid)}
             />
           </div>
         )}

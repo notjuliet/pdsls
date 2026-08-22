@@ -183,7 +183,7 @@ export const Home = () => {
               Alpha
             </span>
           }
-          description="Preview your non-public records"
+          description="Preview non-public records"
           accent="blue"
         />
 

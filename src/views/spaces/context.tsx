@@ -26,19 +26,24 @@ export const makeSpaceRef = (authority: string, type: string, skey: string) =>
   `at://${authority}/space/${type}/${skey}`;
 
 export const makeSpacePath = (authority: string, type: string, skey: string) =>
-  `/spaces/${authority}/${type}/${skey}`;
+  `/spaces/${authority}/space/${type}/${skey}`;
+
+export const makeSpaceRepoPath = (authority: string, type: string, skey: string, repo: string) =>
+  `${makeSpacePath(authority, type, skey)}/${repo}`;
 
 export const makeSpaceCollectionPath = (
   authority: string,
   type: string,
   skey: string,
+  repo: string,
   collection: string,
-) => `${makeSpacePath(authority, type, skey)}/${collection}`;
+) => `${makeSpaceRepoPath(authority, type, skey, repo)}/${collection}`;
 
 export const makeSpaceRecordPath = (
   authority: string,
   type: string,
   skey: string,
+  repo: string,
   collection: string,
   rkey: string,
-) => `${makeSpaceCollectionPath(authority, type, skey, collection)}/${rkey}`;
+) => `${makeSpaceCollectionPath(authority, type, skey, repo, collection)}/${rkey}`;

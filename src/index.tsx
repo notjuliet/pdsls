@@ -19,6 +19,7 @@ import {
   SpaceCollectionLayout,
   SpaceLayout,
   SpaceRecordView,
+  SpaceRepoLayout,
   SpacesLayout,
 } from "./views/spaces/index.tsx";
 import { StreamView } from "./views/stream";
@@ -32,11 +33,14 @@ render(
       <Route path="/car" component={CarView} />
       <Route path="/spaces" component={SpacesLayout}>
         <Route path="/" />
-        <Route path="/:spaceAuthority/:spaceType/:skey" component={SpaceLayout}>
+        <Route path="/:spaceAuthority/space/:spaceType/:skey" component={SpaceLayout}>
           <Route path="/" />
-          <Route path="/:collection" component={SpaceCollectionLayout}>
+          <Route path="/:spaceRepo" component={SpaceRepoLayout}>
             <Route path="/" />
-            <Route path="/:rkey" component={SpaceRecordView} />
+            <Route path="/:collection" component={SpaceCollectionLayout}>
+              <Route path="/" />
+              <Route path="/:rkey" component={SpaceRecordView} />
+            </Route>
           </Route>
         </Route>
       </Route>

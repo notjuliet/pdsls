@@ -18,6 +18,7 @@ const SpaceCollectionView = () => {
   const auth = useSpacesAuth();
   const params = useParams();
   const hidden = () => !!params.rkey;
+  const repo = () => params.spaceRepo!;
   const [records, setRecords] = createSignal<SpaceRecord[]>([]);
   const [cursor, setCursor] = createSignal<string>();
   const [filter, setFilter] = createSignal("");
@@ -44,7 +45,7 @@ const SpaceCollectionView = () => {
     setLoading(true);
     setError(undefined);
     try {
-      const result = await listSpaceRecords(auth(), space(), auth().sub, {
+      const result = await listSpaceRecords(auth(), space(), repo(), {
         collection: params.collection,
         cursor: reset ? undefined : cursor(),
         limit: RECORDS_PER_PAGE,
@@ -63,7 +64,7 @@ const SpaceCollectionView = () => {
   };
 
   createEffect(() => {
-    const key = `${auth().sub}\n${space()}\n${params.collection}`;
+    const key = `${auth().sub}\n${space()}\n${repo()}\n${params.collection}`;
     if (key !== activeKey) {
       activeKey = key;
       requestVersion += 1;
@@ -132,6 +133,7 @@ const SpaceCollectionView = () => {
                           params.spaceAuthority!,
                           params.spaceType!,
                           params.skey!,
+                          repo(),
                           params.collection!,
                           record.rkey,
                         )}
@@ -164,13 +166,7 @@ const SpaceCollectionView = () => {
                         </span>
                       }
                     >
-                      <JSONValue
-                        data={record.value!}
-                        repo={auth().sub}
-                        truncate
-                        hideBlobs
-                        preview
-                      />
+                      <JSONValue data={record.value!} repo={repo()} truncate hideBlobs preview />
                     </Show>
                   </HoverCard>
                 );
@@ -207,7 +203,7 @@ export const SpaceCollectionLayout = (props: RouteSectionProps) => {
   const params = useParams();
   const hasChild = () => !!params.rkey;
   const key = () =>
-    `${params.spaceAuthority}/${params.spaceType}/${params.skey}/${params.collection}`;
+    `${params.spaceAuthority}/${params.spaceType}/${params.skey}/${params.spaceRepo}/${params.collection}`;
 
   return (
     <NestedLayout key={key()} hasChild={hasChild()} view={() => <SpaceCollectionView />}>

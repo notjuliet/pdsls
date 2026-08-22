@@ -15,7 +15,7 @@ interface DidHoverCardProps {
   hoverDelay?: number;
 }
 
-interface DidInfo {
+export interface DidInfo {
   handle?: string;
   pds?: string;
 }
@@ -32,9 +32,20 @@ const fetchDidInfo = async (did: string): Promise<DidInfo> => {
   return { handle, pds };
 };
 
+export const resolveDidInfo = (did: string): Promise<DidInfo> => {
+  const existing = didCache.get(did);
+  if (existing) return existing;
+
+  const pending = fetchDidInfo(did);
+  didCache.set(did, pending);
+  pending.catch(() => {
+    if (didCache.get(did) === pending) didCache.delete(did);
+  });
+  return pending;
+};
+
 const DidHoverCard = (props: DidHoverCardProps) => {
-  const preview = createHoverResource(() => props.did, fetchDidInfo, {
-    cache: didCache,
+  const preview = createHoverResource(() => props.did, resolveDidInfo, {
     getErrorMessage: (err) => (err instanceof Error ? err.message : "Failed to resolve"),
   });
   const loading = preview.visibleLoading;

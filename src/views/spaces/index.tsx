@@ -1,5 +1,5 @@
 import { A, type RouteSectionProps, useParams } from "@solidjs/router";
-import { createEffect, createSignal, For, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
 
 import { hasUserScope, SPACE_READ_SCOPE_ID } from "../../auth/scope-utils";
 import {
@@ -10,6 +10,7 @@ import {
 } from "../../auth/state";
 import { Button } from "../../components/button.jsx";
 import { Favicon } from "../../components/favicon.jsx";
+import DidHoverCard from "../../components/hover-card/did.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
 import { listSpaces, parseSpaceUri, type SpaceView } from "../../lib/spaces.js";
 import {
@@ -32,7 +33,7 @@ const SignInPrompt = () => {
       <div>
         <h2 class="font-medium">Sign in to preview Spaces</h2>
         <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-          Spaces data is non-public and must be requested from your PDS with OAuth.
+          Spaces data requires OAuth and permission from the Space authority.
         </p>
       </div>
       <Button onClick={signIn} classList={{ "bg-blue-500! text-white! border-blue-500!": true }}>
@@ -56,8 +57,8 @@ const PermissionPrompt = () => {
       <div>
         <h2 class="font-medium">Space permission required</h2>
         <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-          Re-authorize this account and enable “Read your Space records (alpha)”. It is opt-in and
-          read-only.
+          Re-authorize this account and enable “Read Space records (alpha)”. It is opt-in and
+          read-only, and only covers Spaces this account is authorized to access.
         </p>
       </div>
       <Button
@@ -82,6 +83,32 @@ const SpacesIndex = () => {
   const [error, setError] = createSignal<string>();
   let activeKey = "";
   let requestVersion = 0;
+
+  const groupedSpaces = createMemo(() => {
+    const groups = new Map<string, { type: string; skey: string; authorities: Set<string> }>();
+
+    for (const space of spaces()) {
+      const parsed = parseSpaceUri(space.uri);
+      if (!parsed) continue;
+
+      const key = `${parsed.type}\n${parsed.skey}`;
+      const group = groups.get(key);
+      if (group) {
+        group.authorities.add(parsed.authority);
+      } else {
+        groups.set(key, {
+          type: parsed.type,
+          skey: parsed.skey,
+          authorities: new Set([parsed.authority]),
+        });
+      }
+    }
+
+    return Array.from(groups.values(), (group) => ({
+      ...group,
+      authorities: Array.from(group.authorities).sort((a, b) => a.localeCompare(b)),
+    })).sort((a, b) => a.type.localeCompare(b.type) || a.skey.localeCompare(b.skey));
+  });
 
   const loadSpaces = async (reset = false, version = requestVersion) => {
     if (loading() && !reset) return;
@@ -120,10 +147,6 @@ const SpacesIndex = () => {
   return (
     <Show when={!hidden()}>
       <div class="flex w-full flex-col gap-3 px-2 py-2 pb-10">
-        <p class="text-sm text-neutral-600 dark:text-neutral-400">
-          Preview non-public records stored in your signed-in account’s PDS.
-        </p>
-
         <Show when={error()}>
           {(message) => (
             <div class="flex flex-col gap-2">
@@ -146,35 +169,46 @@ const SpacesIndex = () => {
           />
         </Show>
 
-        <ul class="-mx-2 flex flex-col">
-          <For each={spaces()}>
-            {(space) => {
-              const parsed = () => parseSpaceUri(space.uri);
-              return (
-                <Show when={parsed()}>
-                  {(details) => (
-                    <li>
-                      <A
-                        href={makeSpacePath(details().authority, details().type, details().skey)}
-                        class="flex w-full min-w-0 items-center gap-2 rounded p-2 text-left hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-                      >
-                        <Favicon domain={details().type.split(".").slice(0, 2).join(".")} reverse />
-                        <span class="shrink-0 font-medium text-blue-500 dark:text-blue-400">
-                          {details().type}
-                        </span>
-                        <span class="iconify lucide--chevron-right shrink-0 text-xs text-neutral-500" />
-                        <span class="shrink-0 font-medium text-blue-500 dark:text-blue-400">
-                          {details().skey}
-                        </span>
-                        <span class="ml-auto min-w-0 truncate font-mono text-xs text-neutral-500 dark:text-neutral-400">
-                          {details().authority}
-                        </span>
-                      </A>
-                    </li>
-                  )}
-                </Show>
-              );
-            }}
+        <ul class="-mx-2 flex flex-col gap-2">
+          <For each={groupedSpaces()}>
+            {(group) => (
+              <li>
+                <div class="flex min-w-0 items-center gap-2 px-2 py-1 text-sm">
+                  <Favicon domain={group.type.split(".").slice(0, 2).join(".")} reverse />
+                  <span class="min-w-0 truncate font-medium">{group.type}</span>
+                  <span class="iconify lucide--chevron-right shrink-0 text-xs text-neutral-500" />
+                  <span class="shrink-0 font-medium">{group.skey}</span>
+                </div>
+                <ul class="flex flex-col pl-6">
+                  <For each={group.authorities}>
+                    {(authority) => (
+                      <li>
+                        <DidHoverCard
+                          did={authority}
+                          class="flex w-full min-w-0 items-center rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+                          renderTrigger={({ loading: hoverLoading }) => (
+                            <A
+                              href={makeSpacePath(authority, group.type, group.skey)}
+                              class="flex w-full min-w-0 items-center gap-2 p-2 text-left text-sm"
+                              classList={{ "hover-card-trigger-loading": hoverLoading() }}
+                            >
+                              <span class="min-w-0 truncate font-medium text-blue-500 dark:text-blue-400">
+                                {authority}
+                              </span>
+                              <Show when={authority === auth().sub}>
+                                <span class="shrink-0 rounded border border-neutral-300 px-1 py-px text-[9px] leading-none text-neutral-500 uppercase dark:border-neutral-600 dark:text-neutral-400">
+                                  You
+                                </span>
+                              </Show>
+                            </A>
+                          )}
+                        />
+                      </li>
+                    )}
+                  </For>
+                </ul>
+              </li>
+            )}
           </For>
         </ul>
 
@@ -205,6 +239,8 @@ export const SpacesLayout = (props: RouteSectionProps) => {
       document.title = `${params.rkey} - ${params.collection} - Spaces - PDSls`;
     } else if (params.collection) {
       document.title = `${params.collection} - Spaces - PDSls`;
+    } else if (params.spaceRepo) {
+      document.title = `${params.spaceRepo} - ${params.spaceType} - Spaces - PDSls`;
     } else if (params.spaceType) {
       document.title = `${params.spaceType} - Spaces - PDSls`;
     } else {
@@ -236,4 +272,5 @@ export const SpacesLayout = (props: RouteSectionProps) => {
 
 export { SpaceCollectionLayout } from "./collection.jsx";
 export { SpaceRecordView } from "./record.jsx";
+export { SpaceRepoLayout } from "./repo.jsx";
 export { SpaceLayout } from "./space.jsx";
