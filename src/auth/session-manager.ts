@@ -55,7 +55,7 @@ export const retrieveSession = async (): Promise<void> => {
 
       localStorage.setItem("lastSignedIn", did);
 
-      const grantedScopes = scopeIdsToString(oauthScopeStringToIds(auth.session.token.scope));
+      const grantedScopes = scopeIdsToString(oauthScopeStringToIds(auth.session.token.scope, did));
 
       const sessions = loadSessionsFromStorage();
       const newSessions: Sessions = sessions || {};
@@ -74,7 +74,7 @@ export const retrieveSession = async (): Promise<void> => {
           const res = await rpc.get("com.atproto.server.getSession");
           newSessions[lastSignedIn].signedIn = true;
           newSessions[lastSignedIn].grantedScopes = scopeIdsToString(
-            oauthScopeStringToIds(session.token.scope),
+            oauthScopeStringToIds(session.token.scope, lastSignedIn as Did),
           );
           saveSessionToStorage(newSessions);
           if (!res.ok) throw res.data.error;

@@ -180,7 +180,7 @@ export const Home = () => {
           icon="lucide--lock-keyhole"
           title="Spaces"
           badge={<AlphaBadge />}
-          description="Preview non-public records"
+          description="Preview and manage non-public records"
           accent="blue"
         />
 

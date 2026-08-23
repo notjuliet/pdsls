@@ -1,4 +1,4 @@
-import { A, type RouteSectionProps, useLocation, useParams } from "@solidjs/router";
+import { A, type RouteSectionProps, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
 
 import { Button } from "../../components/button.jsx";
@@ -10,15 +10,24 @@ import {
   type SimpleSpaceInfo,
   type SpaceRepo,
 } from "../../lib/spaces.js";
-import { makeSpacePath, makeSpaceRef, makeSpaceRepoPath, useSpacesAuth } from "./context.jsx";
+import {
+  makeSpacePath,
+  makeSpaceRef,
+  makeSpaceRepoPath,
+  useSpaceRecords,
+  useSpacesAuth,
+} from "./context.jsx";
 import { SpaceRecordEditor } from "./create-record.jsx";
+import { ManageSpaceDialog } from "./manage-space.jsx";
 import { EmptyState, ErrorNotice, LoadingState } from "./shared.jsx";
 import { SimpleSpaceDetails } from "./simple-space.jsx";
 
 const SpaceView = () => {
   const auth = useSpacesAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const params = useParams();
+  const spaceRecords = useSpaceRecords();
   const hidden = () => !!params.spaceRepo;
   const [repos, setRepos] = createSignal<SpaceRepo[]>([]);
   const [cursor, setCursor] = createSignal<string>();
@@ -137,16 +146,34 @@ const SpaceView = () => {
               <Tab details label="Details" />
             </Show>
           </div>
-          <Show when={loaded() && !hasOwnRepo()}>
-            <SpaceRecordEditor
-              authority={params.spaceAuthority!}
-              type={params.spaceType!}
-              skey={params.skey!}
-              space={space()}
-              label="Create"
-              onSaved={() => void loadRepos(true)}
-            />
-          </Show>
+          <div class="flex items-center gap-1">
+            <Show when={loaded() && !hasOwnRepo()}>
+              <SpaceRecordEditor
+                authority={params.spaceAuthority!}
+                type={params.spaceType!}
+                skey={params.skey!}
+                space={space()}
+                label="Create"
+                onSaved={() => void loadRepos(true)}
+              />
+            </Show>
+            <Show when={params.spaceAuthority === auth().sub && simpleSpaceInfo()}>
+              {(info) => (
+                <ManageSpaceDialog
+                  info={info()}
+                  space={space()}
+                  onUpdated={(updated) => {
+                    setSimpleSpaceInfo(updated);
+                    void loadRepos(true);
+                  }}
+                  onDeleted={() => {
+                    spaceRecords.invalidateRecords();
+                    navigate("/spaces", { replace: true });
+                  }}
+                />
+              )}
+            </Show>
+          </div>
         </div>
 
         <Show when={!showingDetails()}>

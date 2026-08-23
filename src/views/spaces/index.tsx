@@ -1,4 +1,4 @@
-import { A, type RouteSectionProps, useParams } from "@solidjs/router";
+import { A, type RouteSectionProps, useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
 
 import { hasUserScope, SPACE_READ_SCOPE_ID } from "../../auth/scope-utils";
@@ -17,8 +17,10 @@ import {
   makeSpacePath,
   SpaceRecordsContext,
   SpacesAuthContext,
+  useSpaceRecords,
   useSpacesAuth,
 } from "./context.jsx";
+import { CreateSpaceDialog } from "./create-space.jsx";
 import { SpacesNav } from "./nav.jsx";
 import { EmptyState, ErrorNotice, LoadingState } from "./shared.jsx";
 
@@ -31,9 +33,9 @@ const SignInPrompt = () => {
   return (
     <div class="flex flex-col items-start gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800">
       <div>
-        <h2 class="font-medium">Sign in to preview Spaces</h2>
+        <h2 class="font-medium">Sign in to use Spaces</h2>
         <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-          Spaces data requires OAuth and permission from the Space authority.
+          Spaces require OAuth permissions.
         </p>
       </div>
       <Button onClick={signIn} classList={{ "bg-blue-500! text-white! border-blue-500!": true }}>
@@ -73,6 +75,7 @@ const PermissionPrompt = () => {
 
 const SpacesIndex = () => {
   const auth = useSpacesAuth();
+  const spaceRecords = useSpaceRecords();
   const params = useParams();
   const hidden = () => !!params.spaceAuthority;
   const [spaces, setSpaces] = createSignal<SpaceView[]>([]);
@@ -130,7 +133,7 @@ const SpacesIndex = () => {
   };
 
   createEffect(() => {
-    const key = `${auth().sub}\n${auth().session.token.scope}`;
+    const key = `${auth().sub}\n${auth().session.token.scope}\n${spaceRecords.recordsVersion()}`;
     if (key !== activeKey) {
       activeKey = key;
       requestVersion += 1;
@@ -229,9 +232,17 @@ const SpacesIndex = () => {
 };
 
 export const SpacesLayout = (props: RouteSectionProps) => {
+  const navigate = useNavigate();
   const params = useParams();
   const hasChild = () => !!params.spaceAuthority;
   const [recordsVersion, setRecordsVersion] = createSignal(0);
+
+  const handleCreated = (result: { uri: string }) => {
+    const parsed = parseSpaceUri(result.uri);
+    if (!parsed) return;
+    setRecordsVersion((version) => version + 1);
+    navigate(makeSpacePath(parsed.authority, parsed.type, parsed.skey));
+  };
 
   createEffect(() => {
     if (params.rkey) {
@@ -255,7 +266,19 @@ export const SpacesLayout = (props: RouteSectionProps) => {
       }}
     >
       <div class="flex w-full flex-col gap-1">
-        <SpacesNav />
+        <SpacesNav
+          action={
+            <Show when={!hasChild() && hasUserScope(SPACE_READ_SCOPE_ID)}>
+              <Show when={agent()}>
+                {(auth) => (
+                  <SpacesAuthContext.Provider value={auth}>
+                    <CreateSpaceDialog onCreated={handleCreated} />
+                  </SpacesAuthContext.Provider>
+                )}
+              </Show>
+            </Show>
+          }
+        />
         <div>
           <Show when={agent()} fallback={<SignInPrompt />}>
             {(auth) => (

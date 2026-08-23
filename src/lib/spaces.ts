@@ -38,6 +38,23 @@ export interface SimpleSpaceInfo {
   appAccess: SimpleSpaceAppAccess;
 }
 
+export type NewSimpleSpacePolicy = Exclude<SimpleSpacePolicy, { kind: "unknown" }>;
+export type NewSimpleSpaceAppAccess = Exclude<SimpleSpaceAppAccess, { kind: "unknown" }>;
+
+export interface SimpleSpaceConfiguration {
+  policy: NewSimpleSpacePolicy;
+  appAccess: NewSimpleSpaceAppAccess;
+}
+
+export interface CreateSimpleSpaceOptions extends SimpleSpaceConfiguration {
+  type: string;
+  skey?: string;
+}
+
+export interface CreateSimpleSpaceResult {
+  uri: string;
+}
+
 export interface SimpleSpaceMember {
   did: string;
 }
@@ -316,6 +333,16 @@ export const clearSpaceCredentials = (did: string) => {
   }
 };
 
+const clearCredentialsForSpace = (space: string) => {
+  const suffix = `\n${space}`;
+  for (const key of credentialSessions.keys()) {
+    if (key.endsWith(suffix)) credentialSessions.delete(key);
+  }
+  for (const key of pendingCredentialSessions.keys()) {
+    if (key.endsWith(suffix)) pendingCredentialSessions.delete(key);
+  }
+};
+
 const credentialQuery = async (
   auth: OAuthUserAgent,
   space: string,
@@ -381,16 +408,113 @@ const parseSimpleSpaceAppAccess = (value: unknown): SimpleSpaceAppAccess => {
   }
 };
 
+const encodeSimpleSpacePolicy = (policy: NewSimpleSpacePolicy) =>
+  policy.kind === "managing-app"
+    ? {
+        $type: "com.atproto.simplespace.defs#managingAppPolicy",
+        managingApp: policy.managingApp,
+      }
+    : {
+        $type:
+          policy.kind === "public"
+            ? "com.atproto.simplespace.defs#publicPolicy"
+            : "com.atproto.simplespace.defs#memberListPolicy",
+      };
+
+const encodeSimpleSpaceAppAccess = (appAccess: NewSimpleSpaceAppAccess) =>
+  appAccess.kind === "allow-list"
+    ? {
+        $type: "com.atproto.simplespace.defs#allowList",
+        allowed: appAccess.allowed,
+      }
+    : { $type: "com.atproto.simplespace.defs#open" };
+
+const assertSimpleSpaceAuthority = (auth: OAuthUserAgent, space: string, action: string) => {
+  const parsed = parseSpaceUri(space);
+  if (!parsed) throw new Error("Invalid Space reference");
+  if (parsed.authority !== auth.sub) {
+    throw new Error(`Only the Space authority can ${action} this Space`);
+  }
+};
+
+export const createSimpleSpace = async (
+  auth: OAuthUserAgent,
+  options: CreateSimpleSpaceOptions,
+): Promise<CreateSimpleSpaceResult> => {
+  const data = await oauthProcedure(auth, "com.atproto.simplespace.createSpace", {
+    type: options.type,
+    skey: options.skey,
+    policy: encodeSimpleSpacePolicy(options.policy),
+    appAccess: encodeSimpleSpaceAppAccess(options.appAccess),
+  });
+
+  if (!isObject(data) || typeof data.uri !== "string" || !parseSpaceUri(data.uri)) {
+    throw new Error("The PDS returned an invalid SimpleSpace creation response");
+  }
+
+  clearCredentialsForSpace(data.uri);
+  return { uri: data.uri };
+};
+
+export const updateSimpleSpace = async (
+  auth: OAuthUserAgent,
+  space: string,
+  config: SimpleSpaceConfiguration,
+): Promise<void> => {
+  assertSimpleSpaceAuthority(auth, space, "configure");
+
+  await oauthProcedure(auth, "com.atproto.simplespace.updateSpace", {
+    space,
+    policy: encodeSimpleSpacePolicy(config.policy),
+    appAccess: encodeSimpleSpaceAppAccess(config.appAccess),
+  });
+  clearCredentialsForSpace(space);
+};
+
+export const deleteSimpleSpace = async (auth: OAuthUserAgent, space: string): Promise<void> => {
+  assertSimpleSpaceAuthority(auth, space, "delete");
+
+  await oauthProcedure(auth, "com.atproto.simplespace.deleteSpace", { space });
+  clearCredentialsForSpace(space);
+};
+
+export const addSimpleSpaceMember = async (
+  auth: OAuthUserAgent,
+  space: string,
+  did: string,
+): Promise<void> => {
+  assertSimpleSpaceAuthority(auth, space, "add members to");
+  await oauthProcedure(auth, "com.atproto.simplespace.addMember", { space, did });
+  clearCredentialsForSpace(space);
+};
+
+export const removeSimpleSpaceMember = async (
+  auth: OAuthUserAgent,
+  space: string,
+  did: string,
+): Promise<void> => {
+  assertSimpleSpaceAuthority(auth, space, "remove members from");
+  await oauthProcedure(auth, "com.atproto.simplespace.removeMember", { space, did });
+  clearCredentialsForSpace(space);
+};
+
 export const getSimpleSpace = async (
   auth: OAuthUserAgent,
   space: string,
 ): Promise<SimpleSpaceInfo | undefined> => {
-  const host = await resolveSpaceHost(space);
+  const parsed = parseSpaceUri(space);
+  if (!parsed) throw new Error("Invalid Space reference");
+
   let data: unknown;
   try {
-    data = await credentialQuery(auth, space, host, "com.atproto.simplespace.getSpace", {
-      space,
-    });
+    if (parsed.authority === auth.sub) {
+      data = await oauthQuery(auth, "com.atproto.simplespace.getSpace", { space });
+    } else {
+      const host = await resolveSpaceHost(space);
+      data = await credentialQuery(auth, space, host, "com.atproto.simplespace.getSpace", {
+        space,
+      });
+    }
   } catch (err) {
     if (
       err instanceof SpaceRequestError &&

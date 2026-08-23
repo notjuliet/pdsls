@@ -4,6 +4,7 @@ import { AlphaBadge } from "../components/alpha-badge.jsx";
 import {
   buildScopeString,
   SPACE_MANAGE_RECORDS_SCOPE_ID,
+  SPACE_MANAGE_SPACES_SCOPE_ID,
   SPACE_READ_SCOPE_ID,
 } from "./scope-utils";
 
@@ -60,7 +61,9 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
       scopes.add("create");
       scopes.add("update");
     }
-    if (scopes.has(SPACE_MANAGE_RECORDS_SCOPE_ID)) scopes.add(SPACE_READ_SCOPE_ID);
+    if (scopes.has(SPACE_MANAGE_RECORDS_SCOPE_ID) || scopes.has(SPACE_MANAGE_SPACES_SCOPE_ID)) {
+      scopes.add(SPACE_READ_SCOPE_ID);
+    }
     return scopes;
   };
   const initial = initialScopes();
@@ -103,8 +106,22 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
       if (newSet.has(SPACE_READ_SCOPE_ID)) {
         newSet.delete(SPACE_READ_SCOPE_ID);
         newSet.delete(SPACE_MANAGE_RECORDS_SCOPE_ID);
+        newSet.delete(SPACE_MANAGE_SPACES_SCOPE_ID);
       } else {
         newSet.add(SPACE_READ_SCOPE_ID);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSpaceManagement = () => {
+    setSelectedScopes((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(SPACE_MANAGE_SPACES_SCOPE_ID)) {
+        newSet.delete(SPACE_MANAGE_SPACES_SCOPE_ID);
+      } else {
+        newSet.add(SPACE_READ_SCOPE_ID);
+        newSet.add(SPACE_MANAGE_SPACES_SCOPE_ID);
       }
       return newSet;
     });
@@ -184,6 +201,12 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
               description="Create, update, and delete non-public records."
               checked={selectedScopes().has(SPACE_MANAGE_RECORDS_SCOPE_ID)}
               onClick={toggleSpaceEdit}
+            />
+            <PermissionRow
+              label="Manage Spaces"
+              description="Create, configure, and delete Spaces."
+              checked={selectedScopes().has(SPACE_MANAGE_SPACES_SCOPE_ID)}
+              onClick={toggleSpaceManagement}
             />
           </div>
         </section>

@@ -139,7 +139,7 @@ const HierarchyRow = (props: {
   );
 };
 
-export const SpacesNav = () => {
+export const SpacesNav = (props: { action?: JSX.Element }) => {
   const params = useParams();
   const [authorityHandle] = createResource(() => params.spaceAuthority, resolveDidHandle);
   const [repoHandle] = createResource(() => params.spaceRepo, resolveDidHandle);
@@ -163,16 +163,23 @@ export const SpacesNav = () => {
 
   return (
     <nav class="flex w-full flex-col text-sm wrap-anywhere sm:text-base">
-      <HierarchyRow
-        icon="lucide--lock-keyhole"
-        label="Spaces"
-        href={hasSpace() ? "/spaces" : undefined}
-        badge={
-          <span class="ml-auto shrink-0 rounded-md border border-yellow-600 px-1.5 py-0.5 text-[8px] font-medium tracking-wide text-yellow-600 uppercase sm:text-[9px] dark:border-amber-400 dark:text-amber-400">
-            Alpha
-          </span>
-        }
-      />
+      <div class="flex min-w-0 items-center gap-1">
+        <div class="min-w-0 flex-1">
+          <HierarchyRow
+            icon="lucide--lock-keyhole"
+            label="Spaces"
+            href={hasSpace() ? "/spaces" : undefined}
+            badge={
+              <span class="ml-auto shrink-0 rounded-md border border-yellow-600 px-1.5 py-0.5 text-[8px] font-medium tracking-wide text-yellow-600 uppercase sm:text-[9px] dark:border-amber-400 dark:text-amber-400">
+                Alpha
+              </span>
+            }
+          />
+        </div>
+        <Show when={props.action}>
+          <div class="shrink-0">{props.action}</div>
+        </Show>
+      </div>
 
       <Show when={hasSpace()}>
         <HierarchyRow

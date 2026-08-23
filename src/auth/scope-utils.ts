@@ -7,6 +7,8 @@ export const SPACE_READ_SCOPE = "space:*?authority=*&action=read";
 export const SPACE_MANAGE_RECORDS_SCOPE_ID = "space-manage-records" as const;
 export const SPACE_MANAGE_RECORDS_SCOPE =
   "space:*?authority=*&collection=*&action=create&action=update&action=delete";
+export const SPACE_MANAGE_SPACES_SCOPE_ID = "space-manage-spaces" as const;
+export const SPACE_MANAGE_SPACES_SCOPE = "space:*?manage=create&manage=update&manage=delete";
 
 export const GRANULAR_SCOPES = [
   {
@@ -41,6 +43,12 @@ export const GRANULAR_SCOPES = [
     label: "Write non-public records",
     alpha: true,
   },
+  {
+    id: SPACE_MANAGE_SPACES_SCOPE_ID,
+    scope: SPACE_MANAGE_SPACES_SCOPE,
+    label: "Manage Spaces",
+    alpha: true,
+  },
 ] as const;
 
 export type ScopeId = (typeof GRANULAR_SCOPES)[number]["id"];
@@ -48,7 +56,8 @@ export type ScopeId = (typeof GRANULAR_SCOPES)[number]["id"];
 const BASE_SCOPES = ["atproto"];
 
 export const buildScopeString = (selected: Set<string>): string => {
-  const needsSpaceReadScope = selected.has(SPACE_MANAGE_RECORDS_SCOPE_ID);
+  const needsSpaceReadScope =
+    selected.has(SPACE_MANAGE_RECORDS_SCOPE_ID) || selected.has(SPACE_MANAGE_SPACES_SCOPE_ID);
   const needsBlobScope =
     selected.has("create") || selected.has("update") || selected.has(SPACE_MANAGE_RECORDS_SCOPE_ID);
   const granular = GRANULAR_SCOPES.filter(({ id }) => {
@@ -69,9 +78,41 @@ export const parseScopeString = (scopeIdsString: string): Set<string> => {
   return new Set(ids.filter((id) => id !== "atproto"));
 };
 
-export const oauthScopeStringToIds = (scopeString: string): Set<string> => {
-  const granted = new Set(scopeString.split(" ").filter(Boolean));
-  return new Set(GRANULAR_SCOPES.filter(({ scope }) => granted.has(scope)).map(({ id }) => id));
+const normalizeOAuthScope = (scope: string, did?: Did): string => {
+  const separator = scope.indexOf("?");
+  const name = separator === -1 ? scope : scope.slice(0, separator);
+  const params = Array.from(
+    new URLSearchParams(separator === -1 ? "" : scope.slice(separator + 1)),
+    ([key, value]) => [key, key === "authority" && value === "self" && did ? did : value] as const,
+  );
+
+  if (name.startsWith("space:")) {
+    if (!params.some(([key]) => key === "authority")) {
+      params.push(["authority", did ?? "self"]);
+    }
+    if (!params.some(([key]) => key === "skey")) params.push(["skey", "*"]);
+  }
+
+  params.sort(([keyA, valueA], [keyB, valueB]) =>
+    keyA === keyB ? valueA.localeCompare(valueB) : keyA.localeCompare(keyB),
+  );
+  return JSON.stringify([name, params]);
+};
+
+const oauthScopeIsGranted = (scopeString: string, requested: string, did?: Did): boolean => {
+  const normalized = normalizeOAuthScope(requested, did);
+  return scopeString
+    .split(" ")
+    .filter(Boolean)
+    .some((granted) => normalizeOAuthScope(granted, did) === normalized);
+};
+
+export const oauthScopeStringToIds = (scopeString: string, did?: Did): Set<string> => {
+  return new Set(
+    GRANULAR_SCOPES.filter(({ scope }) => oauthScopeIsGranted(scopeString, scope, did)).map(
+      ({ id }) => id,
+    ),
+  );
 };
 
 const hasScope = (grantedScopes: string | undefined, scopeId: string): boolean => {
@@ -91,7 +132,7 @@ export const hasAccountScope = (did: Did, scopeId: ScopeId): boolean => {
 
   const configuredScope = GRANULAR_SCOPES.find(({ id }) => id === scopeId)?.scope;
   if (currentAgent?.sub === did && configuredScope && currentAgent.session.token.scope) {
-    return currentAgent.session.token.scope.split(" ").includes(configuredScope);
+    return oauthScopeIsGranted(currentAgent.session.token.scope, configuredScope, did);
   }
 
   const grantedScopes = sessions[did]?.grantedScopes;
