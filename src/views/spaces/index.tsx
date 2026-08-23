@@ -15,7 +15,7 @@ import { NestedLayout } from "../../components/nested-layout.jsx";
 import { listSpaces, parseSpaceUri, type SpaceView } from "../../lib/spaces.js";
 import {
   makeSpacePath,
-  SpaceRecordMetadataContext,
+  SpaceRecordsContext,
   SpacesAuthContext,
   useSpacesAuth,
 } from "./context.jsx";
@@ -232,7 +232,7 @@ const SpacesIndex = () => {
 export const SpacesLayout = (props: RouteSectionProps) => {
   const params = useParams();
   const hasChild = () => !!params.spaceAuthority;
-  const [recordCid, setRecordCid] = createSignal<string>();
+  const [recordsVersion, setRecordsVersion] = createSignal(0);
 
   createEffect(() => {
     if (params.rkey) {
@@ -249,7 +249,12 @@ export const SpacesLayout = (props: RouteSectionProps) => {
   });
 
   return (
-    <SpaceRecordMetadataContext.Provider value={{ cid: recordCid, setCid: setRecordCid }}>
+    <SpaceRecordsContext.Provider
+      value={{
+        recordsVersion,
+        invalidateRecords: () => setRecordsVersion((version) => version + 1),
+      }}
+    >
       <div class="flex w-full flex-col gap-1">
         <SpacesNav />
         <div>
@@ -266,7 +271,7 @@ export const SpacesLayout = (props: RouteSectionProps) => {
           </Show>
         </div>
       </div>
-    </SpaceRecordMetadataContext.Provider>
+    </SpaceRecordsContext.Provider>
   );
 };
 

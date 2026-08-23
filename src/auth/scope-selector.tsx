@@ -1,6 +1,12 @@
-import { createSignal, For } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
 
-import { buildScopeString, GRANULAR_SCOPES } from "./scope-utils";
+import { AlphaBadge } from "../components/alpha-badge.jsx";
+import {
+  buildScopeString,
+  GRANULAR_SCOPES,
+  SPACE_MANAGE_RECORDS_SCOPE_ID,
+  SPACE_READ_SCOPE_ID,
+} from "./scope-utils";
 
 interface ScopeSelectorProps {
   onConfirm: (scopeString: string) => void;
@@ -24,6 +30,9 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
       const newSet = new Set(prev);
       if (newSet.has(scopeId)) {
         newSet.delete(scopeId);
+        if (scopeId === SPACE_READ_SCOPE_ID) {
+          newSet.delete(SPACE_MANAGE_RECORDS_SCOPE_ID);
+        }
         if (
           (scopeId === "create" || scopeId === "update") &&
           !newSet.has("create") &&
@@ -33,6 +42,9 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
         }
       } else {
         newSet.add(scopeId);
+        if (scopeId === SPACE_MANAGE_RECORDS_SCOPE_ID) {
+          newSet.add(SPACE_READ_SCOPE_ID);
+        }
       }
       return newSet;
     });
@@ -79,6 +91,9 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
                   {isSelected() && <span class="iconify lucide--check text-sm text-white"></span>}
                 </div>
                 <span>{scope.label}</span>
+                <Show when={"alpha" in scope && scope.alpha}>
+                  <AlphaBadge />
+                </Show>
               </button>
             );
           }}

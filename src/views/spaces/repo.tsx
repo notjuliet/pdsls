@@ -3,14 +3,20 @@ import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
 
 import { Button } from "../../components/button.jsx";
 import { Favicon } from "../../components/favicon.jsx";
+import { FilterInput } from "../../components/filter-input.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
-import { TextInput } from "../../components/text-input.jsx";
 import { listSpaceRecords, type SpaceRecord } from "../../lib/spaces.js";
-import { makeSpaceCollectionPath, makeSpaceRef, useSpacesAuth } from "./context.jsx";
+import {
+  makeSpaceCollectionPath,
+  makeSpaceRef,
+  useSpaceRecords,
+  useSpacesAuth,
+} from "./context.jsx";
 import { EmptyState, ErrorNotice, LoadingState } from "./shared.jsx";
 
 const SpaceRepoView = () => {
   const auth = useSpacesAuth();
+  const spaceRecords = useSpaceRecords();
   const params = useParams();
   const hidden = () => !!params.collection;
   const repo = () => params.spaceRepo!;
@@ -64,7 +70,7 @@ const SpaceRepoView = () => {
   };
 
   createEffect(() => {
-    const key = `${auth().sub}\n${space()}\n${repo()}`;
+    const key = `${auth().sub}\n${space()}\n${repo()}\n${spaceRecords.recordsVersion()}`;
     if (key !== activeKey) {
       activeKey = key;
       requestVersion += 1;
@@ -88,21 +94,18 @@ const SpaceRepoView = () => {
         <Show when={error()}>{(message) => <ErrorNotice message={message()} />}</Show>
 
         <Show when={loaded() && (!error() || records().length > 0)}>
-          <div class="px-2 text-sm text-neutral-600 dark:text-neutral-400">
-            {collections().length.toLocaleString()}
-            {cursor() ? "+" : ""} collection{collections().length === 1 ? "" : "s"}
-            <span class="text-neutral-400 dark:text-neutral-600"> · </span>
-            {records().length.toLocaleString()} {cursor() ? "loaded " : ""}record
-            {records().length === 1 ? "" : "s"}
-          </div>
-
-          <div class="px-2">
-            <TextInput
-              placeholder="Filter collections"
+          <div class="flex items-center gap-2 px-2">
+            <FilterInput
+              class="grow"
+              placeholder="Filter collections..."
               value={filter()}
-              onInput={(event) => setFilter(event.currentTarget.value)}
-              class="w-full text-sm"
+              onInput={setFilter}
             />
+            <div class="shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
+              <Show when={filter().trim()}>{filteredCollections().length.toLocaleString()} / </Show>
+              {collections().length.toLocaleString()}
+              {cursor() ? "+" : ""} collection{collections().length === 1 && !cursor() ? "" : "s"}
+            </div>
           </div>
 
           <ul class="flex flex-col">

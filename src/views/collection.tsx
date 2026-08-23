@@ -18,6 +18,7 @@ import { Portal } from "solid-js/web";
 
 import { agent } from "../auth/state";
 import { Button } from "../components/button.jsx";
+import { FilterInput } from "../components/filter-input.jsx";
 import HoverCard from "../components/hover-card/base";
 import { JSONType, JSONValue } from "../components/json.jsx";
 import { Modal } from "../components/modal.jsx";
@@ -647,26 +648,14 @@ const CollectionView = () => {
           <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
             <div class="flex w-full max-w-120 items-center gap-2">
               {/* Filter */}
-              <div
-                class="dark:bg-dark-200 flex min-w-0 grow cursor-text items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 text-sm dark:border-neutral-700"
-                onClick={(e) => {
-                  const input = e.currentTarget.querySelector("input");
-                  if (e.target !== input) input?.focus();
-                }}
-              >
-                <span class="iconify lucide--filter text-neutral-500 dark:text-neutral-400"></span>
-                <input
-                  ref={filterInputRef}
-                  type="text"
-                  spellcheck={false}
-                  autocapitalize="off"
-                  autocomplete="off"
-                  class="min-w-0 grow py-1 select-none placeholder:text-xs focus:outline-none"
-                  placeholder="Filter records..."
-                  value={filter() ?? ""}
-                  onInput={(e) => setFilter(e.currentTarget.value)}
-                />
-              </div>
+              <FilterInput
+                class="grow"
+                inputClass="min-w-0 grow py-1 select-none placeholder:text-xs focus:outline-none"
+                inputRef={(input) => (filterInputRef = input)}
+                placeholder="Filter records..."
+                value={filter() ?? ""}
+                onInput={setFilter}
+              />
               <PreviewFieldMenu
                 value={previewField()}
                 options={previewFieldOptions()}

@@ -1,18 +1,14 @@
-import { Client, simpleFetchHandler } from "@atcute/client";
-import { DidDocument, getPdsEndpoint } from "@atcute/identity";
-import { lexiconDoc } from "@atcute/lexicon-doc";
-import { RecordValidator } from "@atcute/lexicon-doc/validations";
-import { FailedLexiconResolutionError } from "@atcute/lexicon-resolver";
-import { ActorIdentifier, is, Nsid } from "@atcute/lexicons";
-import { AtprotoDid, Did, isNsid } from "@atcute/lexicons/syntax";
+import { Client } from "@atcute/client";
+import { ActorIdentifier, Nsid } from "@atcute/lexicons";
+import { AtprotoDid, Did } from "@atcute/lexicons/syntax";
 import { verifyRecord } from "@atcute/repo";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from "solid-js";
-import * as v from "valibot";
 
 import { agent } from "../auth/state";
 import { Backlinks } from "../components/backlinks.jsx";
 import { Button } from "../components/button.jsx";
+import { CopyableInfoField } from "../components/copyable-info-field.jsx";
 import { RecordEditor, setPlaceholder } from "../components/create";
 import {
   ActionMenu,
@@ -26,13 +22,15 @@ import { JSONValue } from "../components/json.jsx";
 import { Modal } from "../components/modal.jsx";
 import { addNotification, removeNotification } from "../components/notification.jsx";
 import { PermissionButton } from "../components/permission-button.jsx";
-import { canHover } from "../layout.jsx";
-import { didDocumentResolver, resolveLexiconAuthority } from "../lib/api.js";
+import { RecordSchemaValidation } from "../components/record-schema-validation.jsx";
+import {
+  hasKnownRecordSchema,
+  validateKnownRecordSchema,
+  validateResolvedRecordSchema,
+} from "../lib/record-validation.js";
 import { useRepo } from "../lib/repo-context.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
 import { AtUri, uriTemplates } from "../lib/templates.js";
-import { lexicons } from "../lib/types/lexicons.js";
-import { addToClipboard } from "../utils/copy.js";
 import { hideMedia, setHideMedia } from "./settings.jsx";
 
 const faviconWrapper = (children: any) => (
@@ -56,155 +54,6 @@ const bskyAltClients = [
     transform: (url: string) => url.replace("https://bsky.app", "https://reddwarf.app"),
   },
 ];
-
-const authorityCache = new Map<string, Promise<AtprotoDid>>();
-const documentCache = new Map<string, Promise<DidDocument>>();
-const schemaCache = new Map<string, Promise<unknown>>();
-
-const getAuthoritySegment = (nsid: string): string => {
-  const segments = nsid.split(".");
-  return segments.slice(0, -1).join(".");
-};
-
-const resolveSchema = async (authority: AtprotoDid, nsid: Nsid): Promise<unknown> => {
-  const cacheKey = `${authority}:${nsid}`;
-
-  let cachedSchema = schemaCache.get(cacheKey);
-  if (cachedSchema) {
-    return cachedSchema;
-  }
-
-  const schemaPromise = (async () => {
-    let didDocPromise = documentCache.get(authority);
-    if (!didDocPromise) {
-      didDocPromise = didDocumentResolver().resolve(authority);
-      documentCache.set(authority, didDocPromise);
-    }
-
-    const didDocument = await didDocPromise;
-    const pdsEndpoint = getPdsEndpoint(didDocument);
-
-    if (!pdsEndpoint) {
-      throw new FailedLexiconResolutionError(nsid, {
-        cause: new TypeError(`no pds service in did document; did=${authority}`),
-      });
-    }
-
-    const rpc = new Client({ handler: simpleFetchHandler({ service: pdsEndpoint }) });
-    const response = await rpc.get("com.atproto.repo.getRecord", {
-      params: {
-        repo: authority,
-        collection: "com.atproto.lexicon.schema",
-        rkey: nsid,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`got http ${response.status}`);
-    }
-
-    return response.data.value;
-  })();
-
-  schemaCache.set(cacheKey, schemaPromise);
-
-  try {
-    return await schemaPromise;
-  } catch (err) {
-    schemaCache.delete(cacheKey);
-    throw err;
-  }
-};
-
-const extractRefs = (obj: any): Nsid[] => {
-  const refs: Set<string> = new Set();
-
-  const traverse = (value: any) => {
-    if (!value || typeof value !== "object") return;
-
-    if (value.type === "ref" && value.ref) {
-      const ref = value.ref;
-      if (!ref.startsWith("#")) {
-        const nsid = ref.split("#")[0];
-        if (isNsid(nsid)) refs.add(nsid);
-      }
-    }
-
-    if (value.type === "union" && Array.isArray(value.refs)) {
-      for (const ref of value.refs) {
-        if (!ref.startsWith("#")) {
-          const nsid = ref.split("#")[0];
-          if (isNsid(nsid)) refs.add(nsid);
-        }
-      }
-    }
-
-    if (Array.isArray(value)) value.forEach(traverse);
-    else Object.values(value).forEach(traverse);
-  };
-
-  traverse(obj);
-  return Array.from(refs) as Nsid[];
-};
-
-const resolveAllLexicons = async (
-  nsid: Nsid,
-  depth: number = 0,
-  resolved: Map<string, any> = new Map(),
-  failed: Set<string> = new Set(),
-  inFlight: Map<string, Promise<void>> = new Map(),
-): Promise<{ resolved: Map<string, any>; failed: Set<string> }> => {
-  if (depth >= 10) {
-    console.warn(`Maximum recursion depth reached for ${nsid}`);
-    return { resolved, failed };
-  }
-
-  if (resolved.has(nsid) || failed.has(nsid)) return { resolved, failed };
-
-  if (inFlight.has(nsid)) {
-    await inFlight.get(nsid);
-    return { resolved, failed };
-  }
-
-  const fetchPromise = (async () => {
-    let authority: AtprotoDid | undefined;
-    const authoritySegment = getAuthoritySegment(nsid);
-    try {
-      let authorityPromise = authorityCache.get(authoritySegment);
-      if (!authorityPromise) {
-        authorityPromise = resolveLexiconAuthority(nsid);
-        authorityCache.set(authoritySegment, authorityPromise);
-      }
-
-      authority = await authorityPromise;
-      const schema = await resolveSchema(authority, nsid);
-
-      resolved.set(nsid, schema);
-
-      const refs = extractRefs(schema);
-
-      if (refs.length > 0) {
-        await Promise.all(
-          refs.map((ref) => resolveAllLexicons(ref, depth + 1, resolved, failed, inFlight)),
-        );
-      }
-    } catch (err) {
-      console.error(`Failed to resolve lexicon ${nsid}:`, err);
-      failed.add(nsid);
-      authorityCache.delete(authoritySegment);
-      if (authority) {
-        documentCache.delete(authority);
-      }
-    } finally {
-      inFlight.delete(nsid);
-    }
-  })();
-
-  inFlight.set(nsid, fetchPromise);
-  await fetchPromise;
-
-  return { resolved, failed };
-};
 
 export const RecordView = () => {
   const repo = useRepo();
@@ -255,51 +104,27 @@ export const RecordView = () => {
     fetchRecord,
   );
 
-  const validateLocalSchema = async (collection: string, record: Record<string, unknown>) => {
-    try {
-      if (collection === "com.atproto.lexicon.schema") {
-        v.safeParse(lexiconDoc, record);
-        setValidSchema(true);
-      } else if (collection in lexicons) {
-        if (is(lexicons[collection], record)) setValidSchema(true);
-        else setValidSchema(false);
-      }
-    } catch (err: any) {
-      console.error("Schema validation error:", err);
-      setValidSchema(false);
-      setValidationError(err.message || String(err));
-    }
+  const validateLocalSchema = (collection: string, value: unknown) => {
+    const result = validateKnownRecordSchema(collection, value);
+    if (!result) return;
+
+    setValidSchema(result.valid);
+    setValidationError(result.error ?? "");
   };
 
-  const validateRemoteSchema = async (record: Record<string, unknown>) => {
-    const collection = params.collection!;
-    const rkey = params.rkey!;
+  const validateRemoteSchema = async (value: unknown) => {
     try {
       setRemoteValidation(true);
-      const { resolved, failed } = await resolveAllLexicons(collection as Nsid);
-
-      if (failed.size > 0) {
-        console.error(`Failed to resolve ${failed.size} documents:`, Array.from(failed));
-        setValidSchema(false);
-        setValidationError(`Unable to resolve lexicon documents: ${Array.from(failed).join(", ")}`);
-        return;
-      }
-
-      const lexiconDocs = Object.fromEntries(resolved);
-
-      const validator = new RecordValidator(lexiconDocs, collection as Nsid);
-      validator.parse({
-        key: rkey ?? null,
-        object: record,
-      });
-
+      setValidationError("");
+      await validateResolvedRecordSchema(params.collection!, params.rkey!, value);
       setValidSchema(true);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Schema validation error:", err);
       setValidSchema(false);
-      setValidationError(err.message || String(err));
+      setValidationError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setRemoteValidation(false);
     }
-    setRemoteValidation(false);
   };
 
   const verifyRecordIntegrity = async (rpc: Client, collection: string, rkey: string) => {
@@ -568,43 +393,9 @@ export const RecordView = () => {
             </Show>
             <Show when={location.hash === "#info"}>
               <div class="flex w-full flex-col gap-3 px-2">
-                <div>
-                  <p class="font-semibold">AT URI</p>
-                  <button
-                    class="group flex w-full items-center gap-1 text-left text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-200"
-                    onClick={() => addToClipboard(record()!.uri)}
-                  >
-                    <span class="truncate" dir="rtl">
-                      {record()?.uri}
-                    </span>
-                    <span
-                      classList={{
-                        "iconify lucide--copy shrink-0": true,
-                        "opacity-0 group-hover:opacity-100": canHover,
-                      }}
-                    ></span>
-                  </button>
-                </div>
+                <CopyableInfoField label="AT URI" value={record()!.uri} />
                 <Show when={record()?.cid}>
-                  {(cid) => (
-                    <div>
-                      <p class="font-semibold">CID</p>
-                      <button
-                        class="group flex w-full items-center gap-1 text-left text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-200"
-                        onClick={() => addToClipboard(cid())}
-                      >
-                        <span class="truncate" dir="rtl">
-                          {cid()}
-                        </span>
-                        <span
-                          classList={{
-                            "iconify lucide--copy shrink-0": true,
-                            "opacity-0 group-hover:opacity-100": canHover,
-                          }}
-                        ></span>
-                      </button>
-                    </div>
-                  )}
+                  {(cid) => <CopyableInfoField label="CID" value={cid()} />}
                 </Show>
                 <div>
                   <div class="flex items-center gap-1">
@@ -622,35 +413,13 @@ export const RecordView = () => {
                     <div class="text-xs wrap-break-word">{verifyError()}</div>
                   </Show>
                 </div>
-                <div>
-                  <div class="flex items-center gap-1">
-                    <p class="font-semibold">Schema validation</p>
-                    <span
-                      classList={{
-                        "iconify lucide--check text-green-500 dark:text-green-400":
-                          validSchema() === true,
-                        "iconify lucide--x text-red-500 dark:text-red-400": validSchema() === false,
-                        "iconify lucide--loader-circle animate-spin":
-                          validSchema() === undefined && remoteValidation(),
-                      }}
-                    ></span>
-                  </div>
-                  <Show when={validSchema() === false}>
-                    <div class="text-xs wrap-break-word">{validationError()}</div>
-                  </Show>
-                  <Show
-                    when={
-                      !remoteValidation() &&
-                      validSchema() === undefined &&
-                      params.collection &&
-                      !(params.collection in lexicons)
-                    }
-                  >
-                    <Button onClick={() => validateRemoteSchema(record()!.value)}>
-                      Validate via resolution
-                    </Button>
-                  </Show>
-                </div>
+                <RecordSchemaValidation
+                  valid={validSchema()}
+                  error={validationError()}
+                  resolving={!!remoteValidation()}
+                  canResolve={!!params.collection && !hasKnownRecordSchema(params.collection)}
+                  onResolve={() => void validateRemoteSchema(record()!.value)}
+                />
               </div>
             </Show>
           </div>

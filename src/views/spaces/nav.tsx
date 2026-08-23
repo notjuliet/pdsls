@@ -3,12 +3,7 @@ import { createResource, createSignal, type JSX, Show } from "solid-js";
 
 import { Favicon } from "../../components/favicon.jsx";
 import { resolveDidInfo } from "../../components/hover-card/did.jsx";
-import {
-  makeSpaceCollectionPath,
-  makeSpacePath,
-  makeSpaceRepoPath,
-  useSpaceRecordMetadata,
-} from "./context.jsx";
+import { makeSpaceCollectionPath, makeSpacePath, makeSpaceRepoPath } from "./context.jsx";
 
 const resolveDidHandle = async (did: string) => {
   try {
@@ -146,7 +141,6 @@ const HierarchyRow = (props: {
 
 export const SpacesNav = () => {
   const params = useParams();
-  const recordMetadata = useSpaceRecordMetadata();
   const [authorityHandle] = createResource(() => params.spaceAuthority, resolveDidHandle);
   const [repoHandle] = createResource(() => params.spaceRepo, resolveDidHandle);
   const hasSpace = () => !!params.spaceAuthority && !!params.spaceType && !!params.skey;
@@ -212,12 +206,7 @@ export const SpacesNav = () => {
       </Show>
 
       <Show when={params.rkey}>
-        <HierarchyRow
-          icon="lucide--file-json"
-          label={params.rkey}
-          detail={recordMetadata.cid()}
-          preserveLabel
-        />
+        <HierarchyRow icon="lucide--file-json" label={params.rkey} preserveLabel />
       </Show>
     </nav>
   );

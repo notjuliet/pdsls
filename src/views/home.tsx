@@ -2,6 +2,7 @@ import { A } from "@solidjs/router";
 import { JSX, Show } from "solid-js";
 
 import { agent, avatars, sessions, setOpenManager, setShowAddAccount } from "../auth/state";
+import { AlphaBadge } from "../components/alpha-badge.jsx";
 import { setShowSearch } from "../components/search";
 
 const baseCardClass =
@@ -178,11 +179,7 @@ export const Home = () => {
           href="/spaces"
           icon="lucide--lock-keyhole"
           title="Spaces"
-          badge={
-            <span class="shrink-0 rounded-sm border border-yellow-600 px-1.5 py-[3px] text-[8px] leading-none font-medium tracking-wide text-yellow-600 uppercase dark:border-amber-400 dark:text-amber-400">
-              Alpha
-            </span>
-          }
+          badge={<AlphaBadge />}
           description="Preview non-public records"
           accent="blue"
         />

@@ -126,6 +126,25 @@ const oauthQuery = async (
   return data;
 };
 
+const oauthProcedure = async (
+  auth: OAuthUserAgent,
+  method: string,
+  input: Record<string, unknown>,
+): Promise<unknown> => {
+  const response = await auth.handle(`/xrpc/${method}`, {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+  const data = await readJson(response);
+
+  if (!response.ok) throw new SpaceRequestError(data, response.status);
+  return data;
+};
+
 interface SpaceCredentialSession {
   credential: string;
   expiresAt: number;
@@ -525,6 +544,48 @@ export const getSpaceRecord = async (
     cid: data.cid,
     value: data.value as JSONType,
   };
+};
+
+export const deleteSpaceRecord = async (
+  auth: OAuthUserAgent,
+  space: string,
+  repo: string,
+  collection: string,
+  rkey: string,
+): Promise<void> => {
+  if (repo !== auth.sub) throw new Error("You can only delete your own Space records");
+
+  await oauthProcedure(auth, "com.atproto.space.deleteRecord", {
+    space,
+    repo,
+    collection,
+    rkey,
+  });
+};
+
+const MAX_SPACE_WRITES = 200;
+
+export const deleteSpaceRecords = async (
+  auth: OAuthUserAgent,
+  space: string,
+  repo: string,
+  records: { collection: string; rkey: string }[],
+): Promise<void> => {
+  if (repo !== auth.sub) throw new Error("You can only delete your own Space records");
+
+  for (let index = 0; index < records.length; index += MAX_SPACE_WRITES) {
+    const writes = records.slice(index, index + MAX_SPACE_WRITES).map((record) => ({
+      $type: "com.atproto.space.applyWrites#delete",
+      collection: record.collection,
+      rkey: record.rkey,
+    }));
+
+    await oauthProcedure(auth, "com.atproto.space.applyWrites", {
+      space,
+      repo,
+      writes,
+    });
+  }
 };
 
 export const getSpaceBlob = async (

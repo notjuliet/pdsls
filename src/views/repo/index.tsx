@@ -20,6 +20,7 @@ import {
   NavMenu,
 } from "../../components/dropdown.jsx";
 import { Favicon } from "../../components/favicon.jsx";
+import { FilterInput } from "../../components/filter-input.jsx";
 import { LazyTab } from "../../components/lazy-tab.jsx";
 import { setPDS } from "../../components/navbar.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
@@ -577,27 +578,14 @@ const RepoView = () => {
 
         <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
           <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
-            <div
-              class="dark:bg-dark-200 flex w-full max-w-120 cursor-text items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 text-sm dark:border-neutral-700"
-              onClick={(e) => {
-                const input = e.currentTarget.querySelector("input");
-                if (e.target !== input) input?.focus();
-              }}
-            >
-              <span class="iconify lucide--filter text-neutral-500 dark:text-neutral-400"></span>
-              <input
-                ref={filterInputRef}
-                type="text"
-                spellcheck={false}
-                autocapitalize="off"
-                autocomplete="off"
-                class="grow py-1.5 select-none placeholder:text-xs focus:outline-none"
-                name="filter"
-                placeholder="Filter collections..."
-                value={filter() ?? ""}
-                onInput={(e) => setFilter(e.currentTarget.value.toLowerCase())}
-              />
-            </div>
+            <FilterInput
+              class="w-full max-w-120"
+              inputRef={(input) => (filterInputRef = input)}
+              name="filter"
+              placeholder="Filter collections..."
+              value={filter() ?? ""}
+              onInput={(value) => setFilter(value.toLowerCase())}
+            />
             <div class="flex w-full max-w-120 justify-end gap-1">
               <button
                 class="rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
