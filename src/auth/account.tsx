@@ -188,6 +188,8 @@ export const AccountManager = () => {
 
         <Show when={scopeFlow.showScopeSelector()}>
           <ScopeSelector
+            title="Edit permissions"
+            confirmLabel="Save permissions"
             initialScopes={parseScopeString(
               sessions[scopeFlow.pendingAccount()]?.grantedScopes || "",
             )}

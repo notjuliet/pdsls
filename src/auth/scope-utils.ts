@@ -12,12 +12,12 @@ export const GRANULAR_SCOPES = [
   {
     id: "create",
     scope: "repo:*?action=create",
-    label: "Create records",
+    label: "Create and edit records",
   },
   {
     id: "update",
     scope: "repo:*?action=update",
-    label: "Update records",
+    label: "Create and edit records",
   },
   {
     id: "delete",
@@ -32,13 +32,13 @@ export const GRANULAR_SCOPES = [
   {
     id: SPACE_READ_SCOPE_ID,
     scope: SPACE_READ_SCOPE,
-    label: "Read Space records",
+    label: "View non-public records",
     alpha: true,
   },
   {
     id: SPACE_MANAGE_RECORDS_SCOPE_ID,
     scope: SPACE_MANAGE_RECORDS_SCOPE,
-    label: "Manage Space records",
+    label: "Write non-public records",
     alpha: true,
   },
 ] as const;
@@ -48,7 +48,14 @@ export type ScopeId = (typeof GRANULAR_SCOPES)[number]["id"];
 const BASE_SCOPES = ["atproto"];
 
 export const buildScopeString = (selected: Set<string>): string => {
-  const granular = GRANULAR_SCOPES.filter((s) => selected.has(s.id)).map((s) => s.scope);
+  const needsSpaceReadScope = selected.has(SPACE_MANAGE_RECORDS_SCOPE_ID);
+  const needsBlobScope =
+    selected.has("create") || selected.has("update") || selected.has(SPACE_MANAGE_RECORDS_SCOPE_ID);
+  const granular = GRANULAR_SCOPES.filter(({ id }) => {
+    if (id === "blob") return needsBlobScope;
+    if (id === SPACE_READ_SCOPE_ID) return needsSpaceReadScope || selected.has(id);
+    return selected.has(id);
+  }).map(({ scope }) => scope);
   return [...BASE_SCOPES, ...granular].join(" ");
 };
 

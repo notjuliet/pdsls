@@ -14,10 +14,6 @@ export const Login = (props: LoginProps) => {
 
   const scopeFlow = useOAuthScopeFlow({
     onError: (e) => setNotice(`${e}`),
-    onRedirecting: () => {
-      setNotice(`Contacting your data server...`);
-      setTimeout(() => setNotice(`Redirecting...`), 0);
-    },
   });
 
   const initiateLogin = (handle: string) => {

@@ -59,7 +59,7 @@ export const ConfirmSubmit = (props: {
               onChange={(e) => props.setRecreate(e.currentTarget.checked)}
               class="h-3.5 w-3.5 accent-blue-500"
             />
-            Recreate{!hasUserScope("create") ? " (create permission needed)" : ""}
+            Recreate{!hasUserScope("create") ? " (create and edit permission needed)" : ""}
           </label>
           <p class="text-xs text-neutral-500 dark:text-neutral-400">
             Delete the existing record and create a new one with the same record key.

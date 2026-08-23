@@ -21,7 +21,7 @@ export const PermissionPromptContainer = () => {
 
   const scopeLabel = () => {
     const scope = GRANULAR_SCOPES.find((s) => s.id === displayedScope());
-    return scope?.label.toLowerCase() || displayedScope();
+    return scope?.label || displayedScope();
   };
 
   const handleEditPermissions = () => {
@@ -41,7 +41,7 @@ export const PermissionPromptContainer = () => {
     >
       <h2 class="mb-2 font-semibold">Permission required</h2>
       <p class="mb-4 text-sm text-neutral-600 dark:text-neutral-400">
-        You need the "{scopeLabel()}" permission to perform this action.
+        Enable “{scopeLabel()}” in permissions to perform this action.
       </p>
       <div class="flex justify-end gap-2">
         <Button onClick={() => setRequestedScope(null)}>Cancel</Button>

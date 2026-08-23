@@ -57,7 +57,7 @@ const PermissionPrompt = () => {
       <div>
         <h2 class="font-medium">Space permission required</h2>
         <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-          Re-authorize this account and enable “Read Space records”.
+          Re-authorize this account and enable “View non-public records”.
         </p>
       </div>
       <Button
