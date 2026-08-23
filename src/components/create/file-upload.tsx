@@ -1,8 +1,9 @@
 import { Client } from "@atcute/client";
+import { Did } from "@atcute/lexicons";
+import { getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { remove } from "@mary/exif-rm";
 import { createSignal, onCleanup, Show } from "solid-js";
 
-import { agent } from "../../auth/state";
 import { formatFileSize } from "../../utils/format";
 import { Button } from "../button.jsx";
 import { TextInput } from "../text-input.jsx";
@@ -10,6 +11,7 @@ import { editorInstance } from "./state";
 
 export const FileUpload = (props: {
   file: File;
+  repo: Did;
   blobInput: HTMLInputElement;
   onClose: () => void;
 }) => {
@@ -31,7 +33,7 @@ export const FileUpload = (props: {
       if (exifRemoved !== null) blob = new Blob([exifRemoved as BlobPart], { type: blob.type });
     }
 
-    const rpc = new Client({ handler: agent()! });
+    const rpc = new Client({ handler: new OAuthUserAgent(await getSession(props.repo)) });
     setUploading(true);
     const res = await rpc.post("com.atproto.repo.uploadBlob", {
       input: blob,
