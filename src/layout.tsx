@@ -214,7 +214,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
       >
         <A
           href="/"
-          style='font-feature-settings: "cv05"'
+          style='font-feature-settings: "ss02"'
           class="relative flex items-center gap-1 text-xl font-semibold"
         >
           <img src="/pdsls-logo.svg" alt="" class="size-5" />
