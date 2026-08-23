@@ -22,6 +22,7 @@ import {
   useSpaceRecords,
   useSpacesAuth,
 } from "./context.jsx";
+import { SpaceRecordEditor } from "./create-record.jsx";
 import { EmptyState, ErrorNotice, LoadingState } from "./shared.jsx";
 
 const RECORDS_PER_PAGE = 100;
@@ -199,30 +200,41 @@ const SpaceCollectionView = () => {
           </div>
 
           <Show when={!lexicon.showSchema() && repo() === auth().sub}>
-            <div class="flex items-center gap-1 text-sm">
+            <div class="flex items-center gap-1.5 text-sm">
+              <Show when={!managing()}>
+                <SpaceRecordEditor
+                  authority={params.spaceAuthority!}
+                  type={params.spaceType!}
+                  skey={params.skey!}
+                  space={space()}
+                  collection={params.collection!}
+                />
+              </Show>
               <Show when={managing()}>
-                <Tooltip text="Select all">
-                  <button
-                    onclick={selectAll}
-                    class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                  >
-                    <span class="iconify lucide--list-checks" />
-                  </button>
-                </Tooltip>
-                <Tooltip text="Delete">
-                  <button
-                    disabled={selectedCount() === 0}
-                    onclick={() => setOpenDelete(true)}
-                    class="flex items-center rounded-md p-1.5 text-red-500 hover:bg-neutral-200 active:bg-neutral-300 disabled:opacity-40 dark:text-red-400 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                  >
-                    <span class="iconify lucide--trash-2" />
-                  </button>
-                </Tooltip>
+                <div class="flex items-center">
+                  <Tooltip text="Select all">
+                    <button
+                      onclick={selectAll}
+                      class="flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                    >
+                      <span class="iconify lucide--list-checks" />
+                    </button>
+                  </Tooltip>
+                  <Tooltip text="Delete">
+                    <button
+                      disabled={selectedCount() === 0}
+                      onclick={() => setOpenDelete(true)}
+                      class="flex items-center rounded-md p-1.5 text-red-500 hover:bg-neutral-200 active:bg-neutral-300 disabled:opacity-40 dark:text-red-400 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                    >
+                      <span class="iconify lucide--trash-2" />
+                    </button>
+                  </Tooltip>
+                </div>
               </Show>
               <PermissionButton
                 scope={SPACE_MANAGE_RECORDS_SCOPE_ID}
-                class="flex items-center gap-1 rounded-md border border-neutral-300 px-2 py-0.75 transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-                disabledClass="flex items-center gap-1 rounded-md px-2 py-1 opacity-40"
+                class="flex items-center gap-1 rounded-md border border-neutral-300 px-1.5 py-0.5 text-xs transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 sm:px-2 sm:py-0.75 sm:text-sm dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+                disabledClass="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs opacity-40 sm:px-2 sm:py-1 sm:text-sm"
                 onClick={() => (managing() ? stopManaging() : setManaging(true))}
               >
                 {managing() ? "Cancel" : "Manage"}

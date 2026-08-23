@@ -15,7 +15,7 @@ import { editorInstance } from "./create/state";
 const tabIndentKey = indentWithTab as unknown as KeyBinding;
 const jsonLinter = jsonParseLinter() as unknown as LintSource;
 
-const Editor = (props: { content: string }) => {
+const Editor = (props: { content: string; onReady?: (view: EditorView | undefined) => void }) => {
   let editorDiv!: HTMLDivElement;
   let themeColor = new Compartment();
   let view: EditorView;
@@ -58,11 +58,15 @@ const Editor = (props: { content: string }) => {
       ],
     });
     editorInstance.view = view;
+    props.onReady?.(view);
   });
 
-  onCleanup(() =>
-    window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", themeEvent),
-  );
+  onCleanup(() => {
+    window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", themeEvent);
+    props.onReady?.(undefined);
+    if (editorInstance.view === view) editorInstance.view = null;
+    view?.destroy();
+  });
 
   return (
     <div

@@ -68,6 +68,12 @@ export interface GetSpaceRecordResult {
   value: JSONType;
 }
 
+export interface SpaceRecordWriteResult {
+  uri: string;
+  cid: string;
+  validationStatus?: string;
+}
+
 interface ParsedSpaceUri {
   authority: string;
   type: string;
@@ -76,6 +82,21 @@ interface ParsedSpaceUri {
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === "object" && !Array.isArray(value);
+
+const parseSpaceRecordWriteResult = (
+  data: unknown,
+  operation: "creation" | "update",
+): SpaceRecordWriteResult => {
+  if (!isObject(data) || typeof data.uri !== "string" || typeof data.cid !== "string") {
+    throw new Error(`The PDS returned an invalid Space record ${operation} response`);
+  }
+
+  return {
+    uri: data.uri,
+    cid: data.cid,
+    validationStatus: typeof data.validationStatus === "string" ? data.validationStatus : undefined,
+  };
+};
 
 const getErrorMessage = (data: unknown, status: number) => {
   if (isObject(data)) {
@@ -561,6 +582,49 @@ export const deleteSpaceRecord = async (
     collection,
     rkey,
   });
+};
+
+export const createSpaceRecord = async (
+  auth: OAuthUserAgent,
+  space: string,
+  collection: string,
+  record: JSONType,
+  rkey?: string,
+  validate?: boolean,
+): Promise<SpaceRecordWriteResult> => {
+  const data = await oauthProcedure(auth, "com.atproto.space.createRecord", {
+    space,
+    repo: auth.sub,
+    collection,
+    rkey,
+    validate,
+    record,
+  });
+
+  return parseSpaceRecordWriteResult(data, "creation");
+};
+
+export const putSpaceRecord = async (
+  auth: OAuthUserAgent,
+  space: string,
+  repo: string,
+  collection: string,
+  rkey: string,
+  record: JSONType,
+  validate?: boolean,
+): Promise<SpaceRecordWriteResult> => {
+  if (repo !== auth.sub) throw new Error("You can only edit your own Space records");
+
+  const data = await oauthProcedure(auth, "com.atproto.space.putRecord", {
+    space,
+    repo,
+    collection,
+    rkey,
+    validate,
+    record,
+  });
+
+  return parseSpaceRecordWriteResult(data, "update");
 };
 
 const MAX_SPACE_WRITES = 200;

@@ -30,6 +30,7 @@ import {
   useSpaceRecords,
   useSpacesAuth,
 } from "./context.jsx";
+import { SpaceRecordEditor } from "./create-record.jsx";
 import { ErrorNotice, LoadingState } from "./shared.jsx";
 
 export const SpaceRecordView = () => {
@@ -61,6 +62,14 @@ export const SpaceRecordView = () => {
       params.rkey!,
     );
 
+  const showRecord = (result: GetSpaceRecordResult) => {
+    setRecord(result);
+    const validation = validateKnownRecordSchema(params.collection!, result.value);
+    setValidSchema(validation?.valid);
+    setValidationError(validation?.error ?? "");
+    setRemoteValidation(false);
+  };
+
   createEffect(() => {
     requestVersion += 1;
     const version = requestVersion;
@@ -74,12 +83,7 @@ export const SpaceRecordView = () => {
     void getSpaceRecord(auth(), space(), repo(), params.collection!, params.rkey!)
       .then((result) => {
         if (version === requestVersion) {
-          setRecord(result);
-          const validation = validateKnownRecordSchema(params.collection!, result.value);
-          if (validation) {
-            setValidSchema(validation.valid);
-            setValidationError(validation.error ?? "");
-          }
+          showRecord(result);
         }
       })
       .catch((err) => {
@@ -172,7 +176,7 @@ export const SpaceRecordView = () => {
 
         <Show when={error()}>{(message) => <ErrorNotice message={message()} />}</Show>
 
-        <Show when={record()}>
+        <Show when={record()} keyed>
           {(value) => (
             <div class="flex w-full flex-col items-center">
               <div class="mb-3 flex min-h-7 w-full items-center justify-between px-2 text-sm sm:text-base">
@@ -183,6 +187,19 @@ export const SpaceRecordView = () => {
                 </div>
                 <div class="flex sm:gap-0.5">
                   <Show when={repo() === auth().sub}>
+                    <SpaceRecordEditor
+                      authority={params.spaceAuthority!}
+                      type={params.spaceType!}
+                      skey={params.skey!}
+                      space={space()}
+                      collection={params.collection!}
+                      rkey={params.rkey!}
+                      record={value.value}
+                      mode="edit"
+                      onSaved={(result, updatedRecord) =>
+                        showRecord({ ...result, value: updatedRecord })
+                      }
+                    />
                     <PermissionButton
                       scope={SPACE_MANAGE_RECORDS_SCOPE_ID}
                       tooltip="Delete"
@@ -196,7 +213,7 @@ export const SpaceRecordView = () => {
                       type="button"
                       aria-label="Copy record"
                       class="flex items-center rounded-sm p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                      onClick={() => addToClipboard(JSON.stringify(value().value, null, 2) ?? "")}
+                      onClick={() => addToClipboard(JSON.stringify(value.value, null, 2) ?? "")}
                     >
                       <span class="iconify lucide--copy" />
                     </button>
@@ -207,7 +224,7 @@ export const SpaceRecordView = () => {
               <Show when={location.hash !== "#info" && !lexicon.showSchema()}>
                 <div class="w-full max-w-screen min-w-full px-2 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-max sm:text-sm md:max-w-3xl">
                   <JSONValue
-                    data={value().value}
+                    data={value.value}
                     repo={repo()}
                     newTab
                     fetchBlob={(cid) => getSpaceBlob(auth(), space(), repo(), cid)}
@@ -221,21 +238,21 @@ export const SpaceRecordView = () => {
                   loading={lexicon.loading()}
                   error={lexicon.error()}
                   fallbackSchema={
-                    params.collection === "com.atproto.lexicon.schema" ? value().value : undefined
+                    params.collection === "com.atproto.lexicon.schema" ? value.value : undefined
                   }
                 />
               </Show>
 
               <Show when={location.hash === "#info"}>
                 <div class="flex w-full flex-col gap-3 px-2">
-                  <CopyableInfoField label="AT URI" value={value().uri} />
-                  <CopyableInfoField label="CID" value={value().cid} />
+                  <CopyableInfoField label="AT URI" value={value.uri} />
+                  <CopyableInfoField label="CID" value={value.cid} />
                   <RecordSchemaValidation
                     valid={validSchema()}
                     error={validationError()}
                     resolving={remoteValidation()}
                     canResolve={!!params.collection && !hasKnownRecordSchema(params.collection)}
-                    onResolve={() => void validateRemoteSchema(value().value)}
+                    onResolve={() => void validateRemoteSchema(value.value)}
                   />
                 </div>
               </Show>

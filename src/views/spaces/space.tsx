@@ -11,6 +11,7 @@ import {
   type SpaceRepo,
 } from "../../lib/spaces.js";
 import { makeSpacePath, makeSpaceRef, makeSpaceRepoPath, useSpacesAuth } from "./context.jsx";
+import { SpaceRecordEditor } from "./create-record.jsx";
 import { EmptyState, ErrorNotice, LoadingState } from "./shared.jsx";
 import { SimpleSpaceDetails } from "./simple-space.jsx";
 
@@ -25,6 +26,7 @@ const SpaceView = () => {
   const [loading, setLoading] = createSignal(false);
   const [error, setError] = createSignal<string>();
   const [simpleSpaceInfo, setSimpleSpaceInfo] = createSignal<SimpleSpaceInfo>();
+  const [simpleSpaceResolved, setSimpleSpaceResolved] = createSignal(false);
   let activeKey = "";
   let requestVersion = 0;
   let simpleSpaceKey = "";
@@ -57,6 +59,7 @@ const SpaceView = () => {
       return a.did.localeCompare(b.did);
     }),
   );
+  const hasOwnRepo = createMemo(() => repos().some((repo) => repo.did === auth().sub));
 
   const loadRepos = async (reset = false, version = requestVersion) => {
     if (loading() && !reset) return;
@@ -106,26 +109,45 @@ const SpaceView = () => {
     simpleSpaceKey = key;
     simpleSpaceVersion += 1;
     setSimpleSpaceInfo(undefined);
+    setSimpleSpaceResolved(false);
 
     const version = simpleSpaceVersion;
     void getSimpleSpace(agent, spaceRef)
       .then((info) => {
-        if (version === simpleSpaceVersion) setSimpleSpaceInfo(info);
+        if (version === simpleSpaceVersion) {
+          setSimpleSpaceInfo(info);
+          setSimpleSpaceResolved(true);
+        }
       })
       .catch(() => {
-        if (version === simpleSpaceVersion) setSimpleSpaceInfo(undefined);
+        if (version === simpleSpaceVersion) {
+          setSimpleSpaceInfo(undefined);
+          setSimpleSpaceResolved(true);
+        }
       });
   });
 
   return (
     <Show when={!hidden()}>
       <div class="flex w-full flex-col gap-3 py-2 pb-10">
-        <Show when={simpleSpaceInfo()}>
-          <div class="flex min-h-7 items-center gap-3 px-2 text-sm sm:gap-4 sm:text-base">
+        <div class="flex min-h-7 items-center justify-between px-2 text-sm sm:text-base">
+          <div class="flex items-center gap-3 sm:gap-4">
             <Tab label="Writers" />
-            <Tab details label="Details" />
+            <Show when={!simpleSpaceResolved() || simpleSpaceInfo()}>
+              <Tab details label="Details" />
+            </Show>
           </div>
-        </Show>
+          <Show when={loaded() && !hasOwnRepo()}>
+            <SpaceRecordEditor
+              authority={params.spaceAuthority!}
+              type={params.spaceType!}
+              skey={params.skey!}
+              space={space()}
+              label="Create"
+              onSaved={() => void loadRepos(true)}
+            />
+          </Show>
+        </div>
 
         <Show when={!showingDetails()}>
           <Show when={loading() && !loaded()}>

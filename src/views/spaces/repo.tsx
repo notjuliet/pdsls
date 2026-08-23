@@ -3,7 +3,6 @@ import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
 
 import { Button } from "../../components/button.jsx";
 import { Favicon } from "../../components/favicon.jsx";
-import { FilterInput } from "../../components/filter-input.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
 import { listSpaceRecords, type SpaceRecord } from "../../lib/spaces.js";
 import {
@@ -12,6 +11,7 @@ import {
   useSpaceRecords,
   useSpacesAuth,
 } from "./context.jsx";
+import { SpaceRecordEditor } from "./create-record.jsx";
 import { EmptyState, ErrorNotice, LoadingState } from "./shared.jsx";
 
 const SpaceRepoView = () => {
@@ -22,7 +22,6 @@ const SpaceRepoView = () => {
   const repo = () => params.spaceRepo!;
   const [records, setRecords] = createSignal<SpaceRecord[]>([]);
   const [cursor, setCursor] = createSignal<string>();
-  const [filter, setFilter] = createSignal("");
   const [loaded, setLoaded] = createSignal(false);
   const [loading, setLoading] = createSignal(false);
   const [error, setError] = createSignal<string>();
@@ -37,12 +36,6 @@ const SpaceRepoView = () => {
       grouped.set(record.collection, (grouped.get(record.collection) ?? 0) + 1);
     }
     return Array.from(grouped.entries()).sort(([a], [b]) => a.localeCompare(b));
-  });
-
-  const filteredCollections = createMemo(() => {
-    const value = filter().trim().toLowerCase();
-    if (!value) return collections();
-    return collections().filter(([collection]) => collection.toLowerCase().includes(value));
   });
 
   const loadRecords = async (reset = false, version = requestVersion) => {
@@ -76,7 +69,6 @@ const SpaceRepoView = () => {
       requestVersion += 1;
       setRecords([]);
       setCursor(undefined);
-      setFilter("");
       setLoaded(false);
       setLoading(false);
       setError(undefined);
@@ -94,22 +86,21 @@ const SpaceRepoView = () => {
         <Show when={error()}>{(message) => <ErrorNotice message={message()} />}</Show>
 
         <Show when={loaded() && (!error() || records().length > 0)}>
-          <div class="flex items-center gap-2 px-2">
-            <FilterInput
-              class="grow"
-              placeholder="Filter collections..."
-              value={filter()}
-              onInput={setFilter}
-            />
-            <div class="shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
-              <Show when={filter().trim()}>{filteredCollections().length.toLocaleString()} / </Show>
-              {collections().length.toLocaleString()}
-              {cursor() ? "+" : ""} collection{collections().length === 1 && !cursor() ? "" : "s"}
-            </div>
+          <div class="flex min-h-7 items-center justify-between px-2 text-sm sm:text-base">
+            <h2 class="font-medium">Collections</h2>
+            <Show when={repo() === auth().sub}>
+              <SpaceRecordEditor
+                authority={params.spaceAuthority!}
+                type={params.spaceType!}
+                skey={params.skey!}
+                space={space()}
+                label="Create"
+              />
+            </Show>
           </div>
 
           <ul class="flex flex-col">
-            <For each={filteredCollections()}>
+            <For each={collections()}>
               {([collection, count]) => {
                 const authority = () => collection.split(".").slice(0, 2).join(".");
                 return (
@@ -139,11 +130,8 @@ const SpaceRepoView = () => {
             </For>
           </ul>
 
-          <Show when={filteredCollections().length === 0}>
-            <EmptyState
-              icon={filter() ? "lucide--search-x" : "lucide--folder-open"}
-              message={filter() ? "No collections match your filter" : "No collections found"}
-            />
+          <Show when={collections().length === 0}>
+            <EmptyState icon="lucide--folder-open" message="No collections found" />
           </Show>
 
           <Show when={cursor()}>

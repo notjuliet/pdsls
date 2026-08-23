@@ -22,7 +22,9 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
 
   const isBlobDisabled = () => {
     const scopes = selectedScopes();
-    return !scopes.has("create") && !scopes.has("update");
+    return (
+      !scopes.has("create") && !scopes.has("update") && !scopes.has(SPACE_MANAGE_RECORDS_SCOPE_ID)
+    );
   };
 
   const toggleScope = (scopeId: string) => {
@@ -34,9 +36,9 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
           newSet.delete(SPACE_MANAGE_RECORDS_SCOPE_ID);
         }
         if (
-          (scopeId === "create" || scopeId === "update") &&
           !newSet.has("create") &&
-          !newSet.has("update")
+          !newSet.has("update") &&
+          !newSet.has(SPACE_MANAGE_RECORDS_SCOPE_ID)
         ) {
           newSet.delete("blob");
         }
