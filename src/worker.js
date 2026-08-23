@@ -351,7 +351,7 @@ function handleFromDoc(doc) {
 }
 
 const STATIC_ROUTES = {
-  "/": { title: "PDSls", description: "Browse the public data on atproto" },
+  "/": { title: "PDSls", description: "Browse and manage data across the AT Protocol" },
   "/jetstream": {
     title: "Jetstream",
     description: "A simplified event stream with support for collection and DID filtering.",
@@ -366,14 +366,17 @@ const STATIC_ROUTES = {
     title: "CAR explorer",
     description: "Upload an archive to explore or export its contents.",
   },
-  "/settings": { title: "Settings", description: "Browse the public data on atproto" },
+  "/settings": {
+    title: "Settings",
+    description: "Browse and manage data across the AT Protocol",
+  },
 };
 
 async function resolveOgData(pathname) {
   if (pathname in STATIC_ROUTES) return STATIC_ROUTES[pathname];
 
   let title = "PDSls";
-  let description = "Browse the public data on atproto";
+  let description = "Browse and manage data across the AT Protocol";
 
   const segments = pathname.slice(1).split("/").filter(Boolean);
   const isAtUrl = segments[0] === "at:";

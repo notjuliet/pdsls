@@ -120,7 +120,7 @@ export const Home = () => {
         <h1 class="text-lg font-medium">Atmosphere Explorer</h1>
         <div class="text-sm text-neutral-600 dark:text-neutral-300/80">
           <p>
-            Browse the public data on the{" "}
+            Browse and manage data across the{" "}
             <a
               href={getAtProtocolUrl()}
               target="_blank"

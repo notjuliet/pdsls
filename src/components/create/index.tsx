@@ -110,7 +110,7 @@ export const RecordEditor = (props: {
         external: {
           uri: "https://pds.ls",
           title: "PDSls",
-          description: "Browse the public data on atproto",
+          description: "Browse and manage data across the AT Protocol",
         },
       },
       langs: ["en"],
