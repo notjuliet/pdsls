@@ -16,10 +16,11 @@ import { BlobDebugView } from "./views/repo/blob-debug.tsx";
 import { RepoLayout, repoPreload } from "./views/repo/index.tsx";
 import { Settings } from "./views/settings.tsx";
 import {
+  LegacySpaceRedirect,
   SpaceCollectionLayout,
-  SpaceLayout,
   SpaceRecordView,
   SpaceRepoLayout,
+  SpaceRouteLayout,
   SpacesLayout,
 } from "./views/spaces/index.tsx";
 import { StreamView } from "./views/stream";
@@ -31,16 +32,22 @@ render(
       <Route path={["/jetstream", "/firehose", "/spacedust"]} component={StreamView} />
       <Route path="/labels" component={LabelView} />
       <Route path="/car" component={CarView} />
-      <Route path="/spaces" component={SpacesLayout}>
+      <Route path="/spaces" component={SpacesLayout} />
+      <Route
+        path="/spaces/:spaceAuthority/space/:spaceType/:skey/*spaceRest"
+        component={LegacySpaceRedirect}
+      />
+      <Route
+        path="/:pds/:spaceAuthority/space/:spaceType/:skey"
+        matchFilters={{ pds: ["at:"] }}
+        component={SpaceRouteLayout}
+      >
         <Route path="/" />
-        <Route path="/:spaceAuthority/space/:spaceType/:skey" component={SpaceLayout}>
+        <Route path="/:spaceRepo" component={SpaceRepoLayout}>
           <Route path="/" />
-          <Route path="/:spaceRepo" component={SpaceRepoLayout}>
+          <Route path="/:collection" component={SpaceCollectionLayout}>
             <Route path="/" />
-            <Route path="/:collection" component={SpaceCollectionLayout}>
-              <Route path="/" />
-              <Route path="/:rkey" component={SpaceRecordView} />
-            </Route>
+            <Route path="/:rkey" component={SpaceRecordView} />
           </Route>
         </Route>
       </Route>

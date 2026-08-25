@@ -26,7 +26,7 @@ export const makeSpaceRef = (authority: string, type: string, skey: string) =>
   `at://${authority}/space/${type}/${skey}`;
 
 export const makeSpacePath = (authority: string, type: string, skey: string) =>
-  `/spaces/${authority}/space/${type}/${skey}`;
+  `/${makeSpaceRef(authority, type, skey)}`;
 
 export const makeSpaceRepoPath = (authority: string, type: string, skey: string, repo: string) =>
   `${makeSpacePath(authority, type, skey)}/${repo}`;
@@ -47,10 +47,3 @@ export const makeSpaceRecordPath = (
   collection: string,
   rkey: string,
 ) => `${makeSpaceCollectionPath(authority, type, skey, repo, collection)}/${rkey}`;
-
-export const spaceAtUriToPath = (uri: string) => {
-  const spaceUri = /^at:\/\/[^/]+\/space\/[^/]+\/[^/]+(?:\/[^/]+(?:\/[^/]+(?:\/[^/]+)?)?)?$/.test(
-    uri,
-  );
-  return spaceUri ? `/spaces/${uri.slice("at://".length)}` : undefined;
-};

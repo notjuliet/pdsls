@@ -1,5 +1,5 @@
-import { A, type RouteSectionProps, useNavigate, useParams } from "@solidjs/router";
-import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import { A, type RouteSectionProps, useLocation, useNavigate, useParams } from "@solidjs/router";
+import { createEffect, createMemo, createSignal, For, type JSX, Show } from "solid-js";
 
 import { hasUserScope, SPACE_READ_SCOPE_ID } from "../../auth/scope-utils";
 import {
@@ -23,6 +23,7 @@ import {
 import { CreateSpaceDialog } from "./create-space.jsx";
 import { SpacesNav } from "./nav.jsx";
 import { EmptyState, ErrorNotice, LoadingState } from "./shared.jsx";
+import { SpaceLayout } from "./space.jsx";
 
 const SignInPrompt = () => {
   const signIn = () => {
@@ -231,7 +232,7 @@ const SpacesIndex = () => {
   );
 };
 
-export const SpacesLayout = (props: RouteSectionProps) => {
+const SpacesShell = (props: { children?: JSX.Element }) => {
   const navigate = useNavigate();
   const params = useParams();
   const hasChild = () => !!params.spaceAuthority;
@@ -295,6 +296,34 @@ export const SpacesLayout = (props: RouteSectionProps) => {
       </div>
     </SpaceRecordsContext.Provider>
   );
+};
+
+export const SpacesLayout = (props: RouteSectionProps) => (
+  <SpacesShell>{props.children}</SpacesShell>
+);
+
+export const SpaceRouteLayout = (props: RouteSectionProps) => (
+  <SpacesShell>
+    <SpaceLayout>{props.children}</SpaceLayout>
+  </SpacesShell>
+);
+
+export const LegacySpaceRedirect = () => {
+  const params = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  createEffect(() => {
+    if (!params.spaceAuthority || !params.spaceType || !params.skey) return;
+
+    const rest = params.spaceRest ? `/${params.spaceRest}` : "";
+    navigate(
+      `${makeSpacePath(params.spaceAuthority, params.spaceType, params.skey)}${rest}${location.search}${location.hash}`,
+      { replace: true },
+    );
+  });
+
+  return null;
 };
 
 export { SpaceCollectionLayout } from "./collection.jsx";

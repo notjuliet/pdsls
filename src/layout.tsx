@@ -252,7 +252,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
       </header>
       <div class="flex w-full flex-col items-center gap-3 text-pretty">
         <Search />
-        <Show when={props.params.pds}>
+        <Show when={props.params.pds && !props.params.spaceAuthority}>
           <NavBar />
         </Show>
         <ErrorBoundary

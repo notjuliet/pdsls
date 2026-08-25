@@ -1,6 +1,6 @@
 import type { Nsid } from "@atcute/lexicons";
-import { A, type RouteSectionProps, useLocation, useNavigate, useParams } from "@solidjs/router";
-import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
+import { createEffect, createMemo, createSignal, For, type JSX, Show } from "solid-js";
 
 import { Button } from "../../components/button.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
@@ -311,7 +311,7 @@ const SpaceView = () => {
   );
 };
 
-export const SpaceLayout = (props: RouteSectionProps) => {
+export const SpaceLayout = (props: { children?: JSX.Element }) => {
   const params = useParams();
   const hasChild = () => !!params.spaceRepo;
   const key = () => `${params.spaceAuthority}/${params.spaceType}/${params.skey}`;
