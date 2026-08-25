@@ -3,7 +3,6 @@ import { createResource, createSignal, type JSX, Show } from "solid-js";
 
 import { Favicon } from "../../components/favicon.jsx";
 import { resolveDidInfo } from "../../components/hover-card/did.jsx";
-import { schemaHref } from "../../lib/lexicon.js";
 import { makeSpaceCollectionPath, makeSpacePath, makeSpaceRepoPath } from "./context.jsx";
 
 const resolveDidHandle = async (did: string) => {
@@ -185,18 +184,7 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
       <Show when={hasSpace()}>
         <HierarchyRow
           leading={<Favicon domain={params.spaceType!.split(".").slice(0, 2).join(".")} reverse />}
-          label={
-            params.spaceRepo ? (
-              params.spaceType
-            ) : (
-              <A
-                href={schemaHref(params.spaceType!)}
-                class="pointer-events-auto text-blue-500 hover:text-blue-600 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
-              >
-                {params.spaceType}
-              </A>
-            )
-          }
+          label={params.spaceType}
           detailPrefix={`${params.skey} ·`}
           detail={authorityHandle() ?? params.spaceAuthority}
           detailHref={authorityHandle() ? `/at://${params.spaceAuthority}` : undefined}
