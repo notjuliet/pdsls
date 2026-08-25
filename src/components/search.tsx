@@ -15,6 +15,7 @@ import { canHover } from "../layout";
 import { resolveLexiconAuthority, resolveLexiconAuthorityDirect } from "../lib/api";
 import { appHandleLink, appList, AppUrl } from "../lib/app-urls";
 import { createDebouncedValue } from "../lib/debounced";
+import { spaceAtUriToPath } from "../views/spaces/context.jsx";
 import { Button } from "./button";
 import { Modal } from "./modal";
 
@@ -237,7 +238,7 @@ export const Search = () => {
       saveRecentSearch(path, `did:${query}`, "did");
       navigate(path);
     } else if (prefix === "at:") {
-      const path = `/${input}`;
+      const path = spaceAtUriToPath(input) ?? `/${input}`;
       saveRecentSearch(path, input, "at-uri");
       navigate(path);
     } else if (prefix === "lex:") {

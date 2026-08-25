@@ -47,3 +47,10 @@ export const makeSpaceRecordPath = (
   collection: string,
   rkey: string,
 ) => `${makeSpaceCollectionPath(authority, type, skey, repo, collection)}/${rkey}`;
+
+export const spaceAtUriToPath = (uri: string) => {
+  const spaceUri = /^at:\/\/[^/]+\/space\/[^/]+\/[^/]+(?:\/[^/]+(?:\/[^/]+(?:\/[^/]+)?)?)?$/.test(
+    uri,
+  );
+  return spaceUri ? `/spaces/${uri.slice("at://".length)}` : undefined;
+};
