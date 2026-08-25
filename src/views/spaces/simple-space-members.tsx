@@ -23,7 +23,7 @@ import { ErrorNotice, LoadingState } from "./shared.jsx";
 type MemberDialog = { kind: "add" } | { kind: "remove"; did: string };
 
 const actionButtonClass =
-  "flex items-center gap-1 rounded-md border border-neutral-300 px-1.5 py-0.5 text-xs transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 sm:px-2 sm:py-0.75 dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700";
+  "flex self-center items-center gap-1 rounded-md border border-neutral-300 px-1.5 py-0.5 text-xs transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 sm:px-2 sm:py-0.75 dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700";
 
 const notify = (message: string, type: "success" | "error", duration = 3000) => {
   const notification = addNotification({ message, type });
@@ -148,8 +148,8 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
 
   return (
     <section class="flex flex-col gap-2">
-      <div class="flex items-center gap-2 px-2 text-sm">
-        <h2 class="font-medium">Members</h2>
+      <div class="flex items-baseline gap-2 px-2 text-sm">
+        <h2 class="text-base font-medium">Members</h2>
         <Show when={canManage() && loaded()}>
           <span class="text-xs text-neutral-500 dark:text-neutral-400">
             {members().length.toLocaleString()} {cursor() ? "loaded" : ""}

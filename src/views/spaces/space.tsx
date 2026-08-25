@@ -1,9 +1,11 @@
+import type { Nsid } from "@atcute/lexicons";
 import { A, type RouteSectionProps, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
 
 import { Button } from "../../components/button.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
+import { resolveRawLexicon } from "../../lib/lexicon.js";
 import {
   getSimpleSpace,
   listSpaceRepos,
@@ -21,6 +23,7 @@ import { SpaceRecordEditor } from "./create-record.jsx";
 import { ManageSpaceDialog } from "./manage-space.jsx";
 import { EmptyState, ErrorNotice, LoadingState } from "./shared.jsx";
 import { SimpleSpaceDetails } from "./simple-space.jsx";
+import { parseSpaceTypeInfo, SpaceTypeDetails, type SpaceTypeInfo } from "./space-type-details.jsx";
 
 const SpaceView = () => {
   const auth = useSpacesAuth();
@@ -36,14 +39,19 @@ const SpaceView = () => {
   const [error, setError] = createSignal<string>();
   const [simpleSpaceInfo, setSimpleSpaceInfo] = createSignal<SimpleSpaceInfo>();
   const [simpleSpaceResolved, setSimpleSpaceResolved] = createSignal(false);
+  const [spaceTypeInfo, setSpaceTypeInfo] = createSignal<SpaceTypeInfo>();
+  const [spaceTypeLoading, setSpaceTypeLoading] = createSignal(false);
+  const [spaceTypeError, setSpaceTypeError] = createSignal<string>();
   let activeKey = "";
   let requestVersion = 0;
   let simpleSpaceKey = "";
   let simpleSpaceVersion = 0;
+  let spaceTypeKey = "";
+  let spaceTypeVersion = 0;
 
   const space = () => makeSpaceRef(params.spaceAuthority!, params.spaceType!, params.skey!);
   const spacePath = () => makeSpacePath(params.spaceAuthority!, params.spaceType!, params.skey!);
-  const showingDetails = () => location.hash === "#details" && !!simpleSpaceInfo();
+  const showingDetails = () => location.hash === "#details";
 
   const Tab = (props: { details?: boolean; label: string }) => {
     const active = () => (props.details ? showingDetails() : !showingDetails());
@@ -136,15 +144,51 @@ const SpaceView = () => {
       });
   });
 
+  createEffect(() => {
+    if (hidden()) return;
+
+    const nsid = params.spaceType;
+    if (!nsid || nsid === spaceTypeKey) return;
+
+    spaceTypeKey = nsid;
+    spaceTypeVersion += 1;
+    setSpaceTypeInfo(undefined);
+    setSpaceTypeError(undefined);
+    setSpaceTypeLoading(true);
+
+    const version = spaceTypeVersion;
+    void resolveRawLexicon(nsid as Nsid).then(
+      ({ rawSchema }) => {
+        if (version !== spaceTypeVersion) return;
+
+        try {
+          setSpaceTypeInfo(parseSpaceTypeInfo(rawSchema));
+        } catch (err) {
+          setSpaceTypeError(
+            err instanceof Error ? err.message : "Could not read the Space type declaration",
+          );
+        } finally {
+          setSpaceTypeLoading(false);
+        }
+      },
+      (err) => {
+        if (version === spaceTypeVersion) {
+          setSpaceTypeError(
+            err instanceof Error ? err.message : "Could not resolve the Space type declaration",
+          );
+          setSpaceTypeLoading(false);
+        }
+      },
+    );
+  });
+
   return (
     <Show when={!hidden()}>
       <div class="flex w-full flex-col gap-3 py-2 pb-10">
         <div class="flex min-h-7 items-center justify-between px-2 text-sm sm:text-base">
           <div class="flex items-center gap-3 sm:gap-4">
             <Tab label="Writers" />
-            <Show when={!simpleSpaceResolved() || simpleSpaceInfo()}>
-              <Tab details label="Details" />
-            </Show>
+            <Tab details label="Details" />
           </div>
           <div class="flex items-center gap-1">
             <Show when={loaded() && !hasOwnRepo()}>
@@ -240,10 +284,27 @@ const SpaceView = () => {
           </Show>
         </Show>
 
-        <Show when={showingDetails() && simpleSpaceInfo()}>
-          {(info) => (
-            <SimpleSpaceDetails info={info()!} space={space()} authority={params.spaceAuthority!} />
-          )}
+        <Show when={showingDetails()}>
+          <div class="flex w-full flex-col gap-5 py-2 pb-10">
+            <SpaceTypeDetails
+              info={spaceTypeInfo()}
+              loading={spaceTypeLoading()}
+              error={spaceTypeError()}
+            />
+
+            <Show when={!simpleSpaceResolved()}>
+              <LoadingState label="Loading access details…" />
+            </Show>
+            <Show when={simpleSpaceInfo()}>
+              {(info) => (
+                <SimpleSpaceDetails
+                  info={info()}
+                  space={space()}
+                  authority={params.spaceAuthority!}
+                />
+              )}
+            </Show>
+          </div>
         </Show>
       </div>
     </Show>

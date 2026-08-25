@@ -1,6 +1,8 @@
 import "@atcute/atproto";
+import { getPublicKeyFromDidController, P256PublicKey, Secp256k1PublicKey } from "@atcute/crypto";
 import {
   type DidDocument,
+  getAtprotoVerificationMaterial,
   getLabelerEndpoint,
   getPdsEndpoint,
   isAtprotoDid,
@@ -16,6 +18,7 @@ import {
 import { DohJsonLexiconAuthorityResolver, LexiconSchemaResolver } from "@atcute/lexicon-resolver";
 import { Did, Handle } from "@atcute/lexicons";
 import { AtprotoDid, isHandle, Nsid } from "@atcute/lexicons/syntax";
+import { verifyRecord } from "@atcute/repo";
 import { createMemo } from "solid-js";
 import { createStore } from "solid-js/store";
 
@@ -180,6 +183,61 @@ const resolveLexiconSchema = async (authority: AtprotoDid, nsid: Nsid) => {
   return await schemaResolver().resolve(authority, nsid);
 };
 
+const lexiconSchemaCollection = "com.atproto.lexicon.schema";
+
+const resolveRawLexiconSchema = async (authority: AtprotoDid, nsid: Nsid) => {
+  const didDocument = await didDocumentResolver().resolve(authority);
+  const pds = getPdsEndpoint(didDocument);
+  if (!pds) throw new Error(`No PDS found for Lexicon authority ${authority}`);
+
+  const url = new URL("/xrpc/com.atproto.sync.getRecord", pds);
+  url.searchParams.set("did", authority);
+  url.searchParams.set("collection", lexiconSchemaCollection);
+  url.searchParams.set("rkey", nsid);
+
+  const response = await fetch(url, {
+    headers: { accept: "application/vnd.ipld.car" },
+  });
+  if (!response.ok) {
+    throw new Error(`Could not fetch the Lexicon type declaration (${response.status})`);
+  }
+
+  const controller = getAtprotoVerificationMaterial(didDocument);
+  if (!controller) throw new Error("Lexicon authority has no verification key");
+
+  const found = getPublicKeyFromDidController(controller);
+  const publicKey =
+    found.type === "p256"
+      ? await P256PublicKey.importRaw(found.publicKeyBytes)
+      : await Secp256k1PublicKey.importRaw(found.publicKeyBytes);
+  const verified = await verifyRecord({
+    did: authority,
+    collection: lexiconSchemaCollection,
+    rkey: nsid,
+    publicKey,
+    carBytes: new Uint8Array(await response.arrayBuffer()),
+  });
+
+  const rawSchema = verified.record;
+  if (
+    typeof rawSchema !== "object" ||
+    rawSchema === null ||
+    Array.isArray(rawSchema) ||
+    !("$type" in rawSchema) ||
+    rawSchema.$type !== lexiconSchemaCollection ||
+    !("id" in rawSchema) ||
+    rawSchema.id !== nsid
+  ) {
+    throw new Error("The resolved record is not the requested Lexicon type declaration");
+  }
+
+  return {
+    uri: `at://${authority}/${lexiconSchemaCollection}/${nsid}`,
+    cid: verified.cid,
+    rawSchema,
+  };
+};
+
 interface LinkData {
   links: {
     [key: string]: {
@@ -274,6 +332,7 @@ export {
   resolveHandle,
   resolveLexiconAuthority,
   resolveLexiconAuthorityDirect,
+  resolveRawLexiconSchema,
   resolveLexiconSchema,
   validateHandle,
   type LinksWithRecords,

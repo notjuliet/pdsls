@@ -33,40 +33,43 @@ export const SimpleSpaceDetails = (props: {
   authority: string;
 }) => {
   return (
-    <div class="flex w-full flex-col gap-5 py-2 pb-10">
-      <dl class="grid grid-cols-[max-content_minmax(0,1fr)] items-baseline gap-x-4 gap-y-2 px-2 text-sm">
-        <dt class="text-neutral-500 dark:text-neutral-400">User access</dt>
-        <dd>{policyLabel(props.info)}</dd>
+    <>
+      <section class="flex flex-col gap-2 px-2">
+        <h2 class="font-medium">Access</h2>
+        <dl class="grid grid-cols-[max-content_minmax(0,1fr)] items-baseline gap-x-4 gap-y-2 text-sm">
+          <dt class="text-neutral-500 dark:text-neutral-400">User access</dt>
+          <dd>{policyLabel(props.info)}</dd>
 
-        <Show when={props.info.policy.kind === "managing-app"}>
-          <dt class="text-neutral-500 dark:text-neutral-400">Managing app</dt>
-          <dd class="min-w-0 wrap-anywhere">
-            {props.info.policy.kind === "managing-app" && props.info.policy.managingApp}
-          </dd>
-        </Show>
+          <Show when={props.info.policy.kind === "managing-app"}>
+            <dt class="text-neutral-500 dark:text-neutral-400">Managing app</dt>
+            <dd class="min-w-0 wrap-anywhere">
+              {props.info.policy.kind === "managing-app" && props.info.policy.managingApp}
+            </dd>
+          </Show>
 
-        <dt class="text-neutral-500 dark:text-neutral-400">Application access</dt>
-        <dd>{appAccessLabel(props.info)}</dd>
+          <dt class="text-neutral-500 dark:text-neutral-400">Application access</dt>
+          <dd>{appAccessLabel(props.info)}</dd>
 
-        <Show when={props.info.appAccess.kind === "allow-list"}>
-          <dt class="text-neutral-500 dark:text-neutral-400">Allowed applications</dt>
-          <dd class="min-w-0">
-            <ul class="flex flex-col gap-1 wrap-anywhere">
-              <For
-                each={
-                  props.info.appAccess.kind === "allow-list" ? props.info.appAccess.allowed : []
-                }
-              >
-                {(clientId) => <li>{clientId}</li>}
-              </For>
-            </ul>
-          </dd>
-        </Show>
-      </dl>
+          <Show when={props.info.appAccess.kind === "allow-list"}>
+            <dt class="text-neutral-500 dark:text-neutral-400">Allowed applications</dt>
+            <dd class="min-w-0">
+              <ul class="flex flex-col gap-1 wrap-anywhere">
+                <For
+                  each={
+                    props.info.appAccess.kind === "allow-list" ? props.info.appAccess.allowed : []
+                  }
+                >
+                  {(clientId) => <li>{clientId}</li>}
+                </For>
+              </ul>
+            </dd>
+          </Show>
+        </dl>
+      </section>
 
       <Show when={props.info.policy.kind === "member-list"}>
         <SimpleSpaceMembers space={props.space} authority={props.authority} />
       </Show>
-    </div>
+    </>
   );
 };
