@@ -78,7 +78,7 @@ const HierarchyRow = (props: {
   );
 
   const classes =
-    "group/row flex min-h-6 w-full min-w-0 items-center gap-2 rounded-md border-[0.5px] border-transparent px-2 text-left transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 sm:min-h-7 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40";
+    "group/row flex min-h-6 w-full min-w-0 items-center gap-2 overflow-hidden rounded-md border-[0.5px] border-transparent px-2 text-left transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 sm:min-h-7 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40";
 
   const SplitContent = (splitProps: { detailHref: string }) => (
     <div class={`${classes} relative`} onMouseLeave={() => setDetailHovered(false)}>
@@ -213,7 +213,7 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
       </Show>
 
       <Show when={params.rkey}>
-        <HierarchyRow icon="lucide--file-json" label={params.rkey} preserveLabel />
+        <HierarchyRow icon="lucide--file-json" label={params.rkey} />
       </Show>
     </nav>
   );

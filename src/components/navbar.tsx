@@ -256,14 +256,14 @@ export const NavBar = () => {
         {/* Record Level */}
         <Show when={params.rkey}>
           <div class="group flex items-center justify-between gap-2 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-            <div class="flex basis-full items-center gap-2">
+            <div class="flex min-w-0 basis-full items-center gap-2">
               <Tooltip text="Record">
-                <span class="iconify lucide--file-json text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
+                <span class="iconify lucide--file-json shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
               </Tooltip>
               <div class="flex min-w-0 gap-1 py-0.5 font-medium">
-                <span>{params.rkey}</span>
+                <span class="min-w-0 truncate">{params.rkey}</span>
                 <Show when={rkeyTimestamp()}>
-                  <span class="truncate text-neutral-500 dark:text-neutral-400">
+                  <span class="shrink-0 truncate text-neutral-500 dark:text-neutral-400">
                     ({localDateFromTimestamp(rkeyTimestamp()!)})
                   </span>
                 </Show>
