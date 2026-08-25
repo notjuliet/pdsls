@@ -31,6 +31,14 @@ export const makeSpacePath = (authority: string, type: string, skey: string) =>
 export const makeSpaceRepoPath = (authority: string, type: string, skey: string, repo: string) =>
   `${makeSpacePath(authority, type, skey)}/${repo}`;
 
+export const makeSpaceBlobPath = (
+  authority: string,
+  type: string,
+  skey: string,
+  repo: string,
+  cid: string,
+) => `${makeSpaceRepoPath(authority, type, skey, repo)}/blob/${cid}`;
+
 export const makeSpaceCollectionPath = (
   authority: string,
   type: string,

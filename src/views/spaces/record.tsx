@@ -24,6 +24,7 @@ import {
 } from "../../lib/spaces.js";
 import { addToClipboard } from "../../utils/copy.js";
 import {
+  makeSpaceBlobPath,
   makeSpaceCollectionPath,
   makeSpaceRef,
   makeSpaceRecordPath,
@@ -228,6 +229,15 @@ export const SpaceRecordView = () => {
                     repo={repo()}
                     newTab
                     fetchBlob={(cid) => getSpaceBlob(auth(), space(), repo(), cid)}
+                    blobHref={(cid) =>
+                      makeSpaceBlobPath(
+                        params.spaceAuthority!,
+                        params.spaceType!,
+                        params.skey!,
+                        repo(),
+                        cid,
+                      )
+                    }
                   />
                 </div>
               </Show>

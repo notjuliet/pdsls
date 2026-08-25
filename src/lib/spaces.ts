@@ -69,6 +69,11 @@ interface ListSpaceRecordsResult {
   records: SpaceRecord[];
 }
 
+export interface ListSpaceBlobsResult {
+  cursor?: string;
+  cids: string[];
+}
+
 interface ListSpaceReposResult {
   cursor?: string;
   repos: SpaceRepo[];
@@ -657,6 +662,31 @@ export const listSpaceRecords = async (
         typeof record.rkey === "string" &&
         typeof record.cid === "string",
     ),
+  };
+};
+
+export const listSpaceBlobs = async (
+  auth: OAuthUserAgent,
+  space: string,
+  repo: string,
+  options: { cursor?: string; limit?: number; since?: string } = {},
+): Promise<ListSpaceBlobsResult> => {
+  const pds = await resolveRepoHost(repo);
+  const data = await credentialQuery(auth, space, pds, "com.atproto.space.listBlobs", {
+    space,
+    repo,
+    since: options.since,
+    cursor: options.cursor,
+    limit: options.limit ?? 1000,
+  });
+
+  if (!isObject(data) || !Array.isArray(data.cids)) {
+    throw new Error("The PDS returned an invalid Space blobs response");
+  }
+
+  return {
+    cursor: typeof data.cursor === "string" ? data.cursor : undefined,
+    cids: data.cids.filter((cid): cid is string => typeof cid === "string"),
   };
 };
 

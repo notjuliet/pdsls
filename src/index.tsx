@@ -17,6 +17,7 @@ import { RepoLayout, repoPreload } from "./views/repo/index.tsx";
 import { Settings } from "./views/settings.tsx";
 import {
   LegacySpaceRedirect,
+  SpaceBlobView,
   SpaceCollectionLayout,
   SpaceRecordView,
   SpaceRepoLayout,
@@ -45,6 +46,7 @@ render(
         <Route path="/" />
         <Route path="/:spaceRepo" component={SpaceRepoLayout}>
           <Route path="/" />
+          <Route path="/blob/:cid" component={SpaceBlobView} />
           <Route path="/:collection" component={SpaceCollectionLayout}>
             <Route path="/" />
             <Route path="/:rkey" component={SpaceRecordView} />

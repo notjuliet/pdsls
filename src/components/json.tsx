@@ -32,6 +32,7 @@ interface JSONContext {
   preview?: boolean;
   depth?: number;
   fetchBlob?: (cid: string) => Promise<Blob>;
+  blobHref?: (cid: string) => string;
 }
 
 const JSONCtx = createContext<JSONContext>();
@@ -80,10 +81,10 @@ const JSONString = (props: { data: string; isType?: boolean; isLink?: boolean })
               <DidHoverCard did={part} newTab={ctx.newTab} />
             ) : isNsid(part.split("#")[0]) && props.isType ? (
               <LexiconHoverCard lexicon={part} newTab={ctx.newTab} />
-            ) : isCid(part) && props.isLink && ctx.parentIsBlob && params.repo ? (
+            ) : isCid(part) && props.isLink && ctx.parentIsBlob && (ctx.blobHref || params.repo) ? (
               <A
                 class="text-blue-500 hover:underline active:underline dark:text-blue-400"
-                href={`/at://${params.repo}/blob/${part}`}
+                href={ctx.blobHref?.(part) ?? `/at://${params.repo}/blob/${part}`}
                 state={{ from: location.pathname + location.hash, label: "Back to record" }}
               >
                 {part}
@@ -462,6 +463,7 @@ export const JSONValue = (props: {
   keyLinks?: boolean;
   preview?: boolean;
   fetchBlob?: (cid: string) => Promise<Blob>;
+  blobHref?: (cid: string) => string;
 }) => {
   return (
     <JSONCtx.Provider
@@ -474,6 +476,7 @@ export const JSONValue = (props: {
         keyLinks: props.keyLinks,
         preview: props.preview,
         fetchBlob: props.fetchBlob,
+        blobHref: props.blobHref,
       }}
     >
       <JSONValueInner data={props.data} />
