@@ -195,7 +195,12 @@ const CollapsibleItem = (props: {
     >
       <span
         class="relative flex size-fit shrink-0 items-center gap-x-1 wrap-anywhere"
-        classList={{ "max-w-[40%] sm:max-w-[50%]": props.maxWidth !== undefined && show() }}
+        classList={{
+          "max-w-[40%] sm:max-w-[50%]":
+            props.maxWidth !== undefined && show() && typeof props.value !== "boolean",
+          "max-w-[calc(100%_-_6ch)]":
+            props.maxWidth !== undefined && typeof props.value === "boolean",
+        }}
       >
         <Show
           when={ctx.keyLinks}
