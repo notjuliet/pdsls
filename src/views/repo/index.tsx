@@ -503,7 +503,7 @@ const RepoView = () => {
                         >
                           <div class="dark:bg-dark-500 dark:after:from-dark-500 dark:after:via-dark-500/75 dark:sm:from-dark-500 relative sticky top-0 z-10 min-w-0 self-start bg-neutral-100 py-1 after:pointer-events-none after:absolute after:inset-x-0 after:-bottom-1 after:h-1 after:bg-linear-to-b after:from-neutral-100 after:via-neutral-100/75 after:to-transparent after:content-[''] sm:bg-transparent sm:bg-linear-to-b sm:from-neutral-100 sm:from-[70%] sm:to-transparent sm:after:hidden dark:sm:bg-transparent">
                             <Show when={isHighlighted()}>
-                              <span class="absolute inset-y-0 left-0 w-0.5 bg-blue-500 dark:bg-blue-400" />
+                              <span class="absolute inset-y-0 -left-2 w-0.5 bg-blue-500 dark:bg-blue-400" />
                             </Show>
                             <div class="flex min-w-0 items-center gap-2">
                               <a
