@@ -13,13 +13,17 @@ import { createEffect, createResource, createSignal, For, onMount, Show } from "
 
 import { Backlinks } from "../../components/backlinks.jsx";
 import {
+  DomainGroup,
+  DomainGroupRows,
+  domainGroupRowClasses,
+} from "../../components/domain-group.jsx";
+import {
   ActionMenu,
   DropdownMenu,
   MenuProvider,
   MenuSeparator,
   NavMenu,
 } from "../../components/dropdown.jsx";
-import { Favicon } from "../../components/favicon.jsx";
 import { FilterInput } from "../../components/filter-input.jsx";
 import { LazyTab } from "../../components/lazy-tab.jsx";
 import { setPDS } from "../../components/navbar.jsx";
@@ -30,7 +34,6 @@ import {
   updateNotification,
 } from "../../components/notification.jsx";
 import { Spinner } from "../../components/spinner.jsx";
-import { canHover } from "../../layout.jsx";
 import {
   didDocCache,
   getPDS,
@@ -238,18 +241,6 @@ const RepoView = () => {
   const [rotationKeys, setRotationKeys] = createSignal<Array<string>>([]);
   let filterInputRef: HTMLInputElement | undefined;
   const did = repo.did();
-
-  // Handle scrolling to a collection group when hash is like #collections:app.bsky
-  createEffect(() => {
-    const hash = location.hash;
-    if (hash.startsWith("#collections:") && nsids()) {
-      const authority = hash.slice(13);
-      requestAnimationFrame(() => {
-        const element = document.getElementById(`collection-${authority}`);
-        if (element) element.scrollIntoView({ behavior: "instant", block: "start" });
-      });
-    }
-  });
 
   onMount(() => {
     useFilterShortcut(() => filterInputRef);
@@ -491,80 +482,43 @@ const RepoView = () => {
                     )}
                   >
                     {(authority) => {
-                      const isHighlighted = () => location.hash === `#collections:${authority}`;
                       const isCollapsed = () => nsids()?.[authority].hidden ?? false;
                       const domain = displayNsidDomain(authority);
                       const collectionCount = () => nsids()?.[authority].nsids.length ?? 0;
 
                       return (
-                        <div
-                          id={`collection-${authority}`}
-                          class="group relative grid scroll-mt-4 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-2 sm:border-t sm:border-neutral-200 sm:py-1 sm:first:border-t-0 dark:sm:border-neutral-700"
+                        <DomainGroup
+                          domain={domain}
+                          domainTitle={`${domain} (${authority})`}
+                          groupLabel="collections"
+                          sticky
+                          collapsed={isCollapsed()}
+                          collapsedLabel={
+                            <>
+                              {collectionCount()}{" "}
+                              {collectionCount() === 1 ? "collection" : "collections"}
+                            </>
+                          }
+                          onToggle={() => toggleCollapsed(authority)}
                         >
-                          <div class="dark:bg-dark-500 dark:after:from-dark-500 dark:after:via-dark-500/75 dark:sm:from-dark-500 relative sticky top-0 z-10 min-w-0 self-start bg-neutral-100 py-1 after:pointer-events-none after:absolute after:inset-x-0 after:-bottom-1 after:h-1 after:bg-linear-to-b after:from-neutral-100 after:via-neutral-100/75 after:to-transparent after:content-[''] sm:bg-transparent sm:bg-linear-to-b sm:from-neutral-100 sm:from-[70%] sm:to-transparent sm:after:hidden dark:sm:bg-transparent">
-                            <Show when={isHighlighted()}>
-                              <span class="absolute inset-y-0 -left-2 w-0.5 bg-blue-500 dark:bg-blue-400" />
-                            </Show>
-                            <div class="flex min-w-0 items-center gap-2">
-                              <a
-                                href={`#collections:${authority}`}
-                                class="flex min-w-0 items-center gap-2 font-medium text-neutral-600 hover:text-neutral-900 hover:underline active:underline dark:text-neutral-300 dark:hover:text-neutral-100"
-                                title={`${domain} (${authority})`}
-                                aria-current={isHighlighted() ? "location" : undefined}
-                              >
-                                <Favicon domain={domain} />
-                                <span class="min-w-0 truncate">{domain}</span>
-                              </a>
-                              <span class="h-px min-w-4 flex-1 bg-neutral-200 sm:hidden dark:bg-neutral-700" />
-                            </div>
-                          </div>
-                          <div class="min-w-0 pl-4 sm:pl-0">
-                            <Show
-                              when={!isCollapsed()}
-                              fallback={
-                                <button
-                                  class="flex min-h-7 w-full items-center px-2 text-left text-sm text-neutral-500 transition-colors hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
-                                  aria-label={`Expand ${domain} collections`}
-                                  onClick={() => toggleCollapsed(authority)}
-                                >
-                                  {collectionCount()}{" "}
-                                  {collectionCount() === 1 ? "collection" : "collections"}
-                                </button>
-                              }
+                          <DomainGroupRows>
+                            <For
+                              each={nsids()?.[authority].nsids.filter((nsid) =>
+                                filter() ? `${authority}.${nsid}`.includes(filter()!) : true,
+                              )}
                             >
-                              <div class="flex min-w-0 flex-1 flex-col px-2 py-1">
-                                <For
-                                  each={nsids()?.[authority].nsids.filter((nsid) =>
-                                    filter() ? `${authority}.${nsid}`.includes(filter()!) : true,
-                                  )}
+                              {(nsid) => (
+                                <A
+                                  href={`/at://${did}/${authority}.${nsid}`}
+                                  class={`truncate hover:underline active:underline ${domainGroupRowClasses}`}
+                                  title={`${authority}.${nsid}`}
                                 >
-                                  {(nsid, index) => (
-                                    <A
-                                      href={`/at://${did}/${authority}.${nsid}`}
-                                      class="truncate hover:underline active:underline"
-                                      classList={{ "pr-8": canHover && index() === 0 }}
-                                      title={`${authority}.${nsid}`}
-                                    >
-                                      {nsid}
-                                    </A>
-                                  )}
-                                </For>
-                              </div>
-                            </Show>
-                          </div>
-                          <Show when={canHover}>
-                            <button
-                              class="absolute top-1 right-2 flex size-6 items-center justify-center rounded-md text-neutral-400 opacity-0 transition group-hover:opacity-100 hover:bg-neutral-200 hover:text-neutral-700 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-blue-400/40 focus-visible:outline-none active:bg-neutral-300 sm:top-1.5 dark:text-neutral-500 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
-                              aria-label={`${isCollapsed() ? "Expand" : "Collapse"} ${domain} collections`}
-                              title={`${isCollapsed() ? "Expand" : "Collapse"} ${domain}`}
-                              onClick={() => toggleCollapsed(authority)}
-                            >
-                              <span
-                                class={`iconify ${isCollapsed() ? "lucide--chevron-down" : "lucide--chevron-up"}`}
-                              />
-                            </button>
-                          </Show>
-                        </div>
+                                  {nsid}
+                                </A>
+                              )}
+                            </For>
+                          </DomainGroupRows>
+                        </DomainGroup>
                       );
                     }}
                   </For>

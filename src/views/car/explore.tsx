@@ -18,7 +18,11 @@ import {
 } from "solid-js";
 
 import { Button } from "../../components/button.jsx";
-import { Favicon } from "../../components/favicon.jsx";
+import {
+  DomainGroup,
+  DomainGroupRows,
+  domainGroupRowClasses,
+} from "../../components/domain-group.jsx";
 import HoverCard from "../../components/hover-card/base";
 import { JSONValue, type JSONType } from "../../components/json.jsx";
 import { TextInput } from "../../components/text-input.jsx";
@@ -643,6 +647,7 @@ const ExploreView = (props: {
 
 const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void }) => {
   const [filter, setFilter] = createSignal("");
+  const [collapsedDomains, setCollapsedDomains] = createSignal<Set<string>>(new Set());
 
   const sortedEntries = createMemo(() => {
     return [...props.archive.entries].sort((a, b) => a.name.localeCompare(b.name));
@@ -653,6 +658,32 @@ const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void })
     if (!f) return sortedEntries();
     return sortedEntries().filter((entry) => entry.name.toLowerCase().includes(f));
   });
+
+  const groupedEntries = createMemo(() => {
+    const groups = new Map<string, CollectionEntry[]>();
+
+    for (const entry of filteredEntries()) {
+      const authority = entry.name.split(".").slice(0, 2).join(".");
+      const existing = groups.get(authority);
+      if (existing) existing.push(entry);
+      else groups.set(authority, [entry]);
+    }
+
+    return Array.from(groups, ([authority, entries]) => ({
+      authority,
+      domain: authority.split(".").reverse().join("."),
+      entries,
+    })).sort((a, b) => a.domain.localeCompare(b.domain));
+  });
+
+  const toggleDomain = (authority: string) => {
+    setCollapsedDomains((current) => {
+      const next = new Set(current);
+      if (next.has(authority)) next.delete(authority);
+      else next.add(authority);
+      return next;
+    });
+  };
 
   const totalRecords = createMemo(() =>
     props.archive.entries.reduce((sum, entry) => sum + entry.entries.length, 0),
@@ -673,55 +704,82 @@ const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void })
         class="text-sm"
       />
 
-      <ul class="flex flex-col">
-        <For each={filteredEntries()}>
-          {(entry) => {
-            const hasSingleEntry = entry.entries.length === 1;
-            const authority = () => entry.name.split(".").slice(0, 2).join(".");
+      <div class="flex flex-col gap-2 sm:gap-0">
+        <For each={groupedEntries()}>
+          {(group) => {
+            const isCollapsed = () => collapsedDomains().has(group.authority);
 
             return (
-              <li>
-                <button
-                  onClick={() => {
-                    if (hasSingleEntry) {
-                      props.onRoute({
-                        type: "record",
-                        collection: entry,
-                        record: entry.entries[0],
-                      });
-                    } else {
-                      props.onRoute({ type: "collection", collection: entry });
-                    }
-                  }}
-                  class="flex w-full items-center gap-2 rounded p-2 text-left text-sm hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-                >
-                  <Favicon domain={authority()} reverse />
-                  <span
-                    class="truncate font-medium"
-                    classList={{
-                      "text-neutral-700 dark:text-neutral-300": hasSingleEntry,
-                      "text-blue-500 dark:text-blue-400": !hasSingleEntry,
+              <DomainGroup
+                domain={group.domain}
+                domainTitle={`${group.domain} (${group.authority})`}
+                groupLabel="collections"
+                sticky
+                collapsed={isCollapsed()}
+                collapsedLabel={
+                  <>
+                    {group.entries.length}{" "}
+                    {group.entries.length === 1 ? "collection" : "collections"}
+                  </>
+                }
+                onToggle={() => toggleDomain(group.authority)}
+              >
+                <DomainGroupRows as="ul">
+                  <For each={group.entries}>
+                    {(entry) => {
+                      const hasSingleEntry = entry.entries.length === 1;
+                      const label = entry.name.split(".").slice(2).join(".") || entry.name;
+
+                      return (
+                        <li>
+                          <button
+                            onClick={() => {
+                              if (hasSingleEntry) {
+                                props.onRoute({
+                                  type: "record",
+                                  collection: entry,
+                                  record: entry.entries[0],
+                                });
+                              } else {
+                                props.onRoute({ type: "collection", collection: entry });
+                              }
+                            }}
+                            class={`flex w-full min-w-0 items-center gap-2 rounded text-left text-sm hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700 ${domainGroupRowClasses}`}
+                            title={entry.name}
+                          >
+                            <span
+                              class="truncate font-medium"
+                              classList={{
+                                "text-neutral-700 dark:text-neutral-300": hasSingleEntry,
+                                "text-blue-500 dark:text-blue-400": !hasSingleEntry,
+                              }}
+                            >
+                              {label}
+                            </span>
+
+                            <Show when={hasSingleEntry}>
+                              <span class="iconify lucide--chevron-right shrink-0 text-xs text-neutral-500" />
+                              <span class="truncate font-medium text-blue-500 dark:text-blue-400">
+                                {entry.entries[0].key}
+                              </span>
+                            </Show>
+
+                            <Show when={!hasSingleEntry}>
+                              <span class="ml-auto text-xs text-neutral-500">
+                                {entry.entries.length}
+                              </span>
+                            </Show>
+                          </button>
+                        </li>
+                      );
                     }}
-                  >
-                    {entry.name}
-                  </span>
-
-                  <Show when={hasSingleEntry}>
-                    <span class="iconify lucide--chevron-right shrink-0 text-xs text-neutral-500" />
-                    <span class="truncate font-medium text-blue-500 dark:text-blue-400">
-                      {entry.entries[0].key}
-                    </span>
-                  </Show>
-
-                  <Show when={!hasSingleEntry}>
-                    <span class="ml-auto text-xs text-neutral-500">{entry.entries.length}</span>
-                  </Show>
-                </button>
-              </li>
+                  </For>
+                </DomainGroupRows>
+              </DomainGroup>
             );
           }}
         </For>
-      </ul>
+      </div>
 
       <Show when={filteredEntries().length === 0 && filter()}>
         <div class="flex flex-col items-center justify-center py-8 text-center">

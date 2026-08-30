@@ -9,7 +9,7 @@ import {
   setShowAddAccount,
 } from "../../auth/state";
 import { Button } from "../../components/button.jsx";
-import { Favicon } from "../../components/favicon.jsx";
+import { DomainGroup, domainGroupRowClasses } from "../../components/domain-group.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
 import { listSpaces, parseSpaceUri, type SpaceView } from "../../lib/spaces.js";
@@ -204,7 +204,7 @@ const SpacesIndex = () => {
           />
         </Show>
 
-        <ul class="-mx-2 flex flex-col gap-2 sm:gap-0">
+        <div class="flex flex-col gap-2 sm:gap-0">
           <For each={groupedSpaces()}>
             {(group) => {
               const isCollapsed = () => collapsedDomains().has(group.domain);
@@ -214,90 +214,68 @@ const SpacesIndex = () => {
               );
 
               return (
-                <li class="grid sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-2 sm:border-t sm:border-neutral-200 sm:py-1 sm:first:border-t-0 sm:first:pt-0 sm:last:pb-0 dark:sm:border-neutral-700">
-                  <button
-                    type="button"
-                    class="group/domain min-w-0 cursor-pointer self-start px-2 py-1 text-left focus-visible:outline-none active:opacity-70"
-                    aria-expanded={!isCollapsed()}
-                    aria-label={`${isCollapsed() ? "Expand" : "Collapse"} ${group.domain} spaces`}
-                    onClick={() => toggleDomain(group.domain)}
-                  >
-                    <div class="flex min-w-0 items-center gap-2">
-                      <Favicon domain={group.domain} />
-                      <span
-                        class="min-w-0 truncate text-sm font-medium text-neutral-600 transition-colors group-focus-visible/domain:text-neutral-900 group-focus-visible/domain:underline sm:group-hover/domain:text-neutral-900 sm:group-hover/domain:underline dark:group-focus-visible/domain:text-neutral-100 dark:sm:group-hover/domain:text-neutral-100"
-                        title={group.domain}
-                      >
-                        {group.domain}
-                      </span>
-                      <span class="h-px min-w-4 flex-1 bg-neutral-200 sm:hidden dark:bg-neutral-700" />
-                    </div>
-                  </button>
-                  <Show
-                    when={!isCollapsed()}
-                    fallback={
-                      <button
-                        type="button"
-                        class="flex min-h-7 w-full items-center pr-2 pl-8 text-left text-sm text-neutral-500 transition-colors hover:text-neutral-700 sm:pl-2 dark:text-neutral-400 dark:hover:text-neutral-200"
-                        aria-label={`Expand ${group.domain} spaces`}
-                        onClick={() => toggleDomain(group.domain)}
-                      >
-                        {spaceCount} {spaceCount === 1 ? "space" : "spaces"}
-                      </button>
-                    }
-                  >
-                    <ul class="flex flex-col gap-1 pl-6 sm:pl-0">
-                      <For each={group.spaces}>
-                        {(space) => (
-                          <li>
-                            <div
-                              class="flex min-w-0 items-center gap-2 px-2 py-1 text-sm"
-                              title={space.type}
-                            >
-                              <span class="min-w-0 truncate font-medium">{space.displayType}</span>
-                              <span class="iconify lucide--chevron-right shrink-0 text-xs text-neutral-500" />
-                              <span class="shrink-0 font-medium">{space.skey}</span>
-                            </div>
-                            <ul class="flex flex-col">
-                              <For each={space.authorities}>
-                                {(authority) => (
-                                  <li>
-                                    <DidHoverCard
-                                      did={authority}
-                                      class="flex w-full min-w-0 items-center rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-                                      renderTrigger={({ loading: hoverLoading }) => (
-                                        <A
-                                          href={makeSpacePath(authority, space.type, space.skey)}
-                                          class="flex w-full min-w-0 items-center gap-2 px-2 py-1.5 text-left text-sm"
-                                          classList={{
-                                            "hover-card-trigger-loading": hoverLoading(),
-                                          }}
-                                        >
-                                          <span class="min-w-0 truncate text-blue-500 dark:text-blue-400">
-                                            {authority}
+                <DomainGroup
+                  domain={group.domain}
+                  groupLabel="spaces"
+                  collapsed={isCollapsed()}
+                  collapsedLabel={
+                    <>
+                      {spaceCount} {spaceCount === 1 ? "space" : "spaces"}
+                    </>
+                  }
+                  onToggle={() => toggleDomain(group.domain)}
+                >
+                  <ul class="flex flex-col gap-1">
+                    <For each={group.spaces}>
+                      {(space) => (
+                        <li>
+                          <div
+                            class={`flex min-w-0 items-center gap-2 text-sm ${domainGroupRowClasses}`}
+                            title={space.type}
+                          >
+                            <span class="min-w-0 truncate font-medium">{space.displayType}</span>
+                            <span class="iconify lucide--chevron-right shrink-0 text-xs text-neutral-500" />
+                            <span class="shrink-0 font-medium">{space.skey}</span>
+                          </div>
+                          <ul class="flex flex-col">
+                            <For each={space.authorities}>
+                              {(authority) => (
+                                <li>
+                                  <DidHoverCard
+                                    did={authority}
+                                    class="flex w-full min-w-0 items-center rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+                                    renderTrigger={({ loading: hoverLoading }) => (
+                                      <A
+                                        href={makeSpacePath(authority, space.type, space.skey)}
+                                        class="flex w-full min-w-0 items-center gap-2 px-2 py-1.5 text-left text-sm"
+                                        classList={{
+                                          "hover-card-trigger-loading": hoverLoading(),
+                                        }}
+                                      >
+                                        <span class="min-w-0 truncate text-blue-500 dark:text-blue-400">
+                                          {authority}
+                                        </span>
+                                        <Show when={authority === auth().sub}>
+                                          <span class="shrink-0 rounded border border-neutral-300 px-1 py-px text-[9px] leading-none text-neutral-500 uppercase dark:border-neutral-600 dark:text-neutral-400">
+                                            You
                                           </span>
-                                          <Show when={authority === auth().sub}>
-                                            <span class="shrink-0 rounded border border-neutral-300 px-1 py-px text-[9px] leading-none text-neutral-500 uppercase dark:border-neutral-600 dark:text-neutral-400">
-                                              You
-                                            </span>
-                                          </Show>
-                                        </A>
-                                      )}
-                                    />
-                                  </li>
-                                )}
-                              </For>
-                            </ul>
-                          </li>
-                        )}
-                      </For>
-                    </ul>
-                  </Show>
-                </li>
+                                        </Show>
+                                      </A>
+                                    )}
+                                  />
+                                </li>
+                              )}
+                            </For>
+                          </ul>
+                        </li>
+                      )}
+                    </For>
+                  </ul>
+                </DomainGroup>
               );
             }}
           </For>
-        </ul>
+        </div>
 
         <Show when={cursor()}>
           <Button

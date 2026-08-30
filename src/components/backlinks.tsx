@@ -6,6 +6,7 @@ import { getAllBacklinks, getRecordBacklinks, LinksWithRecords } from "../lib/ap
 import { useRepo } from "../lib/repo-context.jsx";
 import { localDateFromTimestamp } from "../utils/date.js";
 import { Button } from "./button.jsx";
+import { DomainGroup, DomainGroupRows, domainGroupRowClasses } from "./domain-group.jsx";
 import { Favicon } from "./favicon.jsx";
 import DidHoverCard from "./hover-card/did.jsx";
 import RecordHoverCard from "./hover-card/record.jsx";
@@ -28,6 +29,16 @@ type CollectionGroup = {
   entries: BacklinkEntry[];
   totalRecords: number;
 };
+
+type BacklinkDomainGroup = {
+  authority: string;
+  domain: string;
+  collections: CollectionGroup[];
+  totalRecords: number;
+};
+
+const collectionAuthority = (collection: string) => collection.split(".").slice(0, 2).join(".");
+const displayDomain = (authority: string) => authority.split(".").reverse().join(".");
 
 const flattenLinks = (links: Record<string, any>): BacklinkEntry[] => {
   const entries: BacklinkEntry[] = [];
@@ -61,6 +72,24 @@ const groupByCollection = (entries: BacklinkEntry[]): CollectionGroup[] => {
     entries,
     totalRecords: entries.reduce((sum, e) => sum + e.counts.records, 0),
   }));
+};
+
+const groupByDomain = (entries: BacklinkEntry[]): BacklinkDomainGroup[] => {
+  const map = new Map<string, CollectionGroup[]>();
+
+  for (const collection of groupByCollection(entries)) {
+    const authority = collectionAuthority(collection.collection);
+    const existing = map.get(authority);
+    if (existing) existing.push(collection);
+    else map.set(authority, [collection]);
+  }
+
+  return Array.from(map, ([authority, collections]) => ({
+    authority,
+    domain: displayDomain(authority),
+    collections,
+    totalRecords: collections.reduce((sum, collection) => sum + collection.totalRecords, 0),
+  })).sort((a, b) => a.domain.localeCompare(b.domain));
 };
 
 const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
@@ -149,28 +178,68 @@ const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
   );
 };
 
-const BacklinkDirectory = (props: { groups: CollectionGroup[]; pathname: string }) => {
+const BacklinkDirectory = (props: { groups: BacklinkDomainGroup[]; pathname: string }) => {
+  const [collapsedDomains, setCollapsedDomains] = createSignal<Set<string>>(new Set());
+
+  const toggleDomain = (authority: string) => {
+    setCollapsedDomains((current) => {
+      const next = new Set(current);
+      if (next.has(authority)) next.delete(authority);
+      else next.add(authority);
+      return next;
+    });
+  };
+
   return (
-    <div class="flex w-full flex-col">
+    <div class="flex w-full flex-col gap-2 sm:gap-0">
       <Show when={props.groups.length === 0}>
         <p class="text-center text-neutral-500 dark:text-neutral-400">No backlinks found.</p>
       </Show>
       <For each={props.groups}>
         {(group) => {
-          const authority = () => group.collection.split(".").slice(0, 2).join(".");
+          const isCollapsed = () => collapsedDomains().has(group.authority);
+
           return (
-            <A
-              href={`${props.pathname}#backlinks:${group.collection}`}
-              class="-mx-2 flex items-center justify-between gap-3 rounded p-2 text-left hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50"
+            <DomainGroup
+              domain={group.domain}
+              domainTitle={`${group.domain} (${group.authority})`}
+              groupLabel="backlink collections"
+              sticky
+              collapsed={isCollapsed()}
+              collapsedLabel={
+                <>
+                  {group.collections.length}{" "}
+                  {group.collections.length === 1 ? "collection" : "collections"}
+                  <span class="ml-1 text-neutral-400 dark:text-neutral-500">
+                    · {group.totalRecords} {group.totalRecords === 1 ? "record" : "records"}
+                  </span>
+                </>
+              }
+              onToggle={() => toggleDomain(group.authority)}
             >
-              <div class="flex min-w-0 flex-1 items-center gap-2">
-                <Favicon domain={authority()} reverse />
-                <span class="min-w-0 truncate">{group.collection}</span>
-              </div>
-              <span class="shrink-0 text-xs text-neutral-600 dark:text-neutral-400">
-                {group.totalRecords} record{group.totalRecords !== 1 ? "s" : ""}
-              </span>
-            </A>
+              <DomainGroupRows>
+                <For each={group.collections}>
+                  {(collection) => {
+                    const label = collection.collection.split(".").slice(2).join(".");
+                    return (
+                      <A
+                        href={`${props.pathname}#backlinks:${collection.collection}`}
+                        class={`group/collection flex min-w-0 items-center justify-between gap-3 active:underline ${domainGroupRowClasses}`}
+                        title={collection.collection}
+                      >
+                        <span class="min-w-0 truncate group-hover/collection:underline">
+                          {label || collection.collection}
+                        </span>
+                        <span class="shrink-0 text-xs text-neutral-500 tabular-nums dark:text-neutral-400">
+                          {collection.totalRecords}{" "}
+                          {collection.totalRecords === 1 ? "record" : "records"}
+                        </span>
+                      </A>
+                    );
+                  }}
+                </For>
+              </DomainGroupRows>
+            </DomainGroup>
           );
         }}
       </For>
@@ -185,7 +254,7 @@ const BacklinkCollectionDetail = (props: {
   pathname: string;
   repoDid: string;
 }) => {
-  const authority = () => props.collection.split(".").slice(0, 2).join(".");
+  const authority = () => collectionAuthority(props.collection);
 
   return (
     <div class="flex w-full flex-col gap-3">
@@ -237,7 +306,7 @@ const Backlinks = (props: { target: string }) => {
     return flattenLinks(res.links);
   });
 
-  const groups = () => (response() ? groupByCollection(response()!) : []);
+  const groups = () => (response() ? groupByDomain(response()!) : []);
 
   const selectedCollection = () => {
     const hash = location.hash;
@@ -254,7 +323,7 @@ const Backlinks = (props: { target: string }) => {
   };
 
   return (
-    <div class="flex w-full flex-col gap-3 text-sm">
+    <div class="flex w-full flex-col gap-4 text-sm">
       <Show when={!response.error} fallback={<p class="text-red-500">Failed to load backlinks.</p>}>
         <Show when={response()} fallback={<p class="text-neutral-500">Loading…</p>}>
           <Show
