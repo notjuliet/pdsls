@@ -214,7 +214,7 @@ const SpacesIndex = () => {
               );
 
               return (
-                <li class="group relative grid sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-2 sm:border-t sm:border-neutral-200 sm:py-1 sm:first:border-t-0 sm:first:pt-0 sm:last:pb-0 dark:sm:border-neutral-700">
+                <li class="grid sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-2 sm:border-t sm:border-neutral-200 sm:py-1 sm:first:border-t-0 sm:first:pt-0 sm:last:pb-0 dark:sm:border-neutral-700">
                   <button
                     type="button"
                     class="group/domain min-w-0 cursor-pointer self-start px-2 py-1 text-left focus-visible:outline-none active:opacity-70"
@@ -237,6 +237,7 @@ const SpacesIndex = () => {
                     when={!isCollapsed()}
                     fallback={
                       <button
+                        type="button"
                         class="flex min-h-7 w-full items-center pr-2 pl-8 text-left text-sm text-neutral-500 transition-colors hover:text-neutral-700 sm:pl-2 dark:text-neutral-400 dark:hover:text-neutral-200"
                         aria-label={`Expand ${group.domain} spaces`}
                         onClick={() => toggleDomain(group.domain)}
