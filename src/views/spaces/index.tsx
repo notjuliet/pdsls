@@ -88,29 +88,50 @@ const SpacesIndex = () => {
   let requestVersion = 0;
 
   const groupedSpaces = createMemo(() => {
-    const groups = new Map<string, { type: string; skey: string; authorities: Set<string> }>();
+    const groups = new Map<
+      string,
+      {
+        domain: string;
+        spaces: Map<
+          string,
+          { authorities: Set<string>; type: string; displayType: string; skey: string }
+        >;
+      }
+    >();
 
     for (const space of spaces()) {
       const parsed = parseSpaceUri(space.uri);
       if (!parsed) continue;
 
-      const key = `${parsed.type}\n${parsed.skey}`;
-      const group = groups.get(key);
-      if (group) {
-        group.authorities.add(parsed.authority);
+      const segments = parsed.type.split(".");
+      const domainSegments = segments.slice(0, 2);
+      const domainKey = domainSegments.join(".");
+      const domain = [...domainSegments].reverse().join(".");
+      const displayType = segments.slice(2).join(".") || parsed.type;
+      const group = groups.get(domainKey) ?? { domain, spaces: new Map() };
+      const spaceKey = `${parsed.type}\n${parsed.skey}`;
+      const groupedSpace = group.spaces.get(spaceKey);
+
+      if (groupedSpace) {
+        groupedSpace.authorities.add(parsed.authority);
       } else {
-        groups.set(key, {
-          type: parsed.type,
-          skey: parsed.skey,
+        group.spaces.set(spaceKey, {
           authorities: new Set([parsed.authority]),
+          type: parsed.type,
+          displayType,
+          skey: parsed.skey,
         });
       }
+      groups.set(domainKey, group);
     }
 
     return Array.from(groups.values(), (group) => ({
-      ...group,
-      authorities: Array.from(group.authorities).sort((a, b) => a.localeCompare(b)),
-    })).sort((a, b) => a.type.localeCompare(b.type) || a.skey.localeCompare(b.skey));
+      domain: group.domain,
+      spaces: Array.from(group.spaces.values(), (space) => ({
+        ...space,
+        authorities: Array.from(space.authorities).sort((a, b) => a.localeCompare(b)),
+      })).sort((a, b) => a.type.localeCompare(b.type) || a.skey.localeCompare(b.skey)),
+    })).sort((a, b) => a.domain.localeCompare(b.domain));
   });
 
   const loadSpaces = async (reset = false, version = requestVersion) => {
@@ -172,40 +193,64 @@ const SpacesIndex = () => {
           />
         </Show>
 
-        <ul class="-mx-2 flex flex-col gap-2">
+        <ul class="-mx-2 flex flex-col gap-2 sm:gap-0">
           <For each={groupedSpaces()}>
             {(group) => (
-              <li>
-                <div class="flex min-w-0 items-center gap-2 px-2 py-1 text-sm">
-                  <Favicon domain={group.type.split(".").slice(0, 2).join(".")} reverse />
-                  <span class="min-w-0 truncate font-medium">{group.type}</span>
-                  <span class="iconify lucide--chevron-right shrink-0 text-xs text-neutral-500" />
-                  <span class="shrink-0 font-medium">{group.skey}</span>
+              <li class="grid sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-2 sm:border-t sm:border-neutral-200 sm:py-1 sm:first:border-t-0 sm:first:pt-0 sm:last:pb-0 dark:sm:border-neutral-700">
+                <div class="min-w-0 px-2 py-1">
+                  <div class="flex min-w-0 items-center gap-2">
+                    <Favicon domain={group.domain} />
+                    <span
+                      class="min-w-0 truncate text-sm font-medium text-neutral-600 dark:text-neutral-300"
+                      title={group.domain}
+                    >
+                      {group.domain}
+                    </span>
+                    <span class="h-px min-w-4 flex-1 bg-neutral-200 sm:hidden dark:bg-neutral-700" />
+                  </div>
                 </div>
-                <ul class="flex flex-col pl-6">
-                  <For each={group.authorities}>
-                    {(authority) => (
+                <ul class="flex flex-col gap-1 pl-6 sm:pl-0">
+                  <For each={group.spaces}>
+                    {(space) => (
                       <li>
-                        <DidHoverCard
-                          did={authority}
-                          class="flex w-full min-w-0 items-center rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-                          renderTrigger={({ loading: hoverLoading }) => (
-                            <A
-                              href={makeSpacePath(authority, group.type, group.skey)}
-                              class="flex w-full min-w-0 items-center gap-2 p-2 text-left text-sm"
-                              classList={{ "hover-card-trigger-loading": hoverLoading() }}
-                            >
-                              <span class="min-w-0 truncate font-medium text-blue-500 dark:text-blue-400">
-                                {authority}
-                              </span>
-                              <Show when={authority === auth().sub}>
-                                <span class="shrink-0 rounded border border-neutral-300 px-1 py-px text-[9px] leading-none text-neutral-500 uppercase dark:border-neutral-600 dark:text-neutral-400">
-                                  You
-                                </span>
-                              </Show>
-                            </A>
-                          )}
-                        />
+                        <div
+                          class="flex min-w-0 items-center gap-2 px-2 py-1 text-sm"
+                          title={space.type}
+                        >
+                          <span class="min-w-0 truncate font-medium">{space.displayType}</span>
+                          <span class="iconify lucide--chevron-right shrink-0 text-xs text-neutral-500" />
+                          <span class="shrink-0 font-medium">{space.skey}</span>
+                        </div>
+                        <ul class="flex flex-col">
+                          <For each={space.authorities}>
+                            {(authority) => (
+                              <li>
+                                <DidHoverCard
+                                  did={authority}
+                                  class="flex w-full min-w-0 items-center rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+                                  renderTrigger={({ loading: hoverLoading }) => (
+                                    <A
+                                      href={makeSpacePath(authority, space.type, space.skey)}
+                                      class="flex w-full min-w-0 items-center gap-2 px-2 py-1.5 text-left text-sm"
+                                      classList={{
+                                        "hover-card-trigger-loading": hoverLoading(),
+                                      }}
+                                    >
+                                      <span class="min-w-0 truncate text-blue-500 dark:text-blue-400">
+                                        {authority}
+                                      </span>
+                                      <Show when={authority === auth().sub}>
+                                        <span class="shrink-0 rounded border border-neutral-300 px-1 py-px text-[9px] leading-none text-neutral-500 uppercase dark:border-neutral-600 dark:text-neutral-400">
+                                          You
+                                        </span>
+                                      </Show>
+                                    </A>
+                                  )}
+                                />
+                              </li>
+                            )}
+                          </For>
+                        </ul>
                       </li>
                     )}
                   </For>
