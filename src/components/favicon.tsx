@@ -15,7 +15,7 @@ export const Favicon = (props: {
   const content = (
     <Switch>
       <Match when={domain() === "tangled.sh" || domain() === "tangled.org"}>
-        <span class="iconify i-tangled size-4" />
+        <span class="iconify i-tangled size-4 text-neutral-900 dark:text-neutral-100" />
       </Match>
       <Match when={true}>
         <Show when={!loaded()}>

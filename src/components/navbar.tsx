@@ -60,7 +60,7 @@ const HoverFavicon = (props: { domain: string; hovered: boolean; children: JSX.E
         <Switch>
           <Match when={props.domain === "tangled.sh" || props.domain === "tangled.org"}>
             <span
-              class="iconify i-tangled size-4"
+              class="iconify i-tangled size-4 text-neutral-900 dark:text-neutral-100"
               classList={{ hidden: !props.hovered || !loaded() }}
               ref={() => setLoaded(true)}
             />

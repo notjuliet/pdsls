@@ -224,6 +224,8 @@ const downloadRepo = async (pdsUrl: string, did: string) => {
   }
 };
 
+const displayNsidDomain = (authority: string) => authority.split(".").reverse().join(".");
+
 const RepoView = () => {
   const repo = useRepo();
   const params = useParams();
@@ -472,7 +474,7 @@ const RepoView = () => {
               </LazyTab>
             </Show>
             <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
-              <div class="flex flex-col pb-22 text-sm wrap-anywhere">
+              <div class="flex flex-col gap-1 pb-22 text-sm wrap-anywhere sm:gap-0">
                 <Show
                   when={Object.keys(nsids() ?? {}).length != 0}
                   fallback={<span class="mt-3 text-center text-base">No collections found.</span>}
@@ -481,6 +483,7 @@ const RepoView = () => {
                     each={Object.keys(nsids() ?? {}).filter((authority) =>
                       filter()
                         ? authority.includes(filter()!) ||
+                          displayNsidDomain(authority).includes(filter()!) ||
                           nsids()?.[authority].nsids.some((nsid) =>
                             `${authority}.${nsid}`.includes(filter()!),
                           )
@@ -490,75 +493,75 @@ const RepoView = () => {
                     {(authority) => {
                       const isHighlighted = () => location.hash === `#collections:${authority}`;
                       const isCollapsed = () => nsids()?.[authority].hidden ?? false;
+                      const domain = displayNsidDomain(authority);
+                      const collectionCount = () => nsids()?.[authority].nsids.length ?? 0;
 
                       return (
                         <div
                           id={`collection-${authority}`}
-                          class="group relative flex scroll-mt-4 items-start gap-2 rounded-lg p-1 transition-colors"
-                          classList={{
-                            "dark:hover:bg-dark-300 hover:bg-neutral-200": !isHighlighted(),
-                            "bg-blue-100 dark:bg-blue-500/25": isHighlighted(),
-                          }}
+                          class="group relative grid scroll-mt-4 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-2 sm:border-t sm:border-neutral-200 sm:py-1 sm:first:border-t-0 dark:sm:border-neutral-700"
                         >
-                          <Favicon
-                            domain={authority}
-                            reverse
-                            wrapper={(children) => (
+                          <div class="dark:bg-dark-500 dark:after:from-dark-500 dark:after:via-dark-500/75 dark:sm:from-dark-500 relative sticky top-0 z-10 min-w-0 self-start bg-neutral-100 py-1 after:pointer-events-none after:absolute after:inset-x-0 after:-bottom-1 after:h-1 after:bg-linear-to-b after:from-neutral-100 after:via-neutral-100/75 after:to-transparent after:content-[''] sm:bg-transparent sm:bg-linear-to-b sm:from-neutral-100 sm:from-[70%] sm:to-transparent sm:after:hidden dark:sm:bg-transparent">
+                            <Show when={isHighlighted()}>
+                              <span class="absolute inset-y-0 left-0 w-0.5 bg-blue-500 dark:bg-blue-400" />
+                            </Show>
+                            <div class="flex min-w-0 items-center gap-2">
                               <a
                                 href={`#collections:${authority}`}
-                                class="relative flex h-5 w-4 shrink-0 items-center justify-center hover:opacity-70"
+                                class="flex min-w-0 items-center gap-2 font-medium text-neutral-600 hover:text-neutral-900 hover:underline active:underline dark:text-neutral-300 dark:hover:text-neutral-100"
+                                title={`${domain} (${authority})`}
+                                aria-current={isHighlighted() ? "location" : undefined}
                               >
-                                <span class="absolute top-1/2 -left-5 flex -translate-y-1/2 items-center text-sm opacity-0 transition-opacity group-hover:opacity-100">
-                                  <span class="iconify lucide--link absolute -left-2 w-7 text-neutral-700 dark:text-neutral-300"></span>
-                                </span>
-                                {children}
+                                <Favicon domain={domain} />
+                                <span class="min-w-0 truncate">{domain}</span>
                               </a>
-                            )}
-                          />
-                          <Show
-                            when={!isCollapsed()}
-                            fallback={
-                              <button
-                                class="flex flex-1 items-center text-left"
-                                onClick={() => toggleCollapsed(authority)}
-                              >
-                                <span class="text-neutral-700 dark:text-neutral-300">
-                                  {authority}
-                                </span>
-                                <span class="text-neutral-500 dark:text-neutral-400">.*</span>
-                                <span class="ml-1.5 text-neutral-400 dark:text-neutral-500">
-                                  ({nsids()?.[authority].nsids.length})
-                                </span>
-                              </button>
-                            }
-                          >
-                            <div class="flex min-w-0 flex-1 flex-col">
-                              <For
-                                each={nsids()?.[authority].nsids.filter((nsid) =>
-                                  filter() ? `${authority}.${nsid}`.includes(filter()!) : true,
-                                )}
-                              >
-                                {(nsid, index) => (
-                                  <A
-                                    href={`/at://${did}/${authority}.${nsid}`}
-                                    class="truncate hover:underline active:underline"
-                                    classList={{ "pr-16": canHover && index() === 0 }}
-                                  >
-                                    <span class="text-neutral-800/70 dark:text-neutral-200/70">
-                                      {authority}.
-                                    </span>
-                                    <span>{nsid}</span>
-                                  </A>
-                                )}
-                              </For>
+                              <span class="h-px min-w-4 flex-1 bg-neutral-200 sm:hidden dark:bg-neutral-700" />
                             </div>
-                          </Show>
+                          </div>
+                          <div class="min-w-0 pl-4 sm:pl-0">
+                            <Show
+                              when={!isCollapsed()}
+                              fallback={
+                                <button
+                                  class="flex min-h-7 w-full items-center px-2 text-left text-sm text-neutral-500 transition-colors hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                                  aria-label={`Expand ${domain} collections`}
+                                  onClick={() => toggleCollapsed(authority)}
+                                >
+                                  {collectionCount()}{" "}
+                                  {collectionCount() === 1 ? "collection" : "collections"}
+                                </button>
+                              }
+                            >
+                              <div class="flex min-w-0 flex-1 flex-col px-2 py-1">
+                                <For
+                                  each={nsids()?.[authority].nsids.filter((nsid) =>
+                                    filter() ? `${authority}.${nsid}`.includes(filter()!) : true,
+                                  )}
+                                >
+                                  {(nsid, index) => (
+                                    <A
+                                      href={`/at://${did}/${authority}.${nsid}`}
+                                      class="truncate hover:underline active:underline"
+                                      classList={{ "pr-8": canHover && index() === 0 }}
+                                      title={`${authority}.${nsid}`}
+                                    >
+                                      {nsid}
+                                    </A>
+                                  )}
+                                </For>
+                              </div>
+                            </Show>
+                          </div>
                           <Show when={canHover}>
                             <button
-                              class="absolute top-1 right-1 rounded px-2 py-0.5 text-xs text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-neutral-300 hover:text-neutral-700 active:bg-neutral-400 dark:text-neutral-400 dark:hover:bg-neutral-600 dark:hover:text-neutral-200 dark:active:bg-neutral-500"
+                              class="absolute top-1 right-2 flex size-6 items-center justify-center rounded-md text-neutral-400 opacity-0 transition group-hover:opacity-100 hover:bg-neutral-200 hover:text-neutral-700 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-blue-400/40 focus-visible:outline-none active:bg-neutral-300 sm:top-1.5 dark:text-neutral-500 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
+                              aria-label={`${isCollapsed() ? "Expand" : "Collapse"} ${domain} collections`}
+                              title={`${isCollapsed() ? "Expand" : "Collapse"} ${domain}`}
                               onClick={() => toggleCollapsed(authority)}
                             >
-                              {isCollapsed() ? "expand" : "collapse"}
+                              <span
+                                class={`iconify ${isCollapsed() ? "lucide--chevron-down" : "lucide--chevron-up"}`}
+                              />
                             </button>
                           </Show>
                         </div>
