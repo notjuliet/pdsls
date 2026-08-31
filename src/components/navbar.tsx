@@ -184,14 +184,14 @@ export const NavBar = () => {
               <Show
                 when={params.collection}
                 fallback={
-                  <span class="flex min-w-0 gap-1 py-0.5 font-medium">
+                  <span class="flex min-w-0 items-baseline gap-2 py-0.5 font-medium">
                     <Show
                       when={handle() !== params.repo}
                       fallback={<span class="truncate">{params.repo}</span>}
                     >
                       <span class="max-w-full shrink-0 truncate">{handle()}</span>
-                      <span class="truncate text-neutral-500 dark:text-neutral-400">
-                        ({params.repo})
+                      <span class="truncate text-xs font-normal text-neutral-500 sm:text-sm dark:text-neutral-400">
+                        {params.repo}
                       </span>
                     </Show>
                   </span>
@@ -200,14 +200,16 @@ export const NavBar = () => {
                 <A
                   end
                   href={`/at://${params.repo}`}
-                  inactiveClass="flex grow min-w-0 gap-1 py-0.5 font-medium text-blue-500 hover:text-blue-600 transition-colors duration-150 dark:text-blue-400 dark:hover:text-blue-300"
+                  inactiveClass="flex grow min-w-0 items-baseline gap-2 py-0.5 font-medium text-blue-500 hover:text-blue-600 transition-colors duration-150 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                   <Show
                     when={handle() !== params.repo}
                     fallback={<span class="truncate">{params.repo}</span>}
                   >
                     <span class="max-w-full shrink-0 truncate">{handle()}</span>
-                    <span class="truncate">({params.repo})</span>
+                    <span class="truncate text-xs font-normal text-neutral-500 sm:text-sm dark:text-neutral-400">
+                      {params.repo}
+                    </span>
                   </Show>
                 </A>
               </Show>
@@ -260,11 +262,11 @@ export const NavBar = () => {
               <Tooltip text="Record">
                 <span class="iconify lucide--file-json shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"></span>
               </Tooltip>
-              <div class="flex min-w-0 gap-1 py-0.5 font-medium">
+              <div class="flex min-w-0 items-baseline gap-2 py-0.5 font-medium">
                 <span class="min-w-0 truncate">{params.rkey}</span>
                 <Show when={rkeyTimestamp()}>
-                  <span class="shrink-0 truncate text-neutral-500 dark:text-neutral-400">
-                    ({localDateFromTimestamp(rkeyTimestamp()!)})
+                  <span class="shrink-0 truncate text-xs font-normal text-neutral-500 sm:text-sm dark:text-neutral-400">
+                    {localDateFromTimestamp(rkeyTimestamp()!)}
                   </span>
                 </Show>
               </div>

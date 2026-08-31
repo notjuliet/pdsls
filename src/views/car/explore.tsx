@@ -477,14 +477,14 @@ const ExploreView = (props: {
             fallback={
               <div class="flex min-h-6 min-w-0 basis-full items-center gap-2 px-2 sm:min-h-7">
                 <span class="iconify lucide--book-user shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-                <span class="flex min-w-0 gap-1 py-0.5 font-medium">
+                <span class="flex min-w-0 items-baseline gap-2 py-0.5 font-medium">
                   <Show
                     when={handle !== props.archive.did}
                     fallback={<span class="truncate">{props.archive.did}</span>}
                   >
                     <span class="shrink-0">{handle}</span>
-                    <span class="truncate text-neutral-500 dark:text-neutral-400">
-                      ({props.archive.did})
+                    <span class="truncate text-xs font-normal text-neutral-500 sm:text-sm dark:text-neutral-400">
+                      {props.archive.did}
                     </span>
                   </Show>
                 </span>
@@ -497,13 +497,15 @@ const ExploreView = (props: {
               class="flex min-h-6 min-w-0 basis-full items-center gap-2 px-2 sm:min-h-7"
             >
               <span class="iconify lucide--book-user shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-              <span class="flex min-w-0 gap-1 py-0.5 font-medium text-blue-500 transition-colors duration-150 group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-300">
+              <span class="flex min-w-0 items-baseline gap-2 py-0.5 font-medium text-blue-500 transition-colors duration-150 group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-300">
                 <Show
                   when={handle !== props.archive.did}
                   fallback={<span class="truncate">{props.archive.did}</span>}
                 >
                   <span class="shrink-0">{handle}</span>
-                  <span class="truncate">({props.archive.did})</span>
+                  <span class="truncate text-xs font-normal text-neutral-500 sm:text-sm dark:text-neutral-400">
+                    {props.archive.did}
+                  </span>
                 </Show>
               </span>
             </button>
@@ -591,11 +593,11 @@ const ExploreView = (props: {
               <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
                 <div class="flex min-h-6 min-w-0 basis-full items-center gap-2 sm:min-h-7">
                   <span class="iconify lucide--file-json shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-                  <div class="flex min-w-0 gap-1 py-0.5 font-medium">
+                  <div class="flex min-w-0 items-baseline gap-2 py-0.5 font-medium">
                     <span class="shrink-0">{record().key}</span>
                     <Show when={rkeyTimestamp()}>
-                      <span class="truncate text-neutral-500 dark:text-neutral-400">
-                        ({localDateFromTimestamp(rkeyTimestamp()!)})
+                      <span class="truncate text-xs font-normal text-neutral-500 sm:text-sm dark:text-neutral-400">
+                        {localDateFromTimestamp(rkeyTimestamp()!)}
                       </span>
                     </Show>
                   </div>
