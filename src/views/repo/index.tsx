@@ -471,15 +471,17 @@ const RepoView = () => {
                   fallback={<span class="mt-3 text-center text-base">No collections found.</span>}
                 >
                   <For
-                    each={Object.keys(nsids() ?? {}).filter((authority) =>
-                      filter()
-                        ? authority.includes(filter()!) ||
-                          displayNsidDomain(authority).includes(filter()!) ||
-                          nsids()?.[authority].nsids.some((nsid) =>
-                            `${authority}.${nsid}`.includes(filter()!),
-                          )
-                        : true,
-                    )}
+                    each={Object.keys(nsids() ?? {})
+                      .filter((authority) =>
+                        filter()
+                          ? authority.includes(filter()!) ||
+                            displayNsidDomain(authority).includes(filter()!) ||
+                            nsids()?.[authority].nsids.some((nsid) =>
+                              `${authority}.${nsid}`.includes(filter()!),
+                            )
+                          : true,
+                      )
+                      .sort((a, b) => displayNsidDomain(a).localeCompare(displayNsidDomain(b)))}
                   >
                     {(authority) => {
                       const isCollapsed = () => nsids()?.[authority].hidden ?? false;
