@@ -12,6 +12,7 @@ import {
   createSignal,
   For,
   Match,
+  onCleanup,
   Show,
   Switch,
   untrack,
@@ -103,8 +104,6 @@ const WelcomeView = (props: {
   progress?: number;
   error?: string;
   onFileChange: (e: Event) => void;
-  onDrop: (e: DragEvent) => void;
-  onDragOver: (e: DragEvent) => void;
 }) => {
   return (
     <div class="flex w-full max-w-3xl flex-col gap-y-4 px-2">
@@ -115,11 +114,7 @@ const WelcomeView = (props: {
         <p class="text-sm text-neutral-600 dark:text-neutral-400">{props.subtitle}</p>
       </div>
 
-      <div
-        class="dark:bg-dark-300 flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-neutral-300 bg-neutral-50 p-8 transition-colors hover:border-neutral-400 dark:border-neutral-600 dark:hover:border-neutral-500"
-        onDrop={props.onDrop}
-        onDragOver={props.onDragOver}
-      >
+      <div class="dark:bg-dark-300 flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-neutral-300 bg-neutral-50 p-8 transition-colors hover:border-neutral-400 dark:border-neutral-600 dark:hover:border-neutral-500">
         <Show
           when={!props.loading}
           fallback={
@@ -325,6 +320,13 @@ export const CarView = () => {
   const handleFileChange = createFileChangeHandler(parseCarFile);
   const handleDrop = createDropHandler(parseCarFile);
 
+  window.addEventListener("dragover", handleDragOver);
+  window.addEventListener("drop", handleDrop);
+  onCleanup(() => {
+    window.removeEventListener("dragover", handleDragOver);
+    window.removeEventListener("drop", handleDrop);
+  });
+
   const reset = () => {
     setArchive(null);
     setError(undefined);
@@ -344,8 +346,6 @@ export const CarView = () => {
             progress={progress()}
             error={error()}
             onFileChange={handleFileChange}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
           />
         }
       >
