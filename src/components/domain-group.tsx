@@ -45,7 +45,7 @@ export const DomainGroup = (props: DomainGroupProps) => (
         <div class="flex min-w-0 items-center gap-2">
           <Favicon domain={props.domain} />
           <span
-            class="min-w-0 truncate text-sm font-medium text-neutral-600 transition-colors group-focus-visible/domain:text-neutral-900 group-focus-visible/domain:underline sm:group-hover/domain:text-neutral-900 sm:group-hover/domain:underline dark:text-neutral-400 dark:group-focus-visible/domain:text-neutral-200 dark:sm:group-hover/domain:text-neutral-200"
+            class="min-w-0 truncate text-sm font-medium text-neutral-600 transition-colors group-focus-visible/domain:text-neutral-900 group-focus-visible/domain:underline sm:group-hover/domain:text-neutral-900 sm:group-hover/domain:underline dark:text-neutral-300 dark:group-focus-visible/domain:text-neutral-200 dark:sm:group-hover/domain:text-neutral-200"
             title={props.domainTitle ?? props.domain}
           >
             {props.domain}

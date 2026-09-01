@@ -230,11 +230,23 @@ const SpacesIndex = () => {
                       {(space) => (
                         <li>
                           <div
-                            class={`flex min-w-0 items-center gap-2 text-sm ${domainGroupRowClasses}`}
+                            class={`flex min-w-0 items-center gap-1.5 text-sm ${domainGroupRowClasses}`}
                             title={space.type}
                           >
-                            <span class="min-w-0 truncate font-medium">{space.displayType}</span>
-                            <span class="iconify lucide--chevron-right shrink-0 text-xs text-neutral-500" />
+                            <span class="min-w-0 truncate font-medium">
+                              <Show when={space.displayType !== space.type}>
+                                <span class="text-neutral-500 dark:text-neutral-400">
+                                  {space.type.slice(0, -space.displayType.length)}
+                                </span>
+                              </Show>
+                              {space.displayType}
+                            </span>
+                            <span
+                              class="shrink-0 text-neutral-400 dark:text-neutral-500"
+                              aria-hidden="true"
+                            >
+                              /
+                            </span>
                             <span class="shrink-0 font-medium">{space.skey}</span>
                           </div>
                           <ul class="flex flex-col">

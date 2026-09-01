@@ -221,18 +221,29 @@ const BacklinkDirectory = (props: { groups: BacklinkDomainGroup[]; pathname: str
                 <For each={group.collections}>
                   {(collection) => {
                     const label = collection.collection.split(".").slice(2).join(".");
+                    const recordCountLabel = `${collection.totalRecords} ${
+                      collection.totalRecords === 1 ? "record" : "records"
+                    }`;
                     return (
                       <A
                         href={`${props.pathname}#backlinks:${collection.collection}`}
                         class={`group/collection flex min-w-0 items-center justify-between gap-3 active:underline ${domainGroupRowClasses}`}
                         title={collection.collection}
+                        aria-label={`${collection.collection}, ${recordCountLabel}`}
                       >
                         <span class="min-w-0 truncate group-hover/collection:underline">
+                          <Show when={label}>
+                            <span class="text-neutral-500 dark:text-neutral-400">
+                              {group.authority}.
+                            </span>
+                          </Show>
                           {label || collection.collection}
                         </span>
-                        <span class="shrink-0 text-xs text-neutral-500 tabular-nums dark:text-neutral-400">
-                          {collection.totalRecords}{" "}
-                          {collection.totalRecords === 1 ? "record" : "records"}
+                        <span
+                          class="shrink-0 text-xs text-neutral-500 tabular-nums dark:text-neutral-400"
+                          title={recordCountLabel}
+                        >
+                          {collection.totalRecords}
                         </span>
                       </A>
                     );

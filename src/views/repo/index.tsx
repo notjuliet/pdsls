@@ -515,6 +515,9 @@ const RepoView = () => {
                                   class={`truncate hover:underline active:underline ${domainGroupRowClasses}`}
                                   title={`${authority}.${nsid}`}
                                 >
+                                  <span class="text-neutral-500 dark:text-neutral-400">
+                                    {authority}.
+                                  </span>
                                   {nsid}
                                 </A>
                               )}

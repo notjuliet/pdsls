@@ -729,48 +729,27 @@ const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void })
                 <DomainGroupRows as="ul">
                   <For each={group.entries}>
                     {(entry) => {
-                      const hasSingleEntry = entry.entries.length === 1;
                       const label = entry.name.split(".").slice(2).join(".") || entry.name;
 
                       return (
                         <li>
                           <button
-                            onClick={() => {
-                              if (hasSingleEntry) {
-                                props.onRoute({
-                                  type: "record",
-                                  collection: entry,
-                                  record: entry.entries[0],
-                                });
-                              } else {
-                                props.onRoute({ type: "collection", collection: entry });
-                              }
-                            }}
+                            onClick={() => props.onRoute({ type: "collection", collection: entry })}
                             class={`flex w-full min-w-0 items-center gap-2 rounded text-left text-sm hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700 ${domainGroupRowClasses}`}
                             title={entry.name}
                           >
-                            <span
-                              class="truncate font-medium"
-                              classList={{
-                                "text-neutral-700 dark:text-neutral-300": hasSingleEntry,
-                                "text-blue-500 dark:text-blue-400": !hasSingleEntry,
-                              }}
-                            >
+                            <span class="truncate font-medium text-neutral-700 dark:text-neutral-300">
+                              <Show when={label !== entry.name}>
+                                <span class="text-neutral-500 dark:text-neutral-400">
+                                  {group.authority}.
+                                </span>
+                              </Show>
                               {label}
                             </span>
 
-                            <Show when={hasSingleEntry}>
-                              <span class="iconify lucide--chevron-right shrink-0 text-xs text-neutral-500" />
-                              <span class="truncate font-medium text-blue-500 dark:text-blue-400">
-                                {entry.entries[0].key}
-                              </span>
-                            </Show>
-
-                            <Show when={!hasSingleEntry}>
-                              <span class="ml-auto text-xs text-neutral-500">
-                                {entry.entries.length}
-                              </span>
-                            </Show>
+                            <span class="ml-auto text-xs text-neutral-500">
+                              {entry.entries.length}
+                            </span>
                           </button>
                         </li>
                       );
