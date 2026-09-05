@@ -250,8 +250,7 @@ export const PlcLogView = (props: { did: string }) => {
         <span
           class="self-center"
           classList={{
-            "text-neutral-500 dark:text-neutral-400":
-              props.label === "Before" || props.label === "Removed",
+            "text-red-600 dark:text-red-300": props.label === "Before" || props.label === "Removed",
             "text-green-600 dark:text-green-300":
               props.label === "After" || props.label === "Added",
           }}
