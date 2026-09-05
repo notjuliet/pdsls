@@ -149,43 +149,35 @@ export const PlcLogView = (props: { did: string }) => {
         case "handle_added":
           return {
             icon: "lucide--at-sign",
-            title: "Alias added",
+            title: "Alias",
             value: diff.handle,
             isAddition: true,
           };
         case "handle_removed":
           return {
             icon: "lucide--at-sign",
-            title: "Alias removed",
+            title: "Alias",
             value: diff.handle,
             isRemoval: true,
           };
         case "handle_changed":
           return {
             icon: "lucide--at-sign",
-            title: "Alias updated",
+            title: "Alias",
             oldValue: diff.prev_handle,
             newValue: diff.next_handle,
           };
         case "rotation_key_updated":
-          const addedRotationKeyCount = diff.added_rotation_keys.length;
-          const removedRotationKeyCount = diff.removed_rotation_keys.length;
-
           return {
             icon: "lucide--key-round",
-            title:
-              addedRotationKeyCount === 1 && removedRotationKeyCount === 0
-                ? "Rotation key added"
-                : removedRotationKeyCount === 1 && addedRotationKeyCount === 0
-                  ? "Rotation key removed"
-                  : "Rotation keys updated",
+            title: "Rotation keys",
             addedValues: diff.added_rotation_keys,
             removedValues: diff.removed_rotation_keys,
           };
         case "service_added":
           return {
             icon: "lucide--hard-drive",
-            title: "Service added",
+            title: "Service",
             badge: diff.service_id,
             value: diff.service_endpoint,
             isAddition: true,
@@ -193,7 +185,7 @@ export const PlcLogView = (props: { did: string }) => {
         case "service_removed":
           return {
             icon: "lucide--hard-drive",
-            title: "Service removed",
+            title: "Service",
             badge: diff.service_id,
             value: diff.service_endpoint,
             isRemoval: true,
@@ -201,7 +193,7 @@ export const PlcLogView = (props: { did: string }) => {
         case "service_changed":
           return {
             icon: "lucide--hard-drive",
-            title: "Service updated",
+            title: "Service",
             badge: diff.service_id,
             oldValue: diff.prev_service_endpoint,
             newValue: diff.next_service_endpoint,
@@ -209,7 +201,7 @@ export const PlcLogView = (props: { did: string }) => {
         case "verification_method_added":
           return {
             icon: "lucide--shield-check",
-            title: "Verification method added",
+            title: "Verification key",
             badge: diff.method_id,
             value: diff.method_key,
             isAddition: true,
@@ -217,7 +209,7 @@ export const PlcLogView = (props: { did: string }) => {
         case "verification_method_removed":
           return {
             icon: "lucide--shield-check",
-            title: "Verification method removed",
+            title: "Verification key",
             badge: diff.method_id,
             value: diff.method_key,
             isRemoval: true,
@@ -225,7 +217,7 @@ export const PlcLogView = (props: { did: string }) => {
         case "verification_method_changed":
           return {
             icon: "lucide--shield-check",
-            title: "Verification method updated",
+            title: "Verification key",
             badge: diff.method_id,
             oldValue: diff.prev_method_key,
             newValue: diff.next_method_key,
@@ -249,6 +241,38 @@ export const PlcLogView = (props: { did: string }) => {
       isRemoval = false,
     } = config;
 
+    const ValueRow = (props: {
+      label: "Before" | "After" | "Added" | "Removed";
+      value: string;
+      muted?: boolean;
+    }) => (
+      <>
+        <span
+          class="self-center"
+          classList={{
+            "text-neutral-500 dark:text-neutral-400":
+              props.label === "Before" || props.label === "Removed",
+            "text-green-600 dark:text-green-300":
+              props.label === "After" || props.label === "Added",
+          }}
+        >
+          <span aria-hidden="true">
+            {props.label === "After" || props.label === "Added" ? "+" : "−"}
+          </span>
+          <span class="sr-only">{props.label}</span>
+        </span>
+        <span
+          class="truncate"
+          classList={{
+            "text-neutral-500/85 dark:text-neutral-400/85": props.muted,
+            "text-neutral-700 dark:text-neutral-300": !props.muted,
+          }}
+        >
+          {props.value}
+        </span>
+      </>
+    );
+
     return (
       <div
         classList={{
@@ -257,17 +281,17 @@ export const PlcLogView = (props: { did: string }) => {
         }}
       >
         <div class={`${icon} iconify shrink-0 self-center`} />
-        <div class="flex min-w-0 items-center gap-1.5">
+        <div class="flex min-w-0 items-baseline gap-1.5">
           <p
             classList={{
-              "font-medium text-sm": true,
+              "font-semibold text-sm": true,
               "line-through": diff.orig.nullified,
             }}
           >
             {title}
           </p>
           <Show when={badge}>
-            <span class="shrink-0 rounded bg-neutral-200 px-1.5 py-0.5 text-xs font-medium text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300">
+            <span class="shrink-0 text-xs font-medium text-neutral-500 dark:text-neutral-400">
               #{badge}
             </span>
           </Show>
@@ -279,53 +303,31 @@ export const PlcLogView = (props: { did: string }) => {
         </div>
         <Show when={value}>
           <div></div>
-          <div
-            classList={{
-              "text-sm flex items-start gap-2 min-w-0": true,
-              "text-green-700 dark:text-green-300": isAddition,
-              "text-red-700 dark:text-red-300": isRemoval,
-              "text-neutral-600 dark:text-neutral-400": !isAddition && !isRemoval,
-            }}
-          >
-            <Show when={isAddition}>
-              <span class="shrink-0">+</span>
+          <div class="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-1.5 text-sm">
+            <Show
+              when={isAddition || isRemoval}
+              fallback={<span class="col-span-2 truncate">{value}</span>}
+            >
+              <ValueRow label={isAddition ? "Added" : "Removed"} value={value} />
             </Show>
-            <Show when={isRemoval}>
-              <span class="shrink-0">−</span>
-            </Show>
-            <span class="truncate">{value}</span>
           </div>
         </Show>
         <Show when={oldValue && newValue}>
           <div></div>
-          <div class="flex min-w-0 flex-col text-sm">
-            <div class="flex items-start gap-2 text-red-700 dark:text-red-300">
-              <span class="shrink-0">−</span>
-              <span class="truncate">{oldValue}</span>
-            </div>
-            <div class="flex items-start gap-2 text-green-700 dark:text-green-300">
-              <span class="shrink-0">+</span>
-              <span class="truncate">{newValue}</span>
-            </div>
+          <div class="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-1.5 text-sm">
+            <ValueRow label="After" value={newValue} />
+            <ValueRow label="Before" value={oldValue} muted />
           </div>
         </Show>
         <Show when={addedValues.length > 0 || removedValues.length > 0}>
           <div></div>
-          <div class="flex min-w-0 flex-col text-sm">
+          <div class="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-1.5 text-sm">
+            <For each={addedValues}>
+              {(addedValue) => <ValueRow label="Added" value={addedValue} />}
+            </For>
             <For each={removedValues}>
               {(removedValue) => (
-                <div class="flex items-start gap-2 text-red-700 dark:text-red-300">
-                  <span class="shrink-0">−</span>
-                  <span class="truncate">{removedValue}</span>
-                </div>
-              )}
-            </For>
-            <For each={addedValues}>
-              {(addedValue) => (
-                <div class="flex items-start gap-2 text-green-700 dark:text-green-300">
-                  <span class="shrink-0">+</span>
-                  <span class="truncate">{addedValue}</span>
-                </div>
+                <ValueRow label="Removed" value={removedValue} muted={addedValues.length > 0} />
               )}
             </For>
           </div>
