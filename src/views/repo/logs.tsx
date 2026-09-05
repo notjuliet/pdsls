@@ -87,7 +87,7 @@ export const PlcLogView = (props: { did: string }) => {
       />
       <select
         aria-label="Filter logs by event type"
-        class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+        class="absolute inset-0 h-full w-full opacity-0"
         value={activePlcEvent() ?? ""}
         onChange={(event) =>
           setActivePlcEvent((event.currentTarget.value || undefined) as PlcEvent | undefined)
@@ -115,7 +115,7 @@ export const PlcLogView = (props: { did: string }) => {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`${label()}. Open audit log (opens in a new tab)`}
-          class="flex h-7 items-center gap-1 rounded-sm text-neutral-500 transition-colors hover:text-neutral-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-neutral-400 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus-visible:outline-neutral-500"
+          class="flex h-7 items-center gap-1 rounded-sm text-neutral-500 transition-colors hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
         >
           <span role="status" class="flex items-center gap-1">
             <span
