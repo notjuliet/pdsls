@@ -16,12 +16,12 @@ import { plcDirectory } from "../settings.jsx";
 
 type PlcEvent = "handle" | "rotation_key" | "service" | "verification_method";
 
-const plcEventFilters: { event?: PlcEvent; icon: string; label: string }[] = [
-  { icon: "lucide--list-filter", label: "All" },
-  { event: "handle", icon: "lucide--at-sign", label: "Alias" },
-  { event: "service", icon: "lucide--hard-drive", label: "Service" },
-  { event: "verification_method", icon: "lucide--shield-check", label: "Verification" },
-  { event: "rotation_key", icon: "lucide--key-round", label: "Rotation" },
+const plcEventFilters: { event?: PlcEvent; label: string }[] = [
+  { label: "All events" },
+  { event: "handle", label: "Aliases" },
+  { event: "service", label: "Services" },
+  { event: "verification_method", label: "Verification methods" },
+  { event: "rotation_key", label: "Rotation keys" },
 ];
 
 export const PlcLogView = (props: { did: string }) => {
@@ -77,31 +77,29 @@ export const PlcLogView = (props: { did: string }) => {
     }
   });
 
-  const FilterButton = (props: { event?: PlcEvent; icon: string; label: string }) => {
-    const isActive = () => activePlcEvent() === props.event;
-    const toggleFilter = () => setActivePlcEvent(isActive() ? undefined : props.event);
-
-    return (
-      <button
-        type="button"
-        aria-label={`${props.label} logs`}
-        aria-pressed={isActive()}
-        class="flex h-7 shrink-0 items-center rounded-md border text-xs font-medium transition-colors sm:w-auto sm:justify-start sm:gap-1 sm:px-2"
-        classList={{
-          "w-auto justify-start gap-1 px-2": isActive(),
-          "w-7 justify-center px-0": !isActive(),
-          "border-neutral-300 bg-neutral-50 text-neutral-900 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200":
-            isActive(),
-          "border-transparent text-neutral-500 hover:bg-neutral-200 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-700/50 dark:hover:text-neutral-200":
-            !isActive(),
-        }}
-        onclick={toggleFilter}
+  const EventFilter = () => (
+    <div class="dark:hover:bg-dark-300 relative flex h-7 items-center gap-1.5 rounded-md border border-neutral-300 bg-neutral-50 px-2 text-xs font-medium text-neutral-900 transition-colors hover:bg-neutral-100 has-[:focus-visible]:outline has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-neutral-400 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200 dark:has-[:focus-visible]:outline-neutral-500">
+      <span aria-hidden="true">
+        {plcEventFilters.find((filter) => filter.event === activePlcEvent())?.label}
+      </span>
+      <span
+        aria-hidden="true"
+        class="iconify lucide--chevron-down shrink-0 text-neutral-500 dark:text-neutral-400"
+      />
+      <select
+        aria-label="Filter logs by event type"
+        class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+        value={activePlcEvent() ?? ""}
+        onChange={(event) =>
+          setActivePlcEvent((event.currentTarget.value || undefined) as PlcEvent | undefined)
+        }
       >
-        <span class={`iconify ${props.icon}`} />
-        <span class={isActive() ? "inline" : "hidden sm:inline"}>{props.label}</span>
-      </button>
-    );
-  };
+        <For each={plcEventFilters}>
+          {(filter) => <option value={filter.event ?? ""}>{filter.label}</option>}
+        </For>
+      </select>
+    </div>
+  );
 
   const ValidationStatus = () => (
     <div class="mr-1.5 flex shrink-0 items-center justify-center text-sm">
@@ -323,13 +321,7 @@ export const PlcLogView = (props: { did: string }) => {
   return (
     <div class="flex w-full flex-col gap-3 wrap-anywhere">
       <div class="flex items-center justify-between gap-2">
-        <div class="flex min-w-0 flex-1 items-center gap-1">
-          <For each={plcEventFilters}>
-            {(filter) => (
-              <FilterButton event={filter.event} icon={filter.icon} label={filter.label} />
-            )}
-          </For>
-        </div>
+        <EventFilter />
         <ValidationStatus />
       </div>
       <div class="flex flex-col gap-3">
