@@ -14,6 +14,7 @@ import { canHover } from "../layout";
 import { didDocCache, resolveDidDoc } from "../lib/api";
 import { createLatch } from "../lib/create-latch.js";
 import { localDateFromTimestamp } from "../utils/date";
+import { formatFileSize } from "../utils/format";
 
 const LIMIT = 1000;
 
@@ -375,6 +376,16 @@ const PdsView = () => {
                         {server().did}
                       </span>
                     </InfoField>
+                    <Show when={server().blobUploadLimit != null}>
+                      <InfoField label="Blob Upload Limit">
+                        <span
+                          class="text-sm text-neutral-700 dark:text-neutral-300"
+                          title={`${server().blobUploadLimit!.toLocaleString()} bytes`}
+                        >
+                          {formatFileSize(server().blobUploadLimit!)}
+                        </span>
+                      </InfoField>
+                    </Show>
                     <div class="flex items-center gap-1">
                       <span class="font-semibold">Invite Code Required</span>
                       <span
