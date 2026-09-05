@@ -436,14 +436,6 @@ const RepoView = () => {
                     label="DID document"
                     icon="lucide--external-link"
                   />
-                  <Show when={did.startsWith("did:plc")}>
-                    <NavMenu
-                      href={`${plcDirectory()}/${did}/log/audit`}
-                      newTab
-                      label="Audit log"
-                      icon="lucide--external-link"
-                    />
-                  </Show>
                 </DropdownMenu>
               </MenuProvider>
             </div>

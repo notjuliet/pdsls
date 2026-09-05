@@ -8,7 +8,6 @@ import { useLocation } from "@solidjs/router";
 import { createEffect, createResource, createSignal, For, onCleanup, Show } from "solid-js";
 import * as v from "valibot";
 
-import Tooltip from "../../components/tooltip.jsx";
 import { createOperationHistory, DiffEntry, groupBy } from "../../lib/plc-logs.js";
 import { localDateFromTimestamp } from "../../utils/date.js";
 import PlcValidateWorker from "../../workers/plc-validate.ts?worker";
@@ -101,25 +100,42 @@ export const PlcLogView = (props: { did: string }) => {
     </div>
   );
 
-  const ValidationStatus = () => (
-    <div class="mr-1.5 flex shrink-0 items-center justify-center text-sm">
-      <Show when={validLog() === true}>
-        <Tooltip text="Valid log">
-          <span class="iconify lucide--check text-green-600 dark:text-green-400"></span>
-        </Tooltip>
-      </Show>
-      <Show when={validLog() === false}>
-        <Tooltip text="Validation failed">
-          <span class="iconify lucide--x text-red-500 dark:text-red-400"></span>
-        </Tooltip>
-      </Show>
-      <Show when={validLog() === undefined}>
-        <Tooltip text="Validating...">
-          <span class="iconify lucide--loader-circle animate-spin text-neutral-500 dark:text-neutral-400"></span>
-        </Tooltip>
-      </Show>
-    </div>
-  );
+  const ValidationStatus = () => {
+    const label = () =>
+      validLog() === true
+        ? "Valid log"
+        : validLog() === false
+          ? "Validation failed"
+          : "Validating…";
+
+    return (
+      <div class="ml-auto flex shrink-0 items-center text-xs">
+        <a
+          href={`${plcDirectory()}/${props.did}/log/audit`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${label()}. Open audit log (opens in a new tab)`}
+          class="flex h-7 items-center gap-1 rounded-sm text-neutral-500 transition-colors hover:text-neutral-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-neutral-400 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus-visible:outline-neutral-500"
+        >
+          <span role="status" class="flex items-center gap-1">
+            <span
+              aria-hidden="true"
+              class="iconify shrink-0"
+              classList={{
+                "lucide--check text-green-600 dark:text-green-400": validLog() === true,
+                "lucide--x text-red-500 dark:text-red-400": validLog() === false,
+                "lucide--loader-circle animate-spin": validLog() === undefined,
+              }}
+            />
+            <span classList={{ "text-red-600 dark:text-red-400": validLog() === false }}>
+              {label()}
+            </span>
+          </span>
+          <span aria-hidden="true" class="iconify lucide--arrow-up-right shrink-0" />
+        </a>
+      </div>
+    );
+  };
 
   const DiffItem = (props: { diff: DiffEntry }) => {
     const diff = props.diff;
@@ -320,7 +336,7 @@ export const PlcLogView = (props: { did: string }) => {
 
   return (
     <div class="flex w-full flex-col gap-3 wrap-anywhere">
-      <div class="flex items-center justify-between gap-2">
+      <div class="flex flex-wrap items-center justify-between gap-2">
         <EventFilter />
         <ValidationStatus />
       </div>
