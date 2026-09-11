@@ -13,9 +13,14 @@ type Notification = {
 const [notifications, setNotifications] = createStore<Notification[]>([]);
 const [removingIds, setRemovingIds] = createSignal<Set<string>>(new Set());
 
-export const addNotification = (notification: Omit<Notification, "id">) => {
+// Omit duration for progress notifications that are dismissed by their caller.
+export const addNotification = ({
+  duration,
+  ...notification
+}: Omit<Notification, "id"> & { duration?: number }) => {
   const id = `notification-${Date.now()}-${Math.random()}`;
   setNotifications(notifications.length, { ...notification, id });
+  if (duration !== undefined) setTimeout(() => removeNotification(id), duration);
   return id;
 };
 

@@ -4,9 +4,10 @@ import { TextInput } from "../components/text-input.jsx";
 import { ThemeSelection } from "../components/theme.jsx";
 
 export const [hideMedia, setHideMedia] = createSignal(localStorage.hideMedia === "true");
-export const [plcDirectory, setPlcDirectory] = createSignal(
+const [plcDirectory, setPlcDirectory] = createSignal(
   localStorage.plcDirectory || "https://plc.directory",
 );
+export { plcDirectory };
 
 const Settings = () => {
   document.title = "Settings - PDSls";

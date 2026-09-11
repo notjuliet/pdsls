@@ -4,7 +4,7 @@ import { createStore } from "solid-js/store";
 import { SPACE_MANAGE_SPACES_SCOPE_ID } from "../../auth/scope-utils.js";
 import { Button } from "../../components/button.jsx";
 import { Modal } from "../../components/modal.jsx";
-import { addNotification, removeNotification } from "../../components/notification.jsx";
+import { addNotification } from "../../components/notification.jsx";
 import { PermissionButton } from "../../components/permission-button.jsx";
 import { deleteSimpleSpace, type SimpleSpaceInfo, updateSimpleSpace } from "../../lib/spaces.js";
 import { useSpacesAuth } from "./context.jsx";
@@ -64,8 +64,7 @@ export const ManageSpaceDialog = (props: {
       props.onUpdated({ uri: props.info.uri, ...config });
       setOpen(false);
 
-      const notification = addNotification({ message: "Space updated", type: "success" });
-      setTimeout(() => removeNotification(notification), 3000);
+      addNotification({ message: "Space updated", type: "success", duration: 3000 });
     } catch (err) {
       setNotice(err instanceof Error ? err.message : "Could not update the Space");
     } finally {
@@ -82,15 +81,14 @@ export const ManageSpaceDialog = (props: {
       setOpenDelete(false);
       setOpen(false);
 
-      const notification = addNotification({ message: "Space deleted", type: "success" });
-      setTimeout(() => removeNotification(notification), 3000);
+      addNotification({ message: "Space deleted", type: "success", duration: 3000 });
       props.onDeleted();
     } catch (err) {
-      const notification = addNotification({
+      addNotification({
         message: err instanceof Error ? err.message : "Could not delete the Space",
         type: "error",
+        duration: 5000,
       });
-      setTimeout(() => removeNotification(notification), 5000);
     } finally {
       setDeleting(false);
     }

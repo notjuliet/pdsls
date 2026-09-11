@@ -23,7 +23,7 @@ import HoverCard from "../components/hover-card/base";
 import { JSONType, JSONValue } from "../components/json.jsx";
 import { Modal } from "../components/modal.jsx";
 import { NestedLayout } from "../components/nested-layout.jsx";
-import { addNotification, removeNotification } from "../components/notification.jsx";
+import { addNotification } from "../components/notification.jsx";
 import { PermissionButton } from "../components/permission-button.jsx";
 import { Spinner } from "../components/spinner.jsx";
 import Tooltip from "../components/tooltip.jsx";
@@ -31,7 +31,7 @@ import { createLatch } from "../lib/create-latch.js";
 import { useFilterShortcut } from "../lib/keyboard.js";
 import { useRepo } from "../lib/repo-context.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
-import { localDateFromTimestamp } from "../utils/date.js";
+import { localDateFromTimestamp } from "../utils/format.js";
 
 interface AtprotoRecord {
   rkey: string;
@@ -421,11 +421,11 @@ const CollectionView = () => {
         },
       });
     }
-    const id = addNotification({
+    addNotification({
       message: `${recsToDel.length} records ${recreate() ? "recreated" : "deleted"}`,
       type: "success",
+      duration: 3000,
     });
-    setTimeout(() => removeNotification(id), 3000);
     setBatchDelete(false);
     setRecords([]);
     setCursor(undefined);

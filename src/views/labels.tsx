@@ -12,7 +12,7 @@ import { TagInput } from "../components/tag-input.jsx";
 import { TextInput } from "../components/text-input.jsx";
 import { getPDS, labelerCache, resolveHandle } from "../lib/api.js";
 import { useFilterShortcut } from "../lib/keyboard.js";
-import { localDateFromTimestamp } from "../utils/date.js";
+import { localDateFromTimestamp } from "../utils/format.js";
 
 const LABELS_PER_PAGE = 50;
 const DEFAULT_LABELER_DID = "did:plc:ar7c4by46qjdydhdevvrndac";

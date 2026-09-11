@@ -49,7 +49,8 @@ const removeRecentSearch = (path: string) => {
   localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
 };
 
-export const [showSearch, setShowSearch] = createSignal(false);
+const [showSearch, setShowSearch] = createSignal(false);
+export { setShowSearch };
 
 const EXAMPLES: (RecentSearch & { prefix: string })[] = [
   {

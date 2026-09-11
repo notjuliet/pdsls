@@ -29,7 +29,7 @@ import { JSONValue, type JSONType } from "../../components/json.jsx";
 import { TextInput } from "../../components/text-input.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
 import { createDebouncedValue } from "../../lib/debounced.js";
-import { localDateFromTimestamp } from "../../utils/date.js";
+import { localDateFromTimestamp } from "../../utils/format.js";
 import { createDropHandler, createFileChangeHandler, handleDragOver } from "./file-handlers.js";
 
 const isIOS =

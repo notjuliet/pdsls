@@ -20,7 +20,7 @@ import {
 import { Favicon } from "../components/favicon.jsx";
 import { JSONValue } from "../components/json.jsx";
 import { Modal } from "../components/modal.jsx";
-import { addNotification, removeNotification } from "../components/notification.jsx";
+import { addNotification } from "../components/notification.jsx";
 import { PermissionButton } from "../components/permission-button.jsx";
 import { RecordSchemaValidation } from "../components/record-schema-validation.jsx";
 import {
@@ -165,11 +165,11 @@ export const RecordView = () => {
         rkey,
       },
     });
-    const id = addNotification({
+    addNotification({
       message: "Record deleted",
       type: "success",
+      duration: 3000,
     });
-    setTimeout(() => removeNotification(id), 3000);
     navigate(`/at://${params.repo}/${params.collection}`);
   };
 

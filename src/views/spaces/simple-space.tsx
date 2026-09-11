@@ -1,10 +1,10 @@
 import { For, Show } from "solid-js";
 
-import { type SimpleSpaceInfo } from "../../lib/spaces.js";
+import { type SimpleSpaceInfo, type SimpleSpacePolicy } from "../../lib/spaces.js";
 import { SimpleSpaceMembers } from "./simple-space-members.jsx";
 
-const policyLabel = (info: SimpleSpaceInfo) => {
-  switch (info.policy.kind) {
+const policyLabel = (policy: SimpleSpacePolicy) => {
+  switch (policy.kind) {
     case "public":
       return "Public";
     case "member-list":
@@ -15,6 +15,9 @@ const policyLabel = (info: SimpleSpaceInfo) => {
       return "Unknown policy";
   }
 };
+
+const managingApp = (policy: SimpleSpacePolicy) =>
+  policy.kind === "managing-app" ? policy.managingApp : undefined;
 
 const appAccessLabel = (info: SimpleSpaceInfo) => {
   switch (info.appAccess.kind) {
@@ -37,15 +40,26 @@ export const SimpleSpaceDetails = (props: {
       <section class="flex flex-col gap-2 px-2">
         <h2 class="font-medium">Access</h2>
         <dl class="grid grid-cols-[max-content_minmax(0,1fr)] items-baseline gap-x-4 gap-y-2 text-sm">
-          <dt class="text-neutral-500 dark:text-neutral-400">User access</dt>
-          <dd>{policyLabel(props.info)}</dd>
-
-          <Show when={props.info.policy.kind === "managing-app"}>
-            <dt class="text-neutral-500 dark:text-neutral-400">Managing app</dt>
-            <dd class="min-w-0 wrap-anywhere">
-              {props.info.policy.kind === "managing-app" && props.info.policy.managingApp}
-            </dd>
-          </Show>
+          <For each={["readPolicy", "writePolicy"] as const}>
+            {(key) => (
+              <>
+                <dt class="text-neutral-500 dark:text-neutral-400">
+                  {key === "readPolicy" ? "Read access" : "Write access"}
+                </dt>
+                <dd>{policyLabel(props.info[key])}</dd>
+                <Show when={managingApp(props.info[key])}>
+                  {(app) => (
+                    <>
+                      <dt class="text-neutral-500 dark:text-neutral-400">
+                        {key === "readPolicy" ? "Read managing app" : "Write managing app"}
+                      </dt>
+                      <dd class="min-w-0 wrap-anywhere">{app()}</dd>
+                    </>
+                  )}
+                </Show>
+              </>
+            )}
+          </For>
 
           <dt class="text-neutral-500 dark:text-neutral-400">Application access</dt>
           <dd>{appAccessLabel(props.info)}</dd>
@@ -67,7 +81,12 @@ export const SimpleSpaceDetails = (props: {
         </dl>
       </section>
 
-      <Show when={props.info.policy.kind === "member-list"}>
+      <Show
+        when={
+          props.info.readPolicy.kind === "member-list" ||
+          props.info.writePolicy.kind === "member-list"
+        }
+      >
         <SimpleSpaceMembers space={props.space} authority={props.authority} />
       </Show>
     </>

@@ -34,7 +34,8 @@ export type SimpleSpaceAppAccess =
 
 export interface SimpleSpaceInfo {
   uri: string;
-  policy: SimpleSpacePolicy;
+  readPolicy: SimpleSpacePolicy;
+  writePolicy: SimpleSpacePolicy;
   appAccess: SimpleSpaceAppAccess;
 }
 
@@ -42,7 +43,8 @@ export type NewSimpleSpacePolicy = Exclude<SimpleSpacePolicy, { kind: "unknown" 
 export type NewSimpleSpaceAppAccess = Exclude<SimpleSpaceAppAccess, { kind: "unknown" }>;
 
 export interface SimpleSpaceConfiguration {
-  policy: NewSimpleSpacePolicy;
+  readPolicy: NewSimpleSpacePolicy;
+  writePolicy: NewSimpleSpacePolicy;
   appAccess: NewSimpleSpaceAppAccess;
 }
 
@@ -57,6 +59,8 @@ export interface CreateSimpleSpaceResult {
 
 export interface SimpleSpaceMember {
   did: string;
+  read: boolean;
+  write: boolean;
 }
 
 interface ListSpacesResult {
@@ -449,7 +453,8 @@ export const createSimpleSpace = async (
   const data = await oauthProcedure(auth, "com.atproto.simplespace.createSpace", {
     type: options.type,
     skey: options.skey,
-    policy: encodeSimpleSpacePolicy(options.policy),
+    readPolicy: encodeSimpleSpacePolicy(options.readPolicy),
+    writePolicy: encodeSimpleSpacePolicy(options.writePolicy),
     appAccess: encodeSimpleSpaceAppAccess(options.appAccess),
   });
 
@@ -470,7 +475,8 @@ export const updateSimpleSpace = async (
 
   await oauthProcedure(auth, "com.atproto.simplespace.updateSpace", {
     space,
-    policy: encodeSimpleSpacePolicy(config.policy),
+    readPolicy: encodeSimpleSpacePolicy(config.readPolicy),
+    writePolicy: encodeSimpleSpacePolicy(config.writePolicy),
     appAccess: encodeSimpleSpaceAppAccess(config.appAccess),
   });
   clearCredentialsForSpace(space);
@@ -483,13 +489,13 @@ export const deleteSimpleSpace = async (auth: OAuthUserAgent, space: string): Pr
   clearCredentialsForSpace(space);
 };
 
-export const addSimpleSpaceMember = async (
+export const putSimpleSpaceMember = async (
   auth: OAuthUserAgent,
   space: string,
-  did: string,
+  member: SimpleSpaceMember,
 ): Promise<void> => {
-  assertSimpleSpaceAuthority(auth, space, "add members to");
-  await oauthProcedure(auth, "com.atproto.simplespace.addMember", { space, did });
+  assertSimpleSpaceAuthority(auth, space, "manage members of");
+  await oauthProcedure(auth, "com.atproto.simplespace.putMember", { space, ...member });
   clearCredentialsForSpace(space);
 };
 
@@ -539,7 +545,8 @@ export const getSimpleSpace = async (
 
   return {
     uri: data.uri,
-    policy: parseSimpleSpacePolicy(data.policy),
+    readPolicy: parseSimpleSpacePolicy(data.readPolicy),
+    writePolicy: parseSimpleSpacePolicy(data.writePolicy),
     appAccess: parseSimpleSpaceAppAccess(data.appAccess),
   };
 };
@@ -566,8 +573,15 @@ export const listSimpleSpaceMembers = async (
     cursor:
       data.members.length >= limit && typeof data.cursor === "string" ? data.cursor : undefined,
     members: data.members.flatMap((member): SimpleSpaceMember[] => {
-      if (!isObject(member) || typeof member.did !== "string") return [];
-      return [{ did: member.did }];
+      if (
+        !isObject(member) ||
+        typeof member.did !== "string" ||
+        typeof member.read !== "boolean" ||
+        typeof member.write !== "boolean"
+      ) {
+        throw new Error("The PDS returned invalid SimpleSpace member access");
+      }
+      return [{ did: member.did, read: member.read, write: member.write }];
     }),
   };
 };

@@ -9,12 +9,12 @@ import HoverCard from "../../components/hover-card/base.jsx";
 import { JSONValue } from "../../components/json.jsx";
 import { Modal } from "../../components/modal.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
-import { addNotification, removeNotification } from "../../components/notification.jsx";
+import { addNotification } from "../../components/notification.jsx";
 import { PermissionButton } from "../../components/permission-button.jsx";
 import Tooltip from "../../components/tooltip.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import { deleteSpaceRecords, listSpaceRecords, type SpaceRecord } from "../../lib/spaces.js";
-import { localDateFromTimestamp } from "../../utils/date.js";
+import { localDateFromTimestamp } from "../../utils/format.js";
 import {
   makeSpaceCollectionPath,
   makeSpaceRecordPath,
@@ -153,17 +153,17 @@ const SpaceCollectionView = () => {
     setDeleting(true);
     try {
       await deleteSpaceRecords(auth(), space(), repo(), recordsToDelete);
-      const notification = addNotification({
+      addNotification({
         message: `${recordsToDelete.length} record${recordsToDelete.length === 1 ? "" : "s"} deleted`,
         type: "success",
+        duration: 3000,
       });
-      setTimeout(() => removeNotification(notification), 3000);
     } catch (err) {
-      const notification = addNotification({
+      addNotification({
         message: err instanceof Error ? err.message : "Could not delete the Space records",
         type: "error",
+        duration: 5000,
       });
-      setTimeout(() => removeNotification(notification), 5000);
     } finally {
       setDeleting(false);
       setOpenDelete(false);

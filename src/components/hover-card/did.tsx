@@ -15,7 +15,7 @@ interface DidHoverCardProps {
   hoverDelay?: number;
 }
 
-export interface DidInfo {
+interface DidInfo {
   handle?: string;
   pds?: string;
 }

@@ -3,6 +3,7 @@ import { Did } from "@atcute/lexicons";
 import { isNsid, isRecordKey } from "@atcute/lexicons/syntax";
 import { getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { useNavigate, useParams } from "@solidjs/router";
+import type { EditorView } from "codemirror";
 import {
   createEffect,
   createSignal,
@@ -18,19 +19,17 @@ import { hasAccountScope, hasUserScope } from "../../auth/scope-utils";
 import { agent, sessions } from "../../auth/state";
 import { Button } from "../button.jsx";
 import { Modal } from "../modal.jsx";
-import { addNotification, removeNotification } from "../notification.jsx";
+import { addNotification } from "../notification.jsx";
 import { showPermissionPrompt } from "../permission-prompt";
 import { TextInput } from "../text-input.jsx";
 import Tooltip from "../tooltip.jsx";
 import { ConfirmSubmit } from "./confirm-submit";
-import { FileUpload } from "./file-upload";
-import { HandleInput } from "./handle-input";
-import { MenuItem } from "./menu-item";
-import { editorInstance, placeholder, setPlaceholder } from "./state";
+import { InsertMenu } from "./insert-menu.jsx";
 
 const Editor = lazy(() => import("../editor.jsx").then((m) => ({ default: m.Editor })));
 
-export { editorInstance, placeholder, setPlaceholder };
+const [placeholder, setPlaceholder] = createSignal<any>();
+export { setPlaceholder };
 
 export const RecordEditor = (props: {
   create: boolean;
@@ -42,9 +41,6 @@ export const RecordEditor = (props: {
   const params = useParams();
   const [openDialog, setOpenDialog] = createSignal(false);
   const [notice, setNotice] = createSignal("");
-  const [openUpload, setOpenUpload] = createSignal(false);
-  const [openInsertMenu, setOpenInsertMenu] = createSignal(false);
-  const [openHandleDialog, setOpenHandleDialog] = createSignal(false);
   const [openConfirmDialog, setOpenConfirmDialog] = createSignal(false);
   const [validate, setValidate] = createSignal<boolean | undefined>(undefined);
   const [recreate, setRecreate] = createSignal(false);
@@ -60,24 +56,11 @@ export const RecordEditor = (props: {
   const [isMinimized, setIsMinimized] = createSignal(false);
   const [collectionError, setCollectionError] = createSignal("");
   const [rkeyError, setRkeyError] = createSignal("");
-  let blobInput!: HTMLInputElement;
+  let editorView: EditorView | undefined;
   let formRef!: HTMLFormElement;
-  let insertMenuRef!: HTMLDivElement;
 
   createEffect(() => {
     setSelectedRepo(agent()?.sub);
-  });
-
-  createEffect(() => {
-    if (openInsertMenu()) {
-      const handleClickOutside = (e: MouseEvent) => {
-        if (insertMenuRef && !insertMenuRef.contains(e.target as Node)) {
-          setOpenInsertMenu(false);
-        }
-      };
-      document.addEventListener("mousedown", handleClickOutside);
-      onCleanup(() => document.removeEventListener("mousedown", handleClickOutside));
-    }
   });
 
   onMount(() => {
@@ -136,7 +119,8 @@ export const RecordEditor = (props: {
     const rkey = formData.get("rkey");
     let record: any;
     try {
-      record = JSON.parse(editorInstance.view.state.doc.toString());
+      if (!editorView) throw new Error("Editor is still loading");
+      record = JSON.parse(editorView.state.doc.toString());
     } catch (e: any) {
       setNotice(e.message);
       return;
@@ -155,90 +139,60 @@ export const RecordEditor = (props: {
       return;
     }
     setOpenDialog(false);
-    const id = addNotification({
+    addNotification({
       message: "Record created",
       type: "success",
+      duration: 3000,
     });
-    setTimeout(() => removeNotification(id), 3000);
     navigate(`/${res.data.uri}`);
   };
 
   const editRecord = async (validate: boolean | undefined, recreate: boolean) => {
-    const record = editorInstance.view.state.doc.toString();
+    const record = editorView?.state.doc.toString();
     if (!record) return;
     const rpc = new Client({ handler: agent()! });
     try {
       const editedRecord = JSON.parse(record);
-      if (recreate) {
-        const res = await rpc.post("com.atproto.repo.applyWrites", {
-          input: {
-            repo: agent()!.sub,
-            validate: validate,
-            writes: [
-              {
-                collection: params.collection as `${string}.${string}.${string}`,
-                rkey: params.rkey!,
-                $type: "com.atproto.repo.applyWrites#delete",
-              },
-              {
-                collection: params.collection as `${string}.${string}.${string}`,
-                rkey: params.rkey,
-                $type: "com.atproto.repo.applyWrites#create",
-                value: editedRecord,
-              },
-            ],
-          },
-        });
-        if (!res.ok) {
-          setNotice(`${res.data.error}: ${res.data.message}`);
-          return;
-        }
-      } else {
-        const res = await rpc.post("com.atproto.repo.applyWrites", {
-          input: {
-            repo: agent()!.sub,
-            validate: validate,
-            writes: [
-              {
-                collection: params.collection as `${string}.${string}.${string}`,
-                rkey: params.rkey!,
-                $type: "com.atproto.repo.applyWrites#update",
-                value: editedRecord,
-              },
-            ],
-          },
-        });
-        if (!res.ok) {
-          setNotice(`${res.data.error}: ${res.data.message}`);
-          return;
-        }
+      const collection = params.collection as `${string}.${string}.${string}`;
+      const rkey = params.rkey!;
+      const res = await rpc.post("com.atproto.repo.applyWrites", {
+        input: {
+          repo: agent()!.sub,
+          validate,
+          writes: recreate
+            ? [
+                { $type: "com.atproto.repo.applyWrites#delete", collection, rkey },
+                {
+                  $type: "com.atproto.repo.applyWrites#create",
+                  collection,
+                  rkey,
+                  value: editedRecord,
+                },
+              ]
+            : [
+                {
+                  $type: "com.atproto.repo.applyWrites#update",
+                  collection,
+                  rkey,
+                  value: editedRecord,
+                },
+              ],
+        },
+      });
+      if (!res.ok) {
+        setNotice(`${res.data.error}: ${res.data.message}`);
+        return;
       }
       setOpenDialog(false);
-      const id = addNotification({
+      addNotification({
         message: "Record edited",
         type: "success",
+        duration: 3000,
       });
-      setTimeout(() => removeNotification(id), 3000);
       props.refetch();
     } catch (err: any) {
       setNotice(err.message);
     }
-  };
-
-  const insertTimestamp = () => {
-    const timestamp = new Date().toISOString();
-    editorInstance.view.dispatch({
-      changes: {
-        from: editorInstance.view.state.selection.main.head,
-        insert: `"${timestamp}"`,
-      },
-    });
-    setOpenInsertMenu(false);
-  };
-
-  const insertDidFromHandle = () => {
-    setOpenInsertMenu(false);
-    setOpenHandleDialog(true);
   };
 
   return (
@@ -344,6 +298,7 @@ export const RecordEditor = (props: {
               }
             >
               <Editor
+                onReady={(view) => (editorView = view)}
                 content={JSON.stringify(
                   !props.create ? props.record : params.rkey ? placeholder() : defaultPlaceholder(),
                   null,
@@ -357,73 +312,12 @@ export const RecordEditor = (props: {
               <div class="text-sm text-red-500 dark:text-red-400">{notice()}</div>
             </Show>
             <div class="flex justify-between gap-2">
-              <div class="relative" ref={insertMenuRef}>
-                <Button onClick={() => setOpenInsertMenu(!openInsertMenu())}>
-                  <span class="iconify lucide--plus"></span>
-                  <span>Add</span>
-                </Button>
-                <Show when={openInsertMenu()}>
-                  <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute bottom-full left-0 z-10 mb-1 flex w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1.5 shadow-md dark:border-neutral-700">
-                    <MenuItem
-                      icon="lucide--id-card"
-                      label="Insert DID"
-                      onClick={insertDidFromHandle}
-                    />
-                    <MenuItem
-                      icon="lucide--clock"
-                      label="Insert timestamp"
-                      onClick={insertTimestamp}
-                    />
-                    <button
-                      type="button"
-                      class={
-                        canUploadBlob()
-                          ? "flex items-center gap-2 rounded-md p-2 text-left text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                          : "flex items-center gap-2 rounded-md p-2 text-left text-xs opacity-40"
-                      }
-                      onClick={() => {
-                        if (canUploadBlob()) {
-                          setOpenInsertMenu(false);
-                          blobInput.click();
-                        }
-                      }}
-                    >
-                      <span class="iconify lucide--upload shrink-0"></span>
-                      <span>Upload blob{canUploadBlob() ? "" : " (permission needed)"}</span>
-                    </button>
-                  </div>
-                </Show>
-                <input
-                  type="file"
-                  id="blob"
-                  class="sr-only"
-                  ref={blobInput}
-                  onChange={(e) => {
-                    if (e.target.files !== null) setOpenUpload(true);
-                  }}
-                />
-              </div>
-              <Modal
-                open={openUpload()}
-                onClose={() => setOpenUpload(false)}
-                closeOnClick={false}
-                contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[20rem] rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
-              >
-                <FileUpload
-                  file={blobInput.files![0]}
-                  repo={uploadRepo()!}
-                  blobInput={blobInput}
-                  onClose={() => setOpenUpload(false)}
-                />
-              </Modal>
-              <Modal
-                open={openHandleDialog()}
-                onClose={() => setOpenHandleDialog(false)}
-                closeOnClick={false}
-                contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[20rem] rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
-              >
-                <HandleInput onClose={() => setOpenHandleDialog(false)} />
-              </Modal>
+              <InsertMenu
+                editor={() => editorView}
+                repo={uploadRepo()}
+                canUpload={canUploadBlob()}
+                dialogClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[20rem] rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
+              />
               <Modal
                 open={openConfirmDialog()}
                 onClose={() => setOpenConfirmDialog(false)}

@@ -404,4 +404,3 @@ export { SpaceCollectionLayout } from "./collection.jsx";
 export { SpaceBlobView } from "./blob.jsx";
 export { SpaceRecordView } from "./record.jsx";
 export { SpaceRepoLayout } from "./repo.jsx";
-export { SpaceLayout } from "./space.jsx";

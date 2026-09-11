@@ -13,7 +13,7 @@ import { Spinner } from "../components/spinner.jsx";
 import { canHover } from "../layout";
 import { didDocCache, resolveDidDoc } from "../lib/api";
 import { createLatch } from "../lib/create-latch.js";
-import { localDateFromTimestamp } from "../utils/date";
+import { localDateFromTimestamp } from "../utils/format";
 import { formatFileSize } from "../utils/format";
 
 const LIMIT = 1000;

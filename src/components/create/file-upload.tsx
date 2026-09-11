@@ -7,12 +7,12 @@ import { createSignal, onCleanup, Show } from "solid-js";
 import { formatFileSize } from "../../utils/format";
 import { Button } from "../button.jsx";
 import { TextInput } from "../text-input.jsx";
-import { editorInstance } from "./state";
 
 export const FileUpload = (props: {
   file: File;
   repo: Did;
   blobInput: HTMLInputElement;
+  onInsert: (text: string) => void;
   onClose: () => void;
 }) => {
   const [uploading, setUploading] = createSignal(false);
@@ -43,12 +43,7 @@ export const FileUpload = (props: {
       setError(res.data.error);
       return;
     }
-    editorInstance.view.dispatch({
-      changes: {
-        from: editorInstance.view.state.selection.main.head,
-        insert: JSON.stringify(res.data.blob, null, 2),
-      },
-    });
+    props.onInsert(JSON.stringify(res.data.blob, null, 2));
     props.onClose();
   };
 

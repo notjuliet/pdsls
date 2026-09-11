@@ -7,12 +7,12 @@ import { SPACE_MANAGE_SPACES_SCOPE_ID } from "../../auth/scope-utils.js";
 import { Button } from "../../components/button.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
 import { Modal } from "../../components/modal.jsx";
-import { addNotification, removeNotification } from "../../components/notification.jsx";
+import { addNotification } from "../../components/notification.jsx";
 import { PermissionButton } from "../../components/permission-button.jsx";
 import { TextInput } from "../../components/text-input.jsx";
 import { resolveHandle } from "../../lib/api.js";
 import {
-  addSimpleSpaceMember,
+  putSimpleSpaceMember,
   listSimpleSpaceMembers,
   removeSimpleSpaceMember,
   type SimpleSpaceMember,
@@ -20,15 +20,13 @@ import {
 import { useSpacesAuth } from "./context.jsx";
 import { ErrorNotice, LoadingState } from "./shared.jsx";
 
-type MemberDialog = { kind: "add" } | { kind: "remove"; did: string };
+type MemberDialog =
+  | { kind: "add" }
+  | { kind: "edit"; did: string }
+  | { kind: "remove"; did: string };
 
 const actionButtonClass =
   "flex self-center items-center gap-1 rounded-md border border-neutral-300 px-1.5 py-0.5 text-xs transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 sm:px-2 sm:py-0.75 dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700";
-
-const notify = (message: string, type: "success" | "error", duration = 3000) => {
-  const notification = addNotification({ message, type });
-  setTimeout(() => removeNotification(notification), duration);
-};
 
 export const SimpleSpaceMembers = (props: { space: string; authority: string }) => {
   const auth = useSpacesAuth();
@@ -39,12 +37,15 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
   const [error, setError] = createSignal<string>();
   const [dialog, setDialog] = createSignal<MemberDialog>();
   const [memberIdentifier, setMemberIdentifier] = createSignal("");
+  const [readAccess, setReadAccess] = createSignal(true);
+  const [writeAccess, setWriteAccess] = createSignal(true);
   const [submitting, setSubmitting] = createSignal(false);
   const [dialogError, setDialogError] = createSignal("");
   let activeKey = "";
   let requestVersion = 0;
 
   const canManage = () => props.authority === auth().sub;
+  const editing = () => dialog()?.kind === "edit";
   const removingDid = () => {
     const current = dialog();
     return current?.kind === "remove" ? current.did : undefined;
@@ -97,8 +98,18 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
 
   const openAddDialog = () => {
     setMemberIdentifier("");
+    setReadAccess(true);
+    setWriteAccess(true);
     setDialogError("");
     setDialog({ kind: "add" });
+  };
+
+  const openEditDialog = (member: SimpleSpaceMember) => {
+    setMemberIdentifier(member.did);
+    setReadAccess(member.read);
+    setWriteAccess(member.write);
+    setDialogError("");
+    setDialog({ kind: "edit", did: member.did });
   };
 
   const openRemoveDialog = (did: string) => {
@@ -131,11 +142,19 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
     try {
       if (current.kind === "remove") {
         await removeSimpleSpaceMember(auth(), props.space, current.did);
-        notify("Member removed", "success");
+        addNotification({ message: "Member removed", type: "success", duration: 3000 });
       } else {
-        const did = await resolveMemberDid();
-        await addSimpleSpaceMember(auth(), props.space, did);
-        notify("Member added", "success");
+        const did = current.kind === "edit" ? current.did : await resolveMemberDid();
+        await putSimpleSpaceMember(auth(), props.space, {
+          did,
+          read: readAccess(),
+          write: writeAccess(),
+        });
+        addNotification({
+          message: current.kind === "edit" ? "Member access updated" : "Member added",
+          type: "success",
+          duration: 3000,
+        });
       }
       setDialog(undefined);
       refreshMembers();
@@ -193,7 +212,7 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
                     renderTrigger={({ loading: hoverLoading }) => (
                       <A
                         href={`/at://${member.did}`}
-                        class="flex min-w-0 items-center p-2 pr-10 text-left text-sm"
+                        class="flex min-w-0 items-center p-2 text-left text-sm"
                         classList={{ "hover-card-trigger-loading": hoverLoading() }}
                       >
                         <span class="min-w-0 truncate font-medium text-blue-500 dark:text-blue-400">
@@ -202,10 +221,28 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
                       </A>
                     )}
                   />
+                  <span class="shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
+                    {member.read && member.write
+                      ? "Read + write"
+                      : member.read
+                        ? "Read"
+                        : member.write
+                          ? "Write"
+                          : "No access"}
+                  </span>
                   <PermissionButton
                     scope={SPACE_MANAGE_SPACES_SCOPE_ID}
-                    class="absolute inset-y-0 right-1 flex w-8 items-center justify-center rounded text-neutral-500 opacity-60 hover:text-red-500 sm:opacity-0 sm:group-hover:opacity-100 dark:text-neutral-400 dark:hover:text-red-400"
-                    disabledClass="absolute inset-y-0 right-1 flex w-8 items-center justify-center rounded text-neutral-500 opacity-40 sm:opacity-0 sm:group-hover:opacity-40 dark:text-neutral-400"
+                    class="flex shrink-0 items-center rounded p-2 text-neutral-500 hover:text-blue-500 dark:text-neutral-400 dark:hover:text-blue-400"
+                    disabledClass="flex shrink-0 items-center rounded p-2 opacity-40"
+                    onClick={() => openEditDialog(member)}
+                  >
+                    <span class="iconify lucide--pencil" />
+                    <span class="sr-only">Edit access for {member.did}</span>
+                  </PermissionButton>
+                  <PermissionButton
+                    scope={SPACE_MANAGE_SPACES_SCOPE_ID}
+                    class="flex shrink-0 items-center rounded p-2 text-neutral-500 hover:text-red-500 dark:text-neutral-400 dark:hover:text-red-400"
+                    disabledClass="flex shrink-0 items-center rounded p-2 opacity-40"
                     onClick={() => openRemoveDialog(member.did)}
                   >
                     <span class="iconify lucide--user-minus" />
@@ -245,7 +282,9 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
         contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto flex w-[calc(100%-1rem)] max-w-sm flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
       >
         <div class="mb-3 flex items-center justify-between">
-          <h2 class="font-semibold">{removingDid() ? "Remove member?" : "Add member"}</h2>
+          <h2 class="font-semibold">
+            {removingDid() ? "Remove member?" : editing() ? "Edit member access" : "Add member"}
+          </h2>
           <button
             type="button"
             aria-label="Close"
@@ -275,7 +314,7 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
                   class="w-full"
                   placeholder="alice.example.com"
                   value={memberIdentifier()}
-                  disabled={submitting()}
+                  disabled={submitting() || editing()}
                   onInput={(event) => setMemberIdentifier(event.currentTarget.value)}
                 />
               </div>
@@ -287,6 +326,31 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
                 Space?
               </p>
             )}
+          </Show>
+
+          <Show when={!removingDid()}>
+            <fieldset disabled={submitting()} class="flex flex-col gap-2 text-sm">
+              <legend class="mb-2 font-medium">Member access</legend>
+              <label class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={readAccess()}
+                  onChange={(event) => setReadAccess(event.currentTarget.checked)}
+                />
+                Read
+              </label>
+              <label class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={writeAccess()}
+                  onChange={(event) => setWriteAccess(event.currentTarget.checked)}
+                />
+                Write
+              </label>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                Each permission applies when that access policy uses the member list.
+              </p>
+            </fieldset>
           </Show>
 
           <Show when={dialogError()}>
@@ -313,10 +377,14 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
               {submitting()
                 ? removingDid()
                   ? "Removing…"
-                  : "Adding…"
+                  : editing()
+                    ? "Saving…"
+                    : "Adding…"
                 : removingDid()
                   ? "Remove"
-                  : "Add"}
+                  : editing()
+                    ? "Save"
+                    : "Add"}
             </Button>
           </div>
         </form>

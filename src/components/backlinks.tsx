@@ -4,7 +4,7 @@ import { createResource, createSignal, For, onMount, Show } from "solid-js";
 
 import { getAllBacklinks, getRecordBacklinks, LinksWithRecords } from "../lib/api.js";
 import { useRepo } from "../lib/repo-context.jsx";
-import { localDateFromTimestamp } from "../utils/date.js";
+import { localDateFromTimestamp } from "../utils/format.js";
 import { Button } from "./button.jsx";
 import { DomainGroup, DomainGroupRows, domainGroupRowClasses } from "./domain-group.jsx";
 import { Favicon } from "./favicon.jsx";

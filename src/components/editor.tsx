@@ -10,8 +10,6 @@ import { basicLight } from "@fsegurai/codemirror-theme-basic-light";
 import { basicSetup, EditorView } from "codemirror";
 import { onCleanup, onMount } from "solid-js";
 
-import { editorInstance } from "./create/state";
-
 const tabIndentKey = indentWithTab as unknown as KeyBinding;
 const jsonLinter = jsonParseLinter() as unknown as LintSource;
 
@@ -57,14 +55,12 @@ const Editor = (props: { content: string; onReady?: (view: EditorView | undefine
         EditorView.lineWrapping,
       ],
     });
-    editorInstance.view = view;
     props.onReady?.(view);
   });
 
   onCleanup(() => {
     window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", themeEvent);
     props.onReady?.(undefined);
-    if (editorInstance.view === view) editorInstance.view = null;
     view?.destroy();
   });
 

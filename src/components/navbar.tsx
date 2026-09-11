@@ -5,10 +5,11 @@ import { createEffect, createMemo, createSignal, JSX, Match, Show, Switch } from
 import { canHover } from "../layout";
 import { didDocCache } from "../lib/api";
 import { addToClipboard } from "../utils/copy";
-import { localDateFromTimestamp } from "../utils/date";
+import { localDateFromTimestamp } from "../utils/format";
 import Tooltip from "./tooltip";
 
-export const [pds, setPDS] = createSignal<string>();
+const [pds, setPDS] = createSignal<string>();
+export { setPDS };
 
 const CopyButton = (props: { content: string; label: string }) => {
   return (

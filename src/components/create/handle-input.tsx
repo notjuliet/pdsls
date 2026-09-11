@@ -4,9 +4,8 @@ import { createSignal, Show } from "solid-js";
 import { resolveHandle } from "../../lib/api";
 import { Button } from "../button.jsx";
 import { TextInput } from "../text-input.jsx";
-import { editorInstance } from "./state";
 
-export const HandleInput = (props: { onClose: () => void }) => {
+export const HandleInput = (props: { onInsert: (text: string) => void; onClose: () => void }) => {
   const [resolving, setResolving] = createSignal(false);
   const [error, setError] = createSignal("");
   let handleFormRef!: HTMLFormElement;
@@ -25,12 +24,7 @@ export const HandleInput = (props: { onClose: () => void }) => {
     setError("");
     try {
       const did = await resolveHandle(handleValue as Handle);
-      editorInstance.view.dispatch({
-        changes: {
-          from: editorInstance.view.state.selection.main.head,
-          insert: `"${did}"`,
-        },
-      });
+      props.onInsert(JSON.stringify(did));
       props.onClose();
       handleFormRef.reset();
     } catch (err: any) {

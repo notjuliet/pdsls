@@ -9,7 +9,7 @@ import { createEffect, createResource, createSignal, For, onCleanup, Show } from
 import * as v from "valibot";
 
 import { createOperationHistory, DiffEntry, groupBy } from "../../lib/plc-logs.js";
-import { localDateFromTimestamp } from "../../utils/date.js";
+import { localDateFromTimestamp } from "../../utils/format.js";
 import PlcValidateWorker from "../../workers/plc-validate.ts?worker";
 import { plcDirectory } from "../settings.jsx";
 

@@ -10,7 +10,7 @@ import * as v from "valibot";
 import { didDocumentResolver, resolveLexiconAuthority } from "./api.js";
 import { lexicons } from "./types/lexicons.js";
 
-export interface RecordSchemaValidation {
+interface RecordSchemaValidation {
   valid: boolean;
   error?: string;
 }

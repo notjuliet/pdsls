@@ -1,5 +1,5 @@
 import { isDid } from "@atcute/lexicons/syntax";
-import { Show } from "solid-js";
+import { For, Show } from "solid-js";
 import type { SetStoreFunction } from "solid-js/store";
 
 import { TextInput } from "../../components/text-input.jsx";
@@ -13,9 +13,14 @@ import type {
 type PolicyKind = NewSimpleSpacePolicy["kind"];
 type AppAccessKind = NewSimpleSpaceAppAccess["kind"];
 
-export interface SimpleSpaceSettingsDraft {
+interface PolicyDraft {
   policy: PolicyKind;
   managingApp: string;
+}
+
+export interface SimpleSpaceSettingsDraft {
+  read: PolicyDraft;
+  write: PolicyDraft;
   appAccess: AppAccessKind;
   allowedApps: string;
 }
@@ -44,8 +49,8 @@ const parseAllowedApps = (value: string) =>
   );
 
 export const defaultSimpleSpaceSettings = (): SimpleSpaceSettingsDraft => ({
-  policy: "member-list",
-  managingApp: "",
+  read: { policy: "member-list", managingApp: "" },
+  write: { policy: "member-list", managingApp: "" },
   appAccess: "open",
   allowedApps: "",
 });
@@ -53,29 +58,41 @@ export const defaultSimpleSpaceSettings = (): SimpleSpaceSettingsDraft => ({
 export const simpleSpaceSettingsFromInfo = (
   info: SimpleSpaceInfo,
 ): SimpleSpaceSettingsDraft | undefined => {
-  if (info.policy.kind === "unknown" || info.appAccess.kind === "unknown") return;
+  if (
+    info.readPolicy.kind === "unknown" ||
+    info.writePolicy.kind === "unknown" ||
+    info.appAccess.kind === "unknown"
+  )
+    return;
 
   return {
-    policy: info.policy.kind,
-    managingApp: info.policy.kind === "managing-app" ? info.policy.managingApp : "",
+    read: {
+      policy: info.readPolicy.kind,
+      managingApp: info.readPolicy.kind === "managing-app" ? info.readPolicy.managingApp : "",
+    },
+    write: {
+      policy: info.writePolicy.kind,
+      managingApp: info.writePolicy.kind === "managing-app" ? info.writePolicy.managingApp : "",
+    },
     appAccess: info.appAccess.kind,
     allowedApps: info.appAccess.kind === "allow-list" ? info.appAccess.allowed.join("\n") : "",
   };
 };
 
+const parsePolicy = (draft: PolicyDraft, label: string): NewSimpleSpacePolicy => {
+  if (draft.policy !== "managing-app") return { kind: draft.policy };
+  const managingApp = draft.managingApp.trim();
+  if (!isServiceIdentifier(managingApp)) {
+    throw new Error(`${label} managing app must be a DID with an optional service fragment`);
+  }
+  return { kind: "managing-app", managingApp };
+};
+
 export const parseSimpleSpaceSettings = (
   draft: SimpleSpaceSettingsDraft,
 ): SimpleSpaceConfiguration => {
-  let policy: NewSimpleSpacePolicy;
-  if (draft.policy === "managing-app") {
-    const managingApp = draft.managingApp.trim();
-    if (!isServiceIdentifier(managingApp)) {
-      throw new Error("Managing app must be a DID with an optional service fragment");
-    }
-    policy = { kind: "managing-app", managingApp };
-  } else {
-    policy = { kind: draft.policy };
-  }
+  const readPolicy = parsePolicy(draft.read, "Read access");
+  const writePolicy = parsePolicy(draft.write, "Write access");
 
   let appAccess: NewSimpleSpaceAppAccess;
   if (draft.appAccess === "allow-list") {
@@ -88,7 +105,7 @@ export const parseSimpleSpaceSettings = (
     appAccess = { kind: "open" };
   }
 
-  return { policy, appAccess };
+  return { readPolicy, writePolicy, appAccess };
 };
 
 export const SimpleSpaceSettingsFields = (props: {
@@ -96,41 +113,52 @@ export const SimpleSpaceSettingsFields = (props: {
   setSettings: SetStoreFunction<SimpleSpaceSettingsDraft>;
 }) => (
   <>
-    <label class="flex flex-col gap-1 text-sm">
-      <span class="font-medium">User access</span>
-      <select
-        class={selectClass}
-        value={props.settings.policy}
-        onChange={(event) => props.setSettings("policy", event.currentTarget.value as PolicyKind)}
-      >
-        <option value="member-list">Member list</option>
-        <option value="public">Public</option>
-        <option value="managing-app">Managing app</option>
-      </select>
-      <span class="text-xs text-neutral-500 dark:text-neutral-400">
-        {props.settings.policy === "member-list"
-          ? "Only members you add can access the Space."
-          : props.settings.policy === "public"
-            ? "Any user may access the Space."
-            : "The managing application decides who may access the Space."}
-      </span>
-    </label>
-
-    <Show when={props.settings.policy === "managing-app"}>
-      <label class="flex flex-col gap-1 text-sm">
-        <span class="font-medium">Managing app</span>
-        <TextInput
-          value={props.settings.managingApp}
-          onInput={(event) => props.setSettings("managingApp", event.currentTarget.value)}
-          placeholder="did:web:example.com#service"
-          class="w-full"
-          required
-        />
-        <span class="text-xs text-neutral-500 dark:text-neutral-400">
-          A service DID that answers access checks for this Space.
-        </span>
-      </label>
-    </Show>
+    <For each={["read", "write"] as const}>
+      {(access) => (
+        <>
+          <label class="flex flex-col gap-1 text-sm">
+            <span class="font-medium">{access === "read" ? "Read access" : "Write access"}</span>
+            <select
+              class={selectClass}
+              value={props.settings[access].policy}
+              onChange={(event) =>
+                props.setSettings(access, "policy", event.currentTarget.value as PolicyKind)
+              }
+            >
+              <option value="member-list">Member list</option>
+              <option value="public">Public</option>
+              <option value="managing-app">Managing app</option>
+            </select>
+            <span class="text-xs text-neutral-500 dark:text-neutral-400">
+              {props.settings[access].policy === "member-list"
+                ? `Only members granted ${access} access may ${access} in this Space.`
+                : props.settings[access].policy === "public"
+                  ? `Any user may ${access} in this Space.`
+                  : `The managing application decides who may ${access} in this Space.`}
+            </span>
+          </label>
+          <Show when={props.settings[access].policy === "managing-app"}>
+            <label class="flex flex-col gap-1 text-sm">
+              <span class="font-medium">
+                {access === "read" ? "Read managing app" : "Write managing app"}
+              </span>
+              <TextInput
+                value={props.settings[access].managingApp}
+                onInput={(event) =>
+                  props.setSettings(access, "managingApp", event.currentTarget.value)
+                }
+                placeholder="did:web:example.com#service"
+                class="w-full"
+                required
+              />
+              <span class="text-xs text-neutral-500 dark:text-neutral-400">
+                A service DID that answers {access} access checks for this Space.
+              </span>
+            </label>
+          </Show>
+        </>
+      )}
+    </For>
 
     <label class="flex flex-col gap-1 text-sm">
       <span class="font-medium">Application access</span>
@@ -146,8 +174,8 @@ export const SimpleSpaceSettingsFields = (props: {
       </select>
       <span class="text-xs text-neutral-500 dark:text-neutral-400">
         {props.settings.appAccess === "open"
-          ? "Any application used by an authorized user may access the Space."
-          : "Only applications with a listed OAuth client ID may access the Space."}
+          ? "Any application used by an authorized reader may read the Space."
+          : "Only applications with a listed OAuth client ID may read the Space."}
       </span>
     </label>
 
@@ -164,7 +192,7 @@ export const SimpleSpaceSettingsFields = (props: {
           required
         />
         <span class="text-xs text-neutral-500 dark:text-neutral-400">
-          PDSls cannot access allow-listed Spaces.
+          PDSls cannot read allow-listed Spaces.
         </span>
       </label>
     </Show>

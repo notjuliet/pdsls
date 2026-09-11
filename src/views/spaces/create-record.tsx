@@ -1,17 +1,15 @@
 import { isNsid, isRecordKey } from "@atcute/lexicons/syntax";
 import { useNavigate } from "@solidjs/router";
 import type { EditorView } from "codemirror";
-import { createEffect, createSignal, lazy, onCleanup, Show, Suspense } from "solid-js";
+import { createSignal, lazy, Show, Suspense } from "solid-js";
 
 import { hasUserScope, SPACE_MANAGE_RECORDS_SCOPE_ID } from "../../auth/scope-utils.js";
 import { Button } from "../../components/button.jsx";
 import { ConfirmSubmit } from "../../components/create/confirm-submit.jsx";
-import { FileUpload } from "../../components/create/file-upload.jsx";
-import { HandleInput } from "../../components/create/handle-input.jsx";
-import { MenuItem } from "../../components/create/menu-item.jsx";
+import { InsertMenu } from "../../components/create/insert-menu.jsx";
 import type { JSONType } from "../../components/json.jsx";
 import { Modal } from "../../components/modal.jsx";
-import { addNotification, removeNotification } from "../../components/notification.jsx";
+import { addNotification } from "../../components/notification.jsx";
 import { PermissionButton } from "../../components/permission-button.jsx";
 import { TextInput } from "../../components/text-input.jsx";
 import {
@@ -56,28 +54,13 @@ export const SpaceRecordEditor = (props: SpaceRecordEditorProps) => {
   const [isMaximized, setIsMaximized] = createSignal(false);
   const [isMinimized, setIsMinimized] = createSignal(false);
   const [openAdvanced, setOpenAdvanced] = createSignal(false);
-  const [openUpload, setOpenUpload] = createSignal(false);
-  const [openInsertMenu, setOpenInsertMenu] = createSignal(false);
-  const [openHandleDialog, setOpenHandleDialog] = createSignal(false);
   const [validate, setValidate] = createSignal<boolean | undefined>();
   const [recreate, setRecreate] = createSignal(false);
   const [notice, setNotice] = createSignal("");
   const [collection, setCollection] = createSignal(props.collection ?? "");
   const [rkey, setRkey] = createSignal("");
   let editorView: EditorView | undefined;
-  let blobInput!: HTMLInputElement;
-  let insertMenuRef!: HTMLDivElement;
   const editing = () => props.mode === "edit";
-
-  createEffect(() => {
-    if (!openInsertMenu()) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!insertMenuRef.contains(event.target as Node)) setOpenInsertMenu(false);
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    onCleanup(() => document.removeEventListener("mousedown", handleClickOutside));
-  });
 
   const openEditor = () => {
     setCollection(props.collection ?? "");
@@ -85,9 +68,6 @@ export const SpaceRecordEditor = (props: SpaceRecordEditorProps) => {
     setNotice("");
     setIsMinimized(false);
     setOpenAdvanced(false);
-    setOpenUpload(false);
-    setOpenInsertMenu(false);
-    setOpenHandleDialog(false);
     setValidate(undefined);
     setRecreate(false);
     setOpen(true);
@@ -96,28 +76,9 @@ export const SpaceRecordEditor = (props: SpaceRecordEditorProps) => {
   const closeEditor = () => {
     if (!submitting()) {
       setOpenAdvanced(false);
-      setOpenUpload(false);
-      setOpenInsertMenu(false);
-      setOpenHandleDialog(false);
       setIsMinimized(false);
       setOpen(false);
     }
-  };
-
-  const insertTimestamp = () => {
-    if (!editorView) return;
-    editorView.dispatch({
-      changes: {
-        from: editorView.state.selection.main.head,
-        insert: `"${new Date().toISOString()}"`,
-      },
-    });
-    setOpenInsertMenu(false);
-  };
-
-  const insertDidFromHandle = () => {
-    setOpenInsertMenu(false);
-    setOpenHandleDialog(true);
   };
 
   const submit = async () => {
@@ -198,11 +159,11 @@ export const SpaceRecordEditor = (props: SpaceRecordEditorProps) => {
       spaceRecords.invalidateRecords();
       props.onSaved?.(result, recordValue);
 
-      const notification = addNotification({
+      addNotification({
         message: editing() ? "Record updated" : "Record created",
         type: "success",
+        duration: 3000,
       });
-      setTimeout(() => removeNotification(notification), 3000);
 
       if (!editing()) {
         navigate(
@@ -339,76 +300,12 @@ export const SpaceRecordEditor = (props: SpaceRecordEditorProps) => {
           </Show>
 
           <div class="flex justify-between gap-2">
-            <div class="relative" ref={insertMenuRef}>
-              <Button onClick={() => setOpenInsertMenu(!openInsertMenu())}>
-                <span class="iconify lucide--plus" />
-                <span>Add</span>
-              </Button>
-              <Show when={openInsertMenu()}>
-                <div class="dark:bg-dark-300 dark:shadow-dark-700 absolute bottom-full left-0 z-10 mb-1 flex w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-1.5 shadow-md dark:border-neutral-700">
-                  <MenuItem
-                    icon="lucide--id-card"
-                    label="Insert DID"
-                    onClick={insertDidFromHandle}
-                  />
-                  <MenuItem
-                    icon="lucide--clock"
-                    label="Insert timestamp"
-                    onClick={insertTimestamp}
-                  />
-                  <button
-                    type="button"
-                    class={
-                      hasUserScope("blob")
-                        ? "flex items-center gap-2 rounded-md p-2 text-left text-xs hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                        : "flex items-center gap-2 rounded-md p-2 text-left text-xs opacity-40"
-                    }
-                    onClick={() => {
-                      if (hasUserScope("blob")) {
-                        setOpenInsertMenu(false);
-                        blobInput.click();
-                      }
-                    }}
-                  >
-                    <span class="iconify lucide--upload shrink-0" />
-                    <span>Upload blob{hasUserScope("blob") ? "" : " (permission needed)"}</span>
-                  </button>
-                </div>
-              </Show>
-              <input
-                type="file"
-                class="sr-only"
-                ref={blobInput}
-                onChange={(event) => {
-                  if (event.currentTarget.files?.length) setOpenUpload(true);
-                }}
-              />
-            </div>
-            <Modal
-              open={openUpload()}
-              onClose={() => setOpenUpload(false)}
-              closeOnClick={false}
-              contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[calc(100%-2rem)] max-w-xs rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
-            >
-              <Show when={blobInput.files?.[0]}>
-                {(file) => (
-                  <FileUpload
-                    file={file()}
-                    repo={auth().sub}
-                    blobInput={blobInput}
-                    onClose={() => setOpenUpload(false)}
-                  />
-                )}
-              </Show>
-            </Modal>
-            <Modal
-              open={openHandleDialog()}
-              onClose={() => setOpenHandleDialog(false)}
-              closeOnClick={false}
-              contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[calc(100%-2rem)] max-w-xs rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
-            >
-              <HandleInput onClose={() => setOpenHandleDialog(false)} />
-            </Modal>
+            <InsertMenu
+              editor={() => editorView}
+              repo={auth().sub}
+              canUpload={hasUserScope("blob")}
+              dialogClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[calc(100%-2rem)] max-w-xs rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
+            />
             <Modal
               open={openAdvanced()}
               onClose={() => setOpenAdvanced(false)}

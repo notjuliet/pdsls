@@ -9,7 +9,17 @@ import {
   useNavigate,
   useParams,
 } from "@solidjs/router";
-import { createEffect, createResource, createSignal, For, onMount, Show } from "solid-js";
+import {
+  createEffect,
+  createResource,
+  createSignal,
+  ErrorBoundary,
+  For,
+  type JSX,
+  onMount,
+  Show,
+  Suspense,
+} from "solid-js";
 
 import { Backlinks } from "../../components/backlinks.jsx";
 import {
@@ -25,7 +35,6 @@ import {
   NavMenu,
 } from "../../components/dropdown.jsx";
 import { FilterInput } from "../../components/filter-input.jsx";
-import { LazyTab } from "../../components/lazy-tab.jsx";
 import { setPDS } from "../../components/navbar.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
 import {
@@ -48,6 +57,16 @@ import { plcDirectory } from "../settings.jsx";
 import { BlobView } from "./blob.jsx";
 import { IdentityView } from "./identity.jsx";
 import { PlcLogView } from "./logs.jsx";
+
+const LazyTab = (props: { children: JSX.Element }) => (
+  <ErrorBoundary fallback={(err) => <div class="wrap-break-word">Error: {err.message}</div>}>
+    <Suspense
+      fallback={<div class="iconify lucide--loader-circle mt-2 animate-spin self-center text-xl" />}
+    >
+      {props.children}
+    </Suspense>
+  </ErrorBoundary>
+);
 
 export const repoPreload: RoutePreloadFunc = ({ params }) => {
   if (params.repo?.startsWith("did:")) void getPDS(params.repo);

@@ -6,7 +6,7 @@ import { Button } from "../../components/button.jsx";
 import { CopyableInfoField } from "../../components/copyable-info-field.jsx";
 import { JSONValue } from "../../components/json.jsx";
 import { Modal } from "../../components/modal.jsx";
-import { addNotification, removeNotification } from "../../components/notification.jsx";
+import { addNotification } from "../../components/notification.jsx";
 import { PermissionButton } from "../../components/permission-button.jsx";
 import { RecordSchemaValidation } from "../../components/record-schema-validation.jsx";
 import Tooltip from "../../components/tooltip.jsx";
@@ -121,11 +121,11 @@ export const SpaceRecordView = () => {
       spaceRecords.invalidateRecords();
       setOpenDelete(false);
 
-      const notification = addNotification({
+      addNotification({
         message: "Record deleted",
         type: "success",
+        duration: 3000,
       });
-      setTimeout(() => removeNotification(notification), 3000);
 
       navigate(
         makeSpaceCollectionPath(
@@ -137,11 +137,11 @@ export const SpaceRecordView = () => {
         ),
       );
     } catch (err) {
-      const notification = addNotification({
+      addNotification({
         message: err instanceof Error ? err.message : "Could not delete the Space record",
         type: "error",
+        duration: 5000,
       });
-      setTimeout(() => removeNotification(notification), 5000);
     } finally {
       setDeleting(false);
     }

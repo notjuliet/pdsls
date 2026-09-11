@@ -5,7 +5,7 @@ import { createStore } from "solid-js/store";
 import { SPACE_MANAGE_SPACES_SCOPE_ID } from "../../auth/scope-utils.js";
 import { Button } from "../../components/button.jsx";
 import { Modal } from "../../components/modal.jsx";
-import { addNotification, removeNotification } from "../../components/notification.jsx";
+import { addNotification } from "../../components/notification.jsx";
 import { PermissionButton } from "../../components/permission-button.jsx";
 import { TextInput } from "../../components/text-input.jsx";
 import {
@@ -91,8 +91,7 @@ export const CreateSpaceDialog = (props: CreateSpaceDialogProps) => {
       setOpen(false);
       props.onCreated(result);
 
-      const notification = addNotification({ message: "Space created", type: "success" });
-      setTimeout(() => removeNotification(notification), 3000);
+      addNotification({ message: "Space created", type: "success", duration: 3000 });
     } catch (err) {
       setNotice(err instanceof Error ? err.message : "Could not create the Space");
     } finally {

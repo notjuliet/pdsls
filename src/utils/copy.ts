@@ -1,10 +1,10 @@
-import { addNotification, removeNotification } from "../components/notification";
+import { addNotification } from "../components/notification";
 
 export const addToClipboard = (text: string) => {
   navigator.clipboard.writeText(text);
-  const id = addNotification({
+  addNotification({
     message: "Copied to clipboard",
     type: "success",
+    duration: 3000,
   });
-  setTimeout(() => removeNotification(id), 3000);
 };

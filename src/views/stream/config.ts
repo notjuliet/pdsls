@@ -1,4 +1,4 @@
-import { localDateFromTimestamp } from "../../utils/date";
+import { localDateFromTimestamp } from "../../utils/format";
 
 export type StreamType = "jetstream" | "firehose" | "spacedust";
 

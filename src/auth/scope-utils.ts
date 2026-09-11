@@ -3,12 +3,12 @@ import { Did } from "@atcute/lexicons";
 import { agent, sessions } from "./state";
 
 export const SPACE_READ_SCOPE_ID = "space-read" as const;
-export const SPACE_READ_SCOPE = "space:*?authority=*&action=read";
+const SPACE_READ_SCOPE = "space:*?authority=*&action=read";
 export const SPACE_MANAGE_RECORDS_SCOPE_ID = "space-manage-records" as const;
-export const SPACE_MANAGE_RECORDS_SCOPE =
+const SPACE_MANAGE_RECORDS_SCOPE =
   "space:*?authority=*&collection=*&action=create&action=update&action=delete";
 export const SPACE_MANAGE_SPACES_SCOPE_ID = "space-manage-spaces" as const;
-export const SPACE_MANAGE_SPACES_SCOPE = "space:*?manage=create&manage=update&manage=delete";
+const SPACE_MANAGE_SPACES_SCOPE = "space:*?manage=create&manage=update&manage=delete";
 
 export const GRANULAR_SCOPES = [
   {
