@@ -136,7 +136,7 @@ export const Home = () => {
           </div>
 
           <div class="mt-3 rounded-lg border border-neutral-200 p-2 sm:p-3 dark:border-neutral-700">
-            <h2 class="px-2 py-1 text-sm font-medium sm:text-base">Sign in</h2>
+            <h2 class="px-2 py-1 text-sm font-medium sm:text-base">Manage</h2>
             <div class="grid grid-cols-2 gap-1">
               <A
                 href="/account/add"
