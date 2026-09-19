@@ -493,7 +493,7 @@ const CollectionView = () => {
                 Schema
               </A>
               <A
-                href={`/jetstream?collections=${params.collection}&dids=${params.repo}`}
+                href={`/streams?type=jetstream&collections=${encodeURIComponent(params.collection!)}&dids=${encodeURIComponent(params.repo!)}`}
                 class="border-b-2 border-transparent font-medium transition-colors not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80"
               >
                 Jetstream
@@ -646,7 +646,7 @@ const CollectionView = () => {
         {/* Fixed bottom panel */}
         <Show when={!lexicon.showSchema() && records.length > 1}>
           <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
-            <div class="flex w-full max-w-120 items-center gap-2">
+            <div class="flex w-full max-w-[34.5rem] items-center gap-2">
               {/* Filter */}
               <FilterInput
                 class="grow"
@@ -664,7 +664,7 @@ const CollectionView = () => {
             </div>
 
             {/* Pagination */}
-            <div class="flex min-h-7.5 w-full max-w-120 items-center justify-between gap-2">
+            <div class="flex min-h-7.5 w-full max-w-[34.5rem] items-center justify-between gap-2">
               <Button
                 onClick={() => {
                   const newReverse = !reverse();

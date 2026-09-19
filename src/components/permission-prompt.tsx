@@ -1,7 +1,8 @@
+import { useNavigate } from "@solidjs/router";
 import { createEffect, createSignal } from "solid-js";
 
 import { GRANULAR_SCOPES, type ScopeId } from "../auth/scope-utils";
-import { agent, setOpenManager, setPendingPermissionEdit } from "../auth/state";
+import { agent } from "../auth/state";
 import { Button } from "./button";
 import { Modal } from "./modal";
 
@@ -12,6 +13,7 @@ export const showPermissionPrompt = (scope: ScopeId) => {
 };
 
 export const PermissionPromptContainer = () => {
+  const navigate = useNavigate();
   const [displayedScope, setDisplayedScope] = createSignal<ScopeId | null>(null);
 
   createEffect(() => {
@@ -27,8 +29,7 @@ export const PermissionPromptContainer = () => {
   const handleEditPermissions = () => {
     setRequestedScope(null);
     if (agent()) {
-      setPendingPermissionEdit(agent()!.sub);
-      setOpenManager(true);
+      navigate(`/account/${agent()!.sub}/permissions`);
     }
   };
 

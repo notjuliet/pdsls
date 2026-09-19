@@ -2,12 +2,7 @@ import { A, type RouteSectionProps, useLocation, useNavigate, useParams } from "
 import { createEffect, createMemo, createSignal, For, type JSX, Show } from "solid-js";
 
 import { hasUserScope, SPACE_READ_SCOPE_ID } from "../../auth/scope-utils";
-import {
-  agent,
-  setOpenManager,
-  setPendingPermissionEdit,
-  setShowAddAccount,
-} from "../../auth/state";
+import { agent } from "../../auth/state";
 import { Button } from "../../components/button.jsx";
 import { DomainGroup, domainGroupRowClasses } from "../../components/domain-group.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
@@ -26,10 +21,7 @@ import { EmptyState, ErrorNotice, LoadingState } from "./shared.jsx";
 import { SpaceLayout } from "./space.jsx";
 
 const SignInPrompt = () => {
-  const signIn = () => {
-    setOpenManager(true);
-    setShowAddAccount(true);
-  };
+  const navigate = useNavigate();
 
   return (
     <div class="flex flex-col items-start gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800">
@@ -39,7 +31,10 @@ const SignInPrompt = () => {
           Spaces require OAuth permissions.
         </p>
       </div>
-      <Button onClick={signIn} classList={{ "bg-blue-500! text-white! border-blue-500!": true }}>
+      <Button
+        onClick={() => navigate("/account/add")}
+        classList={{ "bg-blue-500! text-white! border-blue-500!": true }}
+      >
         <span class="iconify lucide--log-in" />
         Sign in
       </Button>
@@ -48,11 +43,11 @@ const SignInPrompt = () => {
 };
 
 const PermissionPrompt = () => {
+  const navigate = useNavigate();
   const editPermissions = () => {
     const auth = agent();
     if (!auth) return;
-    setPendingPermissionEdit(auth.sub);
-    setOpenManager(true);
+    navigate(`/account/${auth.sub}/permissions`);
   };
 
   return (

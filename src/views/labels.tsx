@@ -1,41 +1,39 @@
 import { ComAtprotoLabelDefs } from "@atcute/atproto";
 import { Client, simpleFetchHandler } from "@atcute/client";
-import { isAtprotoDid } from "@atcute/identity";
-import { Handle } from "@atcute/lexicons";
-import { useSearchParams } from "@solidjs/router";
-import { createMemo, createSignal, For, onMount, Show } from "solid-js";
+import { useLocation, useNavigate, useSearchParams } from "@solidjs/router";
+import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 
 import { Button } from "../components/button.jsx";
+import { FilterInput } from "../components/filter-input.jsx";
 import DidHoverCard from "../components/hover-card/did.jsx";
 import RecordHoverCard from "../components/hover-card/record.jsx";
 import { TagInput } from "../components/tag-input.jsx";
-import { TextInput } from "../components/text-input.jsx";
-import { getPDS, labelerCache, resolveHandle } from "../lib/api.js";
 import { useFilterShortcut } from "../lib/keyboard.js";
 import { localDateFromTimestamp } from "../utils/format.js";
 
 const LABELS_PER_PAGE = 50;
-const DEFAULT_LABELER_DID = "did:plc:ar7c4by46qjdydhdevvrndac";
 
-const LabelCard = (props: { label: ComAtprotoLabelDefs.Label }) => {
+const getSearchParam = (value: string | string[] | undefined) =>
+  Array.isArray(value) ? value[0] : value;
+
+const LabelRow = (props: { label: ComAtprotoLabelDefs.Label }) => {
   const label = props.label;
 
   return (
-    <div class="flex min-w-0 flex-col gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
-      <div class="flex flex-wrap items-baseline gap-2 text-sm">
-        <span class="iconify lucide--tag shrink-0 self-center" />
-        <span class="font-medium">{label.val}</span>
+    <div class="flex min-w-0 flex-col gap-1 px-2 py-2">
+      <div class="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5 text-sm">
+        <span class="truncate font-medium">{label.val}</span>
         <Show when={label.neg}>
-          <span class="text-xs font-medium text-red-500 dark:text-red-400">negated</span>
+          <span class="shrink-0 font-medium text-red-500 dark:text-red-400">negated</span>
         </Show>
-        <div class="flex flex-wrap gap-2 text-xs text-neutral-600 dark:text-neutral-400">
+        <div class="ml-auto flex flex-wrap justify-end gap-x-2 text-xs text-neutral-500 dark:text-neutral-400">
           <span>{localDateFromTimestamp(new Date(label.cts).getTime())}</span>
           <Show when={label.exp}>
-            {(exp) => (
-              <div class="flex items-center gap-x-1">
+            {(expiration) => (
+              <span class="flex items-center gap-1">
                 <span class="iconify lucide--clock-fading shrink-0" />
-                <span>{localDateFromTimestamp(new Date(exp()).getTime())}</span>
-              </div>
+                {localDateFromTimestamp(new Date(expiration()).getTime())}
+              </span>
             )}
           </Show>
         </div>
@@ -49,26 +47,33 @@ const LabelCard = (props: { label: ComAtprotoLabelDefs.Label }) => {
       </Show>
 
       <Show when={label.cid}>
-        <div class="truncate font-mono text-xs text-neutral-600 dark:text-neutral-400">
-          {label.cid}
-        </div>
+        {(cid) => (
+          <span class="truncate font-mono text-xs text-neutral-500 dark:text-neutral-400">
+            {cid()}
+          </span>
+        )}
       </Show>
     </div>
   );
 };
 
-export const LabelView = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+export const LabelFeed = (props: { labelerDid: string; labelerEndpoint: string }) => {
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [cursor, setCursor] = createSignal<string>();
   const [labels, setLabels] = createSignal<ComAtprotoLabelDefs.Label[]>([]);
   const [filter, setFilter] = createSignal("");
-  const [loading, setLoading] = createSignal(false);
+  const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string>();
-  const [didInput, setDidInput] = createSignal(searchParams.did ?? "");
+  const [isSticky, setIsSticky] = createSignal(false);
+  const rpc = new Client({
+    handler: simpleFetchHandler({ service: props.labelerEndpoint }),
+  });
 
-  let rpc: Client | undefined;
   let formRef!: HTMLFormElement;
   let filterInputRef: HTMLInputElement | undefined;
+  let stickySentinelRef!: HTMLDivElement;
 
   const filteredLabels = createMemo(() => {
     const filterValue = filter().trim();
@@ -76,8 +81,8 @@ export const LabelView = () => {
 
     const filters = filterValue
       .split(/[\s,]+/)
-      .map((f) => f.trim())
-      .filter((f) => f.length > 0);
+      .map((value) => value.trim())
+      .filter(Boolean);
 
     const toMatcher = (pattern: string): ((value: string) => boolean) => {
       if (pattern.includes("*")) {
@@ -91,246 +96,179 @@ export const LabelView = () => {
     const exclusions: ((value: string) => boolean)[] = [];
     const inclusions: ((value: string) => boolean)[] = [];
 
-    filters.forEach((f) => {
-      if (f.startsWith("-")) {
-        exclusions.push(toMatcher(f.slice(1).toLowerCase()));
-      } else {
-        inclusions.push(toMatcher(f.toLowerCase()));
-      }
-    });
+    for (const value of filters) {
+      if (value.startsWith("-")) exclusions.push(toMatcher(value.slice(1).toLowerCase()));
+      else inclusions.push(toMatcher(value.toLowerCase()));
+    }
 
     return labels().filter((label) => {
-      const labelValue = label.val.toLowerCase();
-
-      if (exclusions.some((exc) => exc(labelValue))) {
-        return false;
-      }
-
-      if (inclusions.length > 0) {
-        return inclusions.some((inc) => inc(labelValue));
-      }
-
-      // If only exclusions were specified, include everything not excluded
-      return true;
+      const value = label.val.toLowerCase();
+      if (exclusions.some((exclude) => exclude(value))) return false;
+      return inclusions.length === 0 || inclusions.some((include) => include(value));
     });
   });
 
-  const hasSearched = createMemo(() => Boolean(searchParams.uriPatterns));
-
-  onMount(async () => {
-    useFilterShortcut(() => filterInputRef);
-
-    if (searchParams.did && searchParams.uriPatterns) {
-      const formData = new FormData();
-      formData.append("did", searchParams.did.toString());
-      formData.append("uriPatterns", searchParams.uriPatterns.toString());
-      await fetchLabels(formData);
-    }
-  });
-
-  const fetchLabels = async (formData: FormData, reset?: boolean) => {
-    let did = formData.get("did")?.toString()?.trim() || DEFAULT_LABELER_DID;
+  const fetchLabels = async (formData: FormData, reset = false) => {
     const uriPatterns = formData.get("uriPatterns")?.toString()?.trim() || "*";
 
     if (reset) {
       setLabels([]);
       setCursor(undefined);
-      setError(undefined);
     }
 
+    setLoading(true);
+    setError(undefined);
+
     try {
-      setLoading(true);
-      setError(undefined);
-
-      if (!isAtprotoDid(did)) did = await resolveHandle(did as Handle);
-      await getPDS(did);
-      if (!labelerCache[did]) throw new Error("Repository is not a labeler");
-      rpc = new Client({
-        handler: simpleFetchHandler({ service: labelerCache[did] }),
-      });
-
-      setSearchParams({ did, uriPatterns });
-      setDidInput(did);
-
+      const query = uriPatterns === "*" ? "" : `?uriPatterns=${encodeURIComponent(uriPatterns)}`;
+      if (location.search !== query) {
+        navigate(`${location.pathname}${query}${location.hash}`, { replace: true });
+      }
       const res = await rpc.get("com.atproto.label.queryLabels", {
         params: {
-          uriPatterns: uriPatterns.split(",").map((p) => p.trim()),
-          sources: [did as `did:${string}:${string}`],
-          cursor: cursor(),
+          uriPatterns: uriPatterns.split(",").map((pattern) => pattern.trim()),
+          sources: [props.labelerDid as `did:${string}:${string}`],
+          cursor: reset ? undefined : cursor(),
           limit: LABELS_PER_PAGE,
         },
       });
 
       if (!res.ok) throw new Error(res.data.error || "Failed to fetch labels");
 
-      const newLabels = res.data.labels || [];
-      setCursor(newLabels.length < LABELS_PER_PAGE ? undefined : res.data.cursor);
-      setLabels(reset ? newLabels : [...labels(), ...newLabels]);
+      const nextLabels = res.data.labels || [];
+      setCursor(nextLabels.length < LABELS_PER_PAGE ? undefined : res.data.cursor);
+      setLabels(reset ? nextLabels : [...labels(), ...nextLabels]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      console.error("Failed to fetch labels:", err);
+      setError(err instanceof Error ? err.message : "Could not load labels");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSearch = () => {
-    fetchLabels(new FormData(formRef), true);
-  };
+  onMount(() => {
+    useFilterShortcut(() => filterInputRef);
+    const stickyObserver = new IntersectionObserver(([entry]) => {
+      setIsSticky(!entry.isIntersecting);
+    });
+    stickyObserver.observe(stickySentinelRef);
+    onCleanup(() => stickyObserver.disconnect());
 
-  const handleLoadMore = () => {
-    fetchLabels(new FormData(formRef));
-  };
+    const formData = new FormData();
+    formData.append("uriPatterns", getSearchParam(searchParams.uriPatterns) || "*");
+    void fetchLabels(formData, true);
+  });
 
-  document.title = "Labels - PDSls";
   return (
     <div class="flex w-full flex-col items-center">
-      <div class="flex w-full flex-col gap-y-1 px-3 pb-3">
-        <h1 class="text-lg font-semibold">Labels</h1>
-        <p class="text-sm text-neutral-600 dark:text-neutral-400">
-          Query labels applied to accounts and records.
-        </p>
-      </div>
+      <div ref={stickySentinelRef} class="-mb-px h-px w-full" aria-hidden="true" />
       <form
         ref={formRef}
-        class="flex w-full max-w-3xl flex-col gap-y-3 px-3 pb-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSearch();
+        class="dark:bg-dark-500 sticky top-0 z-10 flex w-full flex-col gap-2 bg-neutral-100 pb-3"
+        classList={{ "top-controls-fade": isSticky() }}
+        onSubmit={(event) => {
+          event.preventDefault();
+          void fetchLabels(new FormData(formRef), true);
         }}
       >
-        <div class="flex flex-col gap-y-3">
-          <label class="flex w-full flex-col gap-y-1">
-            <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              Labeler handle or DID
-            </span>
-            <TextInput
-              name="did"
-              value={didInput()}
-              onInput={(e) => setDidInput(e.currentTarget.value)}
-              placeholder="moderation.bsky.app (default)"
-              class="w-full"
-            />
-          </label>
+        <label class="flex w-full flex-col gap-1">
+          <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Target URI</span>
+          <TagInput
+            name="uriPatterns"
+            placeholder="at://did:web:example.com/app.bsky.feed.post/*"
+            initialValues={
+              getSearchParam(searchParams.uriPatterns)
+                ?.split(",")
+                .filter((value) => value.trim()) ?? []
+            }
+          />
+        </label>
+        <div class="flex min-h-7.5 items-center gap-2">
+          <Button type="submit" disabled={loading()}>
+            <span class="iconify lucide--search" />
+            Apply
+          </Button>
 
-          <label class="flex w-full flex-col gap-y-1">
-            <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              URI patterns
-            </span>
-            <TagInput
-              name="uriPatterns"
-              placeholder="at://did:web:example.com/app.bsky.feed.post/*"
-              initialValues={
-                (searchParams.uriPatterns as string)
-                  ?.split(",")
-                  .filter((v) => v.trim().length > 0) ?? []
-              }
-            />
-          </label>
-        </div>
-
-        <Button type="submit" disabled={loading()} classList={{ "w-fit": true }}>
-          <span class="iconify lucide--search" />
-          <span>Search labels</span>
-        </Button>
-
-        <Show when={error()}>
-          <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
-            {error()}
+          <div class="ml-auto flex items-center gap-2">
+            <Show when={labels().length > 0}>
+              <span class="shrink-0 text-sm">
+                <Show when={filter()}>
+                  <span>{filteredLabels().length}/</span>
+                </Show>
+                <span>{labels().length} labels</span>
+              </span>
+            </Show>
+            <Show when={cursor()}>
+              <Button
+                onClick={() => void fetchLabels(new FormData(formRef))}
+                disabled={loading()}
+                classList={{ "h-7.5 w-20 justify-center": true }}
+              >
+                <Show
+                  when={!loading()}
+                  fallback={<span class="iconify lucide--loader-circle animate-spin" />}
+                >
+                  Load more
+                </Show>
+              </Button>
+            </Show>
           </div>
-        </Show>
-      </form>
-
-      <Show when={hasSearched()}>
-        <div class="w-full max-w-3xl py-2 pb-20">
-          <Show when={loading() && labels().length === 0}>
-            <div class="flex flex-col items-center justify-center py-12 text-center">
-              <span class="iconify lucide--loader-circle mb-3 animate-spin text-4xl text-neutral-400" />
-              <p class="text-sm text-neutral-600 dark:text-neutral-400">Loading labels...</p>
-            </div>
-          </Show>
-
-          <Show when={!loading() || labels().length > 0}>
-            <Show when={filteredLabels().length > 0}>
-              <div class="grid gap-2">
-                <For each={filteredLabels()}>{(label) => <LabelCard label={label} />}</For>
-              </div>
-            </Show>
-
-            <Show when={labels().length > 0 && filteredLabels().length === 0}>
-              <div class="flex flex-col items-center justify-center py-8 text-center">
-                <span class="iconify lucide--search-x mb-2 text-3xl text-neutral-400" />
-                <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                  No labels match your filter
-                </p>
-              </div>
-            </Show>
-
-            <Show when={labels().length === 0 && !loading()}>
-              <div class="flex flex-col items-center justify-center py-8 text-center">
-                <span class="iconify lucide--tags mb-2 text-3xl text-neutral-400" />
-                <p class="text-sm text-neutral-600 dark:text-neutral-400">No labels found</p>
-              </div>
-            </Show>
-          </Show>
         </div>
 
         <Show when={labels().length > 1}>
-          <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
-            <div
-              class="dark:bg-dark-200 flex w-full max-w-122 cursor-text items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 text-sm dark:border-neutral-700"
-              onClick={(e) => {
-                const input = e.currentTarget.querySelector("input");
-                if (e.target !== input) input?.focus();
-              }}
-            >
-              <span class="iconify lucide--filter text-neutral-500 dark:text-neutral-400" />
-              <input
-                ref={filterInputRef}
-                type="text"
-                spellcheck={false}
-                autocapitalize="off"
-                autocomplete="off"
-                class="grow py-1.5 select-none placeholder:text-xs focus:outline-none"
-                placeholder="Filter labels... (* for partial, -exclude)"
-                value={filter()}
-                onInput={(e) => setFilter(e.currentTarget.value)}
-              />
+          <FilterInput
+            class="w-full"
+            inputRef={(input) => (filterInputRef = input)}
+            placeholder="Filter label values… (* partial, -exclude)"
+            value={filter()}
+            onInput={setFilter}
+          />
+        </Show>
+      </form>
+
+      <Show when={error()}>
+        {(message) => (
+          <div class="w-full rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
+            {message()}
+          </div>
+        )}
+      </Show>
+
+      <Show when={loading() && labels().length === 0}>
+        <div class="flex items-center gap-2 py-8 text-sm text-neutral-500 dark:text-neutral-400">
+          <span class="iconify lucide--loader-circle animate-spin" />
+          Loading labels…
+        </div>
+      </Show>
+
+      <Show when={!loading() || labels().length > 0}>
+        <Show
+          when={filteredLabels().length > 0}
+          fallback={
+            <div class="py-8 text-sm text-neutral-500 dark:text-neutral-400">
+              {labels().length > 0 ? "No labels match this value filter." : "No labels found."}
             </div>
-
-            <div class="flex min-h-7.5 w-full max-w-122 items-center justify-between">
-              <div class="w-20" />
-
-              <div>
-                <Show when={filter()}>
-                  <span>{filteredLabels().length}</span>
-                  <span>/</span>
-                </Show>
-                <span>{labels().length} labels</span>
-              </div>
-
-              <div class="flex w-20 items-center justify-end">
-                <Show when={cursor()}>
-                  <Button
-                    onClick={handleLoadMore}
-                    disabled={loading()}
-                    classList={{ "w-20 h-7.5 justify-center": true }}
-                  >
-                    <Show
-                      when={!loading()}
-                      fallback={
-                        <span class="iconify lucide--loader-circle animate-spin text-base" />
-                      }
-                    >
-                      Load more
-                    </Show>
-                  </Button>
-                </Show>
-              </div>
-            </div>
+          }
+        >
+          <div class="w-full divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800">
+            <For each={filteredLabels()}>{(label) => <LabelRow label={label} />}</For>
           </div>
         </Show>
       </Show>
     </div>
   );
+};
+
+export const LegacyLabelsRedirect = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  createEffect(() => {
+    const did = getSearchParam(searchParams.did);
+    const uriPatterns = getSearchParam(searchParams.uriPatterns);
+    const query =
+      uriPatterns && uriPatterns !== "*" ? `?uriPatterns=${encodeURIComponent(uriPatterns)}` : "";
+    navigate(did ? `/at://${did}${query}#labels` : "/", { replace: true });
+  });
+
+  return null;
 };

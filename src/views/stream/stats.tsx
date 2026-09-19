@@ -42,7 +42,6 @@ export const StreamStatsPanel = (props: {
   return (
     <Show when={props.stats.connectedAt !== undefined}>
       <div class="w-full text-sm">
-        <div class="mb-1 font-semibold">Statistics</div>
         <div class="grid grid-cols-3 gap-x-4 gap-y-2">
           <div>
             <div class="text-xs text-neutral-500 dark:text-neutral-400">Uptime</div>

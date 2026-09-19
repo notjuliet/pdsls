@@ -30,11 +30,14 @@ import { TextInput } from "../../components/text-input.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
 import { createDebouncedValue } from "../../lib/debounced.js";
 import { localDateFromTimestamp } from "../../utils/format.js";
-import { createDropHandler, createFileChangeHandler, handleDragOver } from "./file-handlers.js";
-
-const isIOS =
-  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+import {
+  carFileAccept,
+  createDropHandler,
+  createFileChangeHandler,
+  handleDragOver,
+  isIOS,
+} from "./file-handlers.js";
+import { clearQueuedCarFile, queuedCarFile } from "./state.js";
 
 const toJsonValue = (obj: unknown): JSONType => {
   if (obj === null || obj === undefined) return null;
@@ -141,7 +144,7 @@ const WelcomeView = (props: {
           <label class="dark:bg-dark-300 dark:hover:bg-dark-200 dark:active:bg-dark-100 flex items-center gap-1 rounded-md border border-neutral-300 bg-neutral-50 px-2.5 py-1.5 text-sm text-neutral-700 transition-colors select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:text-neutral-300">
             <input
               type="file"
-              accept={isIOS ? undefined : ".car,application/vnd.ipld.car"}
+              accept={carFileAccept}
               onChange={props.onFileChange}
               class="hidden"
             />
@@ -210,9 +213,10 @@ const filenamify = (name: string) => {
 export const CarView = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const initialQueuedFile = queuedCarFile();
 
   const [archive, setArchive] = createSignal<Archive | null>(null);
-  const [loading, setLoading] = createSignal(false);
+  const [loading, setLoading] = createSignal(Boolean(initialQueuedFile));
   const [progress, setProgress] = createSignal(0);
   const [error, setError] = createSignal<string>();
 
@@ -319,6 +323,14 @@ export const CarView = () => {
 
   const handleFileChange = createFileChangeHandler(parseCarFile);
   const handleDrop = createDropHandler(parseCarFile);
+
+  createEffect(() => {
+    const file = queuedCarFile();
+    if (file) {
+      clearQueuedCarFile(file);
+      void parseCarFile(file);
+    }
+  });
 
   window.addEventListener("dragover", handleDragOver);
   window.addEventListener("drop", handleDrop);

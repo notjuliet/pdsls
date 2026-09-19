@@ -10,9 +10,9 @@ import {
 
 interface ScopeSelectorProps {
   onConfirm: (scopeString: string) => void | Promise<void>;
-  onCancel: () => void;
+  onCancel?: () => void;
+  cancelLabel?: string;
   initialScopes?: Set<string>;
-  title?: string;
   confirmLabel?: string;
 }
 
@@ -26,10 +26,10 @@ const PermissionRow = (props: {
     type="button"
     aria-pressed={props.checked}
     onclick={props.onClick}
-    class="group flex w-full items-start gap-3 rounded-md px-2 py-2 text-left hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+    class="group flex w-full items-center gap-3 rounded-md py-2 text-left hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
   >
     <div
-      class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded border-2"
+      class="flex size-5 shrink-0 items-center justify-center rounded border-2"
       classList={{
         "border-transparent bg-blue-500 group-hover:bg-blue-600 group-active:bg-blue-400":
           props.checked,
@@ -152,18 +152,9 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
 
   return (
     <div class="flex flex-col gap-y-3">
-      <div class="flex items-center gap-2">
-        <button
-          onclick={props.onCancel}
-          class="flex items-center rounded-md p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-        >
-          <span class="iconify lucide--arrow-left"></span>
-        </button>
-        <div class="font-semibold">{props.title || "Select permissions"}</div>
-      </div>
       <div class="flex flex-col gap-4">
         <section>
-          <div class="mb-1 px-2 text-xs font-semibold tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
+          <div class="mb-1 text-xs font-semibold tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
             Repository
           </div>
           <div class="flex flex-col">
@@ -183,7 +174,7 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
         </section>
 
         <section>
-          <div class="mb-2 flex items-center gap-2 px-2">
+          <div class="mb-2 flex items-center gap-2">
             <span class="text-xs font-semibold tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
               Spaces
             </span>
@@ -214,13 +205,22 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
       <button
         disabled={submitting()}
         onclick={handleConfirm}
-        class="dark:hover:bg-dark-200 dark:active:bg-dark-100 flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 hover:bg-neutral-100 active:bg-neutral-200 disabled:opacity-70 dark:border-neutral-700"
+        class="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-500/90 px-3 py-2 text-white hover:bg-blue-500 active:bg-blue-600 disabled:opacity-70 dark:bg-blue-500/80 dark:hover:bg-blue-500/90 dark:active:bg-blue-500"
       >
         <Show when={submitting()} fallback={props.confirmLabel || "Continue"}>
           <span class="iconify lucide--loader-circle animate-spin"></span>
           <span>Preparing authorization…</span>
         </Show>
       </button>
+      <Show when={props.onCancel && props.cancelLabel}>
+        <button
+          type="button"
+          onclick={props.onCancel}
+          class="rounded-lg px-3 py-2 text-sm text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 active:bg-neutral-200 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-100 dark:active:bg-neutral-600"
+        >
+          {props.cancelLabel}
+        </button>
+      </Show>
     </div>
   );
 };

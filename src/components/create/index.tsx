@@ -36,6 +36,8 @@ export const RecordEditor = (props: {
   record?: any;
   refetch?: any;
   scope?: "create" | "update" | "delete" | "blob";
+  showTrigger?: boolean;
+  registerOpen?: (open: (() => void) | undefined) => void;
 }) => {
   const navigate = useNavigate();
   const params = useParams();
@@ -63,7 +65,19 @@ export const RecordEditor = (props: {
     setSelectedRepo(agent()?.sub);
   });
 
+  const openEditor = () => {
+    if (hasPermission()) {
+      setNotice("");
+      setOpenDialog(true);
+      setIsMinimized(false);
+    } else if (props.scope) {
+      showPermissionPrompt(props.scope);
+    }
+  };
+
   onMount(() => {
+    props.registerOpen?.(openEditor);
+
     const keyEvent = (ev: KeyboardEvent) => {
       if (ev.target instanceof HTMLInputElement || ev.target instanceof HTMLTextAreaElement) return;
       if ((ev.target as HTMLElement).closest("[data-modal]")) return;
@@ -81,7 +95,10 @@ export const RecordEditor = (props: {
     };
 
     window.addEventListener("keydown", keyEvent);
-    onCleanup(() => window.removeEventListener("keydown", keyEvent));
+    onCleanup(() => {
+      window.removeEventListener("keydown", keyEvent);
+      props.registerOpen?.(undefined);
+    });
   });
 
   const defaultPlaceholder = () => {
@@ -194,6 +211,22 @@ export const RecordEditor = (props: {
       setNotice(err.message);
     }
   };
+
+  const triggerButton = () => (
+    <button
+      type="button"
+      aria-label={props.create ? "Create record" : "Edit record"}
+      class={
+        hasPermission()
+          ? `flex items-center hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700 ${props.create ? "gap-1.5 rounded-md px-2 py-1.5 text-sm" : "rounded-sm p-1.5"}`
+          : `flex items-center opacity-40 ${props.create ? "gap-1.5 rounded-md px-2 py-1.5 text-sm" : "rounded-sm p-1.5"}`
+      }
+      onclick={openEditor}
+    >
+      <div class={props.create ? "iconify lucide--square-pen" : "iconify lucide--pencil"} />
+      <Show when={props.create}>Create</Show>
+    </button>
+  );
 
   return (
     <>
@@ -362,37 +395,21 @@ export const RecordEditor = (props: {
           <span class="text-sm font-medium">{props.create ? "Creating" : "Editing"} record</span>
         </button>
       </Show>
-      <Tooltip
-        text={
-          hasPermission()
-            ? props.create
-              ? "Create record"
-              : "Edit record"
-            : `${props.create ? "Create record" : "Edit record"} (permission required)`
-        }
-        shortcut={hasPermission() ? (props.create ? "N" : "E") : undefined}
-      >
-        <button
-          class={
-            hasPermission()
-              ? `flex items-center p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700 ${props.create ? "rounded-md" : "rounded-sm"}`
-              : `flex items-center p-1.5 opacity-40 ${props.create ? "rounded-md" : "rounded-sm"}`
+      <Show when={props.showTrigger !== false}>
+        <Show
+          when={props.create}
+          fallback={
+            <Tooltip
+              text={hasPermission() ? "Edit record" : "Edit record (permission required)"}
+              shortcut={hasPermission() ? "E" : undefined}
+            >
+              {triggerButton()}
+            </Tooltip>
           }
-          onclick={() => {
-            if (hasPermission()) {
-              setNotice("");
-              setOpenDialog(true);
-              setIsMinimized(false);
-            } else if (props.scope) {
-              showPermissionPrompt(props.scope);
-            }
-          }}
         >
-          <div
-            class={props.create ? "iconify lucide--square-pen text-lg" : "iconify lucide--pencil"}
-          />
-        </button>
-      </Tooltip>
+          {triggerButton()}
+        </Show>
+      </Show>
     </>
   );
 };

@@ -352,6 +352,10 @@ function handleFromDoc(doc) {
 
 const STATIC_ROUTES = {
   "/": { title: "PDSls", description: "Browse and manage data across the AT Protocol" },
+  "/streams": {
+    title: "Live streams",
+    description: "Inspect events from the AT Protocol network.",
+  },
   "/jetstream": {
     title: "Jetstream",
     description: "A simplified event stream with support for collection and DID filtering.",
@@ -361,7 +365,6 @@ const STATIC_ROUTES = {
     title: "Spacedust",
     description: "A stream of links showing interactions across the network.",
   },
-  "/labels": { title: "Labels", description: "Query labels applied to accounts and records." },
   "/car": {
     title: "CAR explorer",
     description: "Upload an archive to explore or export its contents.",

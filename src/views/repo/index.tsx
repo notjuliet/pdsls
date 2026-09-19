@@ -53,6 +53,7 @@ import {
 import { createLatch } from "../../lib/create-latch.js";
 import { useFilterShortcut } from "../../lib/keyboard.js";
 import { RepoProvider, useRepo } from "../../lib/repo-context.jsx";
+import { LabelFeed } from "../labels.jsx";
 import { plcDirectory } from "../settings.jsx";
 import { BlobView } from "./blob.jsx";
 import { IdentityView } from "./identity.jsx";
@@ -67,6 +68,8 @@ const LazyTab = (props: { children: JSX.Element }) => (
     </Suspense>
   </ErrorBoundary>
 );
+
+type RepoTabId = "collections" | "labels" | "backlinks" | "identity" | "blobs" | "logs";
 
 export const repoPreload: RoutePreloadFunc = ({ params }) => {
   if (params.repo?.startsWith("did:")) void getPDS(params.repo);
@@ -253,6 +256,7 @@ const RepoView = () => {
   const params = useParams();
   const hidden = () => !!params.collection || !!params.cid;
   const location = useLocation();
+  const navigate = useNavigate();
   const [error, setError] = createSignal<string>();
   const [downloading, setDownloading] = createSignal(false);
   const [nsids, setNsids] = createSignal<Record<string, { hidden: boolean; nsids: string[] }>>();
@@ -265,25 +269,34 @@ const RepoView = () => {
     useFilterShortcut(() => filterInputRef);
   });
 
-  const RepoTab = (props: {
-    tab: "collections" | "backlinks" | "identity" | "blobs" | "logs";
-    label: string;
-  }) => {
-    const isActive = () => {
-      if (!location.hash) {
-        if (!error() && props.tab === "collections") return true;
-        if (!!error() && props.tab === "identity") return true;
-        return false;
-      }
-      return location.hash.startsWith(`#${props.tab}`);
-    };
+  const activeTab = (): RepoTabId => {
+    if (!location.hash) return error() ? "identity" : "collections";
 
+    const tab = location.hash.slice(1).split(":")[0] as RepoTabId;
+    return ["collections", "labels", "identity", "logs", "blobs", "backlinks"].includes(tab)
+      ? tab
+      : "collections";
+  };
+
+  const repoTabs = () =>
+    (
+      [
+        { tab: "collections", label: "Collections", show: !error() },
+        { tab: "labels", label: "Labels", show: !!params.repo && params.repo in labelerCache },
+        { tab: "identity", label: "Identity", show: true },
+        { tab: "logs", label: "Logs", show: did.startsWith("did:plc") },
+        { tab: "blobs", label: "Blobs", show: !error() },
+        { tab: "backlinks", label: "Backlinks", show: true },
+      ] satisfies { tab: RepoTabId; label: string; show: boolean }[]
+    ).filter((tab) => tab.show);
+
+  const RepoTab = (props: { tab: RepoTabId; label: string }) => {
     return (
       <A
         classList={{
           "border-b-2 font-medium transition-colors": true,
           "border-transparent not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80":
-            !isActive(),
+            activeTab() !== props.tab,
         }}
         href={`/at://${params.repo}#${props.tab}`}
       >
@@ -392,19 +405,21 @@ const RepoView = () => {
       </Show>
       <Show when={repoData.state === "ready" || repo.error()}>
         <div class="flex w-full flex-col gap-3 wrap-break-word">
-          <div class="flex justify-between px-2 text-sm sm:text-base">
-            <div class="flex items-center gap-3 sm:gap-4">
-              <Show when={!error()}>
-                <RepoTab tab="collections" label="Collections" />
-              </Show>
-              <RepoTab tab="identity" label="Identity" />
-              <Show when={did.startsWith("did:plc")}>
-                <RepoTab tab="logs" label="Logs" />
-              </Show>
-              <Show when={!error()}>
-                <RepoTab tab="blobs" label="Blobs" />
-              </Show>
-              <RepoTab tab="backlinks" label="Backlinks" />
+          <div class="flex items-center justify-between gap-2 px-2 text-sm sm:text-base">
+            <div class="relative min-w-0 flex-1 sm:hidden">
+              <select
+                aria-label="Repository section"
+                value={activeTab()}
+                class="dark:bg-dark-100 w-full appearance-none rounded-md border border-neutral-300 bg-neutral-50 px-2.5 py-1.5 pr-8 text-sm outline-none focus:border-neutral-400 dark:border-neutral-600 dark:scheme-dark dark:focus:border-neutral-500"
+                onChange={(event) => navigate(`/at://${params.repo}#${event.currentTarget.value}`)}
+              >
+                <For each={repoTabs()}>{(tab) => <option value={tab.tab}>{tab.label}</option>}</For>
+              </select>
+              <span class="iconify lucide--chevron-down pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-neutral-500 dark:text-neutral-400" />
+            </div>
+
+            <div class="hidden items-center gap-4 sm:flex">
+              <For each={repoTabs()}>{(tab) => <RepoTab tab={tab.tab} label={tab.label} />}</For>
             </div>
             <div class="flex gap-1">
               <Show when={error() && error() !== "Missing PDS"}>
@@ -424,17 +439,10 @@ const RepoView = () => {
               <MenuProvider>
                 <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
                   <NavMenu
-                    href={`/jetstream?dids=${params.repo}`}
+                    href={`/streams?type=jetstream&dids=${encodeURIComponent(params.repo!)}`}
                     label="Jetstream"
                     icon="lucide--radio-tower"
                   />
-                  <Show when={params.repo && params.repo in labelerCache}>
-                    <NavMenu
-                      href={`/labels?did=${params.repo}&uriPatterns=*`}
-                      label="Labels"
-                      icon="lucide--tag"
-                    />
-                  </Show>
                   <Show when={error()?.length === 0 || error() === undefined}>
                     <ActionMenu
                       label="Download repo"
@@ -473,6 +481,11 @@ const RepoView = () => {
             <Show when={location.hash === "#blobs"}>
               <LazyTab>
                 <BlobView pds={repo.pds()!} repo={did} />
+              </LazyTab>
+            </Show>
+            <Show when={location.hash === "#labels" && labelerCache[did]}>
+              <LazyTab>
+                <LabelFeed labelerDid={did} labelerEndpoint={labelerCache[did]} />
               </LazyTab>
             </Show>
             <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
@@ -552,14 +565,14 @@ const RepoView = () => {
         <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
           <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
             <FilterInput
-              class="w-full max-w-120"
+              class="w-full max-w-[34.5rem]"
               inputRef={(input) => (filterInputRef = input)}
               name="filter"
               placeholder="Filter collections..."
               value={filter() ?? ""}
               onInput={(value) => setFilter(value.toLowerCase())}
             />
-            <div class="flex w-full max-w-120 justify-end gap-1">
+            <div class="flex w-full max-w-[34.5rem] justify-end gap-1">
               <button
                 class="rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
                 onClick={expandAll}

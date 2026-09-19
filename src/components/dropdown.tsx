@@ -31,11 +31,12 @@ export const CopyMenu = (props: { content: string; label: string; icon?: string 
 
   return (
     <button
+      type="button"
       onClick={() => {
         addToClipboard(props.content);
         ctx?.setShowMenu(false);
       }}
-      class="flex items-center gap-2 rounded-md p-1.5 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      class="flex w-full items-center gap-2 rounded-md p-1.5 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
     >
       <Show when={props.icon}>
         <span
@@ -51,6 +52,8 @@ export const NavMenu = (props: {
   href: string;
   label: string;
   icon?: string;
+  children?: JSX.Element;
+  class?: string;
   newTab?: boolean;
   external?: boolean;
   shortcut?: string;
@@ -61,53 +64,104 @@ export const NavMenu = (props: {
     <A
       href={props.href}
       onClick={() => ctx?.setShowMenu(false)}
-      class="flex items-center gap-2 rounded-md p-1.5 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      class={`flex w-full items-center gap-2 rounded-md p-1.5 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 ${props.class ?? ""}`}
       classList={{ "justify-between": props.external || !!props.shortcut }}
       target={props.newTab ? "_blank" : undefined}
     >
-      <div class="flex items-center gap-2">
-        <Show when={props.icon}>
-          <span
-            class={"iconify shrink-0 text-neutral-500 dark:text-neutral-400 " + props.icon}
-          ></span>
-        </Show>
-        <span class="whitespace-nowrap">{props.label}</span>
-      </div>
-      <Show when={props.shortcut}>
-        <kbd class="rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 font-mono text-[10px] text-neutral-500 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-400">
-          {props.shortcut}
-        </kbd>
-      </Show>
-      <Show when={props.external}>
-        <span class="iconify lucide--external-link"></span>
-      </Show>
+      {props.children ?? (
+        <>
+          <div class="flex items-center gap-2">
+            <Show when={props.icon}>
+              <span
+                class={"iconify shrink-0 text-neutral-500 dark:text-neutral-400 " + props.icon}
+              ></span>
+            </Show>
+            <span class="whitespace-nowrap">{props.label}</span>
+          </div>
+          <Show when={props.shortcut}>
+            <kbd class="rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 font-mono text-[10px] text-neutral-500 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-400">
+              {props.shortcut}
+            </kbd>
+          </Show>
+          <Show when={props.external}>
+            <span class="iconify lucide--external-link"></span>
+          </Show>
+        </>
+      )}
     </A>
   );
 };
 
 export const ActionMenu = (props: {
   label: string;
-  icon: string;
-  onClick: () => void;
+  icon?: string | JSX.Element;
+  onClick: () => unknown;
   keepOpen?: boolean;
+  trailing?: JSX.Element;
 }) => {
   const ctx = useContext(MenuContext);
 
   return (
     <button
-      onClick={() => {
-        props.onClick();
-        if (!props.keepOpen) ctx?.setShowMenu(false);
+      type="button"
+      onClick={async () => {
+        try {
+          await props.onClick();
+        } finally {
+          if (!props.keepOpen) ctx?.setShowMenu(false);
+        }
       }}
-      class="flex items-center gap-2 rounded-md p-1.5 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      class="flex w-full items-center justify-between gap-3 rounded-md p-1.5 text-left whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
     >
-      <Show when={props.icon}>
-        <span
-          class={"iconify shrink-0 text-neutral-500 dark:text-neutral-400 " + props.icon}
-        ></span>
-      </Show>
-      <span class="whitespace-nowrap">{props.label}</span>
+      <span class="flex min-w-0 items-center gap-2">
+        <Show when={props.icon}>
+          {typeof props.icon === "string" ? (
+            <span
+              class={"iconify shrink-0 text-neutral-500 dark:text-neutral-400 " + props.icon}
+            ></span>
+          ) : (
+            props.icon
+          )}
+        </Show>
+        <span class="truncate">{props.label}</span>
+      </span>
+      <Show when={props.trailing}>{props.trailing}</Show>
     </button>
+  );
+};
+
+export const FileActionMenu = (props: {
+  label: string;
+  icon: string;
+  accept?: string;
+  onChange: (event: Event) => void;
+}) => {
+  const ctx = useContext(MenuContext);
+  let inputRef!: HTMLInputElement;
+
+  return (
+    <>
+      <input
+        ref={inputRef}
+        type="file"
+        accept={props.accept}
+        class="hidden"
+        onChange={(event) => {
+          props.onChange(event);
+          ctx?.setShowMenu(false);
+        }}
+      />
+      <button
+        type="button"
+        onClick={() => inputRef.click()}
+        class="flex w-full items-center gap-2 rounded-md p-1.5 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+      >
+        <span
+          class={`iconify ${props.icon} shrink-0 text-neutral-500 dark:text-neutral-400`}
+        ></span>
+        <span>{props.label}</span>
+      </button>
+    </>
   );
 };
 
@@ -116,9 +170,12 @@ export const MenuSeparator = () => {
 };
 
 export const DropdownMenu = (props: {
-  icon: string;
+  icon?: string;
+  buttonContent?: JSX.Element;
+  buttonLabel?: string;
   buttonClass?: string;
   menuClass?: string;
+  menuWidth?: number;
   children?: JSX.Element;
 }) => {
   const ctx = useContext(MenuContext);
@@ -162,6 +219,10 @@ export const DropdownMenu = (props: {
   return (
     <div class="relative">
       <button
+        type="button"
+        aria-label={props.buttonLabel}
+        aria-haspopup="menu"
+        aria-expanded={ctx?.showMenu()}
         class={
           "flex items-center hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700 " +
           props.buttonClass
@@ -172,7 +233,7 @@ export const DropdownMenu = (props: {
           ctx?.setShowMenu(!ctx?.showMenu());
         }}
       >
-        <span class={"iconify " + props.icon}></span>
+        {props.buttonContent ?? <span class={"iconify " + props.icon}></span>}
       </button>
       <Show when={ctx?.showMenu()}>
         <Portal>
@@ -181,8 +242,10 @@ export const DropdownMenu = (props: {
             style={{
               position: "fixed",
               top: `${(buttonRect()?.bottom ?? 0) + 4}px`,
-              left: `${(buttonRect()?.right ?? 0) - 160}px`,
+              left: `${Math.max(8, (buttonRect()?.right ?? 0) - (props.menuWidth ?? 160))}px`,
+              width: props.menuWidth ? `${props.menuWidth}px` : undefined,
             }}
+            role="menu"
             class={
               "dark:bg-dark-300 dark:shadow-dark-700 z-50 flex min-w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-sm shadow-md dark:border-neutral-700 " +
               props.menuClass

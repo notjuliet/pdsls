@@ -1,28 +1,56 @@
 import { A } from "@solidjs/router";
-import { JSX, Show } from "solid-js";
+import { For, JSX } from "solid-js";
 
-import { agent, avatars, sessions, setOpenManager, setShowAddAccount } from "../auth/state";
-import { AlphaBadge } from "../components/alpha-badge.jsx";
-import { setShowSearch } from "../components/search";
+const repositoryExamples = [
+  {
+    type: "Repo",
+    value: "@retr0.id",
+    href: "/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2",
+  },
+  {
+    type: "Record",
+    value: "at://futur.blue/app.bsky.actor.profile/self",
+    href: "/at://did:plc:uu5axsmbm2or2dngy4gwchec/app.bsky.actor.profile/self",
+  },
+  {
+    type: "PDS",
+    value: "pds.witchcraft.systems",
+    href: "/pds.witchcraft.systems",
+  },
+  {
+    type: "Lexicon",
+    value: "site.standard.document",
+    href: "/at://did:plc:re3ebnp5v7ffagz6rb6xfei4/com.atproto.lexicon.schema/site.standard.document#schema",
+  },
+  {
+    type: "Labels",
+    value: "moderation.bsky.app",
+    href: "/at://did:plc:ar7c4by46qjdydhdevvrndac#labels",
+  },
+  {
+    type: "Backlinks",
+    value: "mary.my.id",
+    href: "/at://did:plc:ia76kvnndjutgedggx2ibrem#backlinks",
+  },
+];
 
-const baseCardClass =
-  "group flex flex-col gap-1 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-neutral-700 transition-colors dark:border-neutral-700 dark:bg-neutral-800/50 dark:text-neutral-300 hover:bg-neutral-50/50 dark:hover:bg-neutral-800";
-
-const accentCard = {
-  blue: `${baseCardClass} hover:border-blue-500 dark:hover:border-blue-400`,
-  orange: `${baseCardClass} hover:border-red-500 dark:hover:border-red-400`,
-  violet: `${baseCardClass} hover:border-emerald-500 dark:hover:border-emerald-400`,
-};
-
-const accentIcon = {
-  blue: "text-neutral-400 dark:text-neutral-500 group-hover:text-blue-500 dark:group-hover:text-blue-400",
-  orange:
-    "text-neutral-400 dark:text-neutral-500 group-hover:text-red-500 dark:group-hover:text-red-400",
-  violet:
-    "text-neutral-400 dark:text-neutral-500 group-hover:text-emerald-500 dark:group-hover:text-emerald-400",
-};
-
-type Accent = "blue" | "orange" | "violet";
+const streamLinks = [
+  {
+    label: "Jetstream",
+    icon: "lucide--radio-tower",
+    href: "/streams?type=jetstream",
+  },
+  {
+    label: "Firehose",
+    icon: "lucide--rss",
+    href: "/streams?type=firehose",
+  },
+  {
+    label: "Spacedust",
+    icon: "lucide--sparkles",
+    href: "/streams?type=spacedust",
+  },
+];
 
 const defaultAtProtocolUrl = "https://atproto.com";
 const atProtoRefererUrl = "https://at-proto.com";
@@ -36,65 +64,6 @@ const getAtProtocolUrl = () => {
     return defaultAtProtocolUrl;
   }
 };
-
-const CardContent = (props: {
-  icon: string | JSX.Element;
-  title: string;
-  badge?: JSX.Element;
-  description: string;
-  accent: Accent;
-}) => (
-  <>
-    <span class="flex min-w-0 items-center gap-1.5 text-xs sm:text-base">
-      {typeof props.icon === "string" ? (
-        <span class={`${props.icon} iconify shrink-0 ${accentIcon[props.accent]}`} />
-      ) : (
-        props.icon
-      )}
-      <span class="truncate font-medium">{props.title}</span>
-      <Show when={props.badge}>{props.badge}</Show>
-    </span>
-    <span class="text-xs text-neutral-500 sm:text-sm dark:text-neutral-400">
-      {props.description}
-    </span>
-  </>
-);
-
-const ButtonCard = (props: {
-  onClick: () => void;
-  icon: string | JSX.Element;
-  title: string;
-  description: string;
-  accent: Accent;
-}) => (
-  <button onClick={props.onClick} class={`${accentCard[props.accent]} text-left`}>
-    <CardContent
-      icon={props.icon}
-      title={props.title}
-      description={props.description}
-      accent={props.accent}
-    />
-  </button>
-);
-
-const LinkCard = (props: {
-  href: string;
-  icon: string | JSX.Element;
-  title: string;
-  badge?: JSX.Element;
-  description: string;
-  accent: Accent;
-}) => (
-  <A href={props.href} class={accentCard[props.accent]}>
-    <CardContent
-      icon={props.icon}
-      title={props.title}
-      badge={props.badge}
-      description={props.description}
-      accent={props.accent}
-    />
-  </A>
-);
 
 export const Home = () => {
   const FooterLink = (props: {
@@ -114,119 +83,81 @@ export const Home = () => {
 
   document.title = "PDSls";
   return (
-    <div class="flex w-full flex-col gap-6 px-2 wrap-break-word">
-      {/* Welcome Section */}
-      <div class="flex flex-col gap-1">
-        <h1 class="text-lg font-medium">Atmosphere Explorer</h1>
-        <div class="text-sm text-neutral-600 dark:text-neutral-300/80">
-          <p>
-            Browse and manage data across the{" "}
-            <a
-              href={getAtProtocolUrl()}
-              target="_blank"
-              class="underline decoration-neutral-400 transition-colors hover:text-blue-500 hover:decoration-blue-500 dark:decoration-neutral-500 dark:hover:text-blue-400"
-            >
-              AT Protocol
-            </a>
-          </p>
+    <div class="flex min-h-[calc(100dvh-6rem)] w-full flex-col px-2 wrap-break-word">
+      <section class="flex flex-1 flex-col items-center justify-center py-10 text-center sm:pb-16">
+        <h1 class="text-2xl font-semibold tracking-tight">Explore the Atmosphere</h1>
+        <a
+          href={getAtProtocolUrl()}
+          target="_blank"
+          class="mt-3 text-xs text-neutral-500 underline decoration-neutral-300 underline-offset-2 transition-colors hover:text-blue-500 hover:decoration-blue-500 dark:text-neutral-400 dark:decoration-neutral-600 dark:hover:text-blue-400"
+        >
+          About AT Protocol
+        </a>
+
+        <div class="mt-6 w-full max-w-lg text-left">
+          <div class="rounded-lg border border-neutral-200 p-2 sm:p-3 dark:border-neutral-700">
+            <h2 class="px-2 py-1 text-sm font-medium sm:text-base">Browse</h2>
+            <div class="mt-1 grid grid-cols-1 gap-x-3 sm:grid-cols-2">
+              <For each={repositoryExamples}>
+                {(example) => (
+                  <A
+                    href={example.href}
+                    class="flex min-w-0 items-baseline gap-2 rounded-md px-2 py-1 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-1.5 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+                  >
+                    <span class="w-16 shrink-0 text-[10px] font-medium tracking-wide text-neutral-400 uppercase dark:text-neutral-500">
+                      {example.type}
+                    </span>
+                    <span class="truncate text-xs text-neutral-600 dark:text-neutral-300">
+                      {example.value}
+                    </span>
+                  </A>
+                )}
+              </For>
+            </div>
+          </div>
+
+          <div class="mt-3 rounded-lg border border-neutral-200 p-2 sm:p-3 dark:border-neutral-700">
+            <h2 class="px-2 py-1 text-sm font-medium sm:text-base">Stream</h2>
+            <div class="grid grid-cols-3 gap-1">
+              <For each={streamLinks}>
+                {(stream) => (
+                  <A
+                    href={stream.href}
+                    class="flex min-w-0 items-center justify-center gap-1.5 rounded-md px-1.5 py-1.5 text-xs text-neutral-600 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+                  >
+                    <span
+                      class={`iconify ${stream.icon} shrink-0 text-neutral-500 dark:text-neutral-400`}
+                    />
+                    <span class="truncate">{stream.label}</span>
+                  </A>
+                )}
+              </For>
+            </div>
+          </div>
+
+          <div class="mt-3 rounded-lg border border-neutral-200 p-2 sm:p-3 dark:border-neutral-700">
+            <h2 class="px-2 py-1 text-sm font-medium sm:text-base">Sign in</h2>
+            <div class="grid grid-cols-2 gap-1">
+              <A
+                href="/account/add"
+                class="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-center text-xs text-neutral-600 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+              >
+                <span class="iconify lucide--user-round-plus shrink-0 text-neutral-500 dark:text-neutral-400" />
+                Add account
+              </A>
+              <A
+                href="/spaces"
+                class="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-center text-xs text-neutral-600 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+              >
+                <span class="iconify lucide--lock-keyhole shrink-0 text-neutral-500 dark:text-neutral-400" />
+                Spaces
+              </A>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div class="flex flex-col gap-3 text-sm">
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <ButtonCard
-            onClick={() => setShowSearch(true)}
-            icon="lucide--search"
-            title="Search"
-            description="Find any user or record"
-            accent="blue"
-          />
-          <Show
-            when={agent()?.sub && sessions[agent()!.sub]?.signedIn}
-            fallback={
-              <ButtonCard
-                onClick={() => {
-                  setOpenManager(true);
-                  setShowAddAccount(true);
-                }}
-                icon="lucide--user-round"
-                title="Sign in"
-                description="Manage records"
-                accent="blue"
-              />
-            }
-          >
-            <LinkCard
-              href={`/at://${agent()!.sub}`}
-              icon={
-                avatars[agent()!.sub] ? (
-                  <img
-                    src={avatars[agent()!.sub].replace("img/avatar/", "img/avatar_thumbnail/")}
-                    class="size-3.75 shrink-0 rounded-full sm:size-5"
-                  />
-                ) : (
-                  "lucide--user-round"
-                )
-              }
-              title={sessions[agent()!.sub]?.handle ?? agent()!.sub}
-              description="View your repository"
-              accent="blue"
-            />
-          </Show>
-        </div>
-
-        <LinkCard
-          href="/spaces"
-          icon="lucide--lock-keyhole"
-          title="Spaces"
-          badge={<AlphaBadge />}
-          description="Preview and manage non-public records"
-          accent="blue"
-        />
-
-        <div class="grid grid-cols-3 gap-2">
-          <LinkCard
-            href="/jetstream"
-            icon="lucide--radio-tower"
-            title="Jetstream"
-            description="Simplified stream"
-            accent="orange"
-          />
-          <LinkCard
-            href="/firehose"
-            icon="lucide--rss"
-            title="Firehose"
-            description="Raw event stream"
-            accent="orange"
-          />
-          <LinkCard
-            href="/spacedust"
-            icon="lucide--sparkles"
-            title="Spacedust"
-            description="Backlinks stream"
-            accent="orange"
-          />
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <LinkCard
-            href="/labels"
-            icon="lucide--tag"
-            title="Labels"
-            description="Query labeler services"
-            accent="violet"
-          />
-          <LinkCard
-            href="/car"
-            icon="lucide--folder-archive"
-            title="Archive"
-            description="Explore CAR files"
-            accent="violet"
-          />
-        </div>
-      </div>
-
-      <div class="flex justify-center gap-1.5 text-sm text-neutral-600 sm:gap-2 sm:text-base dark:text-neutral-300">
+      <footer class="flex justify-center gap-1.5 pb-2 text-sm text-neutral-500 sm:gap-2 dark:text-neutral-400">
         <FooterLink href="https://raycast.com/juliet_philippe/pdsls" color="after:text-[#FF6363]">
           <span class="iconify-color i-raycast-light block dark:hidden"></span>
           <span class="iconify-color i-raycast-dark hidden dark:block"></span>
@@ -249,7 +180,7 @@ export const Home = () => {
           <span class="iconify i-tangled text-black dark:text-white"></span>
           Source
         </FooterLink>
-      </div>
+      </footer>
     </div>
   );
 };

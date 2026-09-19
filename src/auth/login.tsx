@@ -4,11 +4,7 @@ import "./oauth-config";
 import { useOAuthScopeFlow } from "./scope-flow";
 import { ScopeSelector } from "./scope-selector";
 
-interface LoginProps {
-  onCancel?: () => void;
-}
-
-export const Login = (props: LoginProps) => {
+export const Login = () => {
   const [notice, setNotice] = createSignal("");
   const [loginInput, setLoginInput] = createSignal("");
 
@@ -25,26 +21,26 @@ export const Login = (props: LoginProps) => {
     scopeFlow.cancel();
     setLoginInput("");
     setNotice("");
-    props.onCancel?.();
   };
 
   return (
     <div class="flex flex-col gap-y-3">
       <Show when={!scopeFlow.showScopeSelector()}>
-        <Show when={props.onCancel}>
-          <div class="flex items-center gap-2">
-            <button
-              onclick={handleCancel}
-              class="flex items-center rounded-md p-1 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-            >
-              <span class="iconify lucide--arrow-left"></span>
-            </button>
-            <div class="font-semibold">Add account</div>
-          </div>
-        </Show>
-        <form class="flex flex-col gap-3" onsubmit={(e) => e.preventDefault()}>
-          <label for="username" class="hidden">
-            Add account
+        <div>
+          <h1 class="text-lg font-semibold">Add account</h1>
+          <p class="text-sm text-neutral-600 dark:text-neutral-400">
+            Sign in with an AT Protocol account.
+          </p>
+        </div>
+        <form
+          class="flex flex-col gap-3"
+          onsubmit={(event) => {
+            event.preventDefault();
+            initiateLogin(loginInput());
+          }}
+        >
+          <label for="username" class="text-sm font-medium">
+            Handle or DID
           </label>
           <input
             type="text"
@@ -59,8 +55,8 @@ export const Login = (props: LoginProps) => {
             onInput={(e) => setLoginInput(e.currentTarget.value)}
           />
           <button
-            onclick={() => initiateLogin(loginInput())}
-            class="dark:hover:bg-dark-200 dark:active:bg-dark-100 flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700"
+            type="submit"
+            class="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-500/90 px-3 py-2 text-white hover:bg-blue-500 active:bg-blue-600 dark:bg-blue-500/80 dark:hover:bg-blue-500/90 dark:active:bg-blue-500"
           >
             Continue
           </button>
@@ -68,7 +64,15 @@ export const Login = (props: LoginProps) => {
       </Show>
 
       <Show when={scopeFlow.showScopeSelector()}>
-        <ScopeSelector onConfirm={scopeFlow.complete} onCancel={handleCancel} />
+        <div>
+          <h1 class="text-lg font-semibold">Choose permissions</h1>
+          <p class="text-sm text-neutral-600 dark:text-neutral-400">{scopeFlow.pendingAccount()}</p>
+        </div>
+        <ScopeSelector
+          onConfirm={scopeFlow.complete}
+          onCancel={handleCancel}
+          cancelLabel="Use a different account"
+        />
       </Show>
 
       <Show when={notice()}>

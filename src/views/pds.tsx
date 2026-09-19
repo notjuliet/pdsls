@@ -305,7 +305,7 @@ const PdsView = () => {
       }}
       href={
         props.tab === "firehose"
-          ? `/firehose?instance=wss://${params.pds}`
+          ? `/streams?type=firehose&instance=${encodeURIComponent(`wss://${params.pds}`)}`
           : `/${params.pds}#${props.tab}`
       }
     >

@@ -5,10 +5,11 @@ import { render } from "solid-js/web";
 import { Layout } from "./layout.tsx";
 
 import "./styles/index.css";
+import { AccountLoginView, AccountPermissionsView } from "./views/account.tsx";
 import { CarView } from "./views/car/explore.tsx";
 import { CollectionLayout } from "./views/collection.tsx";
 import { Home } from "./views/home.tsx";
-import { LabelView } from "./views/labels.tsx";
+import { LegacyLabelsRedirect } from "./views/labels.tsx";
 import { LexiconRedirect } from "./views/lexicon-redirect.tsx";
 import { PdsLayout } from "./views/pds.tsx";
 import { RecordView } from "./views/record.tsx";
@@ -24,15 +25,18 @@ import {
   SpaceRouteLayout,
   SpacesLayout,
 } from "./views/spaces/index.tsx";
-import { StreamView } from "./views/stream";
+import { LegacyStreamRedirect, StreamView } from "./views/stream";
 
 render(
   () => (
     <Router root={Layout}>
       <Route path="/" component={Home} />
-      <Route path={["/jetstream", "/firehose", "/spacedust"]} component={StreamView} />
-      <Route path="/labels" component={LabelView} />
+      <Route path="/streams" component={StreamView} />
+      <Route path={["/jetstream", "/firehose", "/spacedust"]} component={LegacyStreamRedirect} />
+      <Route path="/labels" component={LegacyLabelsRedirect} />
       <Route path="/car" component={CarView} />
+      <Route path="/account/add" component={AccountLoginView} />
+      <Route path="/account/:did/permissions" component={AccountPermissionsView} />
       <Route path="/spaces" component={SpacesLayout} />
       <Route
         path="/spaces/:spaceAuthority/space/:spaceType/:skey/*spaceRest"

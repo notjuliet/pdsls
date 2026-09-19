@@ -135,7 +135,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
   spacedust: {
     label: "Spacedust",
     description: "A stream of links showing interactions across the network.",
-    icon: "lucide--link",
+    icon: "lucide--sparkles",
     defaultInstance: "wss://spacedust.microcosm.blue/subscribe",
     useFirehoseLib: false,
     collectionsLabel: "Top Sources",
@@ -212,8 +212,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
 
 export const STREAM_TYPES = Object.keys(STREAM_CONFIGS) as StreamType[];
 
-export const getStreamType = (pathname: string): StreamType => {
-  if (pathname === "/firehose") return "firehose";
-  if (pathname === "/spacedust") return "spacedust";
-  return "jetstream";
+export const getStreamType = (value: string | string[] | undefined): StreamType => {
+  const type = Array.isArray(value) ? value[0] : value;
+  return STREAM_TYPES.includes(type as StreamType) ? (type as StreamType) : "jetstream";
 };
