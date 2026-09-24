@@ -411,7 +411,7 @@ export const Search = () => {
           aria-expanded={showSearch()}
           aria-controls="global-search-panel"
           placeholder="Search or paste..."
-          class="min-w-0 flex-1 bg-transparent py-1 outline-none placeholder:text-neutral-500 dark:placeholder:text-neutral-400"
+          class="min-w-0 flex-1 bg-transparent py-1 outline-none placeholder:text-neutral-500 dark:placeholder:text-neutral-400 pointer-coarse:text-base"
           value={input() ?? ""}
           onFocus={openSearch}
           onInput={(event) => {
