@@ -6,20 +6,26 @@ export const TagInput = (props: {
   name: string;
   placeholder?: string;
   initialValues?: string[];
+  onChange?: (values: string[]) => void;
 }) => {
   const [tags, setTags] = createSignal<string[]>(props.initialValues ?? []);
   const [inputValue, setInputValue] = createSignal("");
 
+  const updateTags = (next: string[]) => {
+    setTags(next);
+    props.onChange?.(next);
+  };
+
   const addTag = () => {
     const value = inputValue().trim();
     if (value && !tags().includes(value)) {
-      setTags([...tags(), value]);
       setInputValue("");
+      updateTags([...tags(), value]);
     }
   };
 
   const removeTag = (index: number) => {
-    setTags(tags().filter((_, i) => i !== index));
+    updateTags(tags().filter((_, i) => i !== index));
   };
 
   const onKeyDown = (e: KeyboardEvent) => {

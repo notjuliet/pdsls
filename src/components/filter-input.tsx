@@ -10,7 +10,7 @@ interface FilterInputProps {
 
 export const FilterInput = (props: FilterInputProps) => (
   <div
-    class={`dark:bg-dark-200 flex min-w-0 cursor-text items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 text-sm dark:border-neutral-700 ${props.class ?? ""}`}
+    class={`dark:bg-dark-100 flex min-w-0 cursor-text items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2 text-base dark:border-neutral-600 ${props.class ?? ""}`}
     onClick={(event) => {
       const input = event.currentTarget.querySelector("input");
       if (event.target !== input) input?.focus();
@@ -25,7 +25,7 @@ export const FilterInput = (props: FilterInputProps) => (
       autocomplete="off"
       name={props.name}
       class={
-        props.inputClass ?? "min-w-0 grow py-1.5 select-none placeholder:text-xs focus:outline-none"
+        props.inputClass ?? "min-w-0 grow py-1 select-none placeholder:text-xs focus:outline-none"
       }
       placeholder={props.placeholder}
       value={props.value}

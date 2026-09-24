@@ -67,11 +67,13 @@ export const LabelFeed = (props: { labelerDid: string; labelerEndpoint: string }
   const [loading, setLoading] = createSignal(true);
   const [error, setError] = createSignal<string>();
   const [isSticky, setIsSticky] = createSignal(false);
+  const [uriPatterns, setUriPatterns] = createSignal(
+    getSearchParam(searchParams.uriPatterns) || "*",
+  );
   const rpc = new Client({
     handler: simpleFetchHandler({ service: props.labelerEndpoint }),
   });
 
-  let formRef!: HTMLFormElement;
   let filterInputRef: HTMLInputElement | undefined;
   let stickySentinelRef!: HTMLDivElement;
 
@@ -108,9 +110,7 @@ export const LabelFeed = (props: { labelerDid: string; labelerEndpoint: string }
     });
   });
 
-  const fetchLabels = async (formData: FormData, reset = false) => {
-    const uriPatterns = formData.get("uriPatterns")?.toString()?.trim() || "*";
-
+  const fetchLabels = async (uriPatterns: string, reset = false) => {
     if (reset) {
       setLabels([]);
       setCursor(undefined);
@@ -145,6 +145,12 @@ export const LabelFeed = (props: { labelerDid: string; labelerEndpoint: string }
     }
   };
 
+  const applyUriPatterns = (values: string[]) => {
+    const next = values.join(",") || "*";
+    setUriPatterns(next);
+    void fetchLabels(next, true);
+  };
+
   onMount(() => {
     useFilterShortcut(() => filterInputRef);
     const stickyObserver = new IntersectionObserver(([entry]) => {
@@ -153,22 +159,15 @@ export const LabelFeed = (props: { labelerDid: string; labelerEndpoint: string }
     stickyObserver.observe(stickySentinelRef);
     onCleanup(() => stickyObserver.disconnect());
 
-    const formData = new FormData();
-    formData.append("uriPatterns", getSearchParam(searchParams.uriPatterns) || "*");
-    void fetchLabels(formData, true);
+    void fetchLabels(uriPatterns(), true);
   });
 
   return (
     <div class="flex w-full flex-col items-center">
       <div ref={stickySentinelRef} class="-mb-px h-px w-full" aria-hidden="true" />
-      <form
-        ref={formRef}
+      <div
         class="dark:bg-dark-500 sticky top-0 z-10 flex w-full flex-col gap-2 bg-neutral-100 pb-3"
         classList={{ "top-controls-fade": isSticky() }}
-        onSubmit={(event) => {
-          event.preventDefault();
-          void fetchLabels(new FormData(formRef), true);
-        }}
       >
         <label class="flex w-full flex-col gap-1">
           <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Target URI</span>
@@ -180,50 +179,45 @@ export const LabelFeed = (props: { labelerDid: string; labelerEndpoint: string }
                 ?.split(",")
                 .filter((value) => value.trim()) ?? []
             }
+            onChange={applyUriPatterns}
           />
         </label>
         <div class="flex min-h-7.5 items-center gap-2">
-          <Button type="submit" disabled={loading()}>
-            <span class="iconify lucide--search" />
-            Apply
-          </Button>
-
-          <div class="ml-auto flex items-center gap-2">
-            <Show when={labels().length > 0}>
-              <span class="shrink-0 text-sm">
-                <Show when={filter()}>
-                  <span>{filteredLabels().length}/</span>
-                </Show>
-                <span>{labels().length} labels</span>
-              </span>
-            </Show>
-            <Show when={cursor()}>
-              <Button
-                onClick={() => void fetchLabels(new FormData(formRef))}
-                disabled={loading()}
-                classList={{ "h-7.5 w-20 justify-center": true }}
+          <Show when={labels().length > 1}>
+            <FilterInput
+              class="min-w-0 flex-1"
+              inputRef={(input) => (filterInputRef = input)}
+              placeholder="Filter label values… (* partial, -exclude)"
+              value={filter()}
+              onInput={setFilter}
+            />
+          </Show>
+          <Show when={labels().length > 0}>
+            <span class="ml-auto flex shrink-0 items-center gap-1 text-sm">
+              <Show when={filter()}>
+                <span>{filteredLabels().length}/</span>
+              </Show>
+              <span>{labels().length}</span>
+              <span class="iconify lucide--tag shrink-0" aria-hidden="true" />
+              <span class="sr-only">labels</span>
+            </span>
+          </Show>
+          <Show when={cursor()}>
+            <Button
+              onClick={() => void fetchLabels(uriPatterns(), false)}
+              disabled={loading()}
+              classList={{ "h-7.5 w-20 shrink-0 justify-center": true }}
+            >
+              <Show
+                when={!loading()}
+                fallback={<span class="iconify lucide--loader-circle animate-spin" />}
               >
-                <Show
-                  when={!loading()}
-                  fallback={<span class="iconify lucide--loader-circle animate-spin" />}
-                >
-                  Load more
-                </Show>
-              </Button>
-            </Show>
-          </div>
+                Load more
+              </Show>
+            </Button>
+          </Show>
         </div>
-
-        <Show when={labels().length > 1}>
-          <FilterInput
-            class="w-full"
-            inputRef={(input) => (filterInputRef = input)}
-            placeholder="Filter label values… (* partial, -exclude)"
-            value={filter()}
-            onInput={setFilter}
-          />
-        </Show>
-      </form>
+      </div>
 
       <Show when={error()}>
         {(message) => (
