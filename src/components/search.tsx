@@ -440,7 +440,7 @@ export const Search = () => {
             role="dialog"
             aria-label="Navigation and search results"
             style={{ top: `${panelTop()}px` }}
-            class="dark:bg-dark-300 dark:shadow-dark-700 fixed left-1/2 z-50 flex max-h-[min(65vh,28rem)] w-[calc(100vw-1.5rem)] max-w-lg -translate-x-1/2 flex-col overflow-y-auto rounded-xl border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-sm shadow-lg dark:border-neutral-700"
+            class="dark:bg-dark-300 dark:shadow-dark-700 fixed left-1/2 z-50 flex max-h-[min(65vh,28rem)] w-[calc(100vw-1.5rem)] max-w-[34.5rem] -translate-x-1/2 flex-col overflow-y-auto rounded-xl border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-sm shadow-lg dark:border-neutral-700"
           >
             <Show when={!input()}>
               <div class="grid grid-cols-2 gap-1">
