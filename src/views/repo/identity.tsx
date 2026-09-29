@@ -7,6 +7,7 @@ import { canHover } from "../../layout.jsx";
 import { type HandleResolveResult, resolveHandleDetailed, validateHandle } from "../../lib/api.js";
 import { detectDidKeyType, detectKeyType } from "../../lib/key.js";
 import { addToClipboard } from "../../utils/copy.js";
+import { plcDirectory } from "../settings.jsx";
 
 const HandleResult = (props: {
   method: string;
@@ -135,6 +136,11 @@ export const IdentityView = (props: { didDoc: DidDocument; rotationKeys: string[
     })();
   }
 
+  const didDocumentUrl = () =>
+    did.startsWith("did:plc")
+      ? `${plcDirectory()}/${did}`
+      : `https://${did.split("did:web:")[1]}/.well-known/did.json`;
+
   return (
     <div class="flex flex-col gap-3 wrap-anywhere">
       {/* DID */}
@@ -255,6 +261,16 @@ export const IdentityView = (props: { didDoc: DidDocument; rotationKeys: string[
           </div>
         </div>
       </Show>
+
+      <a
+        href={didDocumentUrl()}
+        target="_blank"
+        rel="noopener"
+        class="dark:bg-dark-300 dark:hover:bg-dark-200 dark:active:bg-dark-100 flex w-fit items-center gap-1 rounded-md border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 text-xs text-neutral-700 transition-colors select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:text-neutral-300"
+      >
+        <span class="iconify lucide--external-link" />
+        DID document
+      </a>
     </div>
   );
 };

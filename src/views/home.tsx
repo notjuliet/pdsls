@@ -157,13 +157,12 @@ export const Home = () => {
         </div>
       </section>
 
-      <footer class="flex justify-center gap-1.5 pb-2 text-sm text-neutral-500 sm:gap-2 dark:text-neutral-400">
+      <footer class="flex justify-center gap-4 pb-2 text-sm text-neutral-500 dark:text-neutral-400">
         <FooterLink href="https://raycast.com/juliet_philippe/pdsls" color="after:text-[#FF6363]">
           <span class="iconify-color i-raycast-light block dark:hidden"></span>
           <span class="iconify-color i-raycast-dark hidden dark:block"></span>
           Raycast
         </FooterLink>
-        •
         <FooterLink
           href="https://bsky.app/profile/did:plc:6q5daed5gutiyerimlrnojnz"
           color="after:text-[#0085ff]"
@@ -171,7 +170,6 @@ export const Home = () => {
           <span class="simple-icons--bluesky iconify text-[#0085ff]"></span>
           Bluesky
         </FooterLink>
-        •
         <FooterLink
           href="https://tangled.org/did:plc:6q5daed5gutiyerimlrnojnz/3lvzxnfwb7u22"
           color="after:text-black"

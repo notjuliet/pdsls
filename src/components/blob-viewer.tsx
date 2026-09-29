@@ -225,12 +225,10 @@ export const BlobViewer = (props: {
               return (
                 <>
                   <div class="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 rounded border border-neutral-200 px-3 py-2 text-sm dark:border-neutral-700">
-                    <div class="col-span-2">
-                      <div class="text-neutral-500 dark:text-neutral-400">CID</div>
-                      <div dir="rtl" class="truncate text-left">
-                        {props.cid}
-                      </div>
-                    </div>
+                    <span class="text-neutral-500 dark:text-neutral-400">CID</span>
+                    <span dir="rtl" class="truncate text-left">
+                      {props.cid}
+                    </span>
                     <span class="text-neutral-500 dark:text-neutral-400">Hash</span>
                     <span class="flex flex-col gap-1">
                       <span

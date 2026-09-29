@@ -27,13 +27,7 @@ import {
   DomainGroupRows,
   domainGroupRowClasses,
 } from "../../components/domain-group.jsx";
-import {
-  ActionMenu,
-  DropdownMenu,
-  MenuProvider,
-  MenuSeparator,
-  NavMenu,
-} from "../../components/dropdown.jsx";
+import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../../components/dropdown.jsx";
 import { FilterInput } from "../../components/filter-input.jsx";
 import { setPDS } from "../../components/navbar.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
@@ -452,17 +446,6 @@ const RepoView = () => {
                       onClick={handleDownload}
                     />
                   </Show>
-                  <MenuSeparator />
-                  <NavMenu
-                    href={
-                      did.startsWith("did:plc")
-                        ? `${plcDirectory()}/${did}`
-                        : `https://${did.split("did:web:")[1]}/.well-known/did.json`
-                    }
-                    newTab
-                    label="DID document"
-                    icon="lucide--external-link"
-                  />
                 </DropdownMenu>
               </MenuProvider>
             </div>
