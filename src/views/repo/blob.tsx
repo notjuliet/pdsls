@@ -3,6 +3,7 @@ import { A } from "@solidjs/router";
 import { createResource, createSignal, For, Show } from "solid-js";
 
 import { Button } from "../../components/button";
+import { LoadMoreSentinel } from "../../lib/infinite-scroll";
 
 const LIMIT = 1000;
 
@@ -45,6 +46,11 @@ export const BlobView = (props: { pds: string; repo: string }) => {
               </A>
             )}
           </For>
+          <LoadMoreSentinel
+            hasMore={() => !!cursor() && !response.error}
+            loading={() => response.loading}
+            onLoadMore={() => refetch()}
+          />
         </div>
       </Show>
       <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 pt-3 pb-6">

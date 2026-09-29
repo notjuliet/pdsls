@@ -5,6 +5,7 @@ import { createEffect, createMemo, createSignal, For, type JSX, Show } from "sol
 import { Button } from "../../components/button.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
+import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { resolveRawLexicon } from "../../lib/lexicon.js";
 import {
   getSimpleSpace,
@@ -280,6 +281,11 @@ const SpaceView = () => {
                 </Show>
                 Load more writers
               </Button>
+              <LoadMoreSentinel
+                hasMore={() => !!cursor() && !error()}
+                loading={() => loading()}
+                onLoadMore={() => void loadRepos()}
+              />
             </Show>
           </Show>
         </Show>

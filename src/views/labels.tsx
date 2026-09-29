@@ -8,6 +8,7 @@ import { FilterInput } from "../components/filter-input.jsx";
 import DidHoverCard from "../components/hover-card/did.jsx";
 import RecordHoverCard from "../components/hover-card/record.jsx";
 import { TagInput } from "../components/tag-input.jsx";
+import { LoadMoreSentinel } from "../lib/infinite-scroll.jsx";
 import { useFilterShortcut } from "../lib/keyboard.js";
 import { localDateFromTimestamp } from "../utils/format.js";
 
@@ -247,6 +248,11 @@ export const LabelFeed = (props: { labelerDid: string; labelerEndpoint: string }
             <For each={filteredLabels()}>{(label) => <LabelRow label={label} />}</For>
           </div>
         </Show>
+        <LoadMoreSentinel
+          hasMore={() => !!cursor() && !error()}
+          loading={() => loading()}
+          onLoadMore={() => void fetchLabels(uriPatterns(), false)}
+        />
       </Show>
     </div>
   );

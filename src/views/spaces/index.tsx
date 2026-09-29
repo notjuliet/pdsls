@@ -7,6 +7,7 @@ import { Button } from "../../components/button.jsx";
 import { DomainGroup, domainGroupRowClasses } from "../../components/domain-group.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
+import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { listSpaces, parseSpaceUri, type SpaceView } from "../../lib/spaces.js";
 import {
   makeSpacePath,
@@ -295,6 +296,11 @@ const SpacesIndex = () => {
             </Show>
             Load more Spaces
           </Button>
+          <LoadMoreSentinel
+            hasMore={() => !!cursor() && !error()}
+            loading={() => loading()}
+            onLoadMore={() => void loadSpaces()}
+          />
         </Show>
       </div>
     </Show>

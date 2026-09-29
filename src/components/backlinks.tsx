@@ -3,6 +3,7 @@ import { A, useLocation } from "@solidjs/router";
 import { createResource, createSignal, For, onMount, Show } from "solid-js";
 
 import { getAllBacklinks, getRecordBacklinks, LinksWithRecords } from "../lib/api.js";
+import { LoadMoreSentinel } from "../lib/infinite-scroll.jsx";
 import { useRepo } from "../lib/repo-context.jsx";
 import { localDateFromTimestamp } from "../utils/format.js";
 import { Button } from "./button.jsx";
@@ -162,6 +163,11 @@ const BacklinkRecords = (props: BacklinksProps & { cursor?: string }) => {
               >
                 Load more
               </Button>
+              <LoadMoreSentinel
+                hasMore={() => !more() && !!links()?.cursor}
+                loading={() => false}
+                onLoadMore={() => setMore(true)}
+              />
             </div>
           }
         >

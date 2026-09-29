@@ -28,6 +28,7 @@ import { PermissionButton } from "../components/permission-button.jsx";
 import { Spinner } from "../components/spinner.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import { createLatch } from "../lib/create-latch.js";
+import { LoadMoreSentinel } from "../lib/infinite-scroll.jsx";
 import { useFilterShortcut } from "../lib/keyboard.js";
 import { useRepo } from "../lib/repo-context.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
@@ -614,6 +615,14 @@ const CollectionView = () => {
                   }}
                 </For>
               </Show>
+              <LoadMoreSentinel
+                hasMore={() => !!cursor() && !response.error}
+                loading={() => response.loading}
+                onLoadMore={() => {
+                  setIsLoadingMore(true);
+                  refetch();
+                }}
+              />
             </div>
           </Show>
         </div>

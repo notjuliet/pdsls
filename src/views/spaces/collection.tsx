@@ -12,6 +12,7 @@ import { NestedLayout } from "../../components/nested-layout.jsx";
 import { addNotification } from "../../components/notification.jsx";
 import { PermissionButton } from "../../components/permission-button.jsx";
 import Tooltip from "../../components/tooltip.jsx";
+import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import { deleteSpaceRecords, listSpaceRecords, type SpaceRecord } from "../../lib/spaces.js";
 import { localDateFromTimestamp } from "../../utils/format.js";
@@ -388,6 +389,11 @@ const SpaceCollectionView = () => {
                 </Show>
                 Load more records
               </Button>
+              <LoadMoreSentinel
+                hasMore={() => !!cursor() && !error()}
+                loading={() => loading()}
+                onLoadMore={() => void loadRecords()}
+              />
             </Show>
           </Show>
         </Show>

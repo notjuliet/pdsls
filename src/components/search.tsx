@@ -185,10 +185,10 @@ export const Search = () => {
     setSearch(undefined);
   };
 
-  const closeSearch = (blur = false) => {
+  const closeSearch = () => {
     setShowSearch(false);
     resetSearch();
-    if (blur) searchInput?.blur();
+    searchInput?.blur();
   };
 
   const openSearch = () => {
@@ -291,7 +291,7 @@ export const Search = () => {
   const handleSearchKeyDown = (event: KeyboardEvent) => {
     if (event.key === "Escape") {
       event.preventDefault();
-      closeSearch(true);
+      closeSearch();
       return;
     }
 

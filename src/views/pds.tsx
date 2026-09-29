@@ -13,6 +13,7 @@ import { Spinner } from "../components/spinner.jsx";
 import { canHover } from "../layout";
 import { didDocCache, resolveDidDoc } from "../lib/api";
 import { createLatch } from "../lib/create-latch.js";
+import { LoadMoreSentinel } from "../lib/infinite-scroll";
 import { localDateFromTimestamp } from "../utils/format";
 import { formatFileSize } from "../utils/format";
 
@@ -358,6 +359,15 @@ const PdsView = () => {
                 }}
               </For>
             </div>
+            <LoadMoreSentinel
+              hasMore={() => !!cursor() && !response.error}
+              loading={() => response.loading}
+              onLoadMore={() => {
+                setIsLoadingMore(true);
+                setExpandedIndex(null);
+                refetch();
+              }}
+            />
           </Show>
           <div class="flex flex-col gap-3">
             <Show when={location.hash === "#info"}>

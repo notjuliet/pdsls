@@ -4,6 +4,7 @@ import type { Accessor } from "solid-js";
 import { createEffect, createSignal, For, Show } from "solid-js";
 
 import { Button } from "../../components/button.jsx";
+import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { listSpaceBlobs } from "../../lib/spaces.js";
 import { ErrorNotice, LoadingState } from "./shared.jsx";
 
@@ -80,6 +81,11 @@ export const SpaceBlobList = (props: {
               </A>
             )}
           </For>
+          <LoadMoreSentinel
+            hasMore={() => !!cursor() && !error()}
+            loading={() => loading()}
+            onLoadMore={() => void loadBlobs()}
+          />
         </div>
 
         <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 pt-3 pb-6">

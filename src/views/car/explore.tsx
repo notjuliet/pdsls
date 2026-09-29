@@ -29,6 +29,7 @@ import { JSONValue, type JSONType } from "../../components/json.jsx";
 import { TextInput } from "../../components/text-input.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
 import { createDebouncedValue } from "../../lib/debounced.js";
+import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { localDateFromTimestamp } from "../../utils/format.js";
 import {
   carFileAccept,
@@ -920,6 +921,11 @@ const CollectionSubview = (props: {
             );
           }}
         </For>
+        <LoadMoreSentinel
+          hasMore={() => hasMore()}
+          loading={() => false}
+          onLoadMore={() => loadMore()}
+        />
       </div>
 
       <Show when={filteredEntries().length === 0 && filter()}>

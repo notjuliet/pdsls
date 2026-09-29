@@ -11,6 +11,7 @@ import { addNotification } from "../../components/notification.jsx";
 import { PermissionButton } from "../../components/permission-button.jsx";
 import { TextInput } from "../../components/text-input.jsx";
 import { resolveHandle } from "../../lib/api.js";
+import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import {
   putSimpleSpaceMember,
   listSimpleSpaceMembers,
@@ -270,6 +271,11 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
               </Show>
               Load more members
             </Button>
+            <LoadMoreSentinel
+              hasMore={() => !!cursor() && !error()}
+              loading={() => loading()}
+              onLoadMore={() => void loadMembers()}
+            />
           </Show>
         </Show>
       </Show>

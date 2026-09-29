@@ -4,6 +4,7 @@ import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { Button } from "../../components/button.jsx";
 import { Favicon } from "../../components/favicon.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
+import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { listSpaceRecords, type SpaceRecord } from "../../lib/spaces.js";
 import { SpaceBlobList } from "./blobs.jsx";
 import {
@@ -173,6 +174,11 @@ const SpaceRepoView = () => {
                 </Show>
                 Load more records
               </Button>
+              <LoadMoreSentinel
+                hasMore={() => !!cursor() && !error()}
+                loading={() => loading()}
+                onLoadMore={() => void loadRecords()}
+              />
             </Show>
           </Show>
         </Show>
