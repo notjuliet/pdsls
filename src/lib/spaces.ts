@@ -1,6 +1,7 @@
+import { P256PrivateKeyExportable } from "@atcute/crypto";
 import { getAtprotoServiceEndpoint, getPdsEndpoint } from "@atcute/identity";
+import { toBase64 } from "@atcute/multibase";
 import type { OAuthUserAgent } from "@atcute/oauth-browser-client";
-import { createDpopFetch, generateDpopKey } from "@atcute/oauth-crypto";
 
 import type { JSONType } from "../components/json";
 import { getPDS, resolveDidDoc } from "./api";
@@ -195,7 +196,7 @@ const oauthProcedure = async (
 interface SpaceCredentialSession {
   credential: string;
   expiresAt: number;
-  fetch: typeof fetch;
+  key: P256PrivateKeyExportable;
 }
 
 const spaceHostCache = new Map<string, Promise<string>>();
@@ -255,33 +256,53 @@ const getJwtExpiry = (jwt: string): number | undefined => {
   }
 };
 
+/**
+ * Builds HTTP Message Signature headers (RFC 9421) for a Space request. The credential
+ * exchange signs the `Authorization` field alone; requests carrying a credential also
+ * bind the `Atproto-Space-Audience` field.
+ */
+const spaceSignatureHeaders = async (
+  key: P256PrivateKeyExportable,
+  authorization: string,
+  audience?: string,
+): Promise<Record<string, string>> => {
+  const signatureInput =
+    audience === undefined
+      ? `("authorization");keyid="${await key.exportPublicKey("did")}"`
+      : '("authorization" "atproto-space-audience")';
+  const lines = [`"authorization": ${authorization.trim()}`];
+  if (audience !== undefined) lines.push(`"atproto-space-audience": ${audience.trim()}`);
+  lines.push(`"@signature-params": ${signatureInput}`);
+
+  const signature = await key.sign(new TextEncoder().encode(lines.join("\n")));
+  return {
+    authorization,
+    ...(audience === undefined ? undefined : { "atproto-space-audience": audience }),
+    "signature-input": `atproto-space=${signatureInput}`,
+    signature: `atproto-space=:${toBase64(signature)}:`,
+  };
+};
+
 const acquireSpaceCredential = async (
   auth: OAuthUserAgent,
   space: string,
 ): Promise<SpaceCredentialSession> => {
-  const [host, key] = await Promise.all([resolveSpaceHost(space), generateDpopKey(["ES256"])]);
+  const [host, key] = await Promise.all([
+    resolveSpaceHost(space),
+    P256PrivateKeyExportable.createKeypair(),
+  ]);
 
   const delegation = await oauthQuery(auth, "com.atproto.space.getDelegationToken", { space });
   if (!isObject(delegation) || typeof delegation.token !== "string") {
     throw new Error("The PDS returned an invalid Space delegation token");
   }
 
-  const nonceValues = new Map<string, string>();
-  const dpopFetch = createDpopFetch({
-    key,
-    nonces: {
-      get: (origin) => nonceValues.get(origin),
-      set: (origin, nonce) => {
-        nonceValues.set(origin, nonce);
-      },
-    },
-  });
   const exchangeUrl = new URL("/xrpc/com.atproto.space.getSpaceCredential", host);
-  const response = await dpopFetch(exchangeUrl, {
+  const response = await fetch(exchangeUrl, {
     method: "POST",
     headers: {
+      ...(await spaceSignatureHeaders(key, `Bearer ${delegation.token}`)),
       accept: "application/json",
-      authorization: `Bearer ${delegation.token}`,
       "content-type": "application/json",
     },
     body: JSON.stringify({ space }),
@@ -301,7 +322,7 @@ const acquireSpaceCredential = async (
   return {
     credential: data.credential,
     expiresAt: getJwtExpiry(data.credential) ?? Date.now() + 60 * 60 * 1000,
-    fetch: dpopFetch,
+    key,
   };
 };
 
@@ -355,6 +376,7 @@ const clearCredentialsForSpace = (space: string) => {
 const credentialQuery = async (
   auth: OAuthUserAgent,
   space: string,
+  audience: string,
   service: string,
   method: string,
   params: Record<string, string | number | boolean | undefined>,
@@ -365,10 +387,14 @@ const credentialQuery = async (
     if (value !== undefined) url.searchParams.set(key, String(value));
   }
 
-  const response = await session.fetch(url, {
+  const response = await fetch(url, {
     headers: {
+      ...(await spaceSignatureHeaders(
+        session.key,
+        `Atproto-Space ${session.credential}`,
+        audience,
+      )),
       accept: "application/json",
-      authorization: `DPoP ${session.credential}`,
     },
   });
   const data = await readJson(response);
@@ -522,9 +548,14 @@ export const getSimpleSpace = async (
       data = await oauthQuery(auth, "com.atproto.simplespace.getSpace", { space });
     } else {
       const host = await resolveSpaceHost(space);
-      data = await credentialQuery(auth, space, host, "com.atproto.simplespace.getSpace", {
+      data = await credentialQuery(
+        auth,
         space,
-      });
+        parsed.authority,
+        host,
+        "com.atproto.simplespace.getSpace",
+        { space },
+      );
     }
   } catch (err) {
     if (
@@ -618,24 +649,37 @@ export const listSpaceRepos = async (
   space: string,
   options: { cursor?: string; limit?: number } = {},
 ): Promise<ListSpaceReposResult> => {
+  const limit = options.limit ?? 1000;
+  const parsed = parseSpaceUri(space);
+  if (!parsed) throw new Error("Invalid Space reference");
+
   const host = await resolveSpaceHost(space);
-  const data = await credentialQuery(auth, space, host, "com.atproto.space.listRepos", {
+  const data = await credentialQuery(
+    auth,
     space,
-    cursor: options.cursor,
-    limit: options.limit ?? 1000,
-  });
+    parsed.authority,
+    host,
+    "com.atproto.space.listRepos",
+    {
+      space,
+      cursor: options.cursor,
+      limit,
+    },
+  );
 
   if (!isObject(data) || !Array.isArray(data.repos)) {
     throw new Error("The Space authority returned an invalid writer list");
   }
 
   return {
-    cursor: typeof data.cursor === "string" ? data.cursor : undefined,
+    // Unlike the other list endpoints, the space host always returns the last
+    // writer's spaceRev as the cursor, so a short page is what signals the end.
+    cursor: data.repos.length >= limit && typeof data.cursor === "string" ? data.cursor : undefined,
     repos: data.repos.flatMap((repo): SpaceRepo[] => {
-      if (!isObject(repo) || typeof repo.did !== "string" || typeof repo.rev !== "string") {
+      if (!isObject(repo) || typeof repo.did !== "string" || typeof repo.repoRev !== "string") {
         return [];
       }
-      return [{ did: repo.did, rev: repo.rev }];
+      return [{ did: repo.did, rev: repo.repoRev }];
     }),
   };
 };
@@ -653,7 +697,7 @@ export const listSpaceRecords = async (
   } = {},
 ): Promise<ListSpaceRecordsResult> => {
   const pds = await resolveRepoHost(repo);
-  const data = await credentialQuery(auth, space, pds, "com.atproto.space.listRecords", {
+  const data = await credentialQuery(auth, space, repo, pds, "com.atproto.space.listRecords", {
     space,
     repo,
     collection: options.collection,
@@ -686,7 +730,7 @@ export const listSpaceBlobs = async (
   options: { cursor?: string; limit?: number; since?: string } = {},
 ): Promise<ListSpaceBlobsResult> => {
   const pds = await resolveRepoHost(repo);
-  const data = await credentialQuery(auth, space, pds, "com.atproto.space.listBlobs", {
+  const data = await credentialQuery(auth, space, repo, pds, "com.atproto.space.listBlobs", {
     space,
     repo,
     since: options.since,
@@ -712,7 +756,7 @@ export const getSpaceRecord = async (
   rkey: string,
 ): Promise<GetSpaceRecordResult> => {
   const pds = await resolveRepoHost(repo);
-  const data = await credentialQuery(auth, space, pds, "com.atproto.space.getRecord", {
+  const data = await credentialQuery(auth, space, repo, pds, "com.atproto.space.getRecord", {
     space,
     repo,
     collection,
@@ -832,10 +876,10 @@ export const getSpaceBlob = async (
   ]);
   const url = new URL("/xrpc/com.atproto.space.getBlob", pds);
   url.search = new URLSearchParams({ space, repo, cid }).toString();
-  const response = await session.fetch(url, {
+  const response = await fetch(url, {
     headers: {
+      ...(await spaceSignatureHeaders(session.key, `Atproto-Space ${session.credential}`, repo)),
       accept: "*/*",
-      authorization: `DPoP ${session.credential}`,
     },
   });
 
