@@ -186,7 +186,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           href="/"
           aria-label="PDSls"
           style='font-feature-settings: "ss02"'
-          class="relative flex h-9 shrink-0 items-center gap-1 rounded-md px-1.5 text-xl font-semibold hover:bg-neutral-200/60 active:bg-neutral-200 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+          class="relative flex h-9 shrink-0 items-center gap-1 rounded-md px-1.5 text-xl font-semibold hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700"
         >
           <img src="/pdsls-logo.svg" alt="" class="size-5" />
           <span class="max-sm:hidden">PDSls</span>
