@@ -390,7 +390,7 @@ export const Search = () => {
       />
       <form
         role="search"
-        class="flex h-9 min-w-0 items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-2 text-sm transition-colors focus-within:border-blue-400/70 dark:border-neutral-600 dark:bg-neutral-800 dark:focus-within:border-blue-400"
+        class="flex h-9 min-w-0 items-center gap-1.5 rounded-lg border border-neutral-300 bg-white pr-1.5 pl-2 text-sm transition-colors focus-within:border-blue-400/70 dark:border-neutral-600 dark:bg-neutral-800 dark:focus-within:border-blue-400"
         onSubmit={(event) => {
           event.preventDefault();
           void processInput(searchInput.value);
@@ -411,7 +411,7 @@ export const Search = () => {
           aria-expanded={showSearch()}
           aria-controls="global-search-panel"
           placeholder="Search or paste..."
-          class="min-w-0 flex-1 bg-transparent py-1 outline-none placeholder:text-neutral-500 dark:placeholder:text-neutral-400 pointer-coarse:text-base"
+          class="min-w-0 flex-1 bg-transparent py-1 outline-none placeholder:text-neutral-500 dark:placeholder:text-neutral-400 pointer-coarse:text-base pointer-coarse:placeholder:text-sm"
           value={input() ?? ""}
           onFocus={openSearch}
           onInput={(event) => {
@@ -425,10 +425,11 @@ export const Search = () => {
           type="button"
           title="Open CAR file"
           aria-label="Open CAR file"
-          class="flex size-6 shrink-0 items-center justify-center rounded-md text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
+          class="flex h-6 shrink-0 items-center gap-1 rounded px-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-100 hover:text-neutral-800 active:bg-neutral-200 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-neutral-100 dark:active:bg-neutral-600"
           onClick={() => fileInput.click()}
         >
-          <span class="iconify lucide--folder-archive" />
+          <span class="iconify lucide--file-up" />
+          CAR
         </button>
       </form>
 

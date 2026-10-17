@@ -12,7 +12,6 @@ import {
   createSignal,
   For,
   Match,
-  onCleanup,
   Show,
   Switch,
   untrack,
@@ -31,13 +30,7 @@ import { didDocCache, resolveDidDoc } from "../../lib/api.js";
 import { createDebouncedValue } from "../../lib/debounced.js";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { localDateFromTimestamp } from "../../utils/format.js";
-import {
-  carFileAccept,
-  createDropHandler,
-  createFileChangeHandler,
-  handleDragOver,
-  isIOS,
-} from "./file-handlers.js";
+import { carFileAccept, createFileChangeHandler, isIOS } from "./file-handlers.js";
 import { clearQueuedCarFile, queuedCarFile } from "./state.js";
 
 const toJsonValue = (obj: unknown): JSONType => {
@@ -323,7 +316,6 @@ export const CarView = () => {
   };
 
   const handleFileChange = createFileChangeHandler(parseCarFile);
-  const handleDrop = createDropHandler(parseCarFile);
 
   createEffect(() => {
     const file = queuedCarFile();
@@ -331,13 +323,6 @@ export const CarView = () => {
       clearQueuedCarFile(file);
       void parseCarFile(file);
     }
-  });
-
-  window.addEventListener("dragover", handleDragOver);
-  window.addEventListener("drop", handleDrop);
-  onCleanup(() => {
-    window.removeEventListener("dragover", handleDragOver);
-    window.removeEventListener("drop", handleDrop);
   });
 
   const reset = () => {

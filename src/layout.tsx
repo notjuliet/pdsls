@@ -3,6 +3,7 @@ import { createEffect, ErrorBoundary, on, onCleanup, onMount, Show, Suspense } f
 
 import { AccountManager } from "./auth/account.jsx";
 import { agent } from "./auth/state.js";
+import { CarDropOverlay } from "./components/car-drop-overlay.jsx";
 import { RecordEditor } from "./components/create";
 import { NavBar } from "./components/navbar.jsx";
 import { NotificationContainer } from "./components/notification.jsx";
@@ -180,14 +181,15 @@ const Layout = (props: RouteSectionProps<unknown>) => {
 
   return (
     <div id="main" class="mx-auto mb-8 flex max-w-xl flex-col items-center p-3">
-      <header class="mb-3 flex h-10 w-full items-center gap-3 px-1 sm:gap-4">
+      <header class="mb-3 flex h-10 w-full items-center gap-2 px-1 sm:gap-4">
         <A
           href="/"
+          aria-label="PDSls"
           style='font-feature-settings: "ss02"'
           class="relative flex h-9 shrink-0 items-center gap-1 rounded-md px-1.5 text-xl font-semibold hover:bg-neutral-200/60 active:bg-neutral-200 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
         >
           <img src="/pdsls-logo.svg" alt="" class="size-5" />
-          <span>PDSls</span>
+          <span class="max-sm:hidden">PDSls</span>
           <Show when={localStorage.getItem("hrt") === "true"}>
             <img
               src="/ribbon.webp"
@@ -240,6 +242,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           </Suspense>
         </ErrorBoundary>
       </div>
+      <CarDropOverlay />
       <NotificationContainer />
       <PermissionPromptContainer />
       <Show when={plcDirectory() !== "https://plc.directory"}>
