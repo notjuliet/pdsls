@@ -28,7 +28,7 @@ export type SimpleSpacePolicy =
   | { kind: "managing-app"; managingApp: string }
   | { kind: "unknown"; type: string };
 
-export type SimpleSpaceAppAccess =
+type SimpleSpaceAppAccess =
   | { kind: "open" }
   | { kind: "allow-list"; allowed: string[] }
   | { kind: "unknown"; type: string };
@@ -49,7 +49,7 @@ export interface SimpleSpaceConfiguration {
   appAccess: NewSimpleSpaceAppAccess;
 }
 
-export interface CreateSimpleSpaceOptions extends SimpleSpaceConfiguration {
+interface CreateSimpleSpaceOptions extends SimpleSpaceConfiguration {
   type: string;
   skey?: string;
 }
@@ -74,7 +74,7 @@ interface ListSpaceRecordsResult {
   records: SpaceRecord[];
 }
 
-export interface ListSpaceBlobsResult {
+interface ListSpaceBlobsResult {
   cursor?: string;
   cids: string[];
 }

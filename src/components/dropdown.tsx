@@ -130,41 +130,6 @@ export const ActionMenu = (props: {
   );
 };
 
-export const FileActionMenu = (props: {
-  label: string;
-  icon: string;
-  accept?: string;
-  onChange: (event: Event) => void;
-}) => {
-  const ctx = useContext(MenuContext);
-  let inputRef!: HTMLInputElement;
-
-  return (
-    <>
-      <input
-        ref={inputRef}
-        type="file"
-        accept={props.accept}
-        class="hidden"
-        onChange={(event) => {
-          props.onChange(event);
-          ctx?.setShowMenu(false);
-        }}
-      />
-      <button
-        type="button"
-        onClick={() => inputRef.click()}
-        class="flex w-full items-center gap-2 rounded-md p-1.5 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-      >
-        <span
-          class={`iconify ${props.icon} shrink-0 text-neutral-500 dark:text-neutral-400`}
-        ></span>
-        <span>{props.label}</span>
-      </button>
-    </>
-  );
-};
-
 export const MenuSeparator = () => {
   return <div class="my-1 h-[0.5px] bg-neutral-300 dark:bg-neutral-600" />;
 };

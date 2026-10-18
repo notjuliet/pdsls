@@ -18,7 +18,7 @@ interface PolicyDraft {
   managingApp: string;
 }
 
-export interface SimpleSpaceSettingsDraft {
+interface SimpleSpaceSettingsDraft {
   read: PolicyDraft;
   write: PolicyDraft;
   appAccess: AppAccessKind;

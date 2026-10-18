@@ -20,7 +20,6 @@
         "@atcute/lexicons": "^2.1.1",
         "@atcute/multibase": "^1.2.5",
         "@atcute/oauth-browser-client": "^5.1.0",
-        "@atcute/oauth-crypto": "^1.0.1",
         "@atcute/repo": "^1.1.1",
         "@atcute/tid": "^1.1.4",
         "@codemirror/commands": "^6.11.1",
