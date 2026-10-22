@@ -1,6 +1,6 @@
 import { P256PrivateKeyExportable } from "@atcute/crypto";
 import { getAtprotoServiceEndpoint, getPdsEndpoint } from "@atcute/identity";
-import { toBase64 } from "@atcute/multibase";
+import { toBase64Pad } from "@atcute/multibase";
 import type { OAuthUserAgent } from "@atcute/oauth-browser-client";
 
 import type { JSONType } from "../components/json";
@@ -257,29 +257,29 @@ const getJwtExpiry = (jwt: string): number | undefined => {
 };
 
 /**
- * Builds HTTP Message Signature headers (RFC 9421) for a Space request. The credential
- * exchange signs the `Authorization` field alone; requests carrying a credential also
- * bind the `Atproto-Space-Audience` field.
+ * Builds HTTP Message Signature headers (RFC 9421) for a request carrying a Space
+ * credential, covering the credential and its audience DID.
  */
 const spaceSignatureHeaders = async (
   key: P256PrivateKeyExportable,
-  authorization: string,
-  audience?: string,
+  credential: string,
+  audience: string,
 ): Promise<Record<string, string>> => {
+  const authorization = `Atproto-Space-Credential ${credential}`;
   const signatureInput =
-    audience === undefined
-      ? `("authorization");keyid="${await key.exportPublicKey("did")}"`
-      : '("authorization" "atproto-space-audience")';
-  const lines = [`"authorization": ${authorization.trim()}`];
-  if (audience !== undefined) lines.push(`"atproto-space-audience": ${audience.trim()}`);
-  lines.push(`"@signature-params": ${signatureInput}`);
+    '("authorization" "atproto-space-audience");tag="atproto-space-credential"';
+  const lines = [
+    `"authorization": ${authorization}`,
+    `"atproto-space-audience": ${audience.trim()}`,
+    `"@signature-params": ${signatureInput}`,
+  ];
 
   const signature = await key.sign(new TextEncoder().encode(lines.join("\n")));
   return {
     authorization,
-    ...(audience === undefined ? undefined : { "atproto-space-audience": audience }),
-    "signature-input": `atproto-space=${signatureInput}`,
-    signature: `atproto-space=:${toBase64(signature)}:`,
+    "atproto-space-audience": audience,
+    "signature-input": `atproto-space-credential=${signatureInput}`,
+    signature: `atproto-space-credential=:${toBase64Pad(signature)}:`,
   };
 };
 
@@ -301,11 +301,14 @@ const acquireSpaceCredential = async (
   const response = await fetch(exchangeUrl, {
     method: "POST",
     headers: {
-      ...(await spaceSignatureHeaders(key, `Bearer ${delegation.token}`)),
       accept: "application/json",
       "content-type": "application/json",
     },
-    body: JSON.stringify({ space }),
+    body: JSON.stringify({
+      space,
+      credentialKid: await key.exportPublicKey("did"),
+      delegationToken: delegation.token,
+    }),
   });
   const data = await readJson(response);
   if (!response.ok) {
@@ -380,6 +383,7 @@ const credentialQuery = async (
   service: string,
   method: string,
   params: Record<string, string | number | boolean | undefined>,
+  headers?: Record<string, string>,
 ): Promise<unknown> => {
   const session = await getSpaceCredential(auth, space);
   const url = new URL(`/xrpc/${method}`, service);
@@ -389,11 +393,8 @@ const credentialQuery = async (
 
   const response = await fetch(url, {
     headers: {
-      ...(await spaceSignatureHeaders(
-        session.key,
-        `Atproto-Space ${session.credential}`,
-        audience,
-      )),
+      ...(await spaceSignatureHeaders(session.key, session.credential, audience)),
+      ...headers,
       accept: "application/json",
     },
   });
@@ -755,13 +756,23 @@ export const getSpaceRecord = async (
   collection: string,
   rkey: string,
 ): Promise<GetSpaceRecordResult> => {
-  const pds = await resolveRepoHost(repo);
-  const data = await credentialQuery(auth, space, repo, pds, "com.atproto.space.getRecord", {
+  const [pds, keyShare] = await Promise.all([
+    resolveRepoHost(repo),
+    P256PrivateKeyExportable.createKeypair().then((key) => key.exportPublicKey("did")),
+  ]);
+  const data = await credentialQuery(
+    auth,
     space,
     repo,
-    collection,
-    rkey,
-  });
+    pds,
+    "com.atproto.space.getRecord",
+    { space, repo, collection, rkey },
+    // Reads with a credential must ask for a MAC. We only display the record, so the
+    // MAC isn't verified and the key share is a throwaway key.
+    {
+      "atproto-space-want-mac": `type="atproto-space-record", ver=1, key_share="${keyShare}"`,
+    },
+  );
 
   if (
     !isObject(data) ||
@@ -878,7 +889,7 @@ export const getSpaceBlob = async (
   url.search = new URLSearchParams({ space, repo, cid }).toString();
   const response = await fetch(url, {
     headers: {
-      ...(await spaceSignatureHeaders(session.key, `Atproto-Space ${session.credential}`, repo)),
+      ...(await spaceSignatureHeaders(session.key, session.credential, repo)),
       accept: "*/*",
     },
   });
