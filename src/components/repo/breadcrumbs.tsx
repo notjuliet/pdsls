@@ -1,9 +1,18 @@
+import type { Nsid } from "@atcute/lexicons";
 import { A } from "@solidjs/router";
-import { createEffect, createSignal, type JSX, Match, Show, Switch } from "solid-js";
+import {
+  createEffect,
+  createResource,
+  createSignal,
+  type JSX,
+  Match,
+  Show,
+  Switch,
+} from "solid-js";
 
 import { canHover } from "../../layout";
 import { addToClipboard } from "../../lib/copy";
-import { schemaHref } from "../../lib/lexicon";
+import { resolveLexicon, schemaHref } from "../../lib/lexicon";
 import LexiconHoverCard from "../hover-card/lexicon";
 import Tooltip from "../ui/tooltip";
 
@@ -236,21 +245,34 @@ export const BreadcrumbRow = (props: BreadcrumbRowProps) => {
 };
 
 /**
- * Links a collection row to its lexicon, previewing it on hover. The lexicon resolves only on
- * hover or click, which show an error when none is published.
+ * Links a collection row to its lexicon, previewing it on hover. The lexicon resolves in the
+ * background (cached per NSID) so the preview opens instantly, and the icon dims when none is
+ * published.
  */
-export const BreadcrumbSchemaLink = (props: { nsid: string }) => (
-  // Keyed so the link and its preview remount for each collection instead of keeping the last one open.
-  <Show when={props.nsid} keyed>
-    {(nsid) => (
-      <LexiconHoverCard
-        lexicon={nsid}
-        renderTrigger={() => (
-          <A href={schemaHref(nsid)} aria-label="Schema" class={rowLinkClass}>
-            <span class="iconify lucide--book-text" />
-          </A>
-        )}
-      />
-    )}
-  </Show>
-);
+export const BreadcrumbSchemaLink = (props: { nsid: string }) => {
+  const [lexicon] = createResource(
+    () => props.nsid,
+    (nsid) => resolveLexicon(nsid as Nsid),
+  );
+
+  return (
+    // Keyed so the link and its preview remount for each collection instead of keeping the last one open.
+    <Show when={props.nsid} keyed>
+      {(nsid) => (
+        <LexiconHoverCard
+          lexicon={nsid}
+          renderTrigger={() => (
+            <A
+              href={schemaHref(nsid)}
+              aria-label="Schema"
+              class={rowLinkClass}
+              classList={{ "opacity-40": !!lexicon.error }}
+            >
+              <span class="iconify lucide--book-text" />
+            </A>
+          )}
+        />
+      )}
+    </Show>
+  );
+};
