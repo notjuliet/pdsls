@@ -24,7 +24,8 @@ interface RecordRowProps {
   nextSelected?: boolean;
 }
 
-const timestampFromRkey = (rkey: string) => {
+/** The creation time encoded in a TID record key, if it is one and not in the future. */
+export const timestampFromRkey = (rkey: string) => {
   if (!TID.validate(rkey)) return;
   const timestamp = TID.parse(rkey).timestamp / 1000;
   return timestamp <= Date.now() ? timestamp : undefined;

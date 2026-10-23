@@ -8,9 +8,11 @@ import { zip, type ZipEntry } from "@mary/zip";
 import { useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, Match, Show, Switch } from "solid-js";
 
+import { BreadcrumbRow, Breadcrumbs } from "../../components/breadcrumbs.jsx";
 import { CollectionList } from "../../components/collection-list.jsx";
 import { CollectionPage, type CollectionSource } from "../../components/collection-page.jsx";
 import { CopyMenu, DropdownMenu, MenuProvider } from "../../components/dropdown.jsx";
+import { IconButton } from "../../components/icon-button.jsx";
 import { JSONValue, type JSONType } from "../../components/json.jsx";
 import {
   RecordInfo,
@@ -18,6 +20,7 @@ import {
   recordTabFromHash,
   useRecordSchemaValidation,
 } from "../../components/record-page.jsx";
+import { timestampFromRkey } from "../../components/record-row.jsx";
 import { Spinner } from "../../components/spinner.jsx";
 import { EmptyState, ErrorNotice } from "../../components/states.jsx";
 import { TextInput } from "../../components/text-input.jsx";
@@ -201,10 +204,6 @@ export const CarView = () => {
     return pathToView(params.collection, params.rkey, arch);
   });
 
-  const navigateToView = (newView: View) => {
-    navigate(viewToPath(newView));
-  };
-
   const parseCarFile = async (file: File) => {
     setLoading(true);
     setProgress(0);
@@ -327,9 +326,7 @@ export const CarView = () => {
           />
         }
       >
-        {(arch) => (
-          <ExploreView archive={arch()} view={view} setView={navigateToView} onClose={reset} />
-        )}
+        {(arch) => <ExploreView archive={arch()} view={view} onClose={reset} />}
       </Show>
     </>
   );
@@ -412,12 +409,7 @@ const exportToZip = async (
   }
 };
 
-const ExploreView = (props: {
-  archive: Archive;
-  view: () => View;
-  setView: (view: View) => void;
-  onClose: () => void;
-}) => {
+const ExploreView = (props: { archive: Archive; view: () => View; onClose: () => void }) => {
   const [exporting, setExporting] = createSignal(false);
   const [exportCount, setExportCount] = createSignal(0);
   const [exportSaving, setExportSaving] = createSignal(false);
@@ -447,78 +439,39 @@ const ExploreView = (props: {
 
   return (
     <div class="flex w-full flex-col">
-      <nav class="flex w-full flex-col text-sm wrap-anywhere sm:text-base">
-        {/* DID / Repository Level */}
-        <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-          <Show
-            when={props.view().type !== "repo"}
-            fallback={
-              <div class="flex min-h-6 min-w-0 basis-full items-center gap-2 px-2 sm:min-h-7">
-                <span class="iconify lucide--book-user shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-                <span class="flex min-w-0 items-baseline gap-2 py-0.5 font-medium">
-                  <Show
-                    when={handle !== props.archive.did}
-                    fallback={<span class="truncate">{props.archive.did}</span>}
+      <Breadcrumbs>
+        <BreadcrumbRow
+          icon="lucide--book-user"
+          label={handle}
+          preserveLabel={handle !== props.archive.did}
+          detail={handle !== props.archive.did ? props.archive.did : undefined}
+          href={props.view().type !== "repo" ? "/car" : undefined}
+          trailing={
+            <>
+              <Show
+                when={exporting()}
+                fallback={
+                  <button
+                    type="button"
+                    onClick={handleExport}
+                    class="flex shrink-0 items-center rounded px-2 py-1 text-xs text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70"
                   >
-                    <span class="shrink-0">{handle}</span>
-                    <span class="truncate text-xs font-normal text-neutral-500 sm:text-sm dark:text-neutral-400">
-                      {props.archive.did}
-                    </span>
-                  </Show>
-                </span>
-              </div>
-            }
-          >
-            <button
-              type="button"
-              onClick={() => props.setView({ type: "repo" })}
-              class="flex min-h-6 min-w-0 basis-full items-center gap-2 px-2 sm:min-h-7"
-            >
-              <span class="iconify lucide--book-user shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-              <span class="flex min-w-0 items-baseline gap-2 py-0.5 font-medium text-blue-500 transition-colors duration-150 group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-300">
-                <Show
-                  when={handle !== props.archive.did}
-                  fallback={<span class="truncate">{props.archive.did}</span>}
-                >
-                  <span class="shrink-0">{handle}</span>
-                  <span class="truncate text-xs font-normal text-neutral-500 sm:text-sm dark:text-neutral-400">
-                    {props.archive.did}
+                    Export ZIP
+                  </button>
+                }
+              >
+                <div class="flex items-center gap-2 px-2 py-1 sm:py-1.5">
+                  <Spinner class="text-neutral-400" />
+                  <span class="w-[4ch] text-right text-xs text-neutral-500 dark:text-neutral-400">
+                    {exportSaving() ? "" : `${Math.round((exportCount() / totalRecords()) * 100)}%`}
                   </span>
-                </Show>
-              </span>
-            </button>
-          </Show>
-          <div class="flex shrink-0 items-center gap-0.5">
-            <Show
-              when={exporting()}
-              fallback={
-                <button
-                  type="button"
-                  onClick={handleExport}
-                  class="flex shrink-0 items-center rounded px-2 py-1 text-xs text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70"
-                >
-                  Export ZIP
-                </button>
-              }
-            >
-              <div class="flex items-center gap-2 px-2 py-1 sm:py-1.5">
-                <Spinner class="text-neutral-400" />
-                <span class="w-[4ch] text-right text-xs text-neutral-500 dark:text-neutral-400">
-                  {exportSaving() ? "" : `${Math.round((exportCount() / totalRecords()) * 100)}%`}
-                </span>
-              </div>
-            </Show>
-            <button
-              type="button"
-              onClick={props.onClose}
-              class="flex shrink-0 items-center rounded px-2 py-1 text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70"
-            >
-              <span class="iconify lucide--x" />
-            </button>
-          </div>
-        </div>
+                </div>
+              </Show>
+              <IconButton icon="lucide--x" label="Close archive" onClick={props.onClose} />
+            </>
+          }
+        />
 
-        {/* Collection Level */}
         <Show
           when={(() => {
             const v = props.view();
@@ -526,34 +479,18 @@ const ExploreView = (props: {
           })()}
         >
           {(collection) => (
-            <Show
-              when={props.view().type === "record"}
-              fallback={
-                <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-                  <div class="flex min-h-6 min-w-0 basis-full items-center gap-2 sm:min-h-7">
-                    <span class="iconify lucide--folder-open shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-                    <span class="truncate py-0.5 font-medium">{collection().name}</span>
-                  </div>
-                </div>
+            <BreadcrumbRow
+              icon="lucide--folder-open"
+              label={collection().name}
+              href={
+                props.view().type === "record"
+                  ? viewToPath({ type: "collection", collection: collection() })
+                  : undefined
               }
-            >
-              <button
-                type="button"
-                onClick={() => props.setView({ type: "collection", collection: collection() })}
-                class="group relative flex w-full items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40"
-              >
-                <div class="flex min-h-6 min-w-0 basis-full items-center gap-2 sm:min-h-7">
-                  <span class="iconify lucide--folder-open shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-                  <span class="truncate py-0.5 font-medium text-blue-500 transition-colors duration-150 group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-300">
-                    {collection().name}
-                  </span>
-                </div>
-              </button>
-            </Show>
+            />
           )}
         </Show>
 
-        {/* Record Level */}
         <Show
           when={(() => {
             const v = props.view();
@@ -561,30 +498,17 @@ const ExploreView = (props: {
           })()}
         >
           {(record) => {
-            const rkeyTimestamp = createMemo(() => {
-              if (!record().key || !TID.validate(record().key)) return undefined;
-              const timestamp = TID.parse(record().key).timestamp / 1000;
-              return timestamp <= Date.now() ? timestamp : undefined;
-            });
-
+            const timestamp = () => timestampFromRkey(record().key);
             return (
-              <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-                <div class="flex min-h-6 min-w-0 basis-full items-center gap-2 sm:min-h-7">
-                  <span class="iconify lucide--file-json shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-                  <div class="flex min-w-0 items-baseline gap-2 py-0.5 font-medium">
-                    <span class="shrink-0">{record().key}</span>
-                    <Show when={rkeyTimestamp()}>
-                      <span class="truncate text-xs font-normal text-neutral-500 sm:text-sm dark:text-neutral-400">
-                        {localDateFromTimestamp(rkeyTimestamp()!)}
-                      </span>
-                    </Show>
-                  </div>
-                </div>
-              </div>
+              <BreadcrumbRow
+                icon="lucide--file-json"
+                label={record().key}
+                detail={timestamp() ? localDateFromTimestamp(timestamp()!) : undefined}
+              />
             );
           }}
         </Show>
-      </nav>
+      </Breadcrumbs>
 
       <div class="px-2 py-2">
         <Switch>
