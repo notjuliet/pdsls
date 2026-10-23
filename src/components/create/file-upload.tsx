@@ -6,6 +6,7 @@ import { createSignal, onCleanup, Show } from "solid-js";
 
 import { formatFileSize } from "../../utils/format";
 import { Button } from "../button.jsx";
+import { Spinner } from "../spinner.jsx";
 import { TextInput } from "../text-input.jsx";
 
 export const FileUpload = (props: {
@@ -81,17 +82,12 @@ export const FileUpload = (props: {
           <Button onClick={props.onClose}>Cancel</Button>
           <Show when={uploading()}>
             <div class="flex items-center gap-1">
-              <span class="iconify lucide--loader-circle animate-spin"></span>
+              <Spinner />
               <span>Uploading</span>
             </div>
           </Show>
           <Show when={!uploading()}>
-            <Button
-              onClick={uploadBlob}
-              classList={{
-                "bg-blue-500! text-white! border-none! hover:bg-blue-600! active:bg-blue-700! dark:bg-blue-600! dark:hover:bg-blue-500! dark:active:bg-blue-400!": true,
-              }}
-            >
+            <Button onClick={uploadBlob} variant="primary">
               Upload
             </Button>
           </Show>

@@ -17,6 +17,7 @@ import { hideMedia } from "../views/settings";
 import DidHoverCard from "./hover-card/did";
 import LexiconHoverCard from "./hover-card/lexicon";
 import RecordHoverCard from "./hover-card/record";
+import { Spinner } from "./spinner.jsx";
 import VideoPlayer from "./video-player";
 import { ZoomableImage } from "./zoomable-image";
 
@@ -353,7 +354,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
 
     const LoadingMedia = () => (
       <div class="flex h-48 w-48 items-center justify-center rounded bg-neutral-200 dark:bg-neutral-800">
-        <span class="iconify lucide--loader-circle animate-spin text-xl text-neutral-400 dark:text-neutral-500" />
+        <Spinner class="text-xl text-neutral-400 dark:text-neutral-500" />
       </div>
     );
 

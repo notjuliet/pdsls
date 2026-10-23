@@ -1,10 +1,12 @@
-import { A, type RouteSectionProps, useLocation, useParams } from "@solidjs/router";
+import { type RouteSectionProps, useLocation, useParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, Show } from "solid-js";
 
 import { Button } from "../../components/button.jsx";
 import { CollectionList } from "../../components/collection-list.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
+import { Spinner } from "../../components/spinner.jsx";
 import { EmptyState, ErrorNotice, LoadingState } from "../../components/states.jsx";
+import { Tabs } from "../../components/tabs.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { listSpaceRecords, type SpaceRecord } from "../../lib/spaces.js";
 import { SpaceBlobList } from "./blobs.jsx";
@@ -34,6 +36,8 @@ const SpaceRepoView = () => {
   let requestVersion = 0;
 
   const space = () => makeSpaceRef(params.spaceAuthority!, params.spaceType!, params.skey!);
+  const repoPath = () =>
+    makeSpaceRepoPath(params.spaceAuthority!, params.spaceType!, params.skey!, repo());
 
   const collections = createMemo(() => {
     const grouped = new Map<string, number>();
@@ -83,32 +87,17 @@ const SpaceRepoView = () => {
     }
   });
 
-  const SpaceRepoTab = (props: { tab: "collections" | "blobs"; label: string }) => (
-    <A
-      classList={{
-        "border-b-2 font-medium transition-colors": true,
-        "border-transparent not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80":
-          selectedTab() !== props.tab,
-      }}
-      href={`${makeSpaceRepoPath(
-        params.spaceAuthority!,
-        params.spaceType!,
-        params.skey!,
-        repo(),
-      )}#${props.tab}`}
-    >
-      {props.label}
-    </A>
-  );
-
   return (
     <Show when={!hidden()}>
       <div class="flex w-full flex-col gap-3 py-2 pb-10">
         <div class="flex min-h-7 items-center justify-between px-2 text-sm sm:text-base">
-          <div class="flex items-center gap-3 sm:gap-4">
-            <SpaceRepoTab tab="collections" label="Collections" />
-            <SpaceRepoTab tab="blobs" label="Blobs" />
-          </div>
+          <Tabs
+            items={[
+              { id: "collections", label: "Collections", href: `${repoPath()}#collections` },
+              { id: "blobs", label: "Blobs", href: `${repoPath()}#blobs` },
+            ]}
+            active={selectedTab()}
+          />
           <Show when={selectedTab() === "collections" && repo() === auth().sub}>
             <SpaceRecordEditor
               authority={params.spaceAuthority!}
@@ -150,7 +139,7 @@ const SpaceRepoView = () => {
                 classList={{ "w-fit self-center": true }}
               >
                 <Show when={loading()} fallback={<span class="iconify lucide--chevrons-down" />}>
-                  <span class="iconify lucide--loader-circle animate-spin" />
+                  <Spinner />
                 </Show>
                 Load more records
               </Button>

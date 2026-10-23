@@ -7,6 +7,7 @@ import { Button } from "../components/button.jsx";
 import { FilterInput } from "../components/filter-input.jsx";
 import DidHoverCard from "../components/hover-card/did.jsx";
 import RecordHoverCard from "../components/hover-card/record.jsx";
+import { Spinner } from "../components/spinner.jsx";
 import { TagInput } from "../components/tag-input.jsx";
 import { LoadMoreSentinel } from "../lib/infinite-scroll.jsx";
 import { useFilterShortcut } from "../lib/keyboard.js";
@@ -209,10 +210,7 @@ export const LabelFeed = (props: { labelerDid: string; labelerEndpoint: string }
               disabled={loading()}
               classList={{ "h-7.5 w-20 shrink-0 justify-center": true }}
             >
-              <Show
-                when={!loading()}
-                fallback={<span class="iconify lucide--loader-circle animate-spin" />}
-              >
+              <Show when={!loading()} fallback={<Spinner />}>
                 Load more
               </Show>
             </Button>
@@ -230,7 +228,7 @@ export const LabelFeed = (props: { labelerDid: string; labelerEndpoint: string }
 
       <Show when={loading() && labels().length === 0}>
         <div class="flex items-center gap-2 py-8 text-sm text-neutral-500 dark:text-neutral-400">
-          <span class="iconify lucide--loader-circle animate-spin" />
+          <Spinner />
           Loading labels…
         </div>
       </Show>

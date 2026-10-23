@@ -7,6 +7,7 @@ import { Button } from "../../components/button.jsx";
 import { DomainGroup, domainGroupRowClasses } from "../../components/domain-group.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
+import { Spinner } from "../../components/spinner.jsx";
 import { EmptyState, ErrorNotice, LoadingState } from "../../components/states.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { listSpaces, parseSpaceUri, type SpaceView } from "../../lib/spaces.js";
@@ -32,10 +33,7 @@ const SignInPrompt = () => {
           Spaces require OAuth permissions.
         </p>
       </div>
-      <Button
-        onClick={() => navigate("/account/add")}
-        classList={{ "bg-blue-500! text-white! border-blue-500!": true }}
-      >
+      <Button onClick={() => navigate("/account/add")} variant="primary">
         <span class="iconify lucide--log-in" />
         Sign in
       </Button>
@@ -59,10 +57,7 @@ const PermissionPrompt = () => {
           Re-authorize this account and enable “View non-public records”.
         </p>
       </div>
-      <Button
-        onClick={editPermissions}
-        classList={{ "bg-blue-500! text-white! border-blue-500!": true }}
-      >
+      <Button onClick={editPermissions} variant="primary">
         <span class="iconify lucide--key-round" />
         Edit permissions
       </Button>
@@ -292,7 +287,7 @@ const SpacesIndex = () => {
             classList={{ "w-fit self-center": true }}
           >
             <Show when={loading()} fallback={<span class="iconify lucide--chevrons-down" />}>
-              <span class="iconify lucide--loader-circle animate-spin" />
+              <Spinner />
             </Show>
             Load more Spaces
           </Button>

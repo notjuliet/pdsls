@@ -3,6 +3,7 @@ import { createSignal, Show } from "solid-js";
 
 import { resolveHandle } from "../../lib/api";
 import { Button } from "../button.jsx";
+import { Spinner } from "../spinner.jsx";
 import { TextInput } from "../text-input.jsx";
 
 export const HandleInput = (props: { onInsert: (text: string) => void; onClose: () => void }) => {
@@ -63,17 +64,12 @@ export const HandleInput = (props: { onInsert: (text: string) => void; onClose: 
           </Button>
           <Show when={resolving()}>
             <div class="flex items-center gap-1">
-              <span class="iconify lucide--loader-circle animate-spin"></span>
+              <Spinner />
               <span>Resolving</span>
             </div>
           </Show>
           <Show when={!resolving()}>
-            <Button
-              type="submit"
-              classList={{
-                "bg-blue-500! text-white! border-none! hover:bg-blue-600! active:bg-blue-700! dark:bg-blue-600! dark:hover:bg-blue-500! dark:active:bg-blue-400!": true,
-              }}
-            >
+            <Button type="submit" variant="primary">
               Insert
             </Button>
           </Show>

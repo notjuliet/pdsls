@@ -11,6 +11,7 @@ import {
   MenuSeparator,
   NavMenu,
 } from "../components/dropdown.jsx";
+import { Spinner } from "../components/spinner.jsx";
 import { clearSpaceCredentials } from "../lib/spaces.js";
 import {
   getAvatar,
@@ -190,7 +191,7 @@ export const AccountManager = (props: { onCreateRecord?: () => void }) => {
                               </Show>
                             }
                           >
-                            <span class="iconify lucide--loader-circle shrink-0 animate-spin text-neutral-500 dark:text-neutral-400" />
+                            <Spinner class="shrink-0 text-neutral-500 dark:text-neutral-400" />
                           </Show>
                         }
                         onClick={() => handleAccountClick(did)}
@@ -211,7 +212,7 @@ export const AccountManager = (props: { onCreateRecord?: () => void }) => {
                         when={removingAccount() === did}
                         fallback={<span class="iconify lucide--x size-4" />}
                       >
-                        <span class="iconify lucide--loader-circle size-4 animate-spin" />
+                        <Spinner class="size-4" />
                       </Show>
                     </button>
                   </div>

@@ -227,7 +227,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
             return <div class="mt-3 wrap-anywhere">Error: {err.message}</div>;
           }}
         >
-          <Suspense fallback={<Spinner />}>
+          <Suspense fallback={<Spinner centered class="text-xl" />}>
             <Show
               when={
                 !isRouting() ||
@@ -235,7 +235,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
                 stablePath.startsWith(location.pathname) ||
                 location.pathname.startsWith(stablePath)
               }
-              fallback={<Spinner />}
+              fallback={<Spinner centered class="text-xl" />}
             >
               {props.children}
             </Show>

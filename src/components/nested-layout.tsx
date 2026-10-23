@@ -12,7 +12,7 @@ export const NestedLayout = (props: {
     {(_) => (
       <>
         <Show when={props.hasChild}>
-          <Suspense fallback={<Spinner />}>{props.children}</Suspense>
+          <Suspense fallback={<Spinner centered class="text-xl" />}>{props.children}</Suspense>
         </Show>
         {props.view()}
       </>

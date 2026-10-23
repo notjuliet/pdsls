@@ -170,7 +170,7 @@ export const BlobViewer = (props: {
         <Switch>
           <Match when={blob.loading}>
             <div class="self-center">
-              <Spinner />
+              <Spinner centered class="text-xl" />
             </div>
           </Match>
           <Match when={blob.error}>

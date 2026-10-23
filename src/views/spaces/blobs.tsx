@@ -4,6 +4,7 @@ import type { Accessor } from "solid-js";
 import { createEffect, createSignal, For, Show } from "solid-js";
 
 import { Button } from "../../components/button.jsx";
+import { Spinner } from "../../components/spinner.jsx";
 import { ErrorNotice, LoadingState } from "../../components/states.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { listSpaceBlobs } from "../../lib/spaces.js";
@@ -99,10 +100,7 @@ export const SpaceBlobList = (props: {
                 disabled={loading()}
                 classList={{ "w-20 h-7.5 justify-center": true }}
               >
-                <Show
-                  when={!loading()}
-                  fallback={<span class="iconify lucide--loader-circle animate-spin text-base" />}
-                >
+                <Show when={!loading()} fallback={<Spinner class="text-base" />}>
                   Load more
                 </Show>
               </Button>

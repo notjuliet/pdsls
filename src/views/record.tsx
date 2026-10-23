@@ -7,7 +7,7 @@ import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from
 
 import { agent } from "../auth/state";
 import { Backlinks } from "../components/backlinks.jsx";
-import { Button } from "../components/button.jsx";
+import { ConfirmDialog } from "../components/confirm-dialog.jsx";
 import { RecordEditor, setPlaceholder } from "../components/create";
 import {
   ActionMenu,
@@ -17,16 +17,16 @@ import {
   NavMenu,
 } from "../components/dropdown.jsx";
 import { Favicon } from "../components/favicon.jsx";
+import { IconButton } from "../components/icon-button.jsx";
 import { JSONValue } from "../components/json.jsx";
-import { Modal } from "../components/modal.jsx";
 import { addNotification } from "../components/notification.jsx";
-import { PermissionButton } from "../components/permission-button.jsx";
 import {
   RecordInfo,
   RecordPage,
   recordTabFromHash,
   useRecordSchemaValidation,
 } from "../components/record-page.jsx";
+import { Spinner } from "../components/spinner.jsx";
 import { useRepo } from "../lib/repo-context.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
 import { AtUri, uriTemplates } from "../lib/templates.js";
@@ -197,31 +197,20 @@ export const RecordView = () => {
                     refetch={refetch}
                     scope="update"
                   />
-                  <PermissionButton
+                  <IconButton
+                    icon="lucide--trash-2"
+                    label="Delete"
                     scope="delete"
-                    tooltip="Delete"
                     onClick={() => setOpenDelete(true)}
-                  >
-                    <span class="iconify lucide--trash-2"></span>
-                  </PermissionButton>
-                  <Modal
+                  />
+                  <ConfirmDialog
                     open={openDelete()}
                     onClose={() => setOpenDelete(false)}
-                    contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
-                  >
-                    <h2 class="mb-2 font-semibold">Delete this record?</h2>
-                    <div class="flex justify-end gap-2">
-                      <Button onClick={() => setOpenDelete(false)}>Cancel</Button>
-                      <Button
-                        onClick={deleteRecord}
-                        classList={{
-                          "bg-red-500! border-none! text-white! hover:bg-red-400! active:bg-red-400!": true,
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </Modal>
+                    onConfirm={() => void deleteRecord()}
+                    title="Delete this record?"
+                    description="This cannot be undone."
+                    confirmLabel="Delete"
+                  />
                 </Show>
                 <Show when={externalLink()}>
                   {(link) => {
@@ -329,11 +318,7 @@ export const RecordView = () => {
               <ErrorBoundary
                 fallback={(err) => <div class="wrap-break-word">Error: {err.message}</div>}
               >
-                <Suspense
-                  fallback={
-                    <div class="iconify lucide--loader-circle animate-spin self-center text-xl" />
-                  }
-                >
+                <Suspense fallback={<Spinner class="self-center text-xl" />}>
                   <div class="w-full px-2">
                     <Backlinks target={`at://${did}/${params.collection}/${params.rkey}`} />
                   </div>

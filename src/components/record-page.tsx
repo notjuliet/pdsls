@@ -1,5 +1,4 @@
-import { A } from "@solidjs/router";
-import { createSignal, For, type JSX, Match, Show, Switch } from "solid-js";
+import { createSignal, type JSX, Match, Show, Switch } from "solid-js";
 
 import {
   hasKnownRecordSchema,
@@ -9,6 +8,7 @@ import {
 import { CopyableInfoField } from "./copyable-info-field.jsx";
 import { RecordSchemaValidation } from "./record-schema-validation.jsx";
 import { RecordVerification } from "./record-verification.jsx";
+import { Tabs } from "./tabs.jsx";
 
 export type RecordTab = "record" | "schema" | "backlinks" | "info";
 
@@ -31,28 +31,13 @@ interface RecordPageProps {
   info: JSX.Element;
 }
 
-const tabClass = (active: boolean) => ({
-  "border-b-2 font-medium transition-colors": true,
-  "border-transparent not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80": !active,
-});
-
 export const RecordPage = (props: RecordPageProps) => (
   <div class="flex w-full flex-col items-center">
     <div class="mb-3 flex min-h-7 w-full items-center justify-between px-2 text-sm sm:text-base">
-      <div class="flex items-center gap-3 sm:gap-4">
-        <For each={props.tabs}>
-          {(tab) => (
-            <div class="flex items-center gap-0.5">
-              <A classList={tabClass(props.activeTab === tab.id)} href={props.tabHref(tab.id)}>
-                {tab.label}
-              </A>
-              <Show when={tab.error}>
-                <span class="iconify lucide--x text-red-500 dark:text-red-400" />
-              </Show>
-            </div>
-          )}
-        </For>
-      </div>
+      <Tabs
+        items={props.tabs.map((tab) => ({ ...tab, href: props.tabHref(tab.id) }))}
+        active={props.activeTab}
+      />
       <div class="flex sm:gap-0.5">{props.actions}</div>
     </div>
 

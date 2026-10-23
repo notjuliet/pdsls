@@ -1,7 +1,7 @@
 import { ComAtprotoRepoApplyWrites } from "@atcute/atproto";
 import { Client } from "@atcute/client";
 import { $type, ActorIdentifier } from "@atcute/lexicons";
-import { A, type RouteSectionProps, useParams } from "@solidjs/router";
+import { type RouteSectionProps, useParams } from "@solidjs/router";
 
 import { agent } from "../auth/state";
 import { CollectionPage, type CollectionSource } from "../components/collection-page.jsx";
@@ -100,14 +100,13 @@ const CollectionView = () => {
     <CollectionPage
       source={source()}
       hidden={hidden() || !repo.rpc()}
-      tabs={
-        <A
-          href={`/streams?type=jetstream&collections=${encodeURIComponent(params.collection!)}&dids=${encodeURIComponent(params.repo!)}`}
-          class="border-b-2 border-transparent font-medium transition-colors not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80"
-        >
-          Jetstream
-        </A>
-      }
+      tabs={[
+        {
+          id: "jetstream",
+          label: "Jetstream",
+          href: `/streams?type=jetstream&collections=${encodeURIComponent(params.collection!)}&dids=${encodeURIComponent(params.repo!)}`,
+        },
+      ]}
     />
   );
 };

@@ -5,7 +5,9 @@ import { createEffect, createMemo, createSignal, For, type JSX, Show } from "sol
 import { Button } from "../../components/button.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
+import { Spinner } from "../../components/spinner.jsx";
 import { EmptyState, ErrorNotice, LoadingState } from "../../components/states.jsx";
+import { Tabs } from "../../components/tabs.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { resolveRawLexicon } from "../../lib/lexicon.js";
 import {
@@ -53,22 +55,6 @@ const SpaceView = () => {
   const space = () => makeSpaceRef(params.spaceAuthority!, params.spaceType!, params.skey!);
   const spacePath = () => makeSpacePath(params.spaceAuthority!, params.spaceType!, params.skey!);
   const showingDetails = () => location.hash === "#details";
-
-  const Tab = (props: { details?: boolean; label: string }) => {
-    const active = () => (props.details ? showingDetails() : !showingDetails());
-    return (
-      <A
-        classList={{
-          "border-b-2 font-medium transition-colors": true,
-          "border-transparent not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80":
-            !active(),
-        }}
-        href={`${spacePath()}${props.details ? "#details" : ""}`}
-      >
-        {props.label}
-      </A>
-    );
-  };
 
   const orderedRepos = createMemo(() =>
     [...repos()].sort((a, b) => {
@@ -187,10 +173,13 @@ const SpaceView = () => {
     <Show when={!hidden()}>
       <div class="flex w-full flex-col gap-3 py-2 pb-10">
         <div class="flex min-h-7 items-center justify-between px-2 text-sm sm:text-base">
-          <div class="flex items-center gap-3 sm:gap-4">
-            <Tab label="Writers" />
-            <Tab details label="Details" />
-          </div>
+          <Tabs
+            items={[
+              { id: "writers", label: "Writers", href: spacePath() },
+              { id: "details", label: "Details", href: `${spacePath()}#details` },
+            ]}
+            active={showingDetails() ? "details" : "writers"}
+          />
           <div class="flex items-center gap-1">
             <Show when={loaded() && !hasOwnRepo()}>
               <SpaceRecordEditor
@@ -277,7 +266,7 @@ const SpaceView = () => {
                 classList={{ "w-fit self-center": true }}
               >
                 <Show when={loading()} fallback={<span class="iconify lucide--chevrons-down" />}>
-                  <span class="iconify lucide--loader-circle animate-spin" />
+                  <Spinner />
                 </Show>
                 Load more writers
               </Button>

@@ -3,6 +3,7 @@ import { Did, Handle } from "@atcute/lexicons";
 import { createSignal, For, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { Spinner } from "../../components/spinner.jsx";
 import { canHover } from "../../layout.jsx";
 import { type HandleResolveResult, resolveHandleDetailed, validateHandle } from "../../lib/api.js";
 import { detectDidKeyType, detectKeyType } from "../../lib/key.js";
@@ -98,7 +99,7 @@ const AliasEntry = (props: { alias: string; did: string; valid: boolean | undefi
               when={result()}
               fallback={
                 <div class="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
-                  <span class="iconify lucide--loader-circle animate-spin"></span>
+                  <Spinner />
                   <span>Resolving handle...</span>
                 </div>
               }

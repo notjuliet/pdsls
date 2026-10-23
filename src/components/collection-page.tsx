@@ -1,4 +1,4 @@
-import { A, useSearchParams } from "@solidjs/router";
+import { useSearchParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, For, type JSX, onMount, Show } from "solid-js";
 
 import type { ScopeId } from "../auth/scope-utils";
@@ -7,9 +7,10 @@ import { LoadMoreSentinel } from "../lib/infinite-scroll.jsx";
 import { useFilterShortcut } from "../lib/keyboard.js";
 import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
 import { Button } from "./button.jsx";
+import { ConfirmDialog } from "./confirm-dialog.jsx";
 import { FilterInput } from "./filter-input.jsx";
+import { IconButton } from "./icon-button.jsx";
 import type { JSONType } from "./json.jsx";
-import { Modal } from "./modal.jsx";
 import { addNotification } from "./notification.jsx";
 import { PermissionButton } from "./permission-button.jsx";
 import {
@@ -19,8 +20,9 @@ import {
   PreviewFieldMenu,
 } from "./preview-field.jsx";
 import { RecordRow } from "./record-row.jsx";
+import { Spinner } from "./spinner.jsx";
 import { EmptyState, ErrorNotice, LoadingState } from "./states.jsx";
-import Tooltip from "./tooltip.jsx";
+import { type TabItem, Tabs } from "./tabs.jsx";
 
 export interface CollectionRecord {
   rkey: string;
@@ -57,20 +59,12 @@ const FILTER_DELAY = 150;
 const getSearchParam = (param: string | string[] | undefined) =>
   Array.isArray(param) ? param[0] : (param ?? "");
 
-const tabClass = (active: boolean) => ({
-  "border-b-2 font-medium transition-colors": true,
-  "border-transparent not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80": !active,
-});
-
-const iconButtonClass =
-  "flex items-center rounded-md p-1.5 hover:bg-neutral-200 active:bg-neutral-300 disabled:opacity-40 dark:hover:bg-neutral-700 dark:active:bg-neutral-600";
-
 export const CollectionPage = (props: {
   source: CollectionSource;
   /** Keeps the loaded records while a record of this collection is open. */
   hidden?: boolean;
   /** Extra tab links after Records and Schema. */
-  tabs?: JSX.Element;
+  tabs?: TabItem[];
   /** Header actions shown outside manage mode, e.g. a create button. */
   actions?: JSX.Element;
 }) => {
@@ -257,18 +251,14 @@ export const CollectionPage = (props: {
     <Show when={!props.hidden}>
       <div class="flex w-full flex-col items-center">
         <div class="mb-2 flex min-h-7 w-full items-center justify-between px-2 text-sm sm:text-base">
-          <div class="flex gap-3 sm:gap-4">
-            <A href={props.source.collectionHref} classList={tabClass(!lexicon.showSchema())}>
-              Records
-            </A>
-            <A
-              href={`${props.source.collectionHref}#schema`}
-              classList={tabClass(lexicon.showSchema())}
-            >
-              Schema
-            </A>
-            {props.tabs}
-          </div>
+          <Tabs
+            items={[
+              { id: "records", label: "Records", href: props.source.collectionHref },
+              { id: "schema", label: "Schema", href: `${props.source.collectionHref}#schema` },
+              ...(props.tabs ?? []),
+            ]}
+            active={lexicon.showSchema() ? "schema" : "records"}
+          />
           <Show when={!lexicon.showSchema()}>
             <div class="flex items-center text-sm sm:gap-1">
               <Show when={!managing()}>{props.actions}</Show>
@@ -276,40 +266,35 @@ export const CollectionPage = (props: {
                 {(manage) => (
                   <>
                     <Show when={managing()}>
-                      <Tooltip text="Select all">
-                        <button type="button" onClick={selectAll} class={iconButtonClass}>
-                          <span class="iconify lucide--list-checks" />
-                        </button>
-                      </Tooltip>
+                      <IconButton
+                        icon="lucide--list-checks"
+                        label="Select all"
+                        onClick={selectAll}
+                      />
                       <Show when={manage().recreateScope}>
                         {(scope) => (
-                          <PermissionButton
+                          <IconButton
+                            icon="lucide--recycle"
+                            iconClass="text-green-500 dark:text-green-400"
+                            label="Recreate"
                             scope={scope()}
-                            tooltip="Recreate"
-                            class={iconButtonClass}
-                            disabledClass="flex items-center rounded-md p-1.5 opacity-40"
                             onClick={() => {
                               setRecreate(true);
                               setOpenDelete(true);
                             }}
-                          >
-                            <span class="iconify lucide--recycle text-green-500 dark:text-green-400" />
-                          </PermissionButton>
+                          />
                         )}
                       </Show>
-                      <Tooltip text="Delete">
-                        <button
-                          type="button"
-                          disabled={selected().size === 0}
-                          onClick={() => {
-                            setRecreate(false);
-                            setOpenDelete(true);
-                          }}
-                          class={iconButtonClass}
-                        >
-                          <span class="iconify lucide--trash-2 text-red-500 dark:text-red-400" />
-                        </button>
-                      </Tooltip>
+                      <IconButton
+                        icon="lucide--trash-2"
+                        iconClass="text-red-500 dark:text-red-400"
+                        label="Delete"
+                        disabled={selected().size === 0}
+                        onClick={() => {
+                          setRecreate(false);
+                          setOpenDelete(true);
+                        }}
+                      />
                     </Show>
                     <PermissionButton
                       scope={manage().scope}
@@ -369,36 +354,16 @@ export const CollectionPage = (props: {
         </Show>
       </div>
 
-      <Modal
+      <ConfirmDialog
         open={openDelete()}
-        onClose={() => !deleting() && setOpenDelete(false)}
-        contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
-      >
-        <h2 class="mb-2 font-semibold">
-          {recreate() ? "Recreate" : "Delete"} {selected().size} record
-          {selected().size === 1 ? "" : "s"}?
-        </h2>
-        <div class="flex justify-end gap-2">
-          <Button disabled={deleting()} onClick={() => setOpenDelete(false)}>
-            Cancel
-          </Button>
-          <Button
-            disabled={deleting()}
-            onClick={() => void deleteRecords()}
-            classList={{
-              "bg-blue-500! text-white! hover:bg-blue-600! active:bg-blue-700! dark:bg-blue-600! dark:hover:bg-blue-500! dark:active:bg-blue-400! border-none!":
-                recreate(),
-              "text-white! border-none! bg-red-500! hover:bg-red-600! active:bg-red-700! disabled:opacity-60":
-                !recreate(),
-            }}
-          >
-            <Show when={deleting()}>
-              <span class="iconify lucide--loader-circle animate-spin" />
-            </Show>
-            {recreate() ? "Recreate" : "Delete"}
-          </Button>
-        </div>
-      </Modal>
+        onClose={() => setOpenDelete(false)}
+        onConfirm={() => void deleteRecords()}
+        title={`${recreate() ? "Recreate" : "Delete"} ${selected().size} record${selected().size === 1 ? "" : "s"}?`}
+        description={recreate() ? undefined : "This cannot be undone."}
+        confirmLabel={recreate() ? "Recreate" : "Delete"}
+        variant={recreate() ? "primary" : "danger"}
+        busy={deleting()}
+      />
 
       <Show when={!lexicon.showSchema() && (records().length > 1 || filter())}>
         <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 left-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
@@ -460,10 +425,7 @@ export const CollectionPage = (props: {
                   disabled={loading()}
                   classList={{ "w-20 h-7.5 justify-center": true }}
                 >
-                  <Show
-                    when={!loading()}
-                    fallback={<span class="iconify lucide--loader-circle animate-spin text-base" />}
-                  >
+                  <Show when={!loading()} fallback={<Spinner class="text-base" />}>
                     Load more
                   </Show>
                 </Button>

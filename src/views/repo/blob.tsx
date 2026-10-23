@@ -3,6 +3,7 @@ import { A } from "@solidjs/router";
 import { createResource, createSignal, For, Show } from "solid-js";
 
 import { Button } from "../../components/button";
+import { Spinner } from "../../components/spinner.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll";
 
 const LIMIT = 1000;
@@ -64,10 +65,7 @@ export const BlobView = (props: { pds: string; repo: string }) => {
               disabled={response.loading}
               classList={{ "w-20 h-7.5 justify-center": true }}
             >
-              <Show
-                when={!response.loading}
-                fallback={<span class="iconify lucide--loader-circle animate-spin text-base" />}
-              >
+              <Show when={!response.loading} fallback={<Spinner class="text-base" />}>
                 Load more
               </Show>
             </Button>

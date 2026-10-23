@@ -2,7 +2,6 @@ import { Client, simpleFetchHandler } from "@atcute/client";
 import { DidDocument } from "@atcute/identity";
 import { ActorIdentifier, Handle, Nsid } from "@atcute/lexicons";
 import {
-  A,
   type RoutePreloadFunc,
   type RouteSectionProps,
   useLocation,
@@ -33,6 +32,7 @@ import {
   updateNotification,
 } from "../../components/notification.jsx";
 import { Spinner } from "../../components/spinner.jsx";
+import { Tabs } from "../../components/tabs.jsx";
 import {
   didDocCache,
   getPDS,
@@ -51,11 +51,7 @@ import { PlcLogView } from "./logs.jsx";
 
 const LazyTab = (props: { children: JSX.Element }) => (
   <ErrorBoundary fallback={(err) => <div class="wrap-break-word">Error: {err.message}</div>}>
-    <Suspense
-      fallback={<div class="iconify lucide--loader-circle mt-2 animate-spin self-center text-xl" />}
-    >
-      {props.children}
-    </Suspense>
+    <Suspense fallback={<Spinner class="mt-2 self-center text-xl" />}>{props.children}</Suspense>
   </ErrorBoundary>
 );
 
@@ -278,21 +274,6 @@ const RepoView = () => {
       ] satisfies { tab: RepoTabId; label: string; show: boolean }[]
     ).filter((tab) => tab.show);
 
-  const RepoTab = (props: { tab: RepoTabId; label: string }) => {
-    return (
-      <A
-        classList={{
-          "border-b-2 font-medium transition-colors": true,
-          "border-transparent not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80":
-            activeTab() !== props.tab,
-        }}
-        href={`/at://${params.repo}#${props.tab}`}
-      >
-        {props.label}
-      </A>
-    );
-  };
-
   const getRotationKeys = async () => {
     const res = await fetch(`${plcDirectory()}/${did}/log/last`);
     const json = await res.json();
@@ -389,7 +370,7 @@ const RepoView = () => {
   return (
     <Show when={!hidden()}>
       <Show when={repoData.state === "unresolved" || repoData.loading}>
-        <Spinner />
+        <Spinner centered class="text-xl" />
       </Show>
       <Show when={repoData.state === "ready" || repo.error()}>
         <div class="flex w-full flex-col gap-3 wrap-break-word">
@@ -406,8 +387,15 @@ const RepoView = () => {
               <span class="iconify lucide--chevron-down pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-neutral-500 dark:text-neutral-400" />
             </div>
 
-            <div class="hidden items-center gap-4 sm:flex">
-              <For each={repoTabs()}>{(tab) => <RepoTab tab={tab.tab} label={tab.label} />}</For>
+            <div class="hidden sm:block">
+              <Tabs
+                items={repoTabs().map((tab) => ({
+                  id: tab.tab,
+                  label: tab.label,
+                  href: `/at://${params.repo}#${tab.tab}`,
+                }))}
+                active={activeTab()}
+              />
             </div>
             <div class="flex gap-1">
               <Show when={error() && error() !== "Missing PDS"}>

@@ -18,6 +18,7 @@ import {
   recordTabFromHash,
   useRecordSchemaValidation,
 } from "../../components/record-page.jsx";
+import { Spinner } from "../../components/spinner.jsx";
 import { EmptyState, ErrorNotice } from "../../components/states.jsx";
 import { TextInput } from "../../components/text-input.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
@@ -109,7 +110,7 @@ const WelcomeView = (props: {
           when={!props.loading}
           fallback={
             <div class="flex flex-col items-center gap-2">
-              <span class="iconify lucide--loader-circle animate-spin text-3xl text-neutral-400" />
+              <Spinner class="text-3xl text-neutral-400" />
               <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
                 Reading CAR file...
               </span>
@@ -501,7 +502,7 @@ const ExploreView = (props: {
               }
             >
               <div class="flex items-center gap-2 px-2 py-1 sm:py-1.5">
-                <span class="iconify lucide--loader-circle animate-spin text-neutral-400" />
+                <Spinner class="text-neutral-400" />
                 <span class="w-[4ch] text-right text-xs text-neutral-500 dark:text-neutral-400">
                   {exportSaving() ? "" : `${Math.round((exportCount() / totalRecords()) * 100)}%`}
                 </span>

@@ -2,12 +2,11 @@ import { useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createSignal, Show } from "solid-js";
 
 import { SPACE_MANAGE_RECORDS_SCOPE_ID } from "../../auth/scope-utils";
-import { Button } from "../../components/button.jsx";
+import { ConfirmDialog } from "../../components/confirm-dialog.jsx";
 import { CopyMenu, DropdownMenu, MenuProvider } from "../../components/dropdown.jsx";
+import { IconButton } from "../../components/icon-button.jsx";
 import { JSONValue } from "../../components/json.jsx";
-import { Modal } from "../../components/modal.jsx";
 import { addNotification } from "../../components/notification.jsx";
-import { PermissionButton } from "../../components/permission-button.jsx";
 import {
   RecordInfo,
   RecordPage,
@@ -188,13 +187,12 @@ export const SpaceRecordView = () => {
                         showRecord({ ...result, value: updatedRecord });
                       }}
                     />
-                    <PermissionButton
+                    <IconButton
+                      icon="lucide--trash-2"
+                      label="Delete"
                       scope={SPACE_MANAGE_RECORDS_SCOPE_ID}
-                      tooltip="Delete"
                       onClick={() => setOpenDelete(true)}
-                    >
-                      <span class="iconify lucide--trash-2" />
-                    </PermissionButton>
+                    />
                   </Show>
                   <MenuProvider>
                     <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
@@ -250,33 +248,15 @@ export const SpaceRecordView = () => {
         </Show>
       </div>
 
-      <Modal
+      <ConfirmDialog
         open={openDelete()}
-        onClose={() => !deleting() && setOpenDelete(false)}
-        contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
-      >
-        <h2 class="font-semibold">Delete this record?</h2>
-        <p class="mt-1 mb-3 text-sm text-neutral-600 dark:text-neutral-400">
-          This cannot be undone.
-        </p>
-        <div class="flex justify-end gap-2">
-          <Button disabled={deleting()} onClick={() => setOpenDelete(false)}>
-            Cancel
-          </Button>
-          <Button
-            disabled={deleting()}
-            onClick={() => void deleteRecord()}
-            classList={{
-              "bg-red-500! border-none! text-white! hover:bg-red-400! active:bg-red-400! disabled:opacity-60": true,
-            }}
-          >
-            <Show when={deleting()}>
-              <span class="iconify lucide--loader-circle animate-spin" />
-            </Show>
-            {deleting() ? "Deleting…" : "Delete"}
-          </Button>
-        </div>
-      </Modal>
+        onClose={() => setOpenDelete(false)}
+        onConfirm={() => void deleteRecord()}
+        title="Delete this record?"
+        description="This cannot be undone."
+        confirmLabel={deleting() ? "Deleting…" : "Delete"}
+        busy={deleting()}
+      />
     </>
   );
 };

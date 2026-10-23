@@ -18,9 +18,12 @@ import {
 import { hasAccountScope, hasUserScope } from "../../auth/scope-utils";
 import { agent, sessions } from "../../auth/state";
 import { Button } from "../button.jsx";
+import { IconButton } from "../icon-button.jsx";
 import { Modal } from "../modal.jsx";
 import { addNotification } from "../notification.jsx";
+import { iconButtonClass } from "../permission-button.jsx";
 import { showPermissionPrompt } from "../permission-prompt";
+import { Spinner } from "../spinner.jsx";
 import { TextInput } from "../text-input.jsx";
 import Tooltip from "../tooltip.jsx";
 import { ConfirmSubmit } from "./confirm-submit";
@@ -218,8 +221,10 @@ export const RecordEditor = (props: {
       aria-label={props.create ? "Create record" : "Edit record"}
       class={
         hasPermission()
-          ? `flex items-center hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700 ${props.create ? "gap-1.5 rounded-md px-2 py-1.5 text-sm" : "rounded-sm p-1.5"}`
-          : `flex items-center opacity-40 ${props.create ? "gap-1.5 rounded-md px-2 py-1.5 text-sm" : "rounded-sm p-1.5"}`
+          ? props.create
+            ? "flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700"
+            : iconButtonClass
+          : `flex items-center rounded-md opacity-40 ${props.create ? "gap-1.5 px-2 py-1.5 text-sm" : "p-1.5"}`
       }
       onclick={openEditor}
     >
@@ -236,7 +241,7 @@ export const RecordEditor = (props: {
         closeOnClick={false}
         nonBlocking={isMinimized()}
         alignTop
-        contentClass={`dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700 ${isMaximized() ? "w-[calc(100%-1rem)] max-w-7xl h-[85vh]" : "w-[calc(100%-1rem)] max-w-3xl h-[65vh]"} ${isMinimized() ? "hidden" : ""}`}
+        contentClass={`flex flex-col ${isMaximized() ? "w-[calc(100%-1rem)] max-w-7xl h-[85vh]" : "w-[calc(100%-1rem)] max-w-3xl h-[65vh]"} ${isMinimized() ? "hidden" : ""}`}
       >
         <div class="mb-2 flex w-full justify-between text-base">
           <div class="flex items-center gap-2">
@@ -245,29 +250,24 @@ export const RecordEditor = (props: {
             </span>
           </div>
           <div class="flex items-center gap-1">
-            <button
-              type="button"
-              onclick={() => setIsMinimized(true)}
-              class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-            >
-              <span class="iconify lucide--minus"></span>
-            </button>
-            <button
-              type="button"
-              onclick={() => setIsMaximized(!isMaximized())}
-              class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-            >
-              <span
-                class={`iconify ${isMaximized() ? "lucide--minimize-2" : "lucide--maximize-2"}`}
-              ></span>
-            </button>
-            <button
-              id="close"
-              onclick={() => setOpenDialog(false)}
-              class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-            >
-              <span class="iconify lucide--x"></span>
-            </button>
+            <IconButton
+              icon="lucide--minus"
+              label="Minimize"
+              tooltip={false}
+              onClick={() => setIsMinimized(true)}
+            />
+            <IconButton
+              icon={isMaximized() ? "lucide--minimize-2" : "lucide--maximize-2"}
+              label={isMaximized() ? "Restore window" : "Maximize"}
+              tooltip={false}
+              onClick={() => setIsMaximized(!isMaximized())}
+            />
+            <IconButton
+              icon="lucide--x"
+              label="Close"
+              tooltip={false}
+              onClick={() => setOpenDialog(false)}
+            />
           </div>
         </div>
         <form ref={formRef} class="flex min-h-0 flex-1 flex-col gap-y-2">
@@ -326,7 +326,7 @@ export const RecordEditor = (props: {
             <Suspense
               fallback={
                 <div class="flex h-full items-center justify-center">
-                  <span class="iconify lucide--loader-circle animate-spin text-xl"></span>
+                  <Spinner class="text-xl" />
                 </div>
               }
             >
@@ -349,12 +349,12 @@ export const RecordEditor = (props: {
                 editor={() => editorView}
                 repo={uploadRepo()}
                 canUpload={canUploadBlob()}
-                dialogClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[20rem] rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
+                dialogClass="w-[20rem]"
               />
               <Modal
                 open={openConfirmDialog()}
                 onClose={() => setOpenConfirmDialog(false)}
-                contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[24rem] rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
+                contentClass="w-[24rem]"
               >
                 <ConfirmSubmit
                   isCreate={props.create}
@@ -375,9 +375,7 @@ export const RecordEditor = (props: {
                       editRecord(validate(), recreate());
                     }
                   }}
-                  classList={{
-                    "bg-blue-500! text-white! border-none! hover:bg-blue-600! active:bg-blue-700! dark:bg-blue-600! dark:hover:bg-blue-500! dark:active:bg-blue-400!": true,
-                  }}
+                  variant="primary"
                 >
                   {props.create ? "Create" : "Edit"}
                 </Button>
