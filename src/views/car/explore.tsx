@@ -23,9 +23,10 @@ import {
   useRecordSchemaValidation,
 } from "../../components/repo/record-page.jsx";
 import { timestampFromRkey } from "../../components/repo/record-row.jsx";
-import { CopyMenu, DropdownMenu, MenuProvider } from "../../components/ui/dropdown.jsx";
+import { IconButton } from "../../components/ui/icon-button.jsx";
 import { Spinner, EmptyState, ErrorNotice } from "../../components/ui/states.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
+import { addToClipboard } from "../../lib/copy";
 import { localDateFromTimestamp } from "../../lib/format.js";
 import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import { carFileAccept, createFileChangeHandler, isIOS } from "./file-handlers.js";
@@ -437,34 +438,38 @@ const ExploreView = (props: { archive: Archive; view: () => View }) => {
   return (
     <div class="flex w-full flex-col">
       <Breadcrumbs>
-        <BreadcrumbRow
-          icon="lucide--book-user"
-          label={handle()}
-          preserveLabel={handle() !== props.archive.did}
-          detail={handle() !== props.archive.did ? props.archive.did : undefined}
-          href={props.view().type !== "repo" ? "/car" : undefined}
-          trailing={
+        <div class="flex min-w-0 items-center gap-1">
+          <div class="min-w-0 flex-1">
+            <BreadcrumbRow
+              icon="lucide--book-user"
+              label={handle()}
+              preserveLabel={handle() !== props.archive.did}
+              detail={handle() !== props.archive.did ? props.archive.did : undefined}
+              href={props.view().type !== "repo" ? "/car" : undefined}
+            />
+          </div>
+          <div class="shrink-0">
             <Show
               when={exporting()}
               fallback={
                 <button
                   type="button"
                   onClick={handleExport}
-                  class="flex shrink-0 items-center rounded px-2 py-1 text-xs text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70"
+                  class="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-neutral-500 transition-colors select-none hover:bg-neutral-200/70 hover:text-neutral-700 active:bg-neutral-300/70 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-200 dark:active:bg-neutral-600/70"
                 >
                   Export ZIP
                 </button>
               }
             >
-              <div class="flex items-center gap-2 px-2 py-1 sm:py-1.5">
+              <div class="flex items-center gap-2 px-2 py-1">
                 <Spinner class="text-neutral-400" />
                 <span class="w-[4ch] text-right text-xs text-neutral-500 dark:text-neutral-400">
                   {exportSaving() ? "" : `${Math.round((exportCount() / totalRecords()) * 100)}%`}
                 </span>
               </div>
             </Show>
-          }
-        />
+          </div>
+        </div>
 
         <Show
           when={(() => {
@@ -504,7 +509,7 @@ const ExploreView = (props: { archive: Archive; view: () => View }) => {
         </Show>
       </Breadcrumbs>
 
-      <div class="px-2 py-2">
+      <div class="pt-3 pb-2">
         <Switch>
           <Match when={props.view().type === "repo"}>
             <RepoSubview archive={props.archive} />
@@ -547,7 +552,7 @@ const RepoSubview = (props: { archive: Archive }) => {
   );
 
   return (
-    <div class="flex flex-col gap-3 pb-22">
+    <div class="flex flex-col gap-3 px-2 pb-22">
       <CollectionList
         collections={props.archive.entries.map((entry) => ({
           nsid: entry.name,
@@ -634,15 +639,11 @@ const RecordSubview = (props: {
         `${viewToPath({ type: "record", collection: props.collection, record: props.record })}#${tab}`
       }
       actions={
-        <MenuProvider>
-          <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
-            <CopyMenu
-              content={JSON.stringify(props.record.record, null, 2)}
-              label="Copy record"
-              icon="lucide--copy"
-            />
-          </DropdownMenu>
-        </MenuProvider>
+        <IconButton
+          icon="lucide--copy"
+          label="Copy record"
+          onClick={() => addToClipboard(JSON.stringify(props.record.record, null, 2))}
+        />
       }
       record={
         <Show
