@@ -1,18 +1,9 @@
-import type { Nsid } from "@atcute/lexicons";
 import { A } from "@solidjs/router";
-import {
-  createEffect,
-  createResource,
-  createSignal,
-  type JSX,
-  Match,
-  Show,
-  Switch,
-} from "solid-js";
+import { createEffect, createSignal, type JSX, Match, Show, Switch } from "solid-js";
 
 import { canHover } from "../../layout";
 import { addToClipboard } from "../../lib/copy";
-import { resolveLexicon } from "../../lib/lexicon";
+import { schemaHref } from "../../lib/lexicon";
 import LexiconHoverCard from "../hover-card/lexicon";
 import Tooltip from "../ui/tooltip";
 
@@ -35,7 +26,7 @@ const CopyButton = (props: { content: string; label: string }) => (
           e.stopPropagation();
           addToClipboard(props.content);
         }}
-        class="pointer-events-none -mr-2 flex items-center rounded px-2 py-1 text-neutral-500 opacity-0 transition-all duration-200 group-hover/row:pointer-events-auto group-hover/row:opacity-100 hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70"
+        class="pointer-events-none flex items-center rounded px-1.5 py-1 text-neutral-500 opacity-0 transition-all duration-200 group-hover/row:pointer-events-auto group-hover/row:opacity-100 hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70"
         aria-label="Copy to clipboard"
       >
         <span class="iconify lucide--copy" />
@@ -216,6 +207,14 @@ export const BreadcrumbRow = (props: BreadcrumbRowProps) => {
           </Show>
         </Show>
       </span>
+      {/* Copy shows only on hover, so it goes first and the always-visible links stay flush right. */}
+      <Show when={props.copy}>
+        {(copy) => (
+          <span class="relative z-10 flex shrink-0 focus-within:z-20 hover:z-20">
+            <CopyButton content={copy().content} label={copy().label} />
+          </span>
+        )}
+      </Show>
       <Show when={props.trailing}>
         <span class="relative z-10 flex shrink-0 items-center focus-within:z-20 hover:z-20">
           {props.trailing}
@@ -232,44 +231,26 @@ export const BreadcrumbRow = (props: BreadcrumbRowProps) => {
           </span>
         )}
       </Show>
-      <Show when={props.copy}>
-        {(copy) => (
-          <span class="relative z-10 flex shrink-0 focus-within:z-20 hover:z-20">
-            <CopyButton content={copy().content} label={copy().label} />
-          </span>
-        )}
-      </Show>
     </div>
   );
 };
 
 /**
- * Links a collection row to its published lexicon, previewing it on hover. Shown only once the
- * NSID resolves; lookups are cached per NSID.
+ * Links a collection row to its lexicon, previewing it on hover. The lexicon resolves only on
+ * hover or click, which show an error when none is published.
  */
-export const BreadcrumbSchemaLink = (props: { nsid: string }) => {
-  const [lexicon] = createResource(
-    () => props.nsid,
-    (nsid) => resolveLexicon(nsid as Nsid).catch(() => undefined),
-  );
-
-  return (
-    // Keyed so the link and its preview remount for each collection instead of keeping the last one open.
-    <Show when={!lexicon.loading && lexicon()} keyed>
-      {(found) => (
-        <LexiconHoverCard
-          lexicon={props.nsid}
-          renderTrigger={() => (
-            <A
-              href={`/at://${found.authority}/com.atproto.lexicon.schema/${props.nsid}#schema`}
-              aria-label="Schema"
-              class={rowLinkClass}
-            >
-              <span class="iconify lucide--book-text" />
-            </A>
-          )}
-        />
-      )}
-    </Show>
-  );
-};
+export const BreadcrumbSchemaLink = (props: { nsid: string }) => (
+  // Keyed so the link and its preview remount for each collection instead of keeping the last one open.
+  <Show when={props.nsid} keyed>
+    {(nsid) => (
+      <LexiconHoverCard
+        lexicon={nsid}
+        renderTrigger={() => (
+          <A href={schemaHref(nsid)} aria-label="Schema" class={rowLinkClass}>
+            <span class="iconify lucide--book-text" />
+          </A>
+        )}
+      />
+    )}
+  </Show>
+);
