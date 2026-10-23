@@ -116,20 +116,22 @@ const SpaceRepoView = () => {
           <Show when={error()}>{(message) => <ErrorNotice message={message()} />}</Show>
 
           <Show when={loaded() && (!error() || records().length > 0)}>
-            <CollectionList
-              collections={collections().map(([collection, count]) => ({
-                nsid: collection,
-                count: `${count.toLocaleString()}${cursor() ? "+" : ""}`,
-                href: makeSpaceCollectionPath(
-                  params.spaceAuthority!,
-                  params.spaceType!,
-                  params.skey!,
-                  repo(),
-                  collection,
-                ),
-              }))}
-              fallback={<EmptyState icon="lucide--folder-open" message="No collections found" />}
-            />
+            <div class="px-2">
+              <CollectionList
+                collections={collections().map(([collection, count]) => ({
+                  nsid: collection,
+                  count: `${count.toLocaleString()}${cursor() ? "+" : ""}`,
+                  href: makeSpaceCollectionPath(
+                    params.spaceAuthority!,
+                    params.spaceType!,
+                    params.skey!,
+                    repo(),
+                    collection,
+                  ),
+                }))}
+                fallback={<EmptyState icon="lucide--folder-open" message="No collections found" />}
+              />
+            </div>
 
             <Show when={cursor()}>
               <Button
