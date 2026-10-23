@@ -7,9 +7,7 @@ export interface CollectionItem {
   nsid: string;
   /** Record count, shown on the right when known. */
   count?: number | string;
-  /** Navigates to the collection. Ignored when `onClick` is set. */
-  href?: string;
-  onClick?: () => void;
+  href: string;
 }
 
 interface CollectionListProps {
@@ -101,25 +99,9 @@ export const CollectionList = (props: CollectionListProps) => {
                 <For each={group.items}>
                   {(item) => (
                     <li>
-                      <Show
-                        when={item.onClick}
-                        fallback={
-                          <A href={item.href ?? ""} class={rowClass} title={item.nsid}>
-                            {rowContent(group.authority, item)}
-                          </A>
-                        }
-                      >
-                        {(onClick) => (
-                          <button
-                            type="button"
-                            onClick={() => onClick()()}
-                            class={rowClass}
-                            title={item.nsid}
-                          >
-                            {rowContent(group.authority, item)}
-                          </button>
-                        )}
-                      </Show>
+                      <A href={item.href} class={rowClass} title={item.nsid}>
+                        {rowContent(group.authority, item)}
+                      </A>
                     </li>
                   )}
                 </For>

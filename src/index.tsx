@@ -34,7 +34,11 @@ render(
       <Route path="/streams" component={StreamView} />
       <Route path={["/jetstream", "/firehose", "/spacedust"]} component={LegacyStreamRedirect} />
       <Route path="/labels" component={LegacyLabelsRedirect} />
-      <Route path="/car" component={CarView} />
+      <Route path="/car" component={CarView}>
+        <Route path="/" />
+        <Route path="/:collection" />
+        <Route path="/:collection/:rkey" />
+      </Route>
       <Route path="/account/add" component={AccountLoginView} />
       <Route path="/account/:did/permissions" component={AccountPermissionsView} />
       <Route path="/spaces" component={SpacesLayout} />

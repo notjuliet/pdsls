@@ -5,7 +5,7 @@ import { Did } from "@atcute/lexicons";
 import { fromStream, isCommit } from "@atcute/repo";
 import * as TID from "@atcute/tid";
 import { zip, type ZipEntry } from "@mary/zip";
-import { useLocation, useNavigate } from "@solidjs/router";
+import { useLocation, useNavigate, useParams } from "@solidjs/router";
 import {
   createEffect,
   createMemo,
@@ -24,7 +24,7 @@ import { JSONValue, type JSONType } from "../../components/json.jsx";
 import {
   RecordInfo,
   RecordPage,
-  type RecordTab,
+  recordTabFromHash,
   useRecordSchemaValidation,
 } from "../../components/record-page.jsx";
 import { RecordRow } from "../../components/record-row.jsx";
@@ -158,39 +158,29 @@ const WelcomeView = (props: {
   );
 };
 
-const viewToHash = (view: View): string => {
+const viewToPath = (view: View): string => {
   switch (view.type) {
     case "repo":
-      return "";
+      return "/car";
     case "collection":
-      return `#${view.collection.name}`;
+      return `/car/${view.collection.name}`;
     case "record":
-      return `#${view.collection.name}/${view.record.key}`;
+      return `/car/${view.collection.name}/${view.record.key}`;
   }
 };
 
-const hashToView = (hash: string, archive: Archive): View => {
-  if (!hash || hash === "#") return { type: "repo" };
-
-  const raw = hash.startsWith("#") ? hash.slice(1) : hash;
-  const slashIdx = raw.indexOf("/");
-
-  if (slashIdx === -1) {
-    const collection = archive.entries.find((e) => e.name === raw);
-    if (collection) return { type: "collection", collection };
-    return { type: "repo" };
-  }
-
-  const collectionName = raw.slice(0, slashIdx);
-  const recordKey = raw.slice(slashIdx + 1);
+/** Resolves `/car/<collection>/<rkey>` against the loaded archive, falling back to the nearest level. */
+const pathToView = (
+  collectionName: string | undefined,
+  recordKey: string | undefined,
+  archive: Archive,
+): View => {
   const collection = archive.entries.find((e) => e.name === collectionName);
-  if (collection) {
-    const record = collection.entries.find((r) => r.key === recordKey);
-    if (record) return { type: "record", collection, record };
-    return { type: "collection", collection };
-  }
+  if (!collection) return { type: "repo" };
 
-  return { type: "repo" };
+  const record = recordKey ? collection.entries.find((r) => r.key === recordKey) : undefined;
+  if (record) return { type: "record", collection, record };
+  return { type: "collection", collection };
 };
 
 // Check if browser natively supports File System Access API
@@ -207,6 +197,7 @@ const filenamify = (name: string) => {
 
 export const CarView = () => {
   const location = useLocation();
+  const params = useParams();
   const navigate = useNavigate();
   const initialQueuedFile = queuedCarFile();
 
@@ -218,12 +209,11 @@ export const CarView = () => {
   const view = createMemo((): View => {
     const arch = archive();
     if (!arch) return { type: "repo" };
-    return hashToView(location.hash, arch);
+    return pathToView(params.collection, params.rkey, arch);
   });
 
   const navigateToView = (newView: View) => {
-    const hash = viewToHash(newView);
-    navigate(`${location.pathname}${hash}`);
+    navigate(viewToPath(newView));
   };
 
   const parseCarFile = async (file: File) => {
@@ -307,7 +297,7 @@ export const CarView = () => {
       }
 
       setArchive(result);
-      if (location.hash) navigate(location.pathname, { replace: true });
+      if (location.pathname !== "/car" || location.hash) navigate("/car", { replace: true });
     } catch (err) {
       console.error("Failed to parse CAR file:", err);
       setError(err instanceof Error ? err.message : "Failed to parse CAR file");
@@ -329,7 +319,7 @@ export const CarView = () => {
   const reset = () => {
     setArchive(null);
     setError(undefined);
-    if (location.hash) navigate(location.pathname, { replace: true });
+    if (location.pathname !== "/car" || location.hash) navigate("/car", { replace: true });
   };
 
   document.title = "CAR explorer - PDSls";
@@ -610,7 +600,7 @@ const ExploreView = (props: {
       <div class="px-2 py-2">
         <Switch>
           <Match when={props.view().type === "repo"}>
-            <RepoSubview archive={props.archive} onRoute={props.setView} />
+            <RepoSubview archive={props.archive} />
           </Match>
 
           <Match
@@ -621,11 +611,7 @@ const ExploreView = (props: {
             keyed
           >
             {({ collection }) => (
-              <CollectionSubview
-                archive={props.archive}
-                collection={collection}
-                onRoute={props.setView}
-              />
+              <CollectionSubview archive={props.archive} collection={collection} />
             )}
           </Match>
 
@@ -646,7 +632,7 @@ const ExploreView = (props: {
   );
 };
 
-const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void }) => {
+const RepoSubview = (props: { archive: Archive }) => {
   const [filter, setFilter] = createSignal("");
   const totalRecords = createMemo(() =>
     props.archive.entries.reduce((sum, entry) => sum + entry.entries.length, 0),
@@ -671,7 +657,7 @@ const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void })
         collections={props.archive.entries.map((entry) => ({
           nsid: entry.name,
           count: entry.entries.length,
-          onClick: () => props.onRoute({ type: "collection", collection: entry }),
+          href: viewToPath({ type: "collection", collection: entry }),
         }))}
         filter={filter()}
         fallback={
@@ -686,11 +672,7 @@ const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void })
 
 const RECORDS_PER_PAGE = 100;
 
-const CollectionSubview = (props: {
-  archive: Archive;
-  collection: CollectionEntry;
-  onRoute: (view: View) => void;
-}) => {
+const CollectionSubview = (props: { archive: Archive; collection: CollectionEntry }) => {
   const [filter, setFilter] = createSignal("");
   const debouncedFilter = createDebouncedValue(filter, 150);
   const [displayCount, setDisplayCount] = createSignal(RECORDS_PER_PAGE);
@@ -777,9 +759,7 @@ const CollectionSubview = (props: {
               cid={entry.cid}
               value={entry.record}
               repo={props.archive.did}
-              onClick={() =>
-                props.onRoute({ type: "record", collection: props.collection, record: entry })
-              }
+              href={viewToPath({ type: "record", collection: props.collection, record: entry })}
             />
           )}
         </For>
@@ -802,11 +782,8 @@ const RecordSubview = (props: {
   collection: CollectionEntry;
   record: RecordEntry;
 }) => {
-  const [tab, setTab] = createSignal<RecordTab>("record");
-  const lexicon = useLexiconSchema(
-    () => props.collection.name,
-    () => tab() === "schema",
-  );
+  const location = useLocation();
+  const lexicon = useLexiconSchema(() => props.collection.name);
   const schemaValidation = useRecordSchemaValidation(
     () => props.collection.name,
     () => props.record.key,
@@ -824,8 +801,10 @@ const RecordSubview = (props: {
         { id: "schema", label: "Schema" },
         { id: "info", label: "Info", error: schemaValidation.valid() === false },
       ]}
-      activeTab={tab()}
-      onTabChange={setTab}
+      activeTab={recordTabFromHash(location.hash)}
+      tabHref={(tab) =>
+        `${viewToPath({ type: "record", collection: props.collection, record: props.record })}#${tab}`
+      }
       actions={
         <MenuProvider>
           <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">

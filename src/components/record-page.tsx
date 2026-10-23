@@ -23,10 +23,7 @@ export const recordTabFromHash = (hash: string): RecordTab => {
 interface RecordPageProps {
   tabs: { id: RecordTab; label: string; error?: boolean }[];
   activeTab: RecordTab;
-  /** Makes tabs links, for pages that keep the tab in the URL hash. */
-  tabHref?: (tab: RecordTab) => string;
-  /** Makes tabs buttons, for pages that keep the tab in local state. */
-  onTabChange?: (tab: RecordTab) => void;
+  tabHref: (tab: RecordTab) => string;
   actions?: JSX.Element;
   record: JSX.Element;
   schema: JSX.Element;
@@ -46,27 +43,9 @@ export const RecordPage = (props: RecordPageProps) => (
         <For each={props.tabs}>
           {(tab) => (
             <div class="flex items-center gap-0.5">
-              <Show
-                when={props.onTabChange}
-                fallback={
-                  <A
-                    classList={tabClass(props.activeTab === tab.id)}
-                    href={props.tabHref?.(tab.id) ?? `#${tab.id}`}
-                  >
-                    {tab.label}
-                  </A>
-                }
-              >
-                {(onTabChange) => (
-                  <button
-                    type="button"
-                    classList={tabClass(props.activeTab === tab.id)}
-                    onClick={() => onTabChange()(tab.id)}
-                  >
-                    {tab.label}
-                  </button>
-                )}
-              </Show>
+              <A classList={tabClass(props.activeTab === tab.id)} href={props.tabHref(tab.id)}>
+                {tab.label}
+              </A>
               <Show when={tab.error}>
                 <span class="iconify lucide--x text-red-500 dark:text-red-400" />
               </Show>
