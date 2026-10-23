@@ -19,13 +19,21 @@ import {
 
 import { Button } from "../../components/button.jsx";
 import { CollectionList } from "../../components/collection-list.jsx";
+import { CopyMenu, DropdownMenu, MenuProvider } from "../../components/dropdown.jsx";
 import { JSONValue, type JSONType } from "../../components/json.jsx";
+import {
+  RecordInfo,
+  RecordPage,
+  type RecordTab,
+  useRecordSchemaValidation,
+} from "../../components/record-page.jsx";
 import { RecordRow } from "../../components/record-row.jsx";
 import { EmptyState, ErrorNotice } from "../../components/states.jsx";
 import { TextInput } from "../../components/text-input.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
 import { createDebouncedValue } from "../../lib/debounced.js";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
+import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import { localDateFromTimestamp } from "../../utils/format.js";
 import { carFileAccept, createFileChangeHandler, isIOS } from "./file-handlers.js";
 import { clearQueuedCarFile, queuedCarFile } from "./state.js";
@@ -794,21 +802,67 @@ const RecordSubview = (props: {
   collection: CollectionEntry;
   record: RecordEntry;
 }) => {
-  return (
-    <div class="flex flex-col items-center gap-3">
-      <div class="flex w-full items-center gap-2 text-sm text-neutral-600 sm:text-base dark:text-neutral-400">
-        <span class="iconify lucide--box shrink-0" />
-        <span class="text-xs break-all">{props.record.cid}</span>
-      </div>
+  const [tab, setTab] = createSignal<RecordTab>("record");
+  const lexicon = useLexiconSchema(
+    () => props.collection.name,
+    () => tab() === "schema",
+  );
+  const schemaValidation = useRecordSchemaValidation(
+    () => props.collection.name,
+    () => props.record.key,
+  );
 
-      <Show
-        when={props.record.record !== null}
-        fallback={<ErrorNotice message="Failed to decode record" />}
-      >
-        <div class="max-w-full min-w-full font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-max sm:max-w-screen sm:px-4 sm:text-sm md:max-w-3xl">
+  createEffect(() => {
+    if (props.record.record !== null) schemaValidation.validateLocal(props.record.record);
+    else schemaValidation.reset();
+  });
+
+  return (
+    <RecordPage
+      tabs={[
+        { id: "record", label: "Record" },
+        { id: "schema", label: "Schema" },
+        { id: "info", label: "Info", error: schemaValidation.valid() === false },
+      ]}
+      activeTab={tab()}
+      onTabChange={setTab}
+      actions={
+        <MenuProvider>
+          <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
+            <CopyMenu
+              content={JSON.stringify(props.record.record, null, 2)}
+              label="Copy record"
+              icon="lucide--copy"
+            />
+          </DropdownMenu>
+        </MenuProvider>
+      }
+      record={
+        <Show
+          when={props.record.record !== null}
+          fallback={<ErrorNotice message="Failed to decode record" />}
+        >
           <JSONValue data={props.record.record} repo={props.archive.did || ""} newTab hideBlobs />
-        </div>
-      </Show>
-    </div>
+        </Show>
+      }
+      schema={
+        <SchemaTabContent
+          schema={lexicon.schema()}
+          loading={lexicon.loading()}
+          error={lexicon.error()}
+          fallbackSchema={
+            props.collection.name === "com.atproto.lexicon.schema" ? props.record.record : undefined
+          }
+        />
+      }
+      info={
+        <RecordInfo
+          uri={`at://${props.archive.did}/${props.collection.name}/${props.record.key}`}
+          cid={props.record.cid}
+          schema={schemaValidation}
+          value={props.record.record}
+        />
+      }
+    />
   );
 };

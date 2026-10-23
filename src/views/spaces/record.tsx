@@ -1,22 +1,20 @@
-import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
+import { useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createSignal, Show } from "solid-js";
 
 import { SPACE_MANAGE_RECORDS_SCOPE_ID } from "../../auth/scope-utils";
 import { Button } from "../../components/button.jsx";
-import { CopyableInfoField } from "../../components/copyable-info-field.jsx";
+import { CopyMenu, DropdownMenu, MenuProvider } from "../../components/dropdown.jsx";
 import { JSONValue } from "../../components/json.jsx";
 import { Modal } from "../../components/modal.jsx";
 import { addNotification } from "../../components/notification.jsx";
 import { PermissionButton } from "../../components/permission-button.jsx";
-import { RecordSchemaValidation } from "../../components/record-schema-validation.jsx";
-import { RecordVerification } from "../../components/record-verification.jsx";
-import { ErrorNotice, LoadingState } from "../../components/states.jsx";
-import Tooltip from "../../components/tooltip.jsx";
 import {
-  hasKnownRecordSchema,
-  validateKnownRecordSchema,
-  validateResolvedRecordSchema,
-} from "../../lib/record-validation.js";
+  RecordInfo,
+  RecordPage,
+  recordTabFromHash,
+  useRecordSchemaValidation,
+} from "../../components/record-page.jsx";
+import { ErrorNotice, LoadingState } from "../../components/states.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import {
   deleteSpaceRecord,
@@ -25,7 +23,6 @@ import {
   type GetSpaceRecordResult,
   verifySpaceRecord,
 } from "../../lib/spaces.js";
-import { addToClipboard } from "../../utils/copy.js";
 import {
   makeSpaceBlobPath,
   makeSpaceCollectionPath,
@@ -47,11 +44,12 @@ export const SpaceRecordView = () => {
   const [error, setError] = createSignal<string>();
   const [openDelete, setOpenDelete] = createSignal(false);
   const [deleting, setDeleting] = createSignal(false);
-  const [validSchema, setValidSchema] = createSignal<boolean>();
-  const [validationError, setValidationError] = createSignal("");
-  const [remoteValidation, setRemoteValidation] = createSignal(false);
   const [validRecord, setValidRecord] = createSignal<boolean>();
   const [verifyError, setVerifyError] = createSignal("");
+  const schemaValidation = useRecordSchemaValidation(
+    () => params.collection!,
+    () => params.rkey!,
+  );
   const lexicon = useLexiconSchema(() => params.collection);
   let requestVersion = 0;
 
@@ -69,10 +67,7 @@ export const SpaceRecordView = () => {
 
   const showRecord = (result: GetSpaceRecordResult) => {
     setRecord(result);
-    const validation = validateKnownRecordSchema(params.collection!, result.value);
-    setValidSchema(validation?.valid);
-    setValidationError(validation?.error ?? "");
-    setRemoteValidation(false);
+    schemaValidation.validateLocal(result.value);
   };
 
   createEffect(() => {
@@ -80,9 +75,7 @@ export const SpaceRecordView = () => {
     const version = requestVersion;
     setRecord(undefined);
     setError(undefined);
-    setValidSchema(undefined);
-    setValidationError("");
-    setRemoteValidation(false);
+    schemaValidation.reset();
     setValidRecord(undefined);
     setVerifyError("");
 
@@ -114,21 +107,6 @@ export const SpaceRecordView = () => {
         setVerifyError(err instanceof Error ? err.message : String(err));
         setValidRecord(false);
       }
-    }
-  };
-
-  const validateRemoteSchema = async (value: unknown) => {
-    try {
-      setRemoteValidation(true);
-      setValidationError("");
-      await validateResolvedRecordSchema(params.collection!, params.rkey!, value);
-      setValidSchema(true);
-    } catch (err) {
-      console.error("Schema validation error:", err);
-      setValidSchema(false);
-      setValidationError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setRemoteValidation(false);
     }
   };
 
@@ -167,27 +145,6 @@ export const SpaceRecordView = () => {
     }
   };
 
-  const RecordTab = (props: { tab: "record" | "schema" | "info"; label: string }) => {
-    const active = () => {
-      if (props.tab === "info") return location.hash === "#info";
-      if (props.tab === "schema") return lexicon.showSchema();
-      return location.hash !== "#info" && !lexicon.showSchema();
-    };
-
-    return (
-      <A
-        href={`${recordPath()}#${props.tab}`}
-        classList={{
-          "border-b-2 font-medium transition-colors": true,
-          "border-transparent not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80":
-            !active(),
-        }}
-      >
-        {props.label}
-      </A>
-    );
-  };
-
   return (
     <>
       <div class="flex w-full flex-col items-center py-2 pb-10">
@@ -199,14 +156,20 @@ export const SpaceRecordView = () => {
 
         <Show when={record()} keyed>
           {(value) => (
-            <div class="flex w-full flex-col items-center">
-              <div class="mb-3 flex min-h-7 w-full items-center justify-between px-2 text-sm sm:text-base">
-                <div class="flex items-center gap-3 sm:gap-4">
-                  <RecordTab tab="record" label="Record" />
-                  <RecordTab tab="schema" label="Schema" />
-                  <RecordTab tab="info" label="Info" />
-                </div>
-                <div class="flex sm:gap-0.5">
+            <RecordPage
+              tabs={[
+                { id: "record", label: "Record" },
+                { id: "schema", label: "Schema" },
+                {
+                  id: "info",
+                  label: "Info",
+                  error: validRecord() === false || schemaValidation.valid() === false,
+                },
+              ]}
+              activeTab={recordTabFromHash(location.hash)}
+              tabHref={(tab) => `${recordPath()}#${tab}`}
+              actions={
+                <>
                   <Show when={repo() === auth().sub}>
                     <SpaceRecordEditor
                       authority={params.spaceAuthority!}
@@ -233,40 +196,35 @@ export const SpaceRecordView = () => {
                       <span class="iconify lucide--trash-2" />
                     </PermissionButton>
                   </Show>
-                  <Tooltip text="Copy record">
-                    <button
-                      type="button"
-                      aria-label="Copy record"
-                      class="flex items-center rounded-sm p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                      onClick={() => addToClipboard(JSON.stringify(value.value, null, 2) ?? "")}
-                    >
-                      <span class="iconify lucide--copy" />
-                    </button>
-                  </Tooltip>
-                </div>
-              </div>
-
-              <Show when={location.hash !== "#info" && !lexicon.showSchema()}>
-                <div class="w-full max-w-screen min-w-full px-2 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-max sm:text-sm md:max-w-3xl">
-                  <JSONValue
-                    data={value.value}
-                    repo={repo()}
-                    newTab
-                    fetchBlob={(cid) => getSpaceBlob(auth(), space(), repo(), cid)}
-                    blobHref={(cid) =>
-                      makeSpaceBlobPath(
-                        params.spaceAuthority!,
-                        params.spaceType!,
-                        params.skey!,
-                        repo(),
-                        cid,
-                      )
-                    }
-                  />
-                </div>
-              </Show>
-
-              <Show when={lexicon.showSchema()}>
+                  <MenuProvider>
+                    <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
+                      <CopyMenu
+                        content={JSON.stringify(value.value, null, 2)}
+                        label="Copy record"
+                        icon="lucide--copy"
+                      />
+                    </DropdownMenu>
+                  </MenuProvider>
+                </>
+              }
+              record={
+                <JSONValue
+                  data={value.value}
+                  repo={repo()}
+                  newTab
+                  fetchBlob={(cid) => getSpaceBlob(auth(), space(), repo(), cid)}
+                  blobHref={(cid) =>
+                    makeSpaceBlobPath(
+                      params.spaceAuthority!,
+                      params.spaceType!,
+                      params.skey!,
+                      repo(),
+                      cid,
+                    )
+                  }
+                />
+              }
+              schema={
                 <SchemaTabContent
                   schema={lexicon.schema()}
                   loading={lexicon.loading()}
@@ -275,25 +233,19 @@ export const SpaceRecordView = () => {
                     params.collection === "com.atproto.lexicon.schema" ? value.value : undefined
                   }
                 />
-              </Show>
-
-              <Show when={location.hash === "#info"}>
-                <div class="flex w-full flex-col gap-3 px-2">
-                  <CopyableInfoField label="AT URI" value={value.uri} />
-                  <CopyableInfoField label="CID" value={value.cid} />
-                  <Show when={value.mac}>
-                    <RecordVerification valid={validRecord()} error={verifyError()} />
-                  </Show>
-                  <RecordSchemaValidation
-                    valid={validSchema()}
-                    error={validationError()}
-                    resolving={remoteValidation()}
-                    canResolve={!!params.collection && !hasKnownRecordSchema(params.collection)}
-                    onResolve={() => void validateRemoteSchema(value.value)}
-                  />
-                </div>
-              </Show>
-            </div>
+              }
+              info={
+                <RecordInfo
+                  uri={value.uri}
+                  cid={value.cid}
+                  verification={
+                    value.mac ? { valid: validRecord(), error: verifyError() } : undefined
+                  }
+                  schema={schemaValidation}
+                  value={value.value}
+                />
+              }
+            />
           )}
         </Show>
       </div>

@@ -2,13 +2,12 @@ import { Client } from "@atcute/client";
 import { ActorIdentifier, Nsid } from "@atcute/lexicons";
 import { AtprotoDid, Did } from "@atcute/lexicons/syntax";
 import { verifyRecord } from "@atcute/repo";
-import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
+import { useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from "solid-js";
 
 import { agent } from "../auth/state";
 import { Backlinks } from "../components/backlinks.jsx";
 import { Button } from "../components/button.jsx";
-import { CopyableInfoField } from "../components/copyable-info-field.jsx";
 import { RecordEditor, setPlaceholder } from "../components/create";
 import {
   ActionMenu,
@@ -22,13 +21,12 @@ import { JSONValue } from "../components/json.jsx";
 import { Modal } from "../components/modal.jsx";
 import { addNotification } from "../components/notification.jsx";
 import { PermissionButton } from "../components/permission-button.jsx";
-import { RecordSchemaValidation } from "../components/record-schema-validation.jsx";
-import { RecordVerification } from "../components/record-verification.jsx";
 import {
-  hasKnownRecordSchema,
-  validateKnownRecordSchema,
-  validateResolvedRecordSchema,
-} from "../lib/record-validation.js";
+  RecordInfo,
+  RecordPage,
+  recordTabFromHash,
+  useRecordSchemaValidation,
+} from "../components/record-page.jsx";
 import { useRepo } from "../lib/repo-context.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
 import { AtUri, uriTemplates } from "../lib/templates.js";
@@ -64,13 +62,14 @@ export const RecordView = () => {
   const [openDelete, setOpenDelete] = createSignal(false);
   const [showAlternates, setShowAlternates] = createSignal(false);
   const [verifyError, setVerifyError] = createSignal("");
-  const [validationError, setValidationError] = createSignal("");
   const [externalLink, setExternalLink] = createSignal<
     { label: string; link: string; icon?: string } | undefined
   >();
   const [validRecord, setValidRecord] = createSignal<boolean | undefined>(undefined);
-  const [validSchema, setValidSchema] = createSignal<boolean | undefined>(undefined);
-  const [remoteValidation, setRemoteValidation] = createSignal<boolean>();
+  const schemaValidation = useRecordSchemaValidation(
+    () => params.collection!,
+    () => params.rkey!,
+  );
   const lexicon = useLexiconSchema(() => params.collection);
   const did = repo.did();
 
@@ -79,7 +78,7 @@ export const RecordView = () => {
     const collection = params.collection!;
     const rkey = params.rkey!;
     setValidRecord(undefined);
-    setValidSchema(undefined);
+    schemaValidation.reset();
     const res = await rpc.get("com.atproto.repo.getRecord", {
       params: {
         repo: did as ActorIdentifier,
@@ -95,7 +94,7 @@ export const RecordView = () => {
     setPlaceholder(res.data.value);
     setExternalLink(checkUri(res.data.uri, res.data.value));
     verifyRecordIntegrity(rpc, collection, rkey);
-    validateLocalSchema(collection, res.data.value);
+    schemaValidation.validateLocal(res.data.value);
 
     return res.data;
   };
@@ -104,29 +103,6 @@ export const RecordView = () => {
     () => (repo.rpc() ? params.rkey : undefined),
     fetchRecord,
   );
-
-  const validateLocalSchema = (collection: string, value: unknown) => {
-    const result = validateKnownRecordSchema(collection, value);
-    if (!result) return;
-
-    setValidSchema(result.valid);
-    setValidationError(result.error ?? "");
-  };
-
-  const validateRemoteSchema = async (value: unknown) => {
-    try {
-      setRemoteValidation(true);
-      setValidationError("");
-      await validateResolvedRecordSchema(params.collection!, params.rkey!, value);
-      setValidSchema(true);
-    } catch (err) {
-      console.error("Schema validation error:", err);
-      setValidSchema(false);
-      setValidationError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setRemoteValidation(false);
-    }
-  };
 
   const verifyRecordIntegrity = async (rpc: Client, collection: string, rkey: string) => {
     try {
@@ -184,38 +160,6 @@ export const RecordView = () => {
     return template(parsedUri, record);
   };
 
-  const RecordTab = (props: {
-    tab: "record" | "backlinks" | "info" | "schema";
-    label: string;
-    error?: boolean;
-  }) => {
-    const isActive = () => {
-      if (props.tab === "record") return !location.hash || location.hash.startsWith("#record");
-      if (location.hash === `#${props.tab}`) return true;
-      if (props.tab === "schema" && location.hash.startsWith("#schema:")) return true;
-      if (props.tab === "backlinks" && location.hash.startsWith("#backlinks:")) return true;
-      return false;
-    };
-
-    return (
-      <div class="flex items-center gap-0.5">
-        <A
-          classList={{
-            "border-b-2 font-medium transition-colors": true,
-            "border-transparent not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80":
-              !isActive(),
-          }}
-          href={`/at://${did}/${params.collection}/${params.rkey}#${props.tab}`}
-        >
-          {props.label}
-        </A>
-        <Show when={props.error && (validRecord() === false || validSchema() === false)}>
-          <span class="iconify lucide--x text-red-500 dark:text-red-400"></span>
-        </Show>
-      </div>
-    );
-  };
-
   document.title = `${params.collection}/${params.rkey} - PDSls`;
 
   return (
@@ -231,15 +175,21 @@ export const RecordView = () => {
         )}
       >
         <Show when={record()} keyed>
-          <div class="flex w-full flex-col items-center">
-            <div class="mb-3 flex w-full justify-between px-2 text-sm sm:text-base">
-              <div class="flex items-center gap-3 sm:gap-4">
-                <RecordTab tab="record" label="Record" />
-                <RecordTab tab="schema" label="Schema" />
-                <RecordTab tab="backlinks" label="Backlinks" />
-                <RecordTab tab="info" label="Info" error />
-              </div>
-              <div class="flex sm:gap-0.5">
+          <RecordPage
+            tabs={[
+              { id: "record", label: "Record" },
+              { id: "schema", label: "Schema" },
+              { id: "backlinks", label: "Backlinks" },
+              {
+                id: "info",
+                label: "Info",
+                error: validRecord() === false || schemaValidation.valid() === false,
+              },
+            ]}
+            activeTab={recordTabFromHash(location.hash)}
+            tabHref={(tab) => `/at://${did}/${params.collection}/${params.rkey}#${tab}`}
+            actions={
+              <>
                 <Show when={agent() && agent()?.sub === record()?.uri.split("/")[2]}>
                   <RecordEditor
                     create={false}
@@ -353,19 +303,17 @@ export const RecordView = () => {
                     />
                   </DropdownMenu>
                 </MenuProvider>
-              </div>
-            </div>
-            <Show when={!location.hash || location.hash.startsWith("#record")}>
-              <div class="w-full max-w-screen min-w-full px-2 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-max sm:text-sm md:max-w-3xl">
-                <JSONValue
-                  data={record()?.value as any}
-                  repo={record()!.uri.split("/")[2]}
-                  pds={repo.pds()}
-                  keyLinks
-                />
-              </div>
-            </Show>
-            <Show when={lexicon.showSchema()}>
+              </>
+            }
+            record={
+              <JSONValue
+                data={record()?.value as any}
+                repo={record()!.uri.split("/")[2]}
+                pds={repo.pds()}
+                keyLinks
+              />
+            }
+            schema={
               <SchemaTabContent
                 schema={lexicon.schema()}
                 loading={lexicon.loading()}
@@ -376,8 +324,8 @@ export const RecordView = () => {
                     : undefined
                 }
               />
-            </Show>
-            <Show when={location.hash === "#backlinks" || location.hash.startsWith("#backlinks:")}>
+            }
+            backlinks={
               <ErrorBoundary
                 fallback={(err) => <div class="wrap-break-word">Error: {err.message}</div>}
               >
@@ -391,24 +339,17 @@ export const RecordView = () => {
                   </div>
                 </Suspense>
               </ErrorBoundary>
-            </Show>
-            <Show when={location.hash === "#info"}>
-              <div class="flex w-full flex-col gap-3 px-2">
-                <CopyableInfoField label="AT URI" value={record()!.uri} />
-                <Show when={record()?.cid}>
-                  {(cid) => <CopyableInfoField label="CID" value={cid()} />}
-                </Show>
-                <RecordVerification valid={validRecord()} error={verifyError()} />
-                <RecordSchemaValidation
-                  valid={validSchema()}
-                  error={validationError()}
-                  resolving={!!remoteValidation()}
-                  canResolve={!!params.collection && !hasKnownRecordSchema(params.collection)}
-                  onResolve={() => void validateRemoteSchema(record()!.value)}
-                />
-              </div>
-            </Show>
-          </div>
+            }
+            info={
+              <RecordInfo
+                uri={record()!.uri}
+                cid={record()?.cid}
+                verification={{ valid: validRecord(), error: verifyError() }}
+                schema={schemaValidation}
+                value={record()!.value}
+              />
+            }
+          />
         </Show>
       </ErrorBoundary>
     </>
