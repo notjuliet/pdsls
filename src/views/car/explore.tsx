@@ -9,7 +9,11 @@ import { useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, Match, Show, Switch } from "solid-js";
 
 import { JSONValue, type JSONType } from "../../components/json.jsx";
-import { BreadcrumbRow, Breadcrumbs } from "../../components/repo/breadcrumbs.jsx";
+import {
+  BreadcrumbRow,
+  Breadcrumbs,
+  BreadcrumbSchemaLink,
+} from "../../components/repo/breadcrumbs.jsx";
 import {
   CollectionList,
   CollectionListControls,
@@ -21,6 +25,8 @@ import {
   RecordPage,
   recordTabFromHash,
   useRecordSchemaValidation,
+  isLexiconRecord,
+  LexiconDocument,
 } from "../../components/repo/record-page.jsx";
 import { timestampFromRkey } from "../../components/repo/record-row.jsx";
 import { IconButton } from "../../components/ui/icon-button.jsx";
@@ -28,7 +34,6 @@ import { Spinner, EmptyState, ErrorNotice } from "../../components/ui/states.jsx
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
 import { addToClipboard } from "../../lib/copy";
 import { localDateFromTimestamp } from "../../lib/format.js";
-import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import { carFileAccept, createFileChangeHandler, isIOS } from "./file-handlers.js";
 import { clearQueuedCarFile, queuedCarFile } from "./state.js";
 
@@ -481,6 +486,7 @@ const ExploreView = (props: { archive: Archive; view: () => View }) => {
             <BreadcrumbRow
               icon="lucide--folder-open"
               label={collection().name}
+              trailing={<BreadcrumbSchemaLink nsid={collection().name} />}
               href={
                 props.view().type === "record"
                   ? viewToPath({ type: "collection", collection: collection() })
@@ -616,7 +622,6 @@ const RecordSubview = (props: {
   record: RecordEntry;
 }) => {
   const location = useLocation();
-  const lexicon = useLexiconSchema(() => props.collection.name);
   const schemaValidation = useRecordSchemaValidation(
     () => props.collection.name,
     () => props.record.key,
@@ -631,7 +636,9 @@ const RecordSubview = (props: {
     <RecordPage
       tabs={[
         { id: "record", label: "Record" },
-        { id: "schema", label: "Schema" },
+        ...(isLexiconRecord(props.collection.name)
+          ? [{ id: "schema" as const, label: "Schema" }]
+          : []),
         { id: "info", label: "Info", error: schemaValidation.valid() === false },
       ]}
       activeTab={recordTabFromHash(location.hash)}
@@ -653,16 +660,7 @@ const RecordSubview = (props: {
           <JSONValue data={props.record.record} repo={props.archive.did || ""} newTab hideBlobs />
         </Show>
       }
-      schema={
-        <SchemaTabContent
-          schema={lexicon.schema()}
-          loading={lexicon.loading()}
-          error={lexicon.error()}
-          fallbackSchema={
-            props.collection.name === "com.atproto.lexicon.schema" ? props.record.record : undefined
-          }
-        />
-      }
+      schema={<LexiconDocument schema={props.record.record} />}
       info={
         <RecordInfo
           uri={`at://${props.archive.did}/${props.collection.name}/${props.record.key}`}

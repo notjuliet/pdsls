@@ -1,9 +1,24 @@
+import type { Nsid } from "@atcute/lexicons";
 import { A } from "@solidjs/router";
-import { createEffect, createSignal, type JSX, Match, Show, Switch } from "solid-js";
+import {
+  createEffect,
+  createResource,
+  createSignal,
+  type JSX,
+  Match,
+  Show,
+  Switch,
+} from "solid-js";
 
 import { canHover } from "../../layout";
 import { addToClipboard } from "../../lib/copy";
+import { resolveLexicon } from "../../lib/lexicon";
+import LexiconHoverCard from "../hover-card/lexicon";
 import Tooltip from "../ui/tooltip";
+
+/** A muted icon link at the end of a breadcrumb row. */
+const rowLinkClass =
+  "flex items-center rounded px-1.5 py-1 text-neutral-400 transition-colors hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-500 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70";
 
 /** The stacked hierarchy (PDS → repo → collection → record) at the top of a page. */
 export const Breadcrumbs = (props: { children: JSX.Element }) => (
@@ -103,6 +118,8 @@ interface BreadcrumbRowProps {
   /** Links the row to its level; omitted for the current level. */
   href?: string;
   copy?: { content: string; label: string };
+  /** A live stream of this level, e.g. its firehose or Jetstream. */
+  stream?: { href: string; label: string; icon: string };
   /** Content at the end of the row, e.g. a badge or buttons. */
   trailing?: JSX.Element;
 }
@@ -200,15 +217,59 @@ export const BreadcrumbRow = (props: BreadcrumbRowProps) => {
         </Show>
       </span>
       <Show when={props.trailing}>
-        <span class="relative z-10 flex shrink-0 items-center">{props.trailing}</span>
+        <span class="relative z-10 flex shrink-0 items-center focus-within:z-20 hover:z-20">
+          {props.trailing}
+        </span>
+      </Show>
+      <Show when={props.stream}>
+        {(stream) => (
+          <span class="relative z-10 flex shrink-0 focus-within:z-20 hover:z-20">
+            <Tooltip text={stream().label}>
+              <A href={stream().href} aria-label={stream().label} class={rowLinkClass}>
+                <span class={`iconify ${stream().icon}`} />
+              </A>
+            </Tooltip>
+          </span>
+        )}
       </Show>
       <Show when={props.copy}>
         {(copy) => (
-          <span class="relative z-10 flex shrink-0">
+          <span class="relative z-10 flex shrink-0 focus-within:z-20 hover:z-20">
             <CopyButton content={copy().content} label={copy().label} />
           </span>
         )}
       </Show>
     </div>
+  );
+};
+
+/**
+ * Links a collection row to its published lexicon, previewing it on hover. Shown only once the
+ * NSID resolves; lookups are cached per NSID.
+ */
+export const BreadcrumbSchemaLink = (props: { nsid: string }) => {
+  const [lexicon] = createResource(
+    () => props.nsid,
+    (nsid) => resolveLexicon(nsid as Nsid).catch(() => undefined),
+  );
+
+  return (
+    // Keyed so the link and its preview remount for each collection instead of keeping the last one open.
+    <Show when={!lexicon.loading && lexicon()} keyed>
+      {(found) => (
+        <LexiconHoverCard
+          lexicon={props.nsid}
+          renderTrigger={() => (
+            <A
+              href={`/at://${found.authority}/com.atproto.lexicon.schema/${props.nsid}#schema`}
+              aria-label="Schema"
+              class={rowLinkClass}
+            >
+              <span class="iconify lucide--book-text" />
+            </A>
+          )}
+        />
+      )}
+    </Show>
   );
 };

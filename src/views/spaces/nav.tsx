@@ -2,7 +2,11 @@ import { useParams } from "@solidjs/router";
 import { createResource, type JSX, Show } from "solid-js";
 
 import { resolveDidInfo } from "../../components/hover-card/did.jsx";
-import { BreadcrumbRow, Breadcrumbs } from "../../components/repo/breadcrumbs.jsx";
+import {
+  BreadcrumbRow,
+  Breadcrumbs,
+  BreadcrumbSchemaLink,
+} from "../../components/repo/breadcrumbs.jsx";
 import { AlphaBadge } from "../../components/ui/alpha-badge.jsx";
 import { Favicon } from "../../components/ui/favicon.jsx";
 import { makeSpaceCollectionPath, makeSpacePath, makeSpaceRepoPath } from "./context.jsx";
@@ -81,6 +85,7 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
           icon="lucide--folder-open"
           label={params.collection}
           href={params.rkey ? collectionPath() : undefined}
+          trailing={<BreadcrumbSchemaLink nsid={params.collection!} />}
         />
       </Show>
 

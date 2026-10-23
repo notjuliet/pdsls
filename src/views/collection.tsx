@@ -96,17 +96,5 @@ const CollectionView = () => {
 
   if (!hidden()) document.title = `${params.collection} - PDSls`;
 
-  return (
-    <CollectionPage
-      source={source()}
-      hidden={hidden() || !repo.rpc()}
-      tabs={[
-        {
-          id: "jetstream",
-          label: "Jetstream",
-          href: `/streams?type=jetstream&collections=${encodeURIComponent(params.collection!)}&dids=${encodeURIComponent(params.repo!)}`,
-        },
-      ]}
-    />
-  );
+  return <CollectionPage source={source()} hidden={hidden() || !repo.rpc()} />;
 };

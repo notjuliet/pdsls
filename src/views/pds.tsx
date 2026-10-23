@@ -310,11 +310,6 @@ const PdsView = () => {
             items={[
               { id: "repos", label: "Repositories", href: `/${params.pds}#repos` },
               { id: "info", label: "Info", href: `/${params.pds}#info` },
-              {
-                id: "firehose",
-                label: "Firehose",
-                href: `/streams?type=firehose&instance=${encodeURIComponent(`wss://${params.pds}`)}`,
-              },
             ]}
             active={location.hash ? location.hash.slice(1) : "repos"}
           />

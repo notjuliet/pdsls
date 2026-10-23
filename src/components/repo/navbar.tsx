@@ -3,7 +3,7 @@ import { createEffect, createSignal, Show } from "solid-js";
 
 import { didDocCache } from "../../lib/api";
 import { localDateFromTimestamp } from "../../lib/format";
-import { BreadcrumbRow, Breadcrumbs } from "./breadcrumbs";
+import { BreadcrumbRow, Breadcrumbs, BreadcrumbSchemaLink } from "./breadcrumbs";
 import { timestampFromRkey } from "./record-row";
 
 const [pds, setPDS] = createSignal<string>();
@@ -47,6 +47,15 @@ export const NavBar = () => {
         labelClass={missingPds() ? "text-red-500 dark:text-red-400" : undefined}
         href={params.repo && pds() && !missingPds() ? `/${pds()}` : undefined}
         copy={pds() && !missingPds() ? { content: pds()!, label: "Copy PDS" } : undefined}
+        stream={
+          pds() && !missingPds()
+            ? {
+                href: `/streams?type=firehose&instance=${encodeURIComponent(`wss://${pds()}`)}`,
+                label: "Firehose",
+                icon: "lucide--rss",
+              }
+            : undefined
+        }
       />
 
       <Show when={params.repo}>
@@ -59,6 +68,11 @@ export const NavBar = () => {
           detail={handle() !== params.repo ? params.repo : undefined}
           href={params.collection ? `/at://${params.repo}` : undefined}
           copy={{ content: params.repo!, label: "Copy DID" }}
+          stream={{
+            href: `/streams?type=jetstream&dids=${encodeURIComponent(params.repo!)}`,
+            label: "Jetstream",
+            icon: "lucide--radio-tower",
+          }}
         />
       </Show>
 
@@ -70,6 +84,12 @@ export const NavBar = () => {
           label={params.collection}
           href={params.rkey ? `/at://${params.repo}/${params.collection}` : undefined}
           copy={{ content: `at://${params.repo}/${params.collection}`, label: "Copy AT URI" }}
+          trailing={<BreadcrumbSchemaLink nsid={params.collection!} />}
+          stream={{
+            href: `/streams?type=jetstream&collections=${encodeURIComponent(params.collection!)}&dids=${encodeURIComponent(params.repo!)}`,
+            label: "Jetstream",
+            icon: "lucide--radio-tower",
+          }}
         />
       </Show>
 

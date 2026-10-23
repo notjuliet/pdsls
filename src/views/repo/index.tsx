@@ -26,7 +26,7 @@ import {
   createCollapseState,
 } from "../../components/repo/collection-list.jsx";
 import { setPDS } from "../../components/repo/navbar.jsx";
-import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../../components/ui/dropdown.jsx";
+import { IconButton } from "../../components/ui/icon-button.jsx";
 import { NestedLayout } from "../../components/ui/nested-layout.jsx";
 import {
   addNotification,
@@ -379,24 +379,14 @@ const RepoView = () => {
                   <span>{error()}</span>
                 </div>
               </Show>
-              <MenuProvider>
-                <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
-                  <NavMenu
-                    href={`/streams?type=jetstream&dids=${encodeURIComponent(params.repo!)}`}
-                    label="Jetstream"
-                    icon="lucide--radio-tower"
-                  />
-                  <Show when={error()?.length === 0 || error() === undefined}>
-                    <ActionMenu
-                      label="Download repo"
-                      icon={
-                        downloading() ? "lucide--loader-circle animate-spin" : "lucide--download"
-                      }
-                      onClick={handleDownload}
-                    />
-                  </Show>
-                </DropdownMenu>
-              </MenuProvider>
+              <Show when={error()?.length === 0 || error() === undefined}>
+                <IconButton
+                  icon={downloading() ? "lucide--loader-circle animate-spin" : "lucide--download"}
+                  label="Download repo"
+                  disabled={downloading()}
+                  onClick={handleDownload}
+                />
+              </Show>
             </div>
           </div>
           <div class="flex w-full flex-col gap-1 px-2">

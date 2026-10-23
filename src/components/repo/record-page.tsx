@@ -1,10 +1,11 @@
-import { createSignal, type JSX, Match, Show, Switch } from "solid-js";
+import { createSignal, ErrorBoundary, type JSX, Match, Show, Switch } from "solid-js";
 
 import {
   hasKnownRecordSchema,
   validateKnownRecordSchema,
   validateResolvedRecordSchema,
 } from "../../lib/record-validation.js";
+import { LexiconSchemaView } from "../lexicon-schema.jsx";
 import { Button } from "../ui/button.jsx";
 import { CopyableInfoField } from "../ui/copyable-info-field.jsx";
 import { ExternalLink } from "../ui/external-link.jsx";
@@ -20,41 +21,56 @@ export const recordTabFromHash = (hash: string): RecordTab => {
   return "record";
 };
 
+/** Lexicon records get a Schema tab that renders the lexicon they publish. */
+export const isLexiconRecord = (collection: string) => collection === "com.atproto.lexicon.schema";
+
+export const LexiconDocument = (props: { schema: unknown }) => (
+  <ErrorBoundary fallback={(err) => <div>Error: {err.message}</div>}>
+    <LexiconSchemaView schema={props.schema as any} />
+  </ErrorBoundary>
+);
+
 interface RecordPageProps {
   tabs: { id: RecordTab; label: string; error?: boolean }[];
   activeTab: RecordTab;
   tabHref: (tab: RecordTab) => string;
   actions?: JSX.Element;
   record: JSX.Element;
-  schema: JSX.Element;
+  schema?: JSX.Element;
   backlinks?: JSX.Element;
   info: JSX.Element;
 }
 
-export const RecordPage = (props: RecordPageProps) => (
-  <div class="flex w-full flex-col items-center">
-    <div class="mb-3 flex min-h-7 w-full items-center justify-between px-2 text-sm sm:text-base">
-      <Tabs
-        items={props.tabs.map((tab) => ({ ...tab, href: props.tabHref(tab.id) }))}
-        active={props.activeTab}
-      />
-      <div class="flex sm:gap-0.5">{props.actions}</div>
-    </div>
+export const RecordPage = (props: RecordPageProps) => {
+  // Falls back to the record when the hash names a tab this page doesn't have, e.g. an old #schema link.
+  const activeTab = () =>
+    props.tabs.some((tab) => tab.id === props.activeTab) ? props.activeTab : "record";
 
-    <Switch>
-      <Match when={props.activeTab === "record"}>
-        <div class="w-full max-w-screen min-w-full px-2 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-max sm:text-sm md:max-w-3xl">
-          {props.record}
-        </div>
-      </Match>
-      <Match when={props.activeTab === "schema"}>{props.schema}</Match>
-      <Match when={props.activeTab === "backlinks"}>{props.backlinks}</Match>
-      <Match when={props.activeTab === "info"}>
-        <div class="flex w-full flex-col gap-3 px-2">{props.info}</div>
-      </Match>
-    </Switch>
-  </div>
-);
+  return (
+    <div class="flex w-full flex-col items-center">
+      <div class="mb-3 flex min-h-7 w-full items-center justify-between px-2 text-sm sm:text-base">
+        <Tabs
+          items={props.tabs.map((tab) => ({ ...tab, href: props.tabHref(tab.id) }))}
+          active={activeTab()}
+        />
+        <div class="flex sm:gap-0.5">{props.actions}</div>
+      </div>
+
+      <Switch>
+        <Match when={activeTab() === "record"}>
+          <div class="w-full max-w-screen min-w-full px-2 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-max sm:text-sm md:max-w-3xl">
+            {props.record}
+          </div>
+        </Match>
+        <Match when={activeTab() === "schema"}>{props.schema}</Match>
+        <Match when={activeTab() === "backlinks"}>{props.backlinks}</Match>
+        <Match when={activeTab() === "info"}>
+          <div class="flex w-full flex-col gap-3 px-2">{props.info}</div>
+        </Match>
+      </Switch>
+    </div>
+  );
+};
 
 /** Schema validation state for a record page: known schemas check locally, others on request. */
 export const useRecordSchemaValidation = (collection: () => string, rkey: () => string) => {

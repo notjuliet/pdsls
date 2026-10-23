@@ -8,13 +8,14 @@ import {
   RecordPage,
   recordTabFromHash,
   useRecordSchemaValidation,
+  isLexiconRecord,
+  LexiconDocument,
 } from "../../components/repo/record-page.jsx";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog.jsx";
 import { IconButton } from "../../components/ui/icon-button.jsx";
 import { addNotification } from "../../components/ui/notification.jsx";
 import { ErrorNotice, LoadingState } from "../../components/ui/states.jsx";
 import { addToClipboard } from "../../lib/copy.js";
-import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import {
   deleteSpaceRecord,
   getSpaceBlob,
@@ -49,7 +50,6 @@ export const SpaceRecordView = () => {
     () => params.collection!,
     () => params.rkey!,
   );
-  const lexicon = useLexiconSchema(() => params.collection);
   let requestVersion = 0;
 
   const space = () => makeSpaceRef(params.spaceAuthority!, params.spaceType!, params.skey!);
@@ -158,7 +158,9 @@ export const SpaceRecordView = () => {
             <RecordPage
               tabs={[
                 { id: "record", label: "Record" },
-                { id: "schema", label: "Schema" },
+                ...(isLexiconRecord(params.collection!)
+                  ? [{ id: "schema" as const, label: "Schema" }]
+                  : []),
                 {
                   id: "info",
                   label: "Info",
@@ -218,16 +220,7 @@ export const SpaceRecordView = () => {
                   }
                 />
               }
-              schema={
-                <SchemaTabContent
-                  schema={lexicon.schema()}
-                  loading={lexicon.loading()}
-                  error={lexicon.error()}
-                  fallbackSchema={
-                    params.collection === "com.atproto.lexicon.schema" ? value.value : undefined
-                  }
-                />
-              }
+              schema={<LexiconDocument schema={value.value} />}
               info={
                 <RecordInfo
                   uri={value.uri}
