@@ -20,7 +20,6 @@ import {
 } from "../../components/repo/record-page.jsx";
 import { timestampFromRkey } from "../../components/repo/record-row.jsx";
 import { CopyMenu, DropdownMenu, MenuProvider } from "../../components/ui/dropdown.jsx";
-import { IconButton } from "../../components/ui/icon-button.jsx";
 import { Spinner, EmptyState, ErrorNotice } from "../../components/ui/states.jsx";
 import { TextInput } from "../../components/ui/text-input.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
@@ -204,6 +203,8 @@ export const CarView = () => {
   });
 
   const parseCarFile = async (file: File) => {
+    // Swap to the progress screen, also when replacing an archive that's already open.
+    setArchive(null);
     setLoading(true);
     setProgress(0);
     setError(undefined);
@@ -303,12 +304,6 @@ export const CarView = () => {
     }
   });
 
-  const reset = () => {
-    setArchive(null);
-    setError(undefined);
-    if (location.pathname !== "/car" || location.hash) navigate("/car", { replace: true });
-  };
-
   document.title = "CAR explorer - PDSls";
   return (
     <>
@@ -325,7 +320,7 @@ export const CarView = () => {
           />
         }
       >
-        {(arch) => <ExploreView archive={arch()} view={view} onClose={reset} />}
+        {(arch) => <ExploreView archive={arch()} view={view} />}
       </Show>
     </>
   );
@@ -408,7 +403,7 @@ const exportToZip = async (
   }
 };
 
-const ExploreView = (props: { archive: Archive; view: () => View; onClose: () => void }) => {
+const ExploreView = (props: { archive: Archive; view: () => View }) => {
   const [exporting, setExporting] = createSignal(false);
   const [exportCount, setExportCount] = createSignal(0);
   const [exportSaving, setExportSaving] = createSignal(false);
@@ -431,7 +426,7 @@ const ExploreView = (props: { archive: Archive; view: () => View; onClose: () =>
     }
   };
 
-  const handle =
+  const handle = () =>
     didDocCache[props.archive.did]?.alsoKnownAs
       ?.filter((alias) => alias.startsWith("at://"))[0]
       ?.split("at://")[1] ?? props.archive.did;
@@ -441,33 +436,30 @@ const ExploreView = (props: { archive: Archive; view: () => View; onClose: () =>
       <Breadcrumbs>
         <BreadcrumbRow
           icon="lucide--book-user"
-          label={handle}
-          preserveLabel={handle !== props.archive.did}
-          detail={handle !== props.archive.did ? props.archive.did : undefined}
+          label={handle()}
+          preserveLabel={handle() !== props.archive.did}
+          detail={handle() !== props.archive.did ? props.archive.did : undefined}
           href={props.view().type !== "repo" ? "/car" : undefined}
           trailing={
-            <>
-              <Show
-                when={exporting()}
-                fallback={
-                  <button
-                    type="button"
-                    onClick={handleExport}
-                    class="flex shrink-0 items-center rounded px-2 py-1 text-xs text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70"
-                  >
-                    Export ZIP
-                  </button>
-                }
-              >
-                <div class="flex items-center gap-2 px-2 py-1 sm:py-1.5">
-                  <Spinner class="text-neutral-400" />
-                  <span class="w-[4ch] text-right text-xs text-neutral-500 dark:text-neutral-400">
-                    {exportSaving() ? "" : `${Math.round((exportCount() / totalRecords()) * 100)}%`}
-                  </span>
-                </div>
-              </Show>
-              <IconButton icon="lucide--x" label="Close archive" onClick={props.onClose} />
-            </>
+            <Show
+              when={exporting()}
+              fallback={
+                <button
+                  type="button"
+                  onClick={handleExport}
+                  class="flex shrink-0 items-center rounded px-2 py-1 text-xs text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70"
+                >
+                  Export ZIP
+                </button>
+              }
+            >
+              <div class="flex items-center gap-2 px-2 py-1 sm:py-1.5">
+                <Spinner class="text-neutral-400" />
+                <span class="w-[4ch] text-right text-xs text-neutral-500 dark:text-neutral-400">
+                  {exportSaving() ? "" : `${Math.round((exportCount() / totalRecords()) * 100)}%`}
+                </span>
+              </div>
+            </Show>
           }
         />
 
