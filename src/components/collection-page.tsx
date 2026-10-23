@@ -2,6 +2,7 @@ import { A, useSearchParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, For, type JSX, onMount, Show } from "solid-js";
 
 import type { ScopeId } from "../auth/scope-utils";
+import { createDebouncedValue } from "../lib/debounced.js";
 import { LoadMoreSentinel } from "../lib/infinite-scroll.jsx";
 import { useFilterShortcut } from "../lib/keyboard.js";
 import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
@@ -51,6 +52,7 @@ export interface CollectionSource {
 }
 
 const PAGE_SIZE = 100;
+const FILTER_DELAY = 150;
 
 const getSearchParam = (param: string | string[] | undefined) =>
   Array.isArray(param) ? param[0] : (param ?? "");
@@ -162,13 +164,23 @@ export const CollectionPage = (props: {
     }
   });
 
-  const filteredRecords = createMemo(() => {
-    const value = filter().trim().toLowerCase();
-    if (!value) return records();
-    return records().filter((record) => {
+  // Large collections (e.g. from a CAR) are expensive to scan, so the filter waits for
+  // typing to pause and each record's search text is built once per load.
+  const debouncedFilter = createDebouncedValue(filter, FILTER_DELAY);
+
+  const searchIndex = createMemo(() =>
+    records().map((record) => {
       const recordValue = record.value === undefined ? "" : JSON.stringify(record.value);
-      return `${record.rkey}\n${record.cid}\n${recordValue}`.toLowerCase().includes(value);
-    });
+      return { record, text: `${record.rkey}\n${record.cid}\n${recordValue}`.toLowerCase() };
+    }),
+  );
+
+  const filteredRecords = createMemo(() => {
+    const value = debouncedFilter().trim().toLowerCase();
+    if (!value) return records();
+    return searchIndex()
+      .filter((entry) => entry.text.includes(value))
+      .map((entry) => entry.record);
   });
 
   const visibleRecords = () => filteredRecords().slice(0, visibleCount());
@@ -331,8 +343,8 @@ export const CollectionPage = (props: {
             <Show when={loaded() && filteredRecords().length === 0 && !error()}>
               <div class="font-sans">
                 <EmptyState
-                  icon={filter() ? "lucide--search-x" : "lucide--file-json"}
-                  message={filter() ? "No records match your filter" : "No records found"}
+                  icon={debouncedFilter() ? "lucide--search-x" : "lucide--file-json"}
+                  message={debouncedFilter() ? "No records match your filter" : "No records found"}
                 />
               </div>
             </Show>
@@ -432,9 +444,10 @@ export const CollectionPage = (props: {
                 <span>/</span>
               </Show>
               <span>
-                {(filter() ? filteredRecords().length : records().length).toLocaleString()}
+                {(debouncedFilter() ? filteredRecords().length : records().length).toLocaleString()}
                 {cursor() ? "+" : ""} record
-                {(filter() ? filteredRecords().length : records().length) === 1 && !cursor()
+                {(debouncedFilter() ? filteredRecords().length : records().length) === 1 &&
+                !cursor()
                   ? ""
                   : "s"}
               </span>
