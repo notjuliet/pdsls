@@ -4,8 +4,8 @@ import { For, JSX } from "solid-js";
 const repositoryExamples = [
   {
     type: "Repo",
-    value: "@retr0.id",
-    href: "/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2",
+    value: "@atproto.com",
+    href: "/at://did:plc:ewvi7nxzyoun6zhxrhs64oiz",
   },
   {
     type: "Record",
