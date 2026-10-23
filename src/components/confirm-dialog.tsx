@@ -37,7 +37,7 @@ export const ConfirmDialog = (props: ConfirmDialogProps) => (
         onClick={() => props.onConfirm()}
       >
         <Show when={props.busy}>
-          <Spinner centered class="text-xl" />
+          <Spinner />
         </Show>
         {props.confirmLabel}
       </Button>
