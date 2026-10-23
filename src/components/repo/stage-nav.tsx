@@ -36,8 +36,6 @@ export interface Stage {
   href?: string;
   /** A domain whose favicon shows after the label, e.g. the app behind a collection. */
   favicon?: string;
-  /** Extra content after the label, e.g. a badge. */
-  badge?: JSX.Element;
   /** What tapping the kind copies, e.g. the repo's DID. */
   copy?: { label: string; value: string };
   /** Content before the actions, e.g. a button with its own state. */
@@ -154,9 +152,6 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
                 <Favicon domain={domain} />
               </span>
             )}
-          </Show>
-          <Show when={props.stage.badge}>
-            <span class="flex shrink-0 self-center">{props.stage.badge}</span>
           </Show>
           <Show when={props.stage.detail}>
             <Show

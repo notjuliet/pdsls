@@ -9,7 +9,6 @@ import {
   StageNav,
   useSchemaAction,
 } from "../../components/repo/stage-nav.jsx";
-import { AlphaBadge } from "../../components/ui/alpha-badge.jsx";
 import { localDateFromTimestamp } from "../../lib/format.js";
 import { makeSpaceCollectionPath, makeSpacePath, makeSpaceRepoPath } from "./context.jsx";
 
@@ -35,7 +34,6 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
       {
         kind: "Spaces",
         label: "All spaces",
-        badge: <AlphaBadge />,
         href: hasSpace() ? "/spaces" : undefined,
         trailing: action(),
       },
