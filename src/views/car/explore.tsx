@@ -24,7 +24,12 @@ import {
   LexiconDocument,
 } from "../../components/repo/record-page.jsx";
 import { timestampFromRkey } from "../../components/repo/record-row.jsx";
-import { type Stage, StageNav, useSchemaAction } from "../../components/repo/stage-nav.jsx";
+import {
+  nsidDomain,
+  type Stage,
+  StageNav,
+  useSchemaAction,
+} from "../../components/repo/stage-nav.jsx";
 import { IconButton } from "../../components/ui/icon-button.jsx";
 import { Spinner, EmptyState, ErrorNotice } from "../../components/ui/states.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
@@ -476,6 +481,7 @@ const ExploreView = (props: { archive: Archive; view: () => View }) => {
     result.push({
       kind: "Collection",
       label: view.collection.name,
+      favicon: nsidDomain(view.collection.name),
       href:
         view.type === "record"
           ? viewToPath({ type: "collection", collection: view.collection })

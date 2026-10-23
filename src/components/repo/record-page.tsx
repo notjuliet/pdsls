@@ -58,7 +58,7 @@ export const RecordPage = (props: RecordPageProps) => {
 
       <Switch>
         <Match when={activeTab() === "record"}>
-          <div class="w-full max-w-screen min-w-full px-2 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-max sm:text-sm md:max-w-3xl">
+          <div class="w-full px-2 font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:text-sm">
             {props.record}
           </div>
         </Match>

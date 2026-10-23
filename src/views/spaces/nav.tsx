@@ -3,7 +3,12 @@ import { children, createResource, type JSX } from "solid-js";
 
 import { resolveDidInfo } from "../../components/hover-card/did.jsx";
 import { timestampFromRkey } from "../../components/repo/record-row.jsx";
-import { type Stage, StageNav, useSchemaAction } from "../../components/repo/stage-nav.jsx";
+import {
+  nsidDomain,
+  type Stage,
+  StageNav,
+  useSchemaAction,
+} from "../../components/repo/stage-nav.jsx";
 import { AlphaBadge } from "../../components/ui/alpha-badge.jsx";
 import { localDateFromTimestamp } from "../../lib/format.js";
 import { makeSpaceCollectionPath, makeSpacePath, makeSpaceRepoPath } from "./context.jsx";
@@ -43,6 +48,7 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
     result.push({
       kind: "Space",
       label: spaceType,
+      favicon: nsidDomain(spaceType),
       detail: `${skey} · ${authorityHandle() ?? authority}`,
       detailHref: authorityHandle() ? `/at://${authority}` : undefined,
       href: params.spaceRepo ? makeSpacePath(authority, spaceType, skey) : undefined,
@@ -65,6 +71,7 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
     result.push({
       kind: "Collection",
       label: collection,
+      favicon: nsidDomain(collection),
       href: params.rkey
         ? makeSpaceCollectionPath(authority, spaceType, skey, repo, collection)
         : undefined,

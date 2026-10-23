@@ -6,6 +6,7 @@ import { canHover } from "../../layout";
 import { addToClipboard } from "../../lib/copy";
 import { resolveLexicon, schemaHref } from "../../lib/lexicon";
 import LexiconHoverCard from "../hover-card/lexicon";
+import { Favicon } from "../ui/favicon";
 import Tooltip from "../ui/tooltip";
 
 /** Something you can do with a stage: open a link or run an action. */
@@ -33,6 +34,8 @@ export interface Stage {
   detailHref?: string;
   /** Links the row to its level; omitted for the current level. */
   href?: string;
+  /** A domain whose favicon shows after the label, e.g. the app behind a collection. */
+  favicon?: string;
   /** Extra content after the label, e.g. a badge. */
   badge?: JSX.Element;
   /** What tapping the kind copies, e.g. the repo's DID. */
@@ -41,6 +44,9 @@ export interface Stage {
   trailing?: JSX.Element;
   actions?: StageAction[];
 }
+
+/** The domain behind an NSID, e.g. `bsky.app` for `app.bsky.feed.post`. */
+export const nsidDomain = (nsid: string) => nsid.split(".").slice(0, 2).reverse().join(".");
 
 const iconLinkClass =
   "flex items-center rounded px-1.5 py-1 text-neutral-400 transition-colors hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-500 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70";
@@ -116,7 +122,7 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
   return (
     <div class="flex w-full min-w-0 items-center gap-1">
       <div
-        class="group/row relative flex min-h-7 min-w-0 flex-1 items-baseline gap-2 rounded-md px-2 transition-colors hover:bg-neutral-200/40 dark:hover:bg-neutral-800/40"
+        class="group/row relative flex min-h-7 min-w-0 flex-1 items-baseline gap-2 rounded-md px-2 transition-colors hover:bg-neutral-200/80 dark:hover:bg-neutral-700/50"
         onMouseLeave={() => setDetailHovered(false)}
       >
         <Show when={props.stage.href}>
@@ -141,6 +147,14 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
           >
             {props.stage.label}
           </span>
+          {/* Keyed so the favicon reloads when the domain changes. */}
+          <Show when={props.stage.favicon} keyed>
+            {(domain) => (
+              <span class="-ml-1 flex shrink-0 self-center">
+                <Favicon domain={domain} />
+              </span>
+            )}
+          </Show>
           <Show when={props.stage.badge}>
             <span class="flex shrink-0 self-center">{props.stage.badge}</span>
           </Show>

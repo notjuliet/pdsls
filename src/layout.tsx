@@ -180,7 +180,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
   });
 
   return (
-    <div id="main" class="mx-auto mb-8 flex max-w-xl flex-col items-center p-3">
+    <div id="main" class="mx-auto mb-8 flex max-w-2xl flex-col items-center p-3">
       <header class="mb-3 flex h-10 w-full items-center gap-2 px-1 sm:gap-4">
         <A
           href="/"

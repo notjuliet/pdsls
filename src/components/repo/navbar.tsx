@@ -4,7 +4,7 @@ import { createEffect, createSignal } from "solid-js";
 import { didDocCache } from "../../lib/api";
 import { localDateFromTimestamp } from "../../lib/format";
 import { timestampFromRkey } from "./record-row";
-import { type Stage, StageNav, useSchemaAction } from "./stage-nav";
+import { nsidDomain, type Stage, StageNav, useSchemaAction } from "./stage-nav";
 
 const [pds, setPDS] = createSignal<string>();
 export { setPDS };
@@ -74,6 +74,7 @@ export const NavBar = () => {
       result.push({
         kind: "Collection",
         label: params.collection,
+        favicon: nsidDomain(params.collection),
         href: params.rkey ? `/at://${params.repo}/${params.collection}` : undefined,
         copy: { label: "AT URI", value: collectionUri },
         actions: [
