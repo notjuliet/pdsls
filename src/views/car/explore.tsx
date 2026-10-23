@@ -572,8 +572,8 @@ const RepoSubview = (props: { archive: Archive }) => {
       <CollectionListControls
         filter={filter()}
         onFilter={setFilter}
-        onExpandAll={collapse.expandAll}
-        onCollapseAll={() => collapse.collapseAll(props.archive.entries.map((entry) => entry.name))}
+        collapse={collapse}
+        nsids={props.archive.entries.map((entry) => entry.name)}
       />
     </div>
   );

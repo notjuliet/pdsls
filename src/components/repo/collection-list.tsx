@@ -4,6 +4,7 @@ import { createMemo, createSignal, For, type JSX, onMount, Show } from "solid-js
 import { useFilterShortcut } from "../../lib/keyboard.js";
 import { DomainGroup, DomainGroupRows, domainGroupRowClasses } from "../ui/domain-group.jsx";
 import { FilterInput } from "../ui/filter-input.jsx";
+import Tooltip from "../ui/tooltip.jsx";
 
 export interface CollectionItem {
   nsid: string;
@@ -36,6 +37,8 @@ export const createCollapseState = () => {
         return next;
       }),
     collapseAll: (nsids: string[]) => setCollapsed(new Set(nsids.map(nsidAuthority))),
+    allCollapsed: (nsids: string[]) =>
+      nsids.length > 0 && nsids.every((nsid) => collapsed().has(nsidAuthority(nsid))),
     expandAll: () => setCollapsed(new Set<string>()),
   };
 };
@@ -121,36 +124,45 @@ export const CollectionList = (props: CollectionListProps) => {
   );
 };
 
-/** The fixed panel under a collection list: the filter (focused with "/") and expand/collapse all. */
+/** The fixed panel under a collection list: the filter (focused with "/") and a collapse/expand all toggle. */
 export const CollectionListControls = (props: {
   filter: string;
   onFilter: (value: string) => void;
-  onExpandAll: () => void;
-  onCollapseAll: () => void;
+  collapse: CollapseState;
+  /** Every collection in the list, to collapse all of their groups. */
+  nsids: string[];
 }) => {
   let inputRef: HTMLInputElement | undefined;
   onMount(() => useFilterShortcut(() => inputRef));
 
-  const buttonClass =
-    "rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600";
+  const allCollapsed = () => props.collapse.allCollapsed(props.nsids);
+  const label = () => (allCollapsed() ? "Expand all" : "Collapse all");
 
   return (
-    <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 left-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
-      <FilterInput
-        class="w-full max-w-[34.5rem]"
-        inputRef={(input) => (inputRef = input)}
-        name="filter"
-        placeholder="Filter collections..."
-        value={props.filter}
-        onInput={props.onFilter}
-      />
-      <div class="flex w-full max-w-[34.5rem] justify-end gap-1">
-        <button type="button" class={buttonClass} onClick={() => props.onExpandAll()}>
-          Expand all
-        </button>
-        <button type="button" class={buttonClass} onClick={() => props.onCollapseAll()}>
-          Collapse all
-        </button>
+    <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 left-0 z-10 flex w-full justify-center bg-neutral-100 px-3 pt-3 pb-6">
+      <div class="flex w-full max-w-[34.5rem] items-center gap-2">
+        <FilterInput
+          class="grow"
+          inputRef={(input) => (inputRef = input)}
+          name="filter"
+          placeholder="Filter collections..."
+          value={props.filter}
+          onInput={props.onFilter}
+        />
+        <Tooltip text={label()}>
+          <button
+            type="button"
+            aria-label={label()}
+            onClick={() =>
+              allCollapsed() ? props.collapse.expandAll() : props.collapse.collapseAll(props.nsids)
+            }
+            class="dark:bg-dark-300 dark:hover:bg-dark-200 dark:active:bg-dark-100 flex size-8.5 shrink-0 items-center justify-center rounded-md border border-neutral-200 bg-neutral-50 text-neutral-700 transition-colors select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:text-neutral-300"
+          >
+            <span
+              class={`iconify ${allCollapsed() ? "lucide--chevrons-up-down" : "lucide--chevrons-down-up"}`}
+            />
+          </button>
+        </Tooltip>
       </div>
     </div>
   );

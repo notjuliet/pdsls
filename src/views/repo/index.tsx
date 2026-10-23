@@ -449,8 +449,8 @@ const RepoView = () => {
           <CollectionListControls
             filter={filter()}
             onFilter={setFilter}
-            onExpandAll={collapse.expandAll}
-            onCollapseAll={() => collapse.collapseAll(nsids() ?? [])}
+            collapse={collapse}
+            nsids={nsids() ?? []}
           />
         </Show>
       </Show>
