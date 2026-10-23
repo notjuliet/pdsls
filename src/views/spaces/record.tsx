@@ -10,10 +10,10 @@ import {
   useRecordSchemaValidation,
 } from "../../components/repo/record-page.jsx";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog.jsx";
-import { CopyMenu, DropdownMenu, MenuProvider } from "../../components/ui/dropdown.jsx";
 import { IconButton } from "../../components/ui/icon-button.jsx";
 import { addNotification } from "../../components/ui/notification.jsx";
 import { ErrorNotice, LoadingState } from "../../components/ui/states.jsx";
+import { addToClipboard } from "../../lib/copy.js";
 import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import {
   deleteSpaceRecord,
@@ -194,15 +194,11 @@ export const SpaceRecordView = () => {
                       onClick={() => setOpenDelete(true)}
                     />
                   </Show>
-                  <MenuProvider>
-                    <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
-                      <CopyMenu
-                        content={JSON.stringify(value.value, null, 2)}
-                        label="Copy record"
-                        icon="lucide--copy"
-                      />
-                    </DropdownMenu>
-                  </MenuProvider>
+                  <IconButton
+                    icon="lucide--copy"
+                    label="Copy record"
+                    onClick={() => addToClipboard(JSON.stringify(value.value, null, 2))}
+                  />
                 </>
               }
               record={
