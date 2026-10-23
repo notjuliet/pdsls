@@ -10,11 +10,6 @@ import { createEffect, createMemo, createSignal, Match, Show, Switch } from "sol
 
 import { JSONValue, type JSONType } from "../../components/json.jsx";
 import {
-  BreadcrumbRow,
-  Breadcrumbs,
-  BreadcrumbSchemaLink,
-} from "../../components/repo/breadcrumbs.jsx";
-import {
   CollectionList,
   CollectionListControls,
   createCollapseState,
@@ -29,6 +24,7 @@ import {
   LexiconDocument,
 } from "../../components/repo/record-page.jsx";
 import { timestampFromRkey } from "../../components/repo/record-row.jsx";
+import { type Stage, StageNav, useSchemaAction } from "../../components/repo/stage-nav.jsx";
 import { IconButton } from "../../components/ui/icon-button.jsx";
 import { Spinner, EmptyState, ErrorNotice } from "../../components/ui/states.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
@@ -440,80 +436,68 @@ const ExploreView = (props: { archive: Archive; view: () => View }) => {
       ?.filter((alias) => alias.startsWith("at://"))[0]
       ?.split("at://")[1] ?? props.archive.did;
 
+  const schemaAction = useSchemaAction(() => {
+    const view = props.view();
+    return view.type === "collection" || view.type === "record" ? view.collection.name : undefined;
+  });
+
+  const stages = (): Stage[] => {
+    const view = props.view();
+    const did = props.archive.did;
+    const hasHandle = handle() !== did;
+    const result: Stage[] = [
+      {
+        kind: "Repo",
+        label: handle(),
+        detail: hasHandle ? did : undefined,
+        href: view.type !== "repo" ? "/car" : undefined,
+        copy: { label: "DID", value: did },
+        trailing: exporting() ? (
+          <div class="flex items-center gap-2 px-1.5 py-1">
+            <Spinner class="text-neutral-400" />
+            <span class="w-[4ch] text-right text-xs text-neutral-500 dark:text-neutral-400">
+              {exportSaving() ? "" : `${Math.round((exportCount() / totalRecords()) * 100)}%`}
+            </span>
+          </div>
+        ) : undefined,
+        actions: exporting()
+          ? undefined
+          : [
+              {
+                label: "Export ZIP",
+                icon: "lucide--download",
+                onClick: handleExport,
+              },
+            ],
+      },
+    ];
+    if (view.type === "repo") return result;
+
+    result.push({
+      kind: "Collection",
+      label: view.collection.name,
+      href:
+        view.type === "record"
+          ? viewToPath({ type: "collection", collection: view.collection })
+          : undefined,
+      copy: { label: "NSID", value: view.collection.name },
+      actions: [schemaAction()!],
+    });
+    if (view.type !== "record") return result;
+
+    const timestamp = timestampFromRkey(view.record.key);
+    result.push({
+      kind: "Record",
+      label: view.record.key,
+      detail: timestamp ? localDateFromTimestamp(timestamp) : undefined,
+      copy: { label: "record key", value: view.record.key },
+    });
+    return result;
+  };
+
   return (
     <div class="flex w-full flex-col">
-      <Breadcrumbs>
-        <div class="flex min-w-0 items-center gap-1">
-          <div class="min-w-0 flex-1">
-            <BreadcrumbRow
-              icon="lucide--book-user"
-              label={handle()}
-              preserveLabel={handle() !== props.archive.did}
-              detail={handle() !== props.archive.did ? props.archive.did : undefined}
-              href={props.view().type !== "repo" ? "/car" : undefined}
-            />
-          </div>
-          <div class="shrink-0">
-            <Show
-              when={exporting()}
-              fallback={
-                <button
-                  type="button"
-                  onClick={handleExport}
-                  class="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-neutral-500 transition-colors select-none hover:bg-neutral-200/70 hover:text-neutral-700 active:bg-neutral-300/70 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-200 dark:active:bg-neutral-600/70"
-                >
-                  Export ZIP
-                </button>
-              }
-            >
-              <div class="flex items-center gap-2 px-2 py-1">
-                <Spinner class="text-neutral-400" />
-                <span class="w-[4ch] text-right text-xs text-neutral-500 dark:text-neutral-400">
-                  {exportSaving() ? "" : `${Math.round((exportCount() / totalRecords()) * 100)}%`}
-                </span>
-              </div>
-            </Show>
-          </div>
-        </div>
-
-        <Show
-          when={(() => {
-            const v = props.view();
-            return v.type === "collection" || v.type === "record" ? v.collection : null;
-          })()}
-        >
-          {(collection) => (
-            <BreadcrumbRow
-              icon="lucide--folder-open"
-              label={collection().name}
-              trailing={<BreadcrumbSchemaLink nsid={collection().name} />}
-              href={
-                props.view().type === "record"
-                  ? viewToPath({ type: "collection", collection: collection() })
-                  : undefined
-              }
-            />
-          )}
-        </Show>
-
-        <Show
-          when={(() => {
-            const v = props.view();
-            return v.type === "record" ? v.record : null;
-          })()}
-        >
-          {(record) => {
-            const timestamp = () => timestampFromRkey(record().key);
-            return (
-              <BreadcrumbRow
-                icon="lucide--file-json"
-                label={record().key}
-                detail={timestamp() ? localDateFromTimestamp(timestamp()!) : undefined}
-              />
-            );
-          }}
-        </Show>
-      </Breadcrumbs>
+      <StageNav stages={stages()} />
 
       <div class="pt-3 pb-2">
         <Switch>

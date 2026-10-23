@@ -1,14 +1,11 @@
 import { useParams } from "@solidjs/router";
-import { createResource, type JSX, Show } from "solid-js";
+import { children, createResource, type JSX } from "solid-js";
 
 import { resolveDidInfo } from "../../components/hover-card/did.jsx";
-import {
-  BreadcrumbRow,
-  Breadcrumbs,
-  BreadcrumbSchemaLink,
-} from "../../components/repo/breadcrumbs.jsx";
+import { timestampFromRkey } from "../../components/repo/record-row.jsx";
+import { type Stage, StageNav, useSchemaAction } from "../../components/repo/stage-nav.jsx";
 import { AlphaBadge } from "../../components/ui/alpha-badge.jsx";
-import { Favicon } from "../../components/ui/favicon.jsx";
+import { localDateFromTimestamp } from "../../lib/format.js";
 import { makeSpaceCollectionPath, makeSpacePath, makeSpaceRepoPath } from "./context.jsx";
 
 const resolveDidHandle = async (did: string) => {
@@ -21,77 +18,70 @@ const resolveDidHandle = async (did: string) => {
 
 export const SpacesNav = (props: { action?: JSX.Element }) => {
   const params = useParams();
+  // Resolved once, so rebuilding the stages doesn't recreate the action (and reset its dialog).
+  const action = children(() => props.action);
   const [authorityHandle] = createResource(() => params.spaceAuthority, resolveDidHandle);
   const [repoHandle] = createResource(() => params.spaceRepo, resolveDidHandle);
+  const schemaAction = useSchemaAction(() => params.collection);
   const hasSpace = () => !!params.spaceAuthority && !!params.spaceType && !!params.skey;
-  const spacePath = () =>
-    hasSpace() ? makeSpacePath(params.spaceAuthority!, params.spaceType!, params.skey!) : undefined;
-  const repoPath = () =>
-    spacePath() && params.spaceRepo
-      ? makeSpaceRepoPath(params.spaceAuthority!, params.spaceType!, params.skey!, params.spaceRepo)
-      : undefined;
-  const collectionPath = () =>
-    repoPath() && params.collection
-      ? makeSpaceCollectionPath(
-          params.spaceAuthority!,
-          params.spaceType!,
-          params.skey!,
-          params.spaceRepo!,
-          params.collection,
-        )
-      : undefined;
 
-  return (
-    <Breadcrumbs>
-      <div class="flex min-w-0 items-center gap-1">
-        <div class="min-w-0 flex-1">
-          <BreadcrumbRow
-            icon="lucide--lock-keyhole"
-            label="Spaces"
-            href={hasSpace() ? "/spaces" : undefined}
-            trailing={<AlphaBadge />}
-          />
-        </div>
-        <Show when={props.action}>
-          <div class="shrink-0">{props.action}</div>
-        </Show>
-      </div>
+  const stages = (): Stage[] => {
+    const result: Stage[] = [
+      {
+        kind: "Spaces",
+        label: "All spaces",
+        badge: <AlphaBadge />,
+        href: hasSpace() ? "/spaces" : undefined,
+        trailing: action(),
+      },
+    ];
+    if (!hasSpace()) return result;
 
-      <Show when={hasSpace()}>
-        <BreadcrumbRow
-          leading={<Favicon domain={params.spaceType!.split(".").slice(0, 2).join(".")} reverse />}
-          label={params.spaceType}
-          detailPrefix={`${params.skey} ·`}
-          detail={authorityHandle() ?? params.spaceAuthority}
-          detailHref={authorityHandle() ? `/at://${params.spaceAuthority}` : undefined}
-          href={params.spaceRepo ? spacePath() : undefined}
-          preserveLabel
-        />
-      </Show>
+    const authority = params.spaceAuthority!;
+    const spaceType = params.spaceType!;
+    const skey = params.skey!;
+    result.push({
+      kind: "Space",
+      label: spaceType,
+      detail: `${skey} · ${authorityHandle() ?? authority}`,
+      detailHref: authorityHandle() ? `/at://${authority}` : undefined,
+      href: params.spaceRepo ? makeSpacePath(authority, spaceType, skey) : undefined,
+      copy: { label: "owner DID", value: authority },
+    });
 
-      <Show when={params.spaceRepo}>
-        <BreadcrumbRow
-          icon="lucide--book-user"
-          label={repoHandle() ?? params.spaceRepo}
-          detail={repoHandle() ? params.spaceRepo : undefined}
-          detailHref={repoHandle() ? `/at://${params.spaceRepo}` : undefined}
-          href={params.collection ? repoPath() : undefined}
-          preserveLabel={!!repoHandle()}
-        />
-      </Show>
+    const repo = params.spaceRepo;
+    if (!repo) return result;
+    result.push({
+      kind: "Repo",
+      label: repoHandle() ?? repo,
+      detail: repoHandle() ? repo : undefined,
+      detailHref: repoHandle() ? `/at://${repo}` : undefined,
+      href: params.collection ? makeSpaceRepoPath(authority, spaceType, skey, repo) : undefined,
+      copy: { label: "DID", value: repo },
+    });
 
-      <Show when={params.collection}>
-        <BreadcrumbRow
-          icon="lucide--folder-open"
-          label={params.collection}
-          href={params.rkey ? collectionPath() : undefined}
-          trailing={<BreadcrumbSchemaLink nsid={params.collection!} />}
-        />
-      </Show>
+    const collection = params.collection;
+    if (!collection) return result;
+    result.push({
+      kind: "Collection",
+      label: collection,
+      href: params.rkey
+        ? makeSpaceCollectionPath(authority, spaceType, skey, repo, collection)
+        : undefined,
+      copy: { label: "NSID", value: collection },
+      actions: [schemaAction()!],
+    });
 
-      <Show when={params.rkey}>
-        <BreadcrumbRow icon="lucide--file-json" label={params.rkey} />
-      </Show>
-    </Breadcrumbs>
-  );
+    if (!params.rkey) return result;
+    const timestamp = timestampFromRkey(params.rkey);
+    result.push({
+      kind: "Record",
+      label: params.rkey,
+      detail: timestamp === undefined ? undefined : localDateFromTimestamp(timestamp),
+      copy: { label: "record key", value: params.rkey },
+    });
+    return result;
+  };
+
+  return <StageNav stages={stages()} />;
 };
