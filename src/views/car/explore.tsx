@@ -6,19 +6,10 @@ import { fromStream, isCommit } from "@atcute/repo";
 import * as TID from "@atcute/tid";
 import { zip, type ZipEntry } from "@mary/zip";
 import { useLocation, useNavigate, useParams } from "@solidjs/router";
-import {
-  createEffect,
-  createMemo,
-  createSignal,
-  For,
-  Match,
-  Show,
-  Switch,
-  untrack,
-} from "solid-js";
+import { createEffect, createMemo, createSignal, Match, Show, Switch } from "solid-js";
 
-import { Button } from "../../components/button.jsx";
 import { CollectionList } from "../../components/collection-list.jsx";
+import { CollectionPage, type CollectionSource } from "../../components/collection-page.jsx";
 import { CopyMenu, DropdownMenu, MenuProvider } from "../../components/dropdown.jsx";
 import { JSONValue, type JSONType } from "../../components/json.jsx";
 import {
@@ -27,12 +18,9 @@ import {
   recordTabFromHash,
   useRecordSchemaValidation,
 } from "../../components/record-page.jsx";
-import { RecordRow } from "../../components/record-row.jsx";
 import { EmptyState, ErrorNotice } from "../../components/states.jsx";
 import { TextInput } from "../../components/text-input.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
-import { createDebouncedValue } from "../../lib/debounced.js";
-import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import { localDateFromTimestamp } from "../../utils/format.js";
 import { carFileAccept, createFileChangeHandler, isIOS } from "./file-handlers.js";
@@ -670,111 +658,35 @@ const RepoSubview = (props: { archive: Archive }) => {
   );
 };
 
-const RECORDS_PER_PAGE = 100;
+/** Newest first by TID; records with other keys go last. */
+const compareRecordKeys = (a: RecordEntry, b: RecordEntry) => {
+  const aIsTid = TID.validate(a.key);
+  const bIsTid = TID.validate(b.key);
+  if (aIsTid && bIsTid) return TID.parse(b.key).timestamp - TID.parse(a.key).timestamp;
+  if (aIsTid) return -1;
+  if (bIsTid) return 1;
+  return b.key.localeCompare(a.key);
+};
 
 const CollectionSubview = (props: { archive: Archive; collection: CollectionEntry }) => {
-  const [filter, setFilter] = createSignal("");
-  const debouncedFilter = createDebouncedValue(filter, 150);
-  const [displayCount, setDisplayCount] = createSignal(RECORDS_PER_PAGE);
-
-  // Sort entries by TID timestamp (most recent first), non-TID entries go to the end
-  const sortedEntries = createMemo(() => {
-    return [...props.collection.entries].sort((a, b) => {
-      const aIsTid = TID.validate(a.key);
-      const bIsTid = TID.validate(b.key);
-
-      if (aIsTid && bIsTid) {
-        return TID.parse(b.key).timestamp - TID.parse(a.key).timestamp;
-      }
-      if (aIsTid) return -1;
-      if (bIsTid) return 1;
-      return b.key.localeCompare(a.key);
-    });
+  const source = (): CollectionSource => ({
+    key: `${props.archive.did}/${props.collection.name}`,
+    repo: props.archive.did,
+    collection: props.collection.name,
+    collectionHref: viewToPath({ type: "collection", collection: props.collection }),
+    recordHref: (rkey) =>
+      `${viewToPath({ type: "collection", collection: props.collection })}/${rkey}`,
+    // The archive is already in memory, so the whole collection is one page.
+    listRecords: async ({ reverse }) => {
+      const sorted = [...props.collection.entries].sort(compareRecordKeys);
+      if (reverse) sorted.reverse();
+      return {
+        records: sorted.map((entry) => ({ rkey: entry.key, cid: entry.cid, value: entry.record })),
+      };
+    },
   });
 
-  const searchableEntries = createMemo(() => {
-    return sortedEntries().map((entry) => ({
-      entry,
-      searchText: JSON.stringify(entry.record).toLowerCase(),
-    }));
-  });
-
-  const filteredEntries = createMemo(() => {
-    const f = debouncedFilter().toLowerCase().trim();
-    if (!f) return sortedEntries();
-    return searchableEntries()
-      .filter(({ searchText }) => searchText.includes(f))
-      .map(({ entry }) => entry);
-  });
-
-  createEffect(() => {
-    debouncedFilter();
-    untrack(() => setDisplayCount(RECORDS_PER_PAGE));
-  });
-
-  const displayedEntries = createMemo(() => {
-    return filteredEntries().slice(0, displayCount());
-  });
-
-  const hasMore = createMemo(() => filteredEntries().length > displayCount());
-
-  const loadMore = () => {
-    setDisplayCount((prev) => prev + RECORDS_PER_PAGE);
-  };
-
-  return (
-    <div class="flex flex-col gap-3">
-      <span class="text-sm text-neutral-600 dark:text-neutral-400">
-        {filteredEntries().length} record{filteredEntries().length !== 1 ? "s" : ""}
-        {filter() && filteredEntries().length !== props.collection.entries.length && (
-          <span class="text-neutral-400 dark:text-neutral-500">
-            {" "}
-            (of {props.collection.entries.length})
-          </span>
-        )}
-      </span>
-
-      <div class="flex items-center gap-2">
-        <TextInput
-          placeholder="Filter records"
-          value={filter()}
-          onInput={(e) => setFilter(e.currentTarget.value)}
-          class="grow text-sm"
-        />
-
-        <Show when={hasMore()}>
-          <span class="text-sm text-neutral-600 dark:text-neutral-400">
-            {displayedEntries().length}/{filteredEntries().length}
-          </span>
-
-          <Button onClick={loadMore}>Load more</Button>
-        </Show>
-      </div>
-
-      <div class="flex flex-col font-mono">
-        <For each={displayedEntries()}>
-          {(entry) => (
-            <RecordRow
-              rkey={entry.key}
-              cid={entry.cid}
-              value={entry.record}
-              repo={props.archive.did}
-              href={viewToPath({ type: "record", collection: props.collection, record: entry })}
-            />
-          )}
-        </For>
-        <LoadMoreSentinel
-          hasMore={() => hasMore()}
-          loading={() => false}
-          onLoadMore={() => loadMore()}
-        />
-      </div>
-
-      <Show when={filteredEntries().length === 0 && filter()}>
-        <EmptyState icon="lucide--search-x" message="No records match your filter" />
-      </Show>
-    </div>
-  );
+  return <CollectionPage source={source()} />;
 };
 
 const RecordSubview = (props: {
