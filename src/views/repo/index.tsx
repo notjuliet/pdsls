@@ -15,16 +15,18 @@ import {
   ErrorBoundary,
   For,
   type JSX,
-  onMount,
   Show,
   Suspense,
 } from "solid-js";
 
 import { Backlinks } from "../../components/repo/backlinks.jsx";
-import { CollectionList } from "../../components/repo/collection-list.jsx";
+import {
+  CollectionList,
+  CollectionListControls,
+  createCollapseState,
+} from "../../components/repo/collection-list.jsx";
 import { setPDS } from "../../components/repo/navbar.jsx";
 import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../../components/ui/dropdown.jsx";
-import { FilterInput } from "../../components/ui/filter-input.jsx";
 import { NestedLayout } from "../../components/ui/nested-layout.jsx";
 import {
   addNotification,
@@ -41,7 +43,6 @@ import {
   resolveLexiconAuthority,
 } from "../../lib/api.js";
 import { createLatch } from "../../lib/create-latch.js";
-import { useFilterShortcut } from "../../lib/keyboard.js";
 import { RepoProvider, useRepo } from "../../lib/repo-context.jsx";
 import { LabelFeed } from "../labels.jsx";
 import { plcDirectory } from "../settings.jsx";
@@ -243,15 +244,11 @@ const RepoView = () => {
   const navigate = useNavigate();
   const [error, setError] = createSignal<string>();
   const [downloading, setDownloading] = createSignal(false);
-  const [nsids, setNsids] = createSignal<Record<string, { hidden: boolean; nsids: string[] }>>();
-  const [filter, setFilter] = createSignal<string>();
+  const [nsids, setNsids] = createSignal<string[]>();
+  const [filter, setFilter] = createSignal("");
+  const collapse = createCollapseState();
   const [rotationKeys, setRotationKeys] = createSignal<Array<string>>([]);
-  let filterInputRef: HTMLInputElement | undefined;
   const did = repo.did();
-
-  onMount(() => {
-    useFilterShortcut(() => filterInputRef);
-  });
 
   const activeTab = (): RepoTabId => {
     if (!location.hash) return error() ? "identity" : "collections";
@@ -295,18 +292,7 @@ const RepoView = () => {
         params: { repo: did as ActorIdentifier },
       });
       if (res.ok) {
-        const collections: Record<string, { hidden: boolean; nsids: string[] }> = {};
-        res.data.collections.forEach((c) => {
-          const nsid = c.split(".");
-          if (nsid.length > 2) {
-            const authority = `${nsid[0]}.${nsid[1]}`;
-            collections[authority] = {
-              nsids: (collections[authority]?.nsids ?? []).concat(nsid.slice(2).join(".")),
-              hidden: false,
-            };
-          }
-        });
-        setNsids(collections);
+        setNsids(res.data.collections.filter((nsid) => nsid.split(".").length > 2));
       } else {
         console.error(res.data.error);
         switch (res.data.error) {
@@ -330,25 +316,6 @@ const RepoView = () => {
   const shouldFetch = createLatch(() => !hidden() && (!!repo.rpc() || !!repo.error()));
 
   const [repoData] = createResource(shouldFetch, fetchRepo);
-
-  const toggleCollapsed = (authority: string) => {
-    setNsids((prev) => ({
-      ...prev!,
-      [authority]: { ...prev![authority], hidden: !prev![authority].hidden },
-    }));
-  };
-
-  const collapseAll = () => {
-    setNsids((prev) =>
-      Object.fromEntries(Object.entries(prev!).map(([k, v]) => [k, { ...v, hidden: true }])),
-    );
-  };
-
-  const expandAll = () => {
-    setNsids((prev) =>
-      Object.fromEntries(Object.entries(prev!).map(([k, v]) => [k, { ...v, hidden: false }])),
-    );
-  };
 
   const handleDownload = async () => {
     const pdsUrl = repo.pds();
@@ -456,19 +423,16 @@ const RepoView = () => {
             <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
               <div class="pb-22">
                 <Show
-                  when={Object.keys(nsids() ?? {}).length != 0}
+                  when={nsids()?.length}
                   fallback={<span class="mt-3 text-center text-base">No collections found.</span>}
                 >
                   <CollectionList
-                    collections={Object.entries(nsids() ?? {}).flatMap(([authority, group]) =>
-                      group.nsids.map((nsid) => ({
-                        nsid: `${authority}.${nsid}`,
-                        href: `/at://${did}/${authority}.${nsid}`,
-                      })),
-                    )}
+                    collections={(nsids() ?? []).map((nsid) => ({
+                      nsid,
+                      href: `/at://${did}/${nsid}`,
+                    }))}
                     filter={filter()}
-                    collapsed={(authority) => nsids()?.[authority]?.hidden ?? false}
-                    onToggle={toggleCollapsed}
+                    collapse={collapse}
                   />
                 </Show>
               </div>
@@ -482,30 +446,12 @@ const RepoView = () => {
         </div>
 
         <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
-          <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
-            <FilterInput
-              class="w-full max-w-[34.5rem]"
-              inputRef={(input) => (filterInputRef = input)}
-              name="filter"
-              placeholder="Filter collections..."
-              value={filter() ?? ""}
-              onInput={(value) => setFilter(value.toLowerCase())}
-            />
-            <div class="flex w-full max-w-[34.5rem] justify-end gap-1">
-              <button
-                class="rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
-                onClick={expandAll}
-              >
-                Expand all
-              </button>
-              <button
-                class="rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
-                onClick={collapseAll}
-              >
-                Collapse all
-              </button>
-            </div>
-          </div>
+          <CollectionListControls
+            filter={filter()}
+            onFilter={setFilter}
+            onExpandAll={collapse.expandAll}
+            onCollapseAll={() => collapse.collapseAll(nsids() ?? [])}
+          />
         </Show>
       </Show>
     </Show>

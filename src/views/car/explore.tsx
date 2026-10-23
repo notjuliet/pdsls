@@ -10,7 +10,11 @@ import { createEffect, createMemo, createSignal, Match, Show, Switch } from "sol
 
 import { JSONValue, type JSONType } from "../../components/json.jsx";
 import { BreadcrumbRow, Breadcrumbs } from "../../components/repo/breadcrumbs.jsx";
-import { CollectionList } from "../../components/repo/collection-list.jsx";
+import {
+  CollectionList,
+  CollectionListControls,
+  createCollapseState,
+} from "../../components/repo/collection-list.jsx";
 import { CollectionPage, type CollectionSource } from "../../components/repo/collection-page.jsx";
 import {
   RecordInfo,
@@ -21,7 +25,6 @@ import {
 import { timestampFromRkey } from "../../components/repo/record-row.jsx";
 import { CopyMenu, DropdownMenu, MenuProvider } from "../../components/ui/dropdown.jsx";
 import { Spinner, EmptyState, ErrorNotice } from "../../components/ui/states.jsx";
-import { TextInput } from "../../components/ui/text-input.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
 import { localDateFromTimestamp } from "../../lib/format.js";
 import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
@@ -538,24 +541,18 @@ const ExploreView = (props: { archive: Archive; view: () => View }) => {
 
 const RepoSubview = (props: { archive: Archive }) => {
   const [filter, setFilter] = createSignal("");
+  const collapse = createCollapseState();
   const totalRecords = createMemo(() =>
     props.archive.entries.reduce((sum, entry) => sum + entry.entries.length, 0),
   );
 
   return (
-    <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-3 pb-22">
       <div class="text-sm text-neutral-600 dark:text-neutral-400">
         {props.archive.entries.length} collection{props.archive.entries.length !== 1 ? "s" : ""}
         <span class="text-neutral-400 dark:text-neutral-600"> · </span>
         {totalRecords()} record{totalRecords() !== 1 ? "s" : ""}
       </div>
-
-      <TextInput
-        placeholder="Filter collections"
-        value={filter()}
-        onInput={(e) => setFilter(e.currentTarget.value)}
-        class="text-sm"
-      />
 
       <CollectionList
         collections={props.archive.entries.map((entry) => ({
@@ -564,11 +561,19 @@ const RepoSubview = (props: { archive: Archive }) => {
           href: viewToPath({ type: "collection", collection: entry }),
         }))}
         filter={filter()}
+        collapse={collapse}
         fallback={
           <Show when={filter()}>
             <EmptyState icon="lucide--search-x" message="No collections match your filter" />
           </Show>
         }
+      />
+
+      <CollectionListControls
+        filter={filter()}
+        onFilter={setFilter}
+        onExpandAll={collapse.expandAll}
+        onCollapseAll={() => collapse.collapseAll(props.archive.entries.map((entry) => entry.name))}
       />
     </div>
   );

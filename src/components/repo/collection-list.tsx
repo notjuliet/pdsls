@@ -1,7 +1,9 @@
 import { A } from "@solidjs/router";
-import { createMemo, createSignal, For, type JSX, Show } from "solid-js";
+import { createMemo, createSignal, For, type JSX, onMount, Show } from "solid-js";
 
+import { useFilterShortcut } from "../../lib/keyboard.js";
 import { DomainGroup, DomainGroupRows, domainGroupRowClasses } from "../ui/domain-group.jsx";
+import { FilterInput } from "../ui/filter-input.jsx";
 
 export interface CollectionItem {
   nsid: string;
@@ -13,32 +15,37 @@ export interface CollectionItem {
 interface CollectionListProps {
   collections: CollectionItem[];
   filter?: string;
-  /** Controls which authorities are collapsed; when omitted the list keeps its own state. */
-  collapsed?: (authority: string) => boolean;
-  onToggle?: (authority: string) => void;
+  /** Shared collapse state, e.g. for expand/collapse all; when omitted the list keeps its own. */
+  collapse?: CollapseState;
   /** Shown when no collection matches. */
   fallback?: JSX.Element;
 }
 
-const nsidAuthority = (nsid: string) => nsid.split(".").slice(0, 2).join(".");
+export const nsidAuthority = (nsid: string) => nsid.split(".").slice(0, 2).join(".");
+
+/** Which domain groups of a CollectionList are collapsed. */
+export const createCollapseState = () => {
+  const [collapsed, setCollapsed] = createSignal(new Set<string>());
+  return {
+    isCollapsed: (authority: string) => collapsed().has(authority),
+    toggle: (authority: string) =>
+      setCollapsed((current) => {
+        const next = new Set(current);
+        if (next.has(authority)) next.delete(authority);
+        else next.add(authority);
+        return next;
+      }),
+    collapseAll: (nsids: string[]) => setCollapsed(new Set(nsids.map(nsidAuthority))),
+    expandAll: () => setCollapsed(new Set<string>()),
+  };
+};
+
+export type CollapseState = ReturnType<typeof createCollapseState>;
 
 export const displayNsidDomain = (authority: string) => authority.split(".").reverse().join(".");
 
 export const CollectionList = (props: CollectionListProps) => {
-  const [collapsedAuthorities, setCollapsedAuthorities] = createSignal(new Set<string>());
-
-  const isCollapsed = (authority: string) =>
-    props.collapsed ? props.collapsed(authority) : collapsedAuthorities().has(authority);
-
-  const toggle = (authority: string) => {
-    if (props.onToggle) return props.onToggle(authority);
-    setCollapsedAuthorities((current) => {
-      const next = new Set(current);
-      if (next.has(authority)) next.delete(authority);
-      else next.add(authority);
-      return next;
-    });
-  };
+  const collapse = props.collapse ?? createCollapseState();
 
   const groups = createMemo(() => {
     const filter = props.filter?.toLowerCase().trim();
@@ -87,13 +94,13 @@ export const CollectionList = (props: CollectionListProps) => {
               domainTitle={`${group.domain} (${group.authority})`}
               groupLabel="collections"
               sticky
-              collapsed={isCollapsed(group.authority)}
+              collapsed={collapse.isCollapsed(group.authority)}
               collapsedLabel={
                 <>
                   {group.items.length} {group.items.length === 1 ? "collection" : "collections"}
                 </>
               }
-              onToggle={() => toggle(group.authority)}
+              onToggle={() => collapse.toggle(group.authority)}
             >
               <DomainGroupRows as="ul">
                 <For each={group.items}>
@@ -111,5 +118,40 @@ export const CollectionList = (props: CollectionListProps) => {
         </For>
       </div>
     </Show>
+  );
+};
+
+/** The fixed panel under a collection list: the filter (focused with "/") and expand/collapse all. */
+export const CollectionListControls = (props: {
+  filter: string;
+  onFilter: (value: string) => void;
+  onExpandAll: () => void;
+  onCollapseAll: () => void;
+}) => {
+  let inputRef: HTMLInputElement | undefined;
+  onMount(() => useFilterShortcut(() => inputRef));
+
+  const buttonClass =
+    "rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600";
+
+  return (
+    <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 left-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
+      <FilterInput
+        class="w-full max-w-[34.5rem]"
+        inputRef={(input) => (inputRef = input)}
+        name="filter"
+        placeholder="Filter collections..."
+        value={props.filter}
+        onInput={props.onFilter}
+      />
+      <div class="flex w-full max-w-[34.5rem] justify-end gap-1">
+        <button type="button" class={buttonClass} onClick={() => props.onExpandAll()}>
+          Expand all
+        </button>
+        <button type="button" class={buttonClass} onClick={() => props.onCollapseAll()}>
+          Collapse all
+        </button>
+      </div>
+    </div>
   );
 };
