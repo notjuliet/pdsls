@@ -21,6 +21,7 @@ import {
   getSpaceBlob,
   getSpaceRecord,
   type GetSpaceRecordResult,
+  verifySpaceRecord,
 } from "../../lib/spaces.js";
 import { addToClipboard } from "../../utils/copy.js";
 import {
@@ -48,6 +49,8 @@ export const SpaceRecordView = () => {
   const [validSchema, setValidSchema] = createSignal<boolean>();
   const [validationError, setValidationError] = createSignal("");
   const [remoteValidation, setRemoteValidation] = createSignal(false);
+  const [validRecord, setValidRecord] = createSignal<boolean>();
+  const [verifyError, setVerifyError] = createSignal("");
   const lexicon = useLexiconSchema(() => params.collection);
   let requestVersion = 0;
 
@@ -79,12 +82,15 @@ export const SpaceRecordView = () => {
     setValidSchema(undefined);
     setValidationError("");
     setRemoteValidation(false);
+    setValidRecord(undefined);
+    setVerifyError("");
 
     setLoading(true);
     void getSpaceRecord(auth(), space(), repo(), params.collection!, params.rkey!)
       .then((result) => {
         if (version === requestVersion) {
           showRecord(result);
+          void verifyRecordIntegrity(result, version);
         }
       })
       .catch((err) => {
@@ -96,6 +102,19 @@ export const SpaceRecordView = () => {
         if (version === requestVersion) setLoading(false);
       });
   });
+
+  const verifyRecordIntegrity = async (result: GetSpaceRecordResult, version: number) => {
+    try {
+      await verifySpaceRecord(auth(), space(), repo(), params.collection!, params.rkey!, result);
+      if (version === requestVersion) setValidRecord(true);
+    } catch (err) {
+      console.error("Record verification error:", err);
+      if (version === requestVersion) {
+        setVerifyError(err instanceof Error ? err.message : String(err));
+        setValidRecord(false);
+      }
+    }
+  };
 
   const validateRemoteSchema = async (value: unknown) => {
     try {
@@ -197,9 +216,13 @@ export const SpaceRecordView = () => {
                       rkey={params.rkey!}
                       record={value.value}
                       mode="edit"
-                      onSaved={(result, updatedRecord) =>
-                        showRecord({ ...result, value: updatedRecord })
-                      }
+                      onSaved={(result, updatedRecord) => {
+                        // A saved record wasn't fetched with a MAC, so it can't be checked.
+                        requestVersion += 1;
+                        setValidRecord(undefined);
+                        setVerifyError("");
+                        showRecord({ ...result, value: updatedRecord });
+                      }}
                     />
                     <PermissionButton
                       scope={SPACE_MANAGE_RECORDS_SCOPE_ID}
@@ -257,6 +280,26 @@ export const SpaceRecordView = () => {
                 <div class="flex w-full flex-col gap-3 px-2">
                   <CopyableInfoField label="AT URI" value={value.uri} />
                   <CopyableInfoField label="CID" value={value.cid} />
+                  <Show when={value.mac}>
+                    <div>
+                      <div class="flex items-center gap-1">
+                        <p class="font-semibold">Record verification</p>
+                        <span
+                          classList={{
+                            "iconify lucide--check text-green-500 dark:text-green-400":
+                              validRecord() === true,
+                            "iconify lucide--x text-red-500 dark:text-red-400":
+                              validRecord() === false,
+                            "iconify lucide--loader-circle animate-spin":
+                              validRecord() === undefined,
+                          }}
+                        ></span>
+                      </div>
+                      <Show when={validRecord() === false}>
+                        <div class="text-xs wrap-break-word">{verifyError()}</div>
+                      </Show>
+                    </div>
+                  </Show>
                   <RecordSchemaValidation
                     valid={validSchema()}
                     error={validationError()}

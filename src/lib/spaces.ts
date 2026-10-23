@@ -1,10 +1,16 @@
-import { P256PrivateKeyExportable } from "@atcute/crypto";
-import { getAtprotoServiceEndpoint, getPdsEndpoint } from "@atcute/identity";
-import { toBase64Pad } from "@atcute/multibase";
+import { encode } from "@atcute/cbor";
+import * as CID from "@atcute/cid";
+import {
+  getPublicKeyFromDidController,
+  P256PrivateKeyExportable,
+  P256PublicKey,
+} from "@atcute/crypto";
+import { getPdsEndpoint, type DidDocument } from "@atcute/identity";
+import { fromBase64, toBase64Pad } from "@atcute/multibase";
 import type { OAuthUserAgent } from "@atcute/oauth-browser-client";
 
 import type { JSONType } from "../components/json";
-import { getPDS, resolveDidDoc } from "./api";
+import { didDocCache, getPDS, resolveDidDoc } from "./api";
 
 export interface SpaceView {
   uri: string;
@@ -93,6 +99,13 @@ export interface GetSpaceRecordResult {
   uri: string;
   cid: string;
   value: JSONType;
+  /** Present on records fetched with a space credential, for verifySpaceRecord. */
+  mac?: SpaceRecordMac;
+}
+
+interface SpaceRecordMac {
+  header: string | null;
+  keyShare: KeyShare;
 }
 
 export interface SpaceRecordWriteResult {
@@ -222,10 +235,8 @@ const resolveSpaceHost = async (space: string): Promise<string> => {
 
   const pending = (async () => {
     const document = await resolveDidDoc(parsed.authority as `did:${string}:${string}`);
-    const endpoint =
-      getAtprotoServiceEndpoint(document, { id: "#atproto_space_host" }) ??
-      getPdsEndpoint(document);
-    if (!endpoint) throw new Error("The Space authority does not publish a Space host");
+    const endpoint = getPdsEndpoint(document);
+    if (!endpoint) throw new Error("The Space authority does not publish a PDS");
     return requireSecureEndpoint(endpoint, "The Space host");
   })();
 
@@ -376,7 +387,7 @@ const clearCredentialsForSpace = (space: string) => {
   }
 };
 
-const credentialQuery = async (
+const credentialRequest = async (
   auth: OAuthUserAgent,
   space: string,
   audience: string,
@@ -384,7 +395,7 @@ const credentialQuery = async (
   method: string,
   params: Record<string, string | number | boolean | undefined>,
   headers?: Record<string, string>,
-): Promise<unknown> => {
+): Promise<{ data: unknown; headers: Headers }> => {
   const session = await getSpaceCredential(auth, space);
   const url = new URL(`/xrpc/${method}`, service);
   for (const [key, value] of Object.entries(params)) {
@@ -400,8 +411,11 @@ const credentialQuery = async (
   });
   const data = await readJson(response);
   if (!response.ok) throw new SpaceRequestError(data, response.status);
-  return data;
+  return { data, headers: response.headers };
 };
+
+const credentialQuery = async (...args: Parameters<typeof credentialRequest>): Promise<unknown> =>
+  (await credentialRequest(...args)).data;
 
 const parseSimpleSpacePolicy = (value: unknown): SimpleSpacePolicy => {
   if (!isObject(value) || typeof value.$type !== "string") {
@@ -756,21 +770,16 @@ export const getSpaceRecord = async (
   collection: string,
   rkey: string,
 ): Promise<GetSpaceRecordResult> => {
-  const [pds, keyShare] = await Promise.all([
-    resolveRepoHost(repo),
-    P256PrivateKeyExportable.createKeypair().then((key) => key.exportPublicKey("did")),
-  ]);
-  const data = await credentialQuery(
+  const [pds, keyShare] = await Promise.all([resolveRepoHost(repo), createKeyShare()]);
+  const { data, headers } = await credentialRequest(
     auth,
     space,
     repo,
     pds,
     "com.atproto.space.getRecord",
     { space, repo, collection, rkey },
-    // Reads with a credential must ask for a MAC. We only display the record, so the
-    // MAC isn't verified and the key share is a throwaway key.
     {
-      "atproto-space-want-mac": `type="atproto-space-record", ver=1, key_share="${keyShare}"`,
+      "atproto-space-want-mac": `type="${RECORD_MAC_TYPE}", ver=${RECORD_MAC_VERSION}, key_share="${keyShare.did}"`,
     },
   );
 
@@ -787,7 +796,193 @@ export const getSpaceRecord = async (
     uri: data.uri,
     cid: data.cid,
     value: data.value as JSONType,
+    mac: { header: headers.get("atproto-space-mac"), keyShare },
   };
+};
+
+// Space records read with a credential are authenticated by a MAC keyed with a secret
+// shared between us and the author's repo host: an ephemeral key of ours is combined
+// (ECDH) with the author's #atproto_kem key, as in DHKEM(P-256, HKDF-SHA256).
+
+const RECORD_MAC_TYPE = "atproto-space-record";
+const RECORD_MAC_VERSION = 1;
+
+interface KeyShare {
+  did: string;
+  privateKey: CryptoKey;
+  /** Uncompressed point (0x04 || x || y). */
+  publicKey: Uint8Array<ArrayBuffer>;
+}
+
+interface KemKey {
+  multibase: string;
+  key: CryptoKey;
+  /** Uncompressed point (0x04 || x || y). */
+  publicKey: Uint8Array<ArrayBuffer>;
+}
+
+const utf8 = (value: string) => new TextEncoder().encode(value);
+
+const uint16be = (value: number) => new Uint8Array([value >> 8, value & 0xff]);
+
+const concatBytes = (parts: Uint8Array[]): Uint8Array<ArrayBuffer> => {
+  const result = new Uint8Array(parts.reduce((length, part) => length + part.length, 0));
+  let offset = 0;
+  for (const part of parts) {
+    result.set(part, offset);
+    offset += part.length;
+  }
+  return result;
+};
+
+const lengthPrefixed = (value: string) => {
+  const bytes = utf8(value);
+  return concatBytes([uint16be(bytes.length), bytes]);
+};
+
+const KEM_PREFIX = concatBytes([utf8("HPKE-v1"), utf8("KEM"), uint16be(0x0010)]);
+
+/** A fresh ephemeral key for each request, never reused. */
+const createKeyShare = async (): Promise<KeyShare> => {
+  const pair = await crypto.subtle.generateKey({ name: "ECDH", namedCurve: "P-256" }, false, [
+    "deriveBits",
+  ]);
+  const publicKey = new Uint8Array(await crypto.subtle.exportKey("raw", pair.publicKey));
+  const did = await (await P256PublicKey.importRaw(publicKey)).exportPublicKey("did");
+  return { did, privateKey: pair.privateKey, publicKey };
+};
+
+const getKemKey = async (repo: string, document: DidDocument): Promise<KemKey> => {
+  const method = document.verificationMethod?.find(
+    (method) => method.id === `${repo}#atproto_kem` || method.id === "#atproto_kem",
+  );
+  if (!method || !("publicKeyMultibase" in method) || !method.publicKeyMultibase) {
+    throw new Error("The author's DID document has no #atproto_kem key");
+  }
+  const found = getPublicKeyFromDidController({
+    type: method.type,
+    publicKeyMultibase: method.publicKeyMultibase,
+  });
+  if (found.type !== "p256") throw new Error("The author's #atproto_kem key is not a P-256 key");
+
+  // Going through JWK decompresses the point, which the derivation needs.
+  const jwk = await (await P256PublicKey.importRaw(found.publicKeyBytes)).exportPublicKey("jwk");
+  const key = await crypto.subtle.importKey(
+    "jwk",
+    { kty: jwk.kty, crv: jwk.crv, x: jwk.x, y: jwk.y },
+    { name: "ECDH", namedCurve: "P-256" },
+    true,
+    [],
+  );
+  const publicKey = new Uint8Array(await crypto.subtle.exportKey("raw", key));
+  return { multibase: method.publicKeyMultibase, key, publicKey };
+};
+
+const resolveKemKey = async (repo: string, refresh: boolean): Promise<KemKey> => {
+  let document = refresh ? undefined : didDocCache[repo];
+  if (!document) {
+    document = await resolveDidDoc(repo as `did:${string}:${string}`);
+    didDocCache[repo] = document;
+  }
+  return getKemKey(repo, document);
+};
+
+const deriveSharedSecret = async (keyShare: KeyShare, kemKey: KemKey) => {
+  const dh = new Uint8Array(
+    await crypto.subtle.deriveBits({ name: "ECDH", public: kemKey.key }, keyShare.privateKey, 256),
+  );
+  const input = await crypto.subtle.importKey(
+    "raw",
+    concatBytes([KEM_PREFIX, utf8("eae_prk"), dh]),
+    "HKDF",
+    false,
+    ["deriveBits"],
+  );
+  const info = concatBytes([
+    uint16be(32),
+    KEM_PREFIX,
+    utf8("shared_secret"),
+    keyShare.publicKey,
+    kemKey.publicKey,
+  ]);
+  return crypto.subtle.deriveBits(
+    { name: "HKDF", hash: "SHA-256", salt: new Uint8Array(), info },
+    input,
+    256,
+  );
+};
+
+/** Parses `type="atproto-space-record", ver=1, mac=:<base64>:` into the raw MAC. */
+const parseRecordMacHeader = (header: string | null): Uint8Array<ArrayBuffer> => {
+  if (!header) throw new Error("The PDS did not return a record MAC");
+
+  const fields = new Map<string, string>();
+  for (const member of header.split(",")) {
+    const separator = member.indexOf("=");
+    if (separator === -1) throw new Error("The PDS returned a malformed MAC header");
+    fields.set(member.slice(0, separator).trim(), member.slice(separator + 1).trim());
+  }
+  if (fields.get("type") !== `"${RECORD_MAC_TYPE}"`) {
+    throw new Error("The PDS returned a MAC of an unsupported type");
+  }
+  if (fields.get("ver") !== String(RECORD_MAC_VERSION)) {
+    throw new Error("The PDS returned a MAC of an unsupported version");
+  }
+  const mac = /^:([A-Za-z0-9+/]*)=*:$/.exec(fields.get("mac") ?? "");
+  if (!mac) throw new Error("The PDS returned a malformed MAC header");
+  return fromBase64(mac[1]);
+};
+
+const checkRecordMac = async (record: GetSpaceRecordResult, kemKey: KemKey) => {
+  if (!record.mac) throw new Error("The record was not fetched with a MAC");
+  const mac = parseRecordMacHeader(record.mac.header);
+  const key = await crypto.subtle.importKey(
+    "raw",
+    await deriveSharedSecret(record.mac.keyShare, kemKey),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["verify"],
+  );
+  const data = concatBytes([
+    utf8(`${RECORD_MAC_TYPE}-v${RECORD_MAC_VERSION}`),
+    lengthPrefixed(record.uri),
+    CID.fromString(record.cid).bytes,
+  ]);
+  return crypto.subtle.verify("HMAC", key, mac, data);
+};
+
+/**
+ * Checks a record from getSpaceRecord: that it is the requested record, that its MAC
+ * proves it came from the author's repo host, and that its content matches its CID.
+ * Throws with the reason when any check fails.
+ */
+export const verifySpaceRecord = async (
+  auth: OAuthUserAgent,
+  space: string,
+  repo: string,
+  collection: string,
+  rkey: string,
+  record: GetSpaceRecordResult,
+): Promise<void> => {
+  if (record.uri !== `${space}/${repo}/${collection}/${rkey}`) {
+    throw new Error("The record URI does not match the requested record");
+  }
+
+  const kemKey = await resolveKemKey(repo, false);
+  if (!(await checkRecordMac(record, kemKey))) {
+    // The cached KEM key may have been rotated, so retry once with a fresh one.
+    const refreshed = await resolveKemKey(repo, true);
+    if (refreshed.multibase === kemKey.multibase) throw new Error("The record MAC is invalid");
+    const retried = await getSpaceRecord(auth, space, repo, collection, rkey);
+    if (retried.cid !== record.cid || !(await checkRecordMac(retried, refreshed))) {
+      throw new Error("The record MAC is invalid");
+    }
+  }
+
+  const computed = await CID.create(CID.CODEC_DCBOR, encode(record.value));
+  if (CID.toString(computed) !== record.cid) {
+    throw new Error("The record content does not match its CID");
+  }
 };
 
 export const deleteSpaceRecord = async (
