@@ -568,10 +568,7 @@ const RepoSubview = (props: { archive: Archive }) => {
         onFilter={setFilter}
         collapse={collapse}
         nsids={props.archive.entries.map((entry) => entry.name)}
-        summary={{
-          detail: `${props.archive.entries.length} collection${props.archive.entries.length === 1 ? "" : "s"}`,
-          main: `${totalRecords().toLocaleString()} record${totalRecords() === 1 ? "" : "s"}`,
-        }}
+        summary={`${totalRecords().toLocaleString()} record${totalRecords() === 1 ? "" : "s"}`}
       />
     </div>
   );

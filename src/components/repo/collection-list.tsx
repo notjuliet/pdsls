@@ -131,8 +131,8 @@ export const CollectionListControls = (props: {
   collapse: CollapseState;
   /** Every collection in the list, to collapse all of their groups. */
   nsids: string[];
-  /** Totals shown beside the filter; `detail` is hidden on narrow screens. */
-  summary?: { main: string; detail?: string };
+  /** A total shown beside the filter, e.g. the number of records. */
+  summary?: string;
 }) => {
   let inputRef: HTMLInputElement | undefined;
   onMount(() => useFilterShortcut(() => inputRef));
@@ -152,14 +152,9 @@ export const CollectionListControls = (props: {
           onInput={props.onFilter}
         />
         <Show when={props.summary}>
-          {(summary) => (
-            <span class="shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
-              <Show when={summary().detail}>
-                <span class="hidden sm:inline">{summary().detail} · </span>
-              </Show>
-              {summary().main}
-            </span>
-          )}
+          <span class="shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
+            {props.summary}
+          </span>
         </Show>
         <Tooltip text={label()}>
           <button
