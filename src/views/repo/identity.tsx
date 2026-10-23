@@ -3,6 +3,7 @@ import { Did, Handle } from "@atcute/lexicons";
 import { createSignal, For, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { ExternalLink } from "../../components/ui/external-link.jsx";
 import { Spinner } from "../../components/ui/states.jsx";
 import { canHover } from "../../layout.jsx";
 import { type HandleResolveResult, resolveHandleDetailed, validateHandle } from "../../lib/api.js";
@@ -263,15 +264,7 @@ export const IdentityView = (props: { didDoc: DidDocument; rotationKeys: string[
         </div>
       </Show>
 
-      <a
-        href={didDocumentUrl()}
-        target="_blank"
-        rel="noopener"
-        class="dark:bg-dark-300 dark:hover:bg-dark-200 dark:active:bg-dark-100 flex w-fit items-center gap-1 rounded-md border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 text-xs text-neutral-700 transition-colors select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:text-neutral-300"
-      >
-        <span class="iconify lucide--external-link" />
-        DID document
-      </a>
+      <ExternalLink href={didDocumentUrl()}>DID document</ExternalLink>
     </div>
   );
 };

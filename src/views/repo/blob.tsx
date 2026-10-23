@@ -40,7 +40,7 @@ export const BlobView = (props: { pds: string; repo: string }) => {
               <A
                 href={`/at://${props.repo}/blob/${cid}`}
                 state={{ from: `/at://${props.repo}#blobs`, label: "Back to blobs" }}
-                class="truncate rounded px-0.5 text-left text-blue-500 hover:bg-neutral-200 active:bg-neutral-300 dark:text-blue-400 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                class="w-fit max-w-full truncate rounded px-0.5 text-left text-blue-500 hover:bg-neutral-200 active:bg-neutral-300 dark:text-blue-400 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                 dir="rtl"
               >
                 {cid}
@@ -57,7 +57,7 @@ export const BlobView = (props: { pds: string; repo: string }) => {
       <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 pt-3 pb-6">
         <div class="flex min-w-50 items-center justify-around gap-3">
           <p>
-            {blobs()?.length} blob{(blobs()?.length ?? 0 > 1) ? "s" : ""}
+            {blobs()?.length} blob{blobs()?.length === 1 ? "" : "s"}
           </p>
           <Show when={cursor()}>
             <Button

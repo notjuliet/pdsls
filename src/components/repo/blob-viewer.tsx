@@ -14,6 +14,7 @@ import {
 
 import { formatFileSize } from "../../lib/format.js";
 import { Button } from "../ui/button.jsx";
+import { ExternalLink } from "../ui/external-link.jsx";
 import { Spinner } from "../ui/states.jsx";
 import { ZoomableImage } from "../ui/zoomable-image.jsx";
 
@@ -305,17 +306,7 @@ export const BlobViewer = (props: {
                   </Show>
 
                   <Show when={rawHref()}>
-                    {(href) => (
-                      <a
-                        href={href()}
-                        target="_blank"
-                        rel="noopener"
-                        class="dark:bg-dark-300 dark:hover:bg-dark-200 dark:active:bg-dark-100 flex w-fit items-center gap-1 rounded-md border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 text-xs text-neutral-700 transition-colors select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:text-neutral-300"
-                      >
-                        <span class="iconify lucide--external-link" />
-                        Open raw
-                      </a>
-                    )}
+                    {(href) => <ExternalLink href={href()}>Open raw</ExternalLink>}
                   </Show>
                 </>
               );

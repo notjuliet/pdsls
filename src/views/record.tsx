@@ -16,13 +16,7 @@ import {
   useRecordSchemaValidation,
 } from "../components/repo/record-page.jsx";
 import { ConfirmDialog } from "../components/ui/confirm-dialog.jsx";
-import {
-  ActionMenu,
-  CopyMenu,
-  DropdownMenu,
-  MenuProvider,
-  NavMenu,
-} from "../components/ui/dropdown.jsx";
+import { ActionMenu, CopyMenu, DropdownMenu, MenuProvider } from "../components/ui/dropdown.jsx";
 import { Favicon } from "../components/ui/favicon.jsx";
 import { IconButton } from "../components/ui/icon-button.jsx";
 import { addNotification } from "../components/ui/notification.jsx";
@@ -274,12 +268,6 @@ export const RecordView = () => {
                       label="Copy record"
                       icon="lucide--copy"
                     />
-                    <NavMenu
-                      href={`${repo.pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
-                      icon="lucide--external-link"
-                      label="Record on PDS"
-                      newTab
-                    />
                     <ActionMenu
                       label={hideMedia() ? "Show media" : "Hide media"}
                       icon={hideMedia() ? "lucide--eye" : "lucide--eye-off"}
@@ -329,6 +317,7 @@ export const RecordView = () => {
               <RecordInfo
                 uri={record()!.uri}
                 cid={record()?.cid}
+                rawHref={`${repo.pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
                 verification={{ valid: validRecord(), error: verifyError() }}
                 schema={schemaValidation}
                 value={record()!.value}

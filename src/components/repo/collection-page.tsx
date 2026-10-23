@@ -177,6 +177,7 @@ export const CollectionPage = (props: {
   });
 
   const visibleRecords = () => filteredRecords().slice(0, visibleCount());
+  const shownCount = () => (debouncedFilter() ? filteredRecords() : records()).length;
   const hasMore = () => visibleCount() < filteredRecords().length || (!!cursor() && !error());
 
   const loadMore = () => {
@@ -408,12 +409,7 @@ export const CollectionPage = (props: {
                 <span>/</span>
               </Show>
               <span>
-                {(debouncedFilter() ? filteredRecords().length : records().length).toLocaleString()}
-                {cursor() ? "+" : ""} record
-                {(debouncedFilter() ? filteredRecords().length : records().length) === 1 &&
-                !cursor()
-                  ? ""
-                  : "s"}
+                {shownCount().toLocaleString()} record{shownCount() === 1 ? "" : "s"}
               </span>
             </div>
 

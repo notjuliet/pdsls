@@ -7,6 +7,7 @@ import {
 } from "../../lib/record-validation.js";
 import { Button } from "../ui/button.jsx";
 import { CopyableInfoField } from "../ui/copyable-info-field.jsx";
+import { ExternalLink } from "../ui/external-link.jsx";
 import { Tabs } from "../ui/tabs.jsx";
 
 export type RecordTab = "record" | "schema" | "backlinks" | "info";
@@ -133,6 +134,8 @@ const CheckRow = (props: {
 export const RecordInfo = (props: {
   uri: string;
   cid?: string;
+  /** Where the raw record can be fetched, e.g. its getRecord URL on the PDS. */
+  rawHref?: string;
   /** Omitted when the source offers no way to verify the record. */
   verification?: { valid: boolean | undefined; error: string };
   schema: RecordSchemaValidationState;
@@ -169,5 +172,8 @@ export const RecordInfo = (props: {
         </Button>
       </Show>
     </CheckRow>
+    <Show when={props.rawHref}>
+      {(href) => <ExternalLink href={href()}>Open on PDS</ExternalLink>}
+    </Show>
   </>
 );
