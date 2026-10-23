@@ -94,7 +94,7 @@ export const Home = () => {
           About AT Protocol
         </a>
 
-        <div class="mt-6 w-full max-w-lg text-left">
+        <div class="mt-6 w-full text-left">
           <div class="rounded-lg border border-neutral-200 p-2 sm:p-3 dark:border-neutral-700">
             <h2 class="px-2 py-1 text-sm font-medium sm:text-base">Browse</h2>
             <div class="mt-1 grid grid-cols-1 gap-x-3 sm:grid-cols-2">
