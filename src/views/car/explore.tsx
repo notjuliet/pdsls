@@ -548,12 +548,6 @@ const RepoSubview = (props: { archive: Archive }) => {
 
   return (
     <div class="flex flex-col gap-3 pb-22">
-      <div class="text-sm text-neutral-600 dark:text-neutral-400">
-        {props.archive.entries.length} collection{props.archive.entries.length !== 1 ? "s" : ""}
-        <span class="text-neutral-400 dark:text-neutral-600"> · </span>
-        {totalRecords()} record{totalRecords() !== 1 ? "s" : ""}
-      </div>
-
       <CollectionList
         collections={props.archive.entries.map((entry) => ({
           nsid: entry.name,
@@ -574,6 +568,10 @@ const RepoSubview = (props: { archive: Archive }) => {
         onFilter={setFilter}
         collapse={collapse}
         nsids={props.archive.entries.map((entry) => entry.name)}
+        summary={{
+          detail: `${props.archive.entries.length} collection${props.archive.entries.length === 1 ? "" : "s"}`,
+          main: `${totalRecords().toLocaleString()} record${totalRecords() === 1 ? "" : "s"}`,
+        }}
       />
     </div>
   );
