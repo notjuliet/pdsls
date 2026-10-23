@@ -9,8 +9,8 @@ const repositoryExamples = [
   },
   {
     type: "Record",
-    value: "at://futur.blue/app.bsky.actor.profile/self",
-    href: "/at://did:plc:uu5axsmbm2or2dngy4gwchec/app.bsky.actor.profile/self",
+    value: "at://mary.my.id/app.bsky.actor.profile/self",
+    href: "/at://did:plc:ia76kvnndjutgedggx2ibrem/app.bsky.actor.profile/self",
   },
   {
     type: "PDS",
@@ -19,8 +19,8 @@ const repositoryExamples = [
   },
   {
     type: "Lexicon",
-    value: "site.standard.document",
-    href: "/at://did:plc:re3ebnp5v7ffagz6rb6xfei4/com.atproto.lexicon.schema/site.standard.document#schema",
+    value: "place.stream.chat.message",
+    href: "/at://did:web:stream.place/com.atproto.lexicon.schema/place.stream.chat.message#schema",
   },
   {
     type: "Labels",
@@ -29,8 +29,8 @@ const repositoryExamples = [
   },
   {
     type: "Backlinks",
-    value: "mary.my.id",
-    href: "/at://did:plc:ia76kvnndjutgedggx2ibrem#backlinks",
+    value: "microcosm.blue",
+    href: "/at://did:plc:lulmyldiq4sb2ikags5sfb25#backlinks",
   },
 ];
 
