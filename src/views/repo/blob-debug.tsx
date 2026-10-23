@@ -1,6 +1,6 @@
 import { useLocation, useParams } from "@solidjs/router";
 
-import { BlobViewer } from "../../components/blob-viewer.jsx";
+import { BlobViewer } from "../../components/repo/blob-viewer.jsx";
 import { useRepo } from "../../lib/repo-context.jsx";
 
 export const BlobDebugView = () => {

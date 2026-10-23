@@ -1,12 +1,11 @@
 import { type RouteSectionProps, useLocation, useParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, Show } from "solid-js";
 
-import { Button } from "../../components/button.jsx";
-import { CollectionList } from "../../components/collection-list.jsx";
-import { NestedLayout } from "../../components/nested-layout.jsx";
-import { Spinner } from "../../components/spinner.jsx";
-import { EmptyState, ErrorNotice, LoadingState } from "../../components/states.jsx";
-import { Tabs } from "../../components/tabs.jsx";
+import { CollectionList } from "../../components/repo/collection-list.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { NestedLayout } from "../../components/ui/nested-layout.jsx";
+import { Spinner, EmptyState, ErrorNotice, LoadingState } from "../../components/ui/states.jsx";
+import { Tabs } from "../../components/ui/tabs.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { listSpaceRecords, type SpaceRecord } from "../../lib/spaces.js";
 import { SpaceBlobList } from "./blobs.jsx";

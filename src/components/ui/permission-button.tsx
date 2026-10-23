@@ -1,6 +1,6 @@
 import { JSX } from "solid-js";
 
-import { hasUserScope, type ScopeId } from "../auth/scope-utils";
+import { hasUserScope, type ScopeId } from "../../auth/scope-utils";
 import { showPermissionPrompt } from "./permission-prompt";
 import Tooltip from "./tooltip";
 

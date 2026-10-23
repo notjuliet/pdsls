@@ -1,7 +1,7 @@
 import { For, Show } from "solid-js";
 
 import { hasUserScope } from "../../auth/scope-utils";
-import { Button } from "../button.jsx";
+import { Button } from "../ui/button.jsx";
 
 const VALIDATE_OPTIONS: { label: string; value: boolean | undefined }[] = [
   { label: "Unset", value: undefined },

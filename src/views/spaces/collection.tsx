@@ -2,8 +2,8 @@ import { type RouteSectionProps, useParams } from "@solidjs/router";
 import { Show } from "solid-js";
 
 import { SPACE_MANAGE_RECORDS_SCOPE_ID } from "../../auth/scope-utils";
-import { CollectionPage, type CollectionSource } from "../../components/collection-page.jsx";
-import { NestedLayout } from "../../components/nested-layout.jsx";
+import { CollectionPage, type CollectionSource } from "../../components/repo/collection-page.jsx";
+import { NestedLayout } from "../../components/ui/nested-layout.jsx";
 import { deleteSpaceRecords, listSpaceRecords } from "../../lib/spaces.js";
 import {
   makeSpaceCollectionPath,

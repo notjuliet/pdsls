@@ -17,19 +17,19 @@ import {
 
 import { hasAccountScope, hasUserScope } from "../../auth/scope-utils";
 import { agent, sessions } from "../../auth/state";
-import { Button } from "../button.jsx";
-import { IconButton } from "../icon-button.jsx";
-import { Modal } from "../modal.jsx";
-import { addNotification } from "../notification.jsx";
-import { iconButtonClass } from "../permission-button.jsx";
-import { showPermissionPrompt } from "../permission-prompt";
-import { Spinner } from "../spinner.jsx";
-import { TextInput } from "../text-input.jsx";
-import Tooltip from "../tooltip.jsx";
+import { Button } from "../ui/button.jsx";
+import { IconButton } from "../ui/icon-button.jsx";
+import { Modal } from "../ui/modal.jsx";
+import { addNotification } from "../ui/notification.jsx";
+import { iconButtonClass } from "../ui/permission-button.jsx";
+import { showPermissionPrompt } from "../ui/permission-prompt";
+import { Spinner } from "../ui/states.jsx";
+import { TextInput } from "../ui/text-input.jsx";
+import Tooltip from "../ui/tooltip.jsx";
 import { ConfirmSubmit } from "./confirm-submit";
 import { InsertMenu } from "./insert-menu.jsx";
 
-const Editor = lazy(() => import("../editor.jsx").then((m) => ({ default: m.Editor })));
+const Editor = lazy(() => import("../ui/editor.jsx").then((m) => ({ default: m.Editor })));
 
 const [placeholder, setPlaceholder] = createSignal<any>();
 export { setPlaceholder };

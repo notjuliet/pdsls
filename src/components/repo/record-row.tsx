@@ -2,9 +2,9 @@ import * as TID from "@atcute/tid";
 import { A } from "@solidjs/router";
 import { type JSX, Show } from "solid-js";
 
-import { localDateFromTimestamp } from "../utils/format.js";
-import HoverCard from "./hover-card/base.jsx";
-import { JSONValue, type JSONType } from "./json.jsx";
+import { localDateFromTimestamp } from "../../lib/format.js";
+import HoverCard from "../hover-card/base.jsx";
+import { JSONValue, type JSONType } from "../json.jsx";
 
 interface RecordRowProps {
   rkey: string;

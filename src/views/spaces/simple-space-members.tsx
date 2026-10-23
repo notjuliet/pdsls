@@ -4,15 +4,14 @@ import { A } from "@solidjs/router";
 import { createEffect, createSignal, For, Show } from "solid-js";
 
 import { SPACE_MANAGE_SPACES_SCOPE_ID } from "../../auth/scope-utils.js";
-import { Button } from "../../components/button.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
-import { IconButton } from "../../components/icon-button.jsx";
-import { Modal } from "../../components/modal.jsx";
-import { addNotification } from "../../components/notification.jsx";
-import { PermissionButton } from "../../components/permission-button.jsx";
-import { Spinner } from "../../components/spinner.jsx";
-import { ErrorNotice, LoadingState } from "../../components/states.jsx";
-import { TextInput } from "../../components/text-input.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { IconButton } from "../../components/ui/icon-button.jsx";
+import { Modal } from "../../components/ui/modal.jsx";
+import { addNotification } from "../../components/ui/notification.jsx";
+import { PermissionButton } from "../../components/ui/permission-button.jsx";
+import { Spinner, ErrorNotice, LoadingState } from "../../components/ui/states.jsx";
+import { TextInput } from "../../components/ui/text-input.jsx";
 import { resolveHandle } from "../../lib/api.js";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import {

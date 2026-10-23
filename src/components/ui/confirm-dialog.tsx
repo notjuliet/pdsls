@@ -2,7 +2,7 @@ import { Show } from "solid-js";
 
 import { Button } from "./button.jsx";
 import { Modal } from "./modal.jsx";
-import { Spinner } from "./spinner.jsx";
+import { Spinner } from "./states.jsx";
 
 interface ConfirmDialogProps {
   open: boolean;

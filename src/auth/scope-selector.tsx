@@ -1,7 +1,7 @@
 import { createSignal, Show } from "solid-js";
 
-import { AlphaBadge } from "../components/alpha-badge.jsx";
-import { Spinner } from "../components/spinner.jsx";
+import { AlphaBadge } from "../components/ui/alpha-badge.jsx";
+import { Spinner } from "../components/ui/states.jsx";
 import {
   buildScopeString,
   SPACE_MANAGE_RECORDS_SCOPE_ID,

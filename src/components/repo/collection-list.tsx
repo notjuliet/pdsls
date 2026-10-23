@@ -1,7 +1,7 @@
 import { A } from "@solidjs/router";
 import { createMemo, createSignal, For, type JSX, Show } from "solid-js";
 
-import { DomainGroup, DomainGroupRows, domainGroupRowClasses } from "./domain-group.jsx";
+import { DomainGroup, DomainGroupRows, domainGroupRowClasses } from "../ui/domain-group.jsx";
 
 export interface CollectionItem {
   nsid: string;

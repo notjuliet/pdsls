@@ -6,27 +6,27 @@ import { useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from "solid-js";
 
 import { agent } from "../auth/state";
-import { Backlinks } from "../components/backlinks.jsx";
-import { ConfirmDialog } from "../components/confirm-dialog.jsx";
 import { RecordEditor, setPlaceholder } from "../components/create";
+import { JSONValue } from "../components/json.jsx";
+import { Backlinks } from "../components/repo/backlinks.jsx";
+import {
+  RecordInfo,
+  RecordPage,
+  recordTabFromHash,
+  useRecordSchemaValidation,
+} from "../components/repo/record-page.jsx";
+import { ConfirmDialog } from "../components/ui/confirm-dialog.jsx";
 import {
   ActionMenu,
   CopyMenu,
   DropdownMenu,
   MenuProvider,
   NavMenu,
-} from "../components/dropdown.jsx";
-import { Favicon } from "../components/favicon.jsx";
-import { IconButton } from "../components/icon-button.jsx";
-import { JSONValue } from "../components/json.jsx";
-import { addNotification } from "../components/notification.jsx";
-import {
-  RecordInfo,
-  RecordPage,
-  recordTabFromHash,
-  useRecordSchemaValidation,
-} from "../components/record-page.jsx";
-import { Spinner } from "../components/spinner.jsx";
+} from "../components/ui/dropdown.jsx";
+import { Favicon } from "../components/ui/favicon.jsx";
+import { IconButton } from "../components/ui/icon-button.jsx";
+import { addNotification } from "../components/ui/notification.jsx";
+import { Spinner } from "../components/ui/states.jsx";
 import { useRepo } from "../lib/repo-context.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
 import { AtUri, uriTemplates } from "../lib/templates.js";

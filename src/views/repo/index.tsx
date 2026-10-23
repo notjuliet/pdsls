@@ -20,19 +20,19 @@ import {
   Suspense,
 } from "solid-js";
 
-import { Backlinks } from "../../components/backlinks.jsx";
-import { CollectionList } from "../../components/collection-list.jsx";
-import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../../components/dropdown.jsx";
-import { FilterInput } from "../../components/filter-input.jsx";
-import { setPDS } from "../../components/navbar.jsx";
-import { NestedLayout } from "../../components/nested-layout.jsx";
+import { Backlinks } from "../../components/repo/backlinks.jsx";
+import { CollectionList } from "../../components/repo/collection-list.jsx";
+import { setPDS } from "../../components/repo/navbar.jsx";
+import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../../components/ui/dropdown.jsx";
+import { FilterInput } from "../../components/ui/filter-input.jsx";
+import { NestedLayout } from "../../components/ui/nested-layout.jsx";
 import {
   addNotification,
   removeNotification,
   updateNotification,
-} from "../../components/notification.jsx";
-import { Spinner } from "../../components/spinner.jsx";
-import { Tabs } from "../../components/tabs.jsx";
+} from "../../components/ui/notification.jsx";
+import { Spinner } from "../../components/ui/states.jsx";
+import { Tabs } from "../../components/ui/tabs.jsx";
 import {
   didDocCache,
   getPDS,

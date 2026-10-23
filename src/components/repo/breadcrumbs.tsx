@@ -1,9 +1,9 @@
 import { A } from "@solidjs/router";
 import { createEffect, createSignal, type JSX, Match, Show, Switch } from "solid-js";
 
-import { canHover } from "../layout";
-import { addToClipboard } from "../utils/copy";
-import Tooltip from "./tooltip";
+import { canHover } from "../../layout";
+import { addToClipboard } from "../../lib/copy";
+import Tooltip from "../ui/tooltip";
 
 /** The stacked hierarchy (PDS → repo → collection → record) at the top of a page. */
 export const Breadcrumbs = (props: { children: JSX.Element }) => (

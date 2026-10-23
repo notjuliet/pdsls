@@ -1,8 +1,8 @@
 import { useNavigate } from "@solidjs/router";
 import { createEffect, createSignal } from "solid-js";
 
-import { GRANULAR_SCOPES, type ScopeId } from "../auth/scope-utils";
-import { agent } from "../auth/state";
+import { GRANULAR_SCOPES, type ScopeId } from "../../auth/scope-utils";
+import { agent } from "../../auth/state";
 import { Button } from "./button";
 import { Modal } from "./modal";
 

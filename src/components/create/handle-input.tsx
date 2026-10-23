@@ -2,9 +2,9 @@ import { Handle } from "@atcute/lexicons";
 import { createSignal, Show } from "solid-js";
 
 import { resolveHandle } from "../../lib/api";
-import { Button } from "../button.jsx";
-import { Spinner } from "../spinner.jsx";
-import { TextInput } from "../text-input.jsx";
+import { Button } from "../ui/button.jsx";
+import { Spinner } from "../ui/states.jsx";
+import { TextInput } from "../ui/text-input.jsx";
 
 export const HandleInput = (props: { onInsert: (text: string) => void; onClose: () => void }) => {
   const [resolving, setResolving] = createSignal(false);

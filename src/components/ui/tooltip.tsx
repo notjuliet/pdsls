@@ -1,6 +1,6 @@
 import { JSX, Show } from "solid-js";
 
-import { canHover } from "../layout";
+import { canHover } from "../../layout";
 
 const Tooltip = (props: { text: string; shortcut?: string; children: JSX.Element }) => (
   <span class="group/tooltip relative inline-flex items-center">

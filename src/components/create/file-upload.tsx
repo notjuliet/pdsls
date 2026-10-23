@@ -4,10 +4,10 @@ import { getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { remove } from "@mary/exif-rm";
 import { createSignal, onCleanup, Show } from "solid-js";
 
-import { formatFileSize } from "../../utils/format";
-import { Button } from "../button.jsx";
-import { Spinner } from "../spinner.jsx";
-import { TextInput } from "../text-input.jsx";
+import { formatFileSize } from "../../lib/format";
+import { Button } from "../ui/button.jsx";
+import { Spinner } from "../ui/states.jsx";
+import { TextInput } from "../ui/text-input.jsx";
 
 export const FileUpload = (props: {
   file: File;

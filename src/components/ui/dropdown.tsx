@@ -12,7 +12,7 @@ import {
 } from "solid-js";
 import { Portal } from "solid-js/web";
 
-import { addToClipboard } from "../utils/copy";
+import { addToClipboard } from "../../lib/copy";
 
 const MenuContext = createContext<{
   showMenu: Accessor<boolean>;

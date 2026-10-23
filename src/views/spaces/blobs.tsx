@@ -3,9 +3,8 @@ import { A } from "@solidjs/router";
 import type { Accessor } from "solid-js";
 import { createEffect, createSignal, For, Show } from "solid-js";
 
-import { Button } from "../../components/button.jsx";
-import { Spinner } from "../../components/spinner.jsx";
-import { ErrorNotice, LoadingState } from "../../components/states.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { Spinner, ErrorNotice, LoadingState } from "../../components/ui/states.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { listSpaceBlobs } from "../../lib/spaces.js";
 

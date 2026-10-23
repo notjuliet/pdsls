@@ -10,8 +10,8 @@ import {
   MenuProvider,
   MenuSeparator,
   NavMenu,
-} from "../components/dropdown.jsx";
-import { Spinner } from "../components/spinner.jsx";
+} from "../components/ui/dropdown.jsx";
+import { Spinner } from "../components/ui/states.jsx";
 import { clearSpaceCredentials } from "../lib/spaces.js";
 import {
   getAvatar,

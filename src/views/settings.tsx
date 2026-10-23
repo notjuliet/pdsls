@@ -1,7 +1,7 @@
 import { createSignal } from "solid-js";
 
-import { TextInput } from "../components/text-input.jsx";
-import { ThemeSelection } from "../components/theme.jsx";
+import { TextInput } from "../components/ui/text-input.jsx";
+import { ThemeSelection } from "../components/ui/theme.jsx";
 
 export const [hideMedia, setHideMedia] = createSignal(localStorage.hideMedia === "true");
 const [plcDirectory, setPlcDirectory] = createSignal(

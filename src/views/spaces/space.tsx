@@ -2,12 +2,11 @@ import type { Nsid } from "@atcute/lexicons";
 import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, For, type JSX, Show } from "solid-js";
 
-import { Button } from "../../components/button.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
-import { NestedLayout } from "../../components/nested-layout.jsx";
-import { Spinner } from "../../components/spinner.jsx";
-import { EmptyState, ErrorNotice, LoadingState } from "../../components/states.jsx";
-import { Tabs } from "../../components/tabs.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { NestedLayout } from "../../components/ui/nested-layout.jsx";
+import { Spinner, EmptyState, ErrorNotice, LoadingState } from "../../components/ui/states.jsx";
+import { Tabs } from "../../components/ui/tabs.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { resolveRawLexicon } from "../../lib/lexicon.js";
 import {

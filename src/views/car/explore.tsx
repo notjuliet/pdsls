@@ -8,25 +8,24 @@ import { zip, type ZipEntry } from "@mary/zip";
 import { useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, Match, Show, Switch } from "solid-js";
 
-import { BreadcrumbRow, Breadcrumbs } from "../../components/breadcrumbs.jsx";
-import { CollectionList } from "../../components/collection-list.jsx";
-import { CollectionPage, type CollectionSource } from "../../components/collection-page.jsx";
-import { CopyMenu, DropdownMenu, MenuProvider } from "../../components/dropdown.jsx";
-import { IconButton } from "../../components/icon-button.jsx";
 import { JSONValue, type JSONType } from "../../components/json.jsx";
+import { BreadcrumbRow, Breadcrumbs } from "../../components/repo/breadcrumbs.jsx";
+import { CollectionList } from "../../components/repo/collection-list.jsx";
+import { CollectionPage, type CollectionSource } from "../../components/repo/collection-page.jsx";
 import {
   RecordInfo,
   RecordPage,
   recordTabFromHash,
   useRecordSchemaValidation,
-} from "../../components/record-page.jsx";
-import { timestampFromRkey } from "../../components/record-row.jsx";
-import { Spinner } from "../../components/spinner.jsx";
-import { EmptyState, ErrorNotice } from "../../components/states.jsx";
-import { TextInput } from "../../components/text-input.jsx";
+} from "../../components/repo/record-page.jsx";
+import { timestampFromRkey } from "../../components/repo/record-row.jsx";
+import { CopyMenu, DropdownMenu, MenuProvider } from "../../components/ui/dropdown.jsx";
+import { IconButton } from "../../components/ui/icon-button.jsx";
+import { Spinner, EmptyState, ErrorNotice } from "../../components/ui/states.jsx";
+import { TextInput } from "../../components/ui/text-input.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
+import { localDateFromTimestamp } from "../../lib/format.js";
 import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
-import { localDateFromTimestamp } from "../../utils/format.js";
 import { carFileAccept, createFileChangeHandler, isIOS } from "./file-handlers.js";
 import { clearQueuedCarFile, queuedCarFile } from "./state.js";
 

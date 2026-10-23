@@ -12,14 +12,14 @@ import {
   useContext,
 } from "solid-js";
 
-import { formatFileSize } from "../utils/format";
+import { formatFileSize } from "../lib/format";
 import { hideMedia } from "../views/settings";
 import DidHoverCard from "./hover-card/did";
 import LexiconHoverCard from "./hover-card/lexicon";
 import RecordHoverCard from "./hover-card/record";
-import { Spinner } from "./spinner.jsx";
-import VideoPlayer from "./video-player";
-import { ZoomableImage } from "./zoomable-image";
+import { Spinner } from "./ui/states.jsx";
+import VideoPlayer from "./ui/video-player";
+import { ZoomableImage } from "./ui/zoomable-image";
 
 interface JSONContext {
   repo: string;

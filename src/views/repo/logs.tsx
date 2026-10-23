@@ -8,8 +8,8 @@ import { useLocation } from "@solidjs/router";
 import { createEffect, createResource, createSignal, For, onCleanup, Show } from "solid-js";
 import * as v from "valibot";
 
+import { localDateFromTimestamp } from "../../lib/format.js";
 import { createOperationHistory, DiffEntry, groupBy } from "../../lib/plc-logs.js";
-import { localDateFromTimestamp } from "../../utils/format.js";
 import PlcValidateWorker from "../../workers/plc-validate.ts?worker";
 import { plcDirectory } from "../settings.jsx";
 

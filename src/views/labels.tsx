@@ -3,15 +3,15 @@ import { Client, simpleFetchHandler } from "@atcute/client";
 import { useLocation, useNavigate, useSearchParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 
-import { Button } from "../components/button.jsx";
-import { FilterInput } from "../components/filter-input.jsx";
 import DidHoverCard from "../components/hover-card/did.jsx";
 import RecordHoverCard from "../components/hover-card/record.jsx";
-import { Spinner } from "../components/spinner.jsx";
-import { TagInput } from "../components/tag-input.jsx";
+import { Button } from "../components/ui/button.jsx";
+import { FilterInput } from "../components/ui/filter-input.jsx";
+import { Spinner } from "../components/ui/states.jsx";
+import { TagInput } from "../components/ui/tag-input.jsx";
+import { localDateFromTimestamp } from "../lib/format.js";
 import { LoadMoreSentinel } from "../lib/infinite-scroll.jsx";
 import { useFilterShortcut } from "../lib/keyboard.js";
-import { localDateFromTimestamp } from "../utils/format.js";
 
 const LABELS_PER_PAGE = 50;
 

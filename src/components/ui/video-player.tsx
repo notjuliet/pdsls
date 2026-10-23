@@ -1,6 +1,6 @@
 import { onCleanup, onMount } from "solid-js";
 
-import { useRepo } from "../lib/repo-context.jsx";
+import { useRepo } from "../../lib/repo-context.jsx";
 
 interface VideoPlayerProps {
   did: string;

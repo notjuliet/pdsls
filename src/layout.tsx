@@ -5,12 +5,12 @@ import { AccountManager } from "./auth/account.jsx";
 import { agent } from "./auth/state.js";
 import { CarDropOverlay } from "./components/car-drop-overlay.jsx";
 import { RecordEditor } from "./components/create";
-import { NavBar } from "./components/navbar.jsx";
-import { NotificationContainer } from "./components/notification.jsx";
-import { PermissionPromptContainer } from "./components/permission-prompt.jsx";
+import { NavBar } from "./components/repo/navbar.jsx";
 import { Search } from "./components/search.jsx";
-import { Spinner } from "./components/spinner.jsx";
-import { themeEvent } from "./components/theme.jsx";
+import { NotificationContainer } from "./components/ui/notification.jsx";
+import { PermissionPromptContainer } from "./components/ui/permission-prompt.jsx";
+import { Spinner } from "./components/ui/states.jsx";
+import { themeEvent } from "./components/ui/theme.jsx";
 import { plcDirectory } from "./views/settings.jsx";
 
 export const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;

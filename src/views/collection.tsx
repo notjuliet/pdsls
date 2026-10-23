@@ -4,9 +4,9 @@ import { $type, ActorIdentifier } from "@atcute/lexicons";
 import { type RouteSectionProps, useParams } from "@solidjs/router";
 
 import { agent } from "../auth/state";
-import { CollectionPage, type CollectionSource } from "../components/collection-page.jsx";
 import type { JSONType } from "../components/json.jsx";
-import { NestedLayout } from "../components/nested-layout.jsx";
+import { CollectionPage, type CollectionSource } from "../components/repo/collection-page.jsx";
+import { NestedLayout } from "../components/ui/nested-layout.jsx";
 import { useRepo } from "../lib/repo-context.jsx";
 
 const APPLY_WRITES_BATCH_SIZE = 200;

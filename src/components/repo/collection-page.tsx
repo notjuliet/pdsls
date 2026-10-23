@@ -1,18 +1,20 @@
 import { useSearchParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, For, type JSX, onMount, Show } from "solid-js";
 
-import type { ScopeId } from "../auth/scope-utils";
-import { createDebouncedValue } from "../lib/debounced.js";
-import { LoadMoreSentinel } from "../lib/infinite-scroll.jsx";
-import { useFilterShortcut } from "../lib/keyboard.js";
-import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
-import { Button } from "./button.jsx";
-import { ConfirmDialog } from "./confirm-dialog.jsx";
-import { FilterInput } from "./filter-input.jsx";
-import { IconButton } from "./icon-button.jsx";
-import type { JSONType } from "./json.jsx";
-import { addNotification } from "./notification.jsx";
-import { PermissionButton } from "./permission-button.jsx";
+import type { ScopeId } from "../../auth/scope-utils";
+import { createDebouncedValue } from "../../lib/debounced.js";
+import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
+import { useFilterShortcut } from "../../lib/keyboard.js";
+import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
+import type { JSONType } from "../json.jsx";
+import { Button } from "../ui/button.jsx";
+import { ConfirmDialog } from "../ui/confirm-dialog.jsx";
+import { FilterInput } from "../ui/filter-input.jsx";
+import { IconButton } from "../ui/icon-button.jsx";
+import { addNotification } from "../ui/notification.jsx";
+import { PermissionButton } from "../ui/permission-button.jsx";
+import { Spinner, EmptyState, ErrorNotice, LoadingState } from "../ui/states.jsx";
+import { type TabItem, Tabs } from "../ui/tabs.jsx";
 import {
   addPreviewFieldOptions,
   formatPreviewValue,
@@ -20,9 +22,6 @@ import {
   PreviewFieldMenu,
 } from "./preview-field.jsx";
 import { RecordRow } from "./record-row.jsx";
-import { Spinner } from "./spinner.jsx";
-import { EmptyState, ErrorNotice, LoadingState } from "./states.jsx";
-import { type TabItem, Tabs } from "./tabs.jsx";
 
 export interface CollectionRecord {
   rkey: string;

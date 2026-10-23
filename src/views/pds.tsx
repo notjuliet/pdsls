@@ -6,17 +6,16 @@ import { A, type RouteSectionProps, useLocation, useParams } from "@solidjs/rout
 import { createWindowVirtualizer } from "@tanstack/solid-virtual";
 import { createEffect, createResource, createSignal, For, on, onCleanup, Show } from "solid-js";
 
-import { Button } from "../components/button";
-import { setPDS } from "../components/navbar";
-import { NestedLayout } from "../components/nested-layout.jsx";
-import { Spinner } from "../components/spinner.jsx";
-import { Tabs } from "../components/tabs.jsx";
+import { setPDS } from "../components/repo/navbar";
+import { Button } from "../components/ui/button";
+import { NestedLayout } from "../components/ui/nested-layout.jsx";
+import { Spinner } from "../components/ui/states.jsx";
+import { Tabs } from "../components/ui/tabs.jsx";
 import { canHover } from "../layout";
 import { didDocCache, resolveDidDoc } from "../lib/api";
 import { createLatch } from "../lib/create-latch.js";
+import { localDateFromTimestamp, formatFileSize } from "../lib/format";
 import { LoadMoreSentinel } from "../lib/infinite-scroll";
-import { localDateFromTimestamp } from "../utils/format";
-import { formatFileSize } from "../utils/format";
 
 const LIMIT = 1000;
 

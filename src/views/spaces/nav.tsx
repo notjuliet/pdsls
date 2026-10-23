@@ -1,9 +1,10 @@
 import { useParams } from "@solidjs/router";
 import { createResource, type JSX, Show } from "solid-js";
 
-import { BreadcrumbRow, Breadcrumbs } from "../../components/breadcrumbs.jsx";
-import { Favicon } from "../../components/favicon.jsx";
 import { resolveDidInfo } from "../../components/hover-card/did.jsx";
+import { BreadcrumbRow, Breadcrumbs } from "../../components/repo/breadcrumbs.jsx";
+import { AlphaBadge } from "../../components/ui/alpha-badge.jsx";
+import { Favicon } from "../../components/ui/favicon.jsx";
 import { makeSpaceCollectionPath, makeSpacePath, makeSpaceRepoPath } from "./context.jsx";
 
 const resolveDidHandle = async (did: string) => {
@@ -44,11 +45,7 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
             icon="lucide--lock-keyhole"
             label="Spaces"
             href={hasSpace() ? "/spaces" : undefined}
-            trailing={
-              <span class="ml-auto shrink-0 rounded-md border border-yellow-600 px-1.5 py-0.5 text-[8px] font-medium tracking-wide text-yellow-600 uppercase sm:text-[9px] dark:border-amber-400 dark:text-amber-400">
-                Alpha
-              </span>
-            }
+            trailing={<AlphaBadge />}
           />
         </div>
         <Show when={props.action}>

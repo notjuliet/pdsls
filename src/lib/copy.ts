@@ -1,4 +1,4 @@
-import { addNotification } from "../components/notification";
+import { addNotification } from "../components/ui/notification";
 
 export const addToClipboard = (text: string) => {
   navigator.clipboard.writeText(text);

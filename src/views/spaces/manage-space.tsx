@@ -2,12 +2,12 @@ import { createMemo, createSignal, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { SPACE_MANAGE_SPACES_SCOPE_ID } from "../../auth/scope-utils.js";
-import { Button } from "../../components/button.jsx";
-import { IconButton } from "../../components/icon-button.jsx";
-import { Modal } from "../../components/modal.jsx";
-import { addNotification } from "../../components/notification.jsx";
-import { PermissionButton } from "../../components/permission-button.jsx";
-import { Spinner } from "../../components/spinner.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { IconButton } from "../../components/ui/icon-button.jsx";
+import { Modal } from "../../components/ui/modal.jsx";
+import { addNotification } from "../../components/ui/notification.jsx";
+import { PermissionButton } from "../../components/ui/permission-button.jsx";
+import { Spinner } from "../../components/ui/states.jsx";
 import { deleteSimpleSpace, type SimpleSpaceInfo, updateSimpleSpace } from "../../lib/spaces.js";
 import { useSpacesAuth } from "./context.jsx";
 import {

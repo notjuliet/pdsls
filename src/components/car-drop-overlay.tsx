@@ -4,7 +4,7 @@ import { Portal } from "solid-js/web";
 
 import { isCarFile } from "../views/car/file-handlers.js";
 import { queueCarFile } from "../views/car/state.js";
-import { addNotification } from "./notification.jsx";
+import { addNotification } from "./ui/notification.jsx";
 
 const hasFiles = (event: DragEvent) => event.dataTransfer?.types.includes("Files") ?? false;
 

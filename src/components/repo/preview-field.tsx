@@ -1,7 +1,7 @@
 import { createSignal, For, type JSX, onCleanup, onMount, Show } from "solid-js";
 import { Portal } from "solid-js/web";
 
-import type { JSONType } from "./json.jsx";
+import type { JSONType } from "../json.jsx";
 
 const PREVIEW_VALUE_MAX_LENGTH = 200;
 const PREVIEW_FIELD_OPTION_MAX_DEPTH = 2;

@@ -3,12 +3,11 @@ import { createEffect, createMemo, createSignal, For, type JSX, Show } from "sol
 
 import { hasUserScope, SPACE_READ_SCOPE_ID } from "../../auth/scope-utils";
 import { agent } from "../../auth/state";
-import { Button } from "../../components/button.jsx";
-import { DomainGroup, domainGroupRowClasses } from "../../components/domain-group.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
-import { NestedLayout } from "../../components/nested-layout.jsx";
-import { Spinner } from "../../components/spinner.jsx";
-import { EmptyState, ErrorNotice, LoadingState } from "../../components/states.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { DomainGroup, domainGroupRowClasses } from "../../components/ui/domain-group.jsx";
+import { NestedLayout } from "../../components/ui/nested-layout.jsx";
+import { Spinner, EmptyState, ErrorNotice, LoadingState } from "../../components/ui/states.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { listSpaces, parseSpaceUri, type SpaceView } from "../../lib/spaces.js";
 import {

@@ -1,8 +1,8 @@
 import { useParams } from "@solidjs/router";
 import { createEffect, createSignal, Show } from "solid-js";
 
-import { didDocCache } from "../lib/api";
-import { localDateFromTimestamp } from "../utils/format";
+import { didDocCache } from "../../lib/api";
+import { localDateFromTimestamp } from "../../lib/format";
 import { BreadcrumbRow, Breadcrumbs } from "./breadcrumbs";
 import { timestampFromRkey } from "./record-row";
 

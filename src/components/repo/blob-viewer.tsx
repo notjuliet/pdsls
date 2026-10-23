@@ -12,10 +12,10 @@ import {
   Switch,
 } from "solid-js";
 
-import { formatFileSize } from "../utils/format.js";
-import { Button } from "./button.jsx";
-import { Spinner } from "./spinner.jsx";
-import { ZoomableImage } from "./zoomable-image.jsx";
+import { formatFileSize } from "../../lib/format.js";
+import { Button } from "../ui/button.jsx";
+import { Spinner } from "../ui/states.jsx";
+import { ZoomableImage } from "../ui/zoomable-image.jsx";
 
 const SIZE_CAP = 50 * 1024 * 1024; // 50 MiB
 

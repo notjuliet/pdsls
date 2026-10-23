@@ -4,16 +4,16 @@ import type { EditorView } from "codemirror";
 import { createSignal, lazy, Show, Suspense } from "solid-js";
 
 import { hasUserScope, SPACE_MANAGE_RECORDS_SCOPE_ID } from "../../auth/scope-utils.js";
-import { Button } from "../../components/button.jsx";
 import { ConfirmSubmit } from "../../components/create/confirm-submit.jsx";
 import { InsertMenu } from "../../components/create/insert-menu.jsx";
-import { IconButton } from "../../components/icon-button.jsx";
 import type { JSONType } from "../../components/json.jsx";
-import { Modal } from "../../components/modal.jsx";
-import { addNotification } from "../../components/notification.jsx";
-import { PermissionButton } from "../../components/permission-button.jsx";
-import { Spinner } from "../../components/spinner.jsx";
-import { TextInput } from "../../components/text-input.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { IconButton } from "../../components/ui/icon-button.jsx";
+import { Modal } from "../../components/ui/modal.jsx";
+import { addNotification } from "../../components/ui/notification.jsx";
+import { PermissionButton } from "../../components/ui/permission-button.jsx";
+import { Spinner } from "../../components/ui/states.jsx";
+import { TextInput } from "../../components/ui/text-input.jsx";
 import {
   createSpaceRecord,
   putSpaceRecord,
@@ -22,7 +22,7 @@ import {
 import { makeSpaceRecordPath, useSpaceRecords, useSpacesAuth } from "./context.jsx";
 
 const Editor = lazy(() =>
-  import("../../components/editor.jsx").then((m) => ({ default: m.Editor })),
+  import("../../components/ui/editor.jsx").then((m) => ({ default: m.Editor })),
 );
 
 interface SpaceRecordEditorProps {

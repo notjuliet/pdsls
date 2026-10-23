@@ -3,11 +3,11 @@ import { Did, Handle } from "@atcute/lexicons";
 import { createSignal, For, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { Spinner } from "../../components/spinner.jsx";
+import { Spinner } from "../../components/ui/states.jsx";
 import { canHover } from "../../layout.jsx";
 import { type HandleResolveResult, resolveHandleDetailed, validateHandle } from "../../lib/api.js";
+import { addToClipboard } from "../../lib/copy.js";
 import { detectDidKeyType, detectKeyType } from "../../lib/key.js";
-import { addToClipboard } from "../../utils/copy.js";
 import { plcDirectory } from "../settings.jsx";
 
 const HandleResult = (props: {

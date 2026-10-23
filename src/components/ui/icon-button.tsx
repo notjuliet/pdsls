@@ -1,6 +1,6 @@
 import { Show } from "solid-js";
 
-import type { ScopeId } from "../auth/scope-utils";
+import type { ScopeId } from "../../auth/scope-utils";
 import { iconButtonClass, PermissionButton } from "./permission-button.jsx";
 import Tooltip from "./tooltip.jsx";
 

@@ -2,8 +2,8 @@ import { Client, simpleFetchHandler } from "@atcute/client";
 import { A } from "@solidjs/router";
 import { createResource, createSignal, For, Show } from "solid-js";
 
-import { Button } from "../../components/button";
-import { Spinner } from "../../components/spinner.jsx";
+import { Button } from "../../components/ui/button";
+import { Spinner } from "../../components/ui/states.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll";
 
 const LIMIT = 1000;

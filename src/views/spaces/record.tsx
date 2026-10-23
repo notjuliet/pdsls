@@ -2,18 +2,18 @@ import { useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createSignal, Show } from "solid-js";
 
 import { SPACE_MANAGE_RECORDS_SCOPE_ID } from "../../auth/scope-utils";
-import { ConfirmDialog } from "../../components/confirm-dialog.jsx";
-import { CopyMenu, DropdownMenu, MenuProvider } from "../../components/dropdown.jsx";
-import { IconButton } from "../../components/icon-button.jsx";
 import { JSONValue } from "../../components/json.jsx";
-import { addNotification } from "../../components/notification.jsx";
 import {
   RecordInfo,
   RecordPage,
   recordTabFromHash,
   useRecordSchemaValidation,
-} from "../../components/record-page.jsx";
-import { ErrorNotice, LoadingState } from "../../components/states.jsx";
+} from "../../components/repo/record-page.jsx";
+import { ConfirmDialog } from "../../components/ui/confirm-dialog.jsx";
+import { CopyMenu, DropdownMenu, MenuProvider } from "../../components/ui/dropdown.jsx";
+import { IconButton } from "../../components/ui/icon-button.jsx";
+import { addNotification } from "../../components/ui/notification.jsx";
+import { ErrorNotice, LoadingState } from "../../components/ui/states.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import {
   deleteSpaceRecord,

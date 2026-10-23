@@ -2,8 +2,8 @@ import type { Did } from "@atcute/lexicons";
 import type { EditorView } from "codemirror";
 import { createEffect, createSignal, onCleanup, Show } from "solid-js";
 
-import { Button } from "../button.jsx";
-import { Modal } from "../modal.jsx";
+import { Button } from "../ui/button.jsx";
+import { Modal } from "../ui/modal.jsx";
 import { FileUpload } from "./file-upload.jsx";
 import { HandleInput } from "./handle-input.jsx";
 

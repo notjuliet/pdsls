@@ -4,11 +4,10 @@ import {
   hasKnownRecordSchema,
   validateKnownRecordSchema,
   validateResolvedRecordSchema,
-} from "../lib/record-validation.js";
-import { CopyableInfoField } from "./copyable-info-field.jsx";
-import { RecordSchemaValidation } from "./record-schema-validation.jsx";
-import { RecordVerification } from "./record-verification.jsx";
-import { Tabs } from "./tabs.jsx";
+} from "../../lib/record-validation.js";
+import { Button } from "../ui/button.jsx";
+import { CopyableInfoField } from "../ui/copyable-info-field.jsx";
+import { Tabs } from "../ui/tabs.jsx";
 
 export type RecordTab = "record" | "schema" | "backlinks" | "info";
 
@@ -104,6 +103,32 @@ export const useRecordSchemaValidation = (collection: () => string, rkey: () => 
 
 export type RecordSchemaValidationState = ReturnType<typeof useRecordSchemaValidation>;
 
+/** A titled check with its result: a spinner while running, then a check or a cross and the reason. */
+const CheckRow = (props: {
+  title: string;
+  valid: boolean | undefined;
+  error: string;
+  running: boolean;
+  children?: JSX.Element;
+}) => (
+  <div>
+    <div class="flex items-center gap-1">
+      <p class="font-semibold">{props.title}</p>
+      <span
+        classList={{
+          "iconify lucide--check text-green-500 dark:text-green-400": props.valid === true,
+          "iconify lucide--x text-red-500 dark:text-red-400": props.valid === false,
+          "iconify lucide--loader-circle animate-spin": props.valid === undefined && props.running,
+        }}
+      />
+    </div>
+    <Show when={props.valid === false}>
+      <div class="text-xs wrap-break-word">{props.error}</div>
+    </Show>
+    {props.children}
+  </div>
+);
+
 /** The Info tab: the record's identifiers and how far it has been checked. */
 export const RecordInfo = (props: {
   uri: string;
@@ -118,15 +143,31 @@ export const RecordInfo = (props: {
     <Show when={props.cid}>{(cid) => <CopyableInfoField label="CID" value={cid()} />}</Show>
     <Show when={props.verification}>
       {(verification) => (
-        <RecordVerification valid={verification().valid} error={verification().error} />
+        <CheckRow
+          title="Record verification"
+          valid={verification().valid}
+          error={verification().error}
+          running
+        />
       )}
     </Show>
-    <RecordSchemaValidation
+    <CheckRow
+      title="Schema validation"
       valid={props.schema.valid()}
       error={props.schema.error()}
-      resolving={props.schema.resolving()}
-      canResolve={props.schema.canResolve()}
-      onResolve={() => void props.schema.validateRemote(props.value)}
-    />
+      running={props.schema.resolving()}
+    >
+      <Show
+        when={
+          !props.schema.resolving() &&
+          props.schema.valid() === undefined &&
+          props.schema.canResolve()
+        }
+      >
+        <Button onClick={() => void props.schema.validateRemote(props.value)}>
+          Validate via resolution
+        </Button>
+      </Show>
+    </CheckRow>
   </>
 );
