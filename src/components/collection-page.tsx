@@ -401,7 +401,7 @@ export const CollectionPage = (props: {
       </Modal>
 
       <Show when={!lexicon.showSchema() && (records().length > 1 || filter())}>
-        <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
+        <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 left-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
           <div class="flex w-full max-w-[34.5rem] items-center gap-2">
             <FilterInput
               class="grow"
