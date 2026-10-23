@@ -18,13 +18,10 @@ import {
 } from "solid-js";
 
 import { Button } from "../../components/button.jsx";
-import {
-  DomainGroup,
-  DomainGroupRows,
-  domainGroupRowClasses,
-} from "../../components/domain-group.jsx";
-import HoverCard from "../../components/hover-card/base";
+import { CollectionList } from "../../components/collection-list.jsx";
 import { JSONValue, type JSONType } from "../../components/json.jsx";
+import { RecordRow } from "../../components/record-row.jsx";
+import { EmptyState, ErrorNotice } from "../../components/states.jsx";
 import { TextInput } from "../../components/text-input.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
 import { createDebouncedValue } from "../../lib/debounced.js";
@@ -148,11 +145,7 @@ const WelcomeView = (props: {
         </Show>
       </div>
 
-      <Show when={props.error}>
-        <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
-          {props.error}
-        </div>
-      </Show>
+      <Show when={props.error}>{(message) => <ErrorNotice message={message()} />}</Show>
     </div>
   );
 };
@@ -647,44 +640,6 @@ const ExploreView = (props: {
 
 const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void }) => {
   const [filter, setFilter] = createSignal("");
-  const [collapsedDomains, setCollapsedDomains] = createSignal<Set<string>>(new Set());
-
-  const sortedEntries = createMemo(() => {
-    return [...props.archive.entries].sort((a, b) => a.name.localeCompare(b.name));
-  });
-
-  const filteredEntries = createMemo(() => {
-    const f = filter().toLowerCase().trim();
-    if (!f) return sortedEntries();
-    return sortedEntries().filter((entry) => entry.name.toLowerCase().includes(f));
-  });
-
-  const groupedEntries = createMemo(() => {
-    const groups = new Map<string, CollectionEntry[]>();
-
-    for (const entry of filteredEntries()) {
-      const authority = entry.name.split(".").slice(0, 2).join(".");
-      const existing = groups.get(authority);
-      if (existing) existing.push(entry);
-      else groups.set(authority, [entry]);
-    }
-
-    return Array.from(groups, ([authority, entries]) => ({
-      authority,
-      domain: authority.split(".").reverse().join("."),
-      entries,
-    })).sort((a, b) => a.domain.localeCompare(b.domain));
-  });
-
-  const toggleDomain = (authority: string) => {
-    setCollapsedDomains((current) => {
-      const next = new Set(current);
-      if (next.has(authority)) next.delete(authority);
-      else next.add(authority);
-      return next;
-    });
-  };
-
   const totalRecords = createMemo(() =>
     props.archive.entries.reduce((sum, entry) => sum + entry.entries.length, 0),
   );
@@ -704,70 +659,19 @@ const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void })
         class="text-sm"
       />
 
-      <div class="flex flex-col gap-2 sm:gap-0">
-        <For each={groupedEntries()}>
-          {(group) => {
-            const isCollapsed = () => collapsedDomains().has(group.authority);
-
-            return (
-              <DomainGroup
-                domain={group.domain}
-                domainTitle={`${group.domain} (${group.authority})`}
-                groupLabel="collections"
-                sticky
-                collapsed={isCollapsed()}
-                collapsedLabel={
-                  <>
-                    {group.entries.length}{" "}
-                    {group.entries.length === 1 ? "collection" : "collections"}
-                  </>
-                }
-                onToggle={() => toggleDomain(group.authority)}
-              >
-                <DomainGroupRows as="ul">
-                  <For each={group.entries}>
-                    {(entry) => {
-                      const label = entry.name.split(".").slice(2).join(".") || entry.name;
-
-                      return (
-                        <li>
-                          <button
-                            onClick={() => props.onRoute({ type: "collection", collection: entry })}
-                            class={`flex w-full min-w-0 items-center gap-2 rounded text-left text-sm hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700 ${domainGroupRowClasses}`}
-                            title={entry.name}
-                          >
-                            <span class="truncate font-medium text-neutral-700 dark:text-neutral-300">
-                              <Show when={label !== entry.name}>
-                                <span class="text-neutral-500 dark:text-neutral-400">
-                                  {group.authority}.
-                                </span>
-                              </Show>
-                              {label}
-                            </span>
-
-                            <span class="ml-auto text-xs text-neutral-500">
-                              {entry.entries.length}
-                            </span>
-                          </button>
-                        </li>
-                      );
-                    }}
-                  </For>
-                </DomainGroupRows>
-              </DomainGroup>
-            );
-          }}
-        </For>
-      </div>
-
-      <Show when={filteredEntries().length === 0 && filter()}>
-        <div class="flex flex-col items-center justify-center py-8 text-center">
-          <span class="iconify lucide--search-x mb-2 text-3xl text-neutral-400" />
-          <p class="text-sm text-neutral-600 dark:text-neutral-400">
-            No collections match your filter
-          </p>
-        </div>
-      </Show>
+      <CollectionList
+        collections={props.archive.entries.map((entry) => ({
+          nsid: entry.name,
+          count: entry.entries.length,
+          onClick: () => props.onRoute({ type: "collection", collection: entry }),
+        }))}
+        filter={filter()}
+        fallback={
+          <Show when={filter()}>
+            <EmptyState icon="lucide--search-x" message="No collections match your filter" />
+          </Show>
+        }
+      />
     </div>
   );
 };
@@ -859,52 +763,17 @@ const CollectionSubview = (props: {
 
       <div class="flex flex-col font-mono">
         <For each={displayedEntries()}>
-          {(entry) => {
-            const isTid = TID.validate(entry.key);
-            const timestamp = isTid ? TID.parse(entry.key).timestamp / 1_000 : null;
-
-            return (
-              <HoverCard
-                class="flex w-full items-baseline gap-1 rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                activeClass="bg-neutral-200 dark:bg-neutral-700"
-                previewPlacement="side"
-                trigger={
-                  <button
-                    onClick={() => {
-                      props.onRoute({
-                        type: "record",
-                        collection: props.collection,
-                        record: entry,
-                      });
-                    }}
-                    class="flex w-full items-baseline gap-1 px-1 py-0.5"
-                  >
-                    <span class="max-w-full shrink-0 truncate text-sm text-blue-500 dark:text-blue-400">
-                      {entry.key}
-                    </span>
-                    <span class="truncate text-xs text-neutral-400 dark:text-neutral-500" dir="rtl">
-                      {entry.cid}
-                    </span>
-                    <Show when={timestamp}>
-                      {(ts) => (
-                        <span class="ml-auto shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
-                          {localDateFromTimestamp(ts())}
-                        </span>
-                      )}
-                    </Show>
-                  </button>
-                }
-              >
-                <JSONValue
-                  data={entry.record}
-                  repo={props.archive.did}
-                  truncate
-                  hideBlobs
-                  preview
-                />
-              </HoverCard>
-            );
-          }}
+          {(entry) => (
+            <RecordRow
+              rkey={entry.key}
+              cid={entry.cid}
+              value={entry.record}
+              repo={props.archive.did}
+              onClick={() =>
+                props.onRoute({ type: "record", collection: props.collection, record: entry })
+              }
+            />
+          )}
         </For>
         <LoadMoreSentinel
           hasMore={() => hasMore()}
@@ -914,10 +783,7 @@ const CollectionSubview = (props: {
       </div>
 
       <Show when={filteredEntries().length === 0 && filter()}>
-        <div class="flex flex-col items-center justify-center py-8 text-center">
-          <span class="iconify lucide--search-x mb-2 text-3xl text-neutral-400" />
-          <p class="text-sm text-neutral-600 dark:text-neutral-400">No records match your filter</p>
-        </div>
+        <EmptyState icon="lucide--search-x" message="No records match your filter" />
       </Show>
     </div>
   );
@@ -937,11 +803,7 @@ const RecordSubview = (props: {
 
       <Show
         when={props.record.record !== null}
-        fallback={
-          <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
-            Failed to decode record
-          </div>
-        }
+        fallback={<ErrorNotice message="Failed to decode record" />}
       >
         <div class="max-w-full min-w-full font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-max sm:max-w-screen sm:px-4 sm:text-sm md:max-w-3xl">
           <JSONValue data={props.record.record} repo={props.archive.did || ""} newTab hideBlobs />

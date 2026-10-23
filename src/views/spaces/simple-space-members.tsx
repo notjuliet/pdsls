@@ -9,6 +9,7 @@ import DidHoverCard from "../../components/hover-card/did.jsx";
 import { Modal } from "../../components/modal.jsx";
 import { addNotification } from "../../components/notification.jsx";
 import { PermissionButton } from "../../components/permission-button.jsx";
+import { ErrorNotice, LoadingState } from "../../components/states.jsx";
 import { TextInput } from "../../components/text-input.jsx";
 import { resolveHandle } from "../../lib/api.js";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
@@ -19,7 +20,6 @@ import {
   type SimpleSpaceMember,
 } from "../../lib/spaces.js";
 import { useSpacesAuth } from "./context.jsx";
-import { ErrorNotice, LoadingState } from "./shared.jsx";
 
 type MemberDialog =
   | { kind: "add" }

@@ -1,7 +1,6 @@
 import { ComAtprotoRepoApplyWrites, ComAtprotoRepoGetRecord } from "@atcute/atproto";
 import { Client } from "@atcute/client";
 import { $type, ActorIdentifier, InferXRPCBodyOutput } from "@atcute/lexicons";
-import * as TID from "@atcute/tid";
 import { A, type RouteSectionProps, useParams, useSearchParams } from "@solidjs/router";
 import {
   createMemo,
@@ -19,12 +18,12 @@ import { Portal } from "solid-js/web";
 import { agent } from "../auth/state";
 import { Button } from "../components/button.jsx";
 import { FilterInput } from "../components/filter-input.jsx";
-import HoverCard from "../components/hover-card/base";
-import { JSONType, JSONValue } from "../components/json.jsx";
+import { JSONType } from "../components/json.jsx";
 import { Modal } from "../components/modal.jsx";
 import { NestedLayout } from "../components/nested-layout.jsx";
 import { addNotification } from "../components/notification.jsx";
 import { PermissionButton } from "../components/permission-button.jsx";
+import { RecordRow } from "../components/record-row.jsx";
 import { Spinner } from "../components/spinner.jsx";
 import Tooltip from "../components/tooltip.jsx";
 import { createLatch } from "../lib/create-latch.js";
@@ -32,13 +31,11 @@ import { LoadMoreSentinel } from "../lib/infinite-scroll.jsx";
 import { useFilterShortcut } from "../lib/keyboard.js";
 import { useRepo } from "../lib/repo-context.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
-import { localDateFromTimestamp } from "../utils/format.js";
 
 interface AtprotoRecord {
   rkey: string;
   cid: string;
   record: InferXRPCBodyOutput<ComAtprotoRepoGetRecord.mainSchema["output"]>;
-  timestamp: number | undefined;
   toDelete: boolean;
 }
 
@@ -98,62 +95,6 @@ const formatPreviewValue = (value: JSONType | undefined) => {
   if (str.length <= PREVIEW_VALUE_MAX_LENGTH) return str;
 
   return `${str.slice(0, PREVIEW_VALUE_MAX_LENGTH)}...`;
-};
-
-const RecordLink = (props: {
-  record: AtprotoRecord;
-  previewField?: string;
-  activeClass?: string;
-}) => {
-  const previewValue = () => {
-    const field = props.previewField;
-    const value = getRecordValue(props.record);
-    if (!field) return;
-    return formatPreviewValue(getPathValue(value, field));
-  };
-
-  return (
-    <HoverCard
-      class="flex w-full min-w-0 flex-col rounded px-1 py-0.5"
-      activeClass={props.activeClass ?? "bg-neutral-200 dark:bg-neutral-700"}
-      previewPlacement="side"
-      trigger={
-        <>
-          <span class="flex w-full min-w-0 items-baseline">
-            <span class="max-w-full shrink-0 truncate text-sm text-blue-500 dark:text-blue-400">
-              {props.record.rkey}
-            </span>
-            <span class="ml-1 truncate text-xs text-neutral-400 dark:text-neutral-500" dir="rtl">
-              {props.record.cid}
-            </span>
-            <Show when={props.record.timestamp && props.record.timestamp <= Date.now()}>
-              <span class="ml-1 shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
-                {localDateFromTimestamp(props.record.timestamp!)}
-              </span>
-            </Show>
-          </span>
-          <Show when={previewValue()}>
-            {(preview) => (
-              <span class="flex w-full min-w-0 items-baseline gap-1 text-xs">
-                <span class="shrink-0 text-neutral-500 dark:text-neutral-400">
-                  {props.previewField}:
-                </span>
-                <span class="min-w-0 truncate">{preview()}</span>
-              </span>
-            )}
-          </Show>
-        </>
-      }
-    >
-      <JSONValue
-        data={props.record.record.value as JSONType}
-        repo={props.record.record.uri.split("/")[2]}
-        truncate
-        hideBlobs
-        preview
-      />
-    </HoverCard>
-  );
 };
 
 const PreviewFieldMenu = (props: {
@@ -357,7 +298,6 @@ const CollectionView = () => {
         rkey: rkey,
         cid: record.cid,
         record: record,
-        timestamp: TID.validate(rkey) ? TID.parse(rkey).timestamp / 1000 : undefined,
         toDelete: false,
       });
     });
@@ -573,44 +513,32 @@ const CollectionView = () => {
               >
                 <For each={filteredRecords()}>
                   {(record, index) => {
-                    const rounding = () => {
-                      const recs = filteredRecords();
-                      const prevSelected = recs[index() - 1]?.toDelete;
-                      const nextSelected = recs[index() + 1]?.toDelete;
-                      return `${!prevSelected ? "rounded-t" : ""} ${!nextSelected ? "rounded-b" : ""}`;
+                    const preview = () => {
+                      const field = previewField();
+                      if (!field) return;
+                      const value = formatPreviewValue(getPathValue(getRecordValue(record), field));
+                      return value === undefined ? undefined : { field, value };
                     };
                     return (
-                      <>
-                        <Show when={batchDelete()}>
-                          <div
-                            class={`select-none ${
-                              record.toDelete
-                                ? `bg-blue-200 hover:bg-blue-300/80 active:bg-blue-300 dark:bg-blue-700/30 dark:hover:bg-blue-700/50 dark:active:bg-blue-700/70 ${rounding()}`
-                                : "rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                            }`}
-                            onclick={(e) => {
-                              handleSelectionClick(e, index());
-                              setRecords(index(), "toDelete", !record.toDelete);
-                            }}
-                          >
-                            <RecordLink
-                              record={record}
-                              previewField={previewField()}
-                              activeClass={
-                                record.toDelete ? "bg-blue-300/80 dark:bg-blue-700/50" : undefined
+                      <RecordRow
+                        rkey={record.rkey}
+                        cid={record.cid}
+                        value={getRecordValue(record)}
+                        repo={record.record.uri.split("/")[2]}
+                        href={`/at://${did}/${params.collection}/${record.rkey}`}
+                        onClick={
+                          batchDelete()
+                            ? (e) => {
+                                handleSelectionClick(e, index());
+                                setRecords(index(), "toDelete", !record.toDelete);
                               }
-                            />
-                          </div>
-                        </Show>
-                        <Show when={!batchDelete()}>
-                          <A
-                            href={`/at://${did}/${params.collection}/${record.rkey}`}
-                            class="rounded select-none hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                          >
-                            <RecordLink record={record} previewField={previewField()} />
-                          </A>
-                        </Show>
-                      </>
+                            : undefined
+                        }
+                        preview={preview()}
+                        selected={batchDelete() && record.toDelete}
+                        prevSelected={filteredRecords()[index() - 1]?.toDelete}
+                        nextSelected={filteredRecords()[index() + 1]?.toDelete}
+                      />
                     );
                   }}
                 </For>

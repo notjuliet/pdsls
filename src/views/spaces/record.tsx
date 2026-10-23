@@ -9,6 +9,8 @@ import { Modal } from "../../components/modal.jsx";
 import { addNotification } from "../../components/notification.jsx";
 import { PermissionButton } from "../../components/permission-button.jsx";
 import { RecordSchemaValidation } from "../../components/record-schema-validation.jsx";
+import { RecordVerification } from "../../components/record-verification.jsx";
+import { ErrorNotice, LoadingState } from "../../components/states.jsx";
 import Tooltip from "../../components/tooltip.jsx";
 import {
   hasKnownRecordSchema,
@@ -33,7 +35,6 @@ import {
   useSpacesAuth,
 } from "./context.jsx";
 import { SpaceRecordEditor } from "./create-record.jsx";
-import { ErrorNotice, LoadingState } from "./shared.jsx";
 
 export const SpaceRecordView = () => {
   const auth = useSpacesAuth();
@@ -281,24 +282,7 @@ export const SpaceRecordView = () => {
                   <CopyableInfoField label="AT URI" value={value.uri} />
                   <CopyableInfoField label="CID" value={value.cid} />
                   <Show when={value.mac}>
-                    <div>
-                      <div class="flex items-center gap-1">
-                        <p class="font-semibold">Record verification</p>
-                        <span
-                          classList={{
-                            "iconify lucide--check text-green-500 dark:text-green-400":
-                              validRecord() === true,
-                            "iconify lucide--x text-red-500 dark:text-red-400":
-                              validRecord() === false,
-                            "iconify lucide--loader-circle animate-spin":
-                              validRecord() === undefined,
-                          }}
-                        ></span>
-                      </div>
-                      <Show when={validRecord() === false}>
-                        <div class="text-xs wrap-break-word">{verifyError()}</div>
-                      </Show>
-                    </div>
+                    <RecordVerification valid={validRecord()} error={verifyError()} />
                   </Show>
                   <RecordSchemaValidation
                     valid={validSchema()}

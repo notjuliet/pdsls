@@ -1,21 +1,19 @@
-import * as TID from "@atcute/tid";
 import { A, type RouteSectionProps, useParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
 
 import { SPACE_MANAGE_RECORDS_SCOPE_ID } from "../../auth/scope-utils";
 import { Button } from "../../components/button.jsx";
 import { FilterInput } from "../../components/filter-input.jsx";
-import HoverCard from "../../components/hover-card/base.jsx";
-import { JSONValue } from "../../components/json.jsx";
 import { Modal } from "../../components/modal.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
 import { addNotification } from "../../components/notification.jsx";
 import { PermissionButton } from "../../components/permission-button.jsx";
+import { RecordRow } from "../../components/record-row.jsx";
+import { EmptyState, ErrorNotice, LoadingState } from "../../components/states.jsx";
 import Tooltip from "../../components/tooltip.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import { deleteSpaceRecords, listSpaceRecords, type SpaceRecord } from "../../lib/spaces.js";
-import { localDateFromTimestamp } from "../../utils/format.js";
 import {
   makeSpaceCollectionPath,
   makeSpaceRecordPath,
@@ -24,7 +22,6 @@ import {
   useSpacesAuth,
 } from "./context.jsx";
 import { SpaceRecordEditor } from "./create-record.jsx";
-import { EmptyState, ErrorNotice, LoadingState } from "./shared.jsx";
 
 const RECORDS_PER_PAGE = 100;
 
@@ -287,87 +284,28 @@ const SpaceCollectionView = () => {
           <Show when={loaded() && (!error() || records().length > 0)}>
             <div class="flex flex-col px-1 font-mono">
               <For each={filteredRecords()}>
-                {(record, index) => {
-                  const timestamp = () =>
-                    TID.validate(record.rkey) ? TID.parse(record.rkey).timestamp / 1000 : undefined;
-
-                  const summary = () => (
-                    <>
-                      <span class="max-w-full shrink-0 truncate text-sm text-blue-500 dark:text-blue-400">
-                        {record.rkey}
-                      </span>
-                      <span
-                        class="min-w-0 truncate text-xs text-neutral-400 dark:text-neutral-500"
-                        dir="rtl"
-                      >
-                        {record.cid}
-                      </span>
-                      <Show when={timestamp()}>
-                        {(value) => (
-                          <span class="ml-auto shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
-                            {localDateFromTimestamp(value())}
-                          </span>
-                        )}
-                      </Show>
-                    </>
-                  );
-
-                  return (
-                    <HoverCard
-                      class={`flex w-full min-w-0 items-baseline rounded ${
-                        managing() && selectedRkeys().has(record.rkey)
-                          ? "bg-blue-200 hover:bg-blue-300/80 active:bg-blue-300 dark:bg-blue-700/30 dark:hover:bg-blue-700/50 dark:active:bg-blue-700/70"
-                          : "hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-                      }`}
-                      activeClass={
-                        managing() && selectedRkeys().has(record.rkey)
-                          ? "bg-blue-300/80 dark:bg-blue-700/50"
-                          : "bg-neutral-200 dark:bg-neutral-800"
-                      }
-                      previewPlacement="side"
-                      trigger={
-                        <Show
-                          when={managing()}
-                          fallback={
-                            <A
-                              href={makeSpaceRecordPath(
-                                params.spaceAuthority!,
-                                params.spaceType!,
-                                params.skey!,
-                                repo(),
-                                params.collection!,
-                                record.rkey,
-                              )}
-                              class="flex w-full min-w-0 items-baseline gap-1 px-1 py-0.5"
-                            >
-                              {summary()}
-                            </A>
-                          }
-                        >
-                          <button
-                            type="button"
-                            aria-pressed={selectedRkeys().has(record.rkey)}
-                            onclick={(event) => toggleRecord(record, index(), event)}
-                            class="flex w-full min-w-0 items-baseline gap-1 px-1 py-0.5 text-left select-none"
-                          >
-                            {summary()}
-                          </button>
-                        </Show>
-                      }
-                    >
-                      <Show
-                        when={record.value !== undefined}
-                        fallback={
-                          <span class="text-sm text-neutral-500 dark:text-neutral-400">
-                            No value returned
-                          </span>
-                        }
-                      >
-                        <JSONValue data={record.value!} repo={repo()} truncate hideBlobs preview />
-                      </Show>
-                    </HoverCard>
-                  );
-                }}
+                {(record, index) => (
+                  <RecordRow
+                    rkey={record.rkey}
+                    cid={record.cid}
+                    value={record.value}
+                    repo={repo()}
+                    href={makeSpaceRecordPath(
+                      params.spaceAuthority!,
+                      params.spaceType!,
+                      params.skey!,
+                      repo(),
+                      params.collection!,
+                      record.rkey,
+                    )}
+                    onClick={
+                      managing() ? (event) => toggleRecord(record, index(), event) : undefined
+                    }
+                    selected={managing() && selectedRkeys().has(record.rkey)}
+                    prevSelected={selectedRkeys().has(filteredRecords()[index() - 1]?.rkey)}
+                    nextSelected={selectedRkeys().has(filteredRecords()[index() + 1]?.rkey)}
+                  />
+                )}
               </For>
             </div>
 

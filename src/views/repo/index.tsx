@@ -22,11 +22,7 @@ import {
 } from "solid-js";
 
 import { Backlinks } from "../../components/backlinks.jsx";
-import {
-  DomainGroup,
-  DomainGroupRows,
-  domainGroupRowClasses,
-} from "../../components/domain-group.jsx";
+import { CollectionList } from "../../components/collection-list.jsx";
 import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../../components/dropdown.jsx";
 import { FilterInput } from "../../components/filter-input.jsx";
 import { setPDS } from "../../components/navbar.jsx";
@@ -242,8 +238,6 @@ const downloadRepo = async (pdsUrl: string, did: string) => {
     }
   }
 };
-
-const displayNsidDomain = (authority: string) => authority.split(".").reverse().join(".");
 
 const RepoView = () => {
   const repo = useRepo();
@@ -472,68 +466,22 @@ const RepoView = () => {
               </LazyTab>
             </Show>
             <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
-              <div class="flex flex-col gap-1 pb-22 text-sm wrap-anywhere sm:gap-0">
+              <div class="pb-22">
                 <Show
                   when={Object.keys(nsids() ?? {}).length != 0}
                   fallback={<span class="mt-3 text-center text-base">No collections found.</span>}
                 >
-                  <For
-                    each={Object.keys(nsids() ?? {})
-                      .filter((authority) =>
-                        filter()
-                          ? authority.includes(filter()!) ||
-                            displayNsidDomain(authority).includes(filter()!) ||
-                            nsids()?.[authority].nsids.some((nsid) =>
-                              `${authority}.${nsid}`.includes(filter()!),
-                            )
-                          : true,
-                      )
-                      .sort((a, b) => displayNsidDomain(a).localeCompare(displayNsidDomain(b)))}
-                  >
-                    {(authority) => {
-                      const isCollapsed = () => nsids()?.[authority].hidden ?? false;
-                      const domain = displayNsidDomain(authority);
-                      const collectionCount = () => nsids()?.[authority].nsids.length ?? 0;
-
-                      return (
-                        <DomainGroup
-                          domain={domain}
-                          domainTitle={`${domain} (${authority})`}
-                          groupLabel="collections"
-                          sticky
-                          collapsed={isCollapsed()}
-                          collapsedLabel={
-                            <>
-                              {collectionCount()}{" "}
-                              {collectionCount() === 1 ? "collection" : "collections"}
-                            </>
-                          }
-                          onToggle={() => toggleCollapsed(authority)}
-                        >
-                          <DomainGroupRows>
-                            <For
-                              each={nsids()?.[authority].nsids.filter((nsid) =>
-                                filter() ? `${authority}.${nsid}`.includes(filter()!) : true,
-                              )}
-                            >
-                              {(nsid) => (
-                                <A
-                                  href={`/at://${did}/${authority}.${nsid}`}
-                                  class={`truncate hover:underline active:underline ${domainGroupRowClasses}`}
-                                  title={`${authority}.${nsid}`}
-                                >
-                                  <span class="text-neutral-500 dark:text-neutral-400">
-                                    {authority}.
-                                  </span>
-                                  {nsid}
-                                </A>
-                              )}
-                            </For>
-                          </DomainGroupRows>
-                        </DomainGroup>
-                      );
-                    }}
-                  </For>
+                  <CollectionList
+                    collections={Object.entries(nsids() ?? {}).flatMap(([authority, group]) =>
+                      group.nsids.map((nsid) => ({
+                        nsid: `${authority}.${nsid}`,
+                        href: `/at://${did}/${authority}.${nsid}`,
+                      })),
+                    )}
+                    filter={filter()}
+                    collapsed={(authority) => nsids()?.[authority]?.hidden ?? false}
+                    onToggle={toggleCollapsed}
+                  />
                 </Show>
               </div>
             </Show>

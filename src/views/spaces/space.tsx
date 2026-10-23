@@ -5,6 +5,7 @@ import { createEffect, createMemo, createSignal, For, type JSX, Show } from "sol
 import { Button } from "../../components/button.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
+import { EmptyState, ErrorNotice, LoadingState } from "../../components/states.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { resolveRawLexicon } from "../../lib/lexicon.js";
 import {
@@ -22,7 +23,6 @@ import {
 } from "./context.jsx";
 import { SpaceRecordEditor } from "./create-record.jsx";
 import { ManageSpaceDialog } from "./manage-space.jsx";
-import { EmptyState, ErrorNotice, LoadingState } from "./shared.jsx";
 import { SimpleSpaceDetails } from "./simple-space.jsx";
 import { parseSpaceTypeInfo, SpaceTypeDetails, type SpaceTypeInfo } from "./space-type-details.jsx";
 

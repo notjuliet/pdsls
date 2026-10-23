@@ -23,6 +23,7 @@ import { Modal } from "../components/modal.jsx";
 import { addNotification } from "../components/notification.jsx";
 import { PermissionButton } from "../components/permission-button.jsx";
 import { RecordSchemaValidation } from "../components/record-schema-validation.jsx";
+import { RecordVerification } from "../components/record-verification.jsx";
 import {
   hasKnownRecordSchema,
   validateKnownRecordSchema,
@@ -397,22 +398,7 @@ export const RecordView = () => {
                 <Show when={record()?.cid}>
                   {(cid) => <CopyableInfoField label="CID" value={cid()} />}
                 </Show>
-                <div>
-                  <div class="flex items-center gap-1">
-                    <p class="font-semibold">Record verification</p>
-                    <span
-                      classList={{
-                        "iconify lucide--check text-green-500 dark:text-green-400":
-                          validRecord() === true,
-                        "iconify lucide--x text-red-500 dark:text-red-400": validRecord() === false,
-                        "iconify lucide--loader-circle animate-spin": validRecord() === undefined,
-                      }}
-                    ></span>
-                  </div>
-                  <Show when={validRecord() === false}>
-                    <div class="text-xs wrap-break-word">{verifyError()}</div>
-                  </Show>
-                </div>
+                <RecordVerification valid={validRecord()} error={verifyError()} />
                 <RecordSchemaValidation
                   valid={validSchema()}
                   error={validationError()}

@@ -1,9 +1,10 @@
 import { A, type RouteSectionProps, useLocation, useParams } from "@solidjs/router";
-import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, Show } from "solid-js";
 
 import { Button } from "../../components/button.jsx";
-import { Favicon } from "../../components/favicon.jsx";
+import { CollectionList } from "../../components/collection-list.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
+import { EmptyState, ErrorNotice, LoadingState } from "../../components/states.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { listSpaceRecords, type SpaceRecord } from "../../lib/spaces.js";
 import { SpaceBlobList } from "./blobs.jsx";
@@ -15,7 +16,6 @@ import {
   useSpacesAuth,
 } from "./context.jsx";
 import { SpaceRecordEditor } from "./create-record.jsx";
-import { EmptyState, ErrorNotice, LoadingState } from "./shared.jsx";
 
 const SpaceRepoView = () => {
   const auth = useSpacesAuth();
@@ -128,40 +128,20 @@ const SpaceRepoView = () => {
           <Show when={error()}>{(message) => <ErrorNotice message={message()} />}</Show>
 
           <Show when={loaded() && (!error() || records().length > 0)}>
-            <ul class="flex flex-col">
-              <For each={collections()}>
-                {([collection, count]) => {
-                  const authority = () => collection.split(".").slice(0, 2).join(".");
-                  return (
-                    <li>
-                      <A
-                        href={makeSpaceCollectionPath(
-                          params.spaceAuthority!,
-                          params.spaceType!,
-                          params.skey!,
-                          repo(),
-                          collection,
-                        )}
-                        class="flex w-full items-center gap-2 rounded p-2 text-left text-sm hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-                      >
-                        <Favicon domain={authority()} reverse />
-                        <span class="min-w-0 truncate font-medium text-blue-500 dark:text-blue-400">
-                          {collection}
-                        </span>
-                        <span class="ml-auto shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
-                          {count.toLocaleString()}
-                          {cursor() ? "+" : ""}
-                        </span>
-                      </A>
-                    </li>
-                  );
-                }}
-              </For>
-            </ul>
-
-            <Show when={collections().length === 0}>
-              <EmptyState icon="lucide--folder-open" message="No collections found" />
-            </Show>
+            <CollectionList
+              collections={collections().map(([collection, count]) => ({
+                nsid: collection,
+                count: `${count.toLocaleString()}${cursor() ? "+" : ""}`,
+                href: makeSpaceCollectionPath(
+                  params.spaceAuthority!,
+                  params.spaceType!,
+                  params.skey!,
+                  repo(),
+                  collection,
+                ),
+              }))}
+              fallback={<EmptyState icon="lucide--folder-open" message="No collections found" />}
+            />
 
             <Show when={cursor()}>
               <Button

@@ -4,9 +4,9 @@ import type { Accessor } from "solid-js";
 import { createEffect, createSignal, For, Show } from "solid-js";
 
 import { Button } from "../../components/button.jsx";
+import { ErrorNotice, LoadingState } from "../../components/states.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { listSpaceBlobs } from "../../lib/spaces.js";
-import { ErrorNotice, LoadingState } from "./shared.jsx";
 
 export const SpaceBlobList = (props: {
   auth: Accessor<OAuthUserAgent>;

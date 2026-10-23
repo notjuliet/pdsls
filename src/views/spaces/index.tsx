@@ -7,6 +7,7 @@ import { Button } from "../../components/button.jsx";
 import { DomainGroup, domainGroupRowClasses } from "../../components/domain-group.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
 import { NestedLayout } from "../../components/nested-layout.jsx";
+import { EmptyState, ErrorNotice, LoadingState } from "../../components/states.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { listSpaces, parseSpaceUri, type SpaceView } from "../../lib/spaces.js";
 import {
@@ -18,7 +19,6 @@ import {
 } from "./context.jsx";
 import { CreateSpaceDialog } from "./create-space.jsx";
 import { SpacesNav } from "./nav.jsx";
-import { EmptyState, ErrorNotice, LoadingState } from "./shared.jsx";
 import { SpaceLayout } from "./space.jsx";
 
 const SignInPrompt = () => {
