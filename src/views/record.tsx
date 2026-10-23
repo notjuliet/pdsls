@@ -16,15 +16,14 @@ import {
   useRecordSchemaValidation,
 } from "../components/repo/record-page.jsx";
 import { ConfirmDialog } from "../components/ui/confirm-dialog.jsx";
-import { ActionMenu, CopyMenu, DropdownMenu, MenuProvider } from "../components/ui/dropdown.jsx";
 import { Favicon } from "../components/ui/favicon.jsx";
 import { IconButton } from "../components/ui/icon-button.jsx";
 import { addNotification } from "../components/ui/notification.jsx";
 import { Spinner } from "../components/ui/states.jsx";
+import { addToClipboard } from "../lib/copy.js";
 import { useRepo } from "../lib/repo-context.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
 import { AtUri, uriTemplates } from "../lib/templates.js";
-import { hideMedia, setHideMedia } from "./settings.jsx";
 
 const faviconWrapper = (children: any) => (
   <div class="flex size-4 items-center justify-center">{children}</div>
@@ -261,25 +260,11 @@ export const RecordView = () => {
                     );
                   }}
                 </Show>
-                <MenuProvider>
-                  <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
-                    <CopyMenu
-                      content={JSON.stringify(record()?.value, null, 2)}
-                      label="Copy record"
-                      icon="lucide--copy"
-                    />
-                    <ActionMenu
-                      label={hideMedia() ? "Show media" : "Hide media"}
-                      icon={hideMedia() ? "lucide--eye" : "lucide--eye-off"}
-                      keepOpen
-                      onClick={() => {
-                        const next = !hideMedia();
-                        localStorage.hideMedia = String(next);
-                        setHideMedia(next);
-                      }}
-                    />
-                  </DropdownMenu>
-                </MenuProvider>
+                <IconButton
+                  icon="lucide--copy"
+                  label="Copy record"
+                  onClick={() => addToClipboard(JSON.stringify(record()?.value, null, 2))}
+                />
               </>
             }
             record={
