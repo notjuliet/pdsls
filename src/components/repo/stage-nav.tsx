@@ -48,6 +48,12 @@ export const nsidDomain = (nsid: string) => nsid.split(".").slice(0, 2).reverse(
 const iconLinkClass =
   "flex items-center rounded px-1.5 py-1 text-neutral-400 transition-colors hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-500 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70";
 
+/** The longest kind any view uses, which sets the label column's width. */
+const LONGEST_KIND = "Collection";
+
+/** The row box's grid, shared with the invisible sizing row. */
+const rowBoxClass = "grid grid-cols-subgrid items-baseline gap-x-4 px-2";
+
 const kindClass = "relative text-left text-xs whitespace-nowrap";
 
 const ActionIcon = (props: { action: StageAction }) => {
@@ -116,7 +122,7 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
     // Rows share the nav's grid columns, so every label, value and action group lines up.
     <div class="col-span-full grid grid-cols-subgrid items-center">
       <div
-        class="group/row relative grid grid-cols-subgrid items-baseline gap-x-4 rounded-md px-2 py-0.5 transition-colors hover:bg-neutral-200/80 sm:py-0 dark:hover:bg-neutral-700/50"
+        class={`group/row relative rounded-md py-0.5 transition-colors hover:bg-neutral-200/80 sm:py-0 dark:hover:bg-neutral-700/50 ${rowBoxClass}`}
         classList={{ "col-span-2": props.kindColumn }}
         onMouseLeave={() => setDetailHovered(false)}
       >
@@ -195,6 +201,14 @@ export const StageNav = (props: { stages: Stage[] }) => (
     <Index each={props.stages}>
       {(stage) => <StageRow stage={stage()} kindColumn={props.stages.some((item) => item.kind)} />}
     </Index>
+    {/* An invisible row with the longest label keeps the column the same width at every
+        level, so values don't shift as you go deeper. It copies the row box's grid, gap and
+        padding so it sizes the column exactly like a real row. */}
+    <Show when={props.stages.some((item) => item.kind)}>
+      <div aria-hidden="true" class={`invisible h-0 ${rowBoxClass} col-span-2`}>
+        <span class={kindClass}>{LONGEST_KIND}</span>
+      </div>
+    </Show>
   </nav>
 );
 
