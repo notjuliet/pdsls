@@ -2,6 +2,7 @@ import { A, RouteSectionProps, useIsRouting, useLocation } from "@solidjs/router
 import { createEffect, ErrorBoundary, on, onCleanup, onMount, Show, Suspense } from "solid-js";
 
 import { AccountManager } from "./auth/account.jsx";
+import { rememberPage } from "./auth/return-to.js";
 import { agent } from "./auth/state.js";
 import { CarDropOverlay } from "./components/car-drop-overlay.jsx";
 import { RecordEditor } from "./components/create";
@@ -87,6 +88,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
   createEffect(() => {
     if (!isRouting()) stablePath = location.pathname;
   });
+  createEffect(() => rememberPage(location.pathname + location.search + location.hash));
 
   if (location.search.includes("hrt=true")) localStorage.setItem("hrt", "true");
   else if (location.search.includes("hrt=false")) localStorage.setItem("hrt", "false");

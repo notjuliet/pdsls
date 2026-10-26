@@ -2,6 +2,7 @@
 import { Route, Router } from "@solidjs/router";
 import { render } from "solid-js/web";
 
+import { restoreAfterSignIn } from "./auth/return-to.ts";
 import { Layout } from "./layout.tsx";
 
 import "./styles/index.css";
@@ -26,6 +27,8 @@ import {
   SpacesLayout,
 } from "./views/spaces/index.tsx";
 import { LegacyStreamRedirect, StreamView } from "./views/stream";
+
+restoreAfterSignIn();
 
 render(
   () => (

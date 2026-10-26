@@ -2,6 +2,8 @@ import { isDid, isHandle } from "@atcute/lexicons/syntax";
 import { createAuthorizationUrl } from "@atcute/oauth-browser-client";
 import { createSignal } from "solid-js";
 
+import { saveReturnPage } from "./return-to";
+
 interface UseOAuthScopeFlowOptions {
   onError?: (error: unknown) => void;
   onRedirecting?: () => void;
@@ -49,6 +51,7 @@ export const useOAuthScopeFlow = (options: UseOAuthScopeFlowOptions = {}) => {
             : { type: "pds", serviceUrl: account },
       });
 
+      saveReturnPage();
       await new Promise((resolve) => setTimeout(resolve, 250));
       location.assign(authUrl);
     } catch (e) {

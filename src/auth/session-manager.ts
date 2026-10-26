@@ -8,6 +8,7 @@ import {
 } from "@atcute/oauth-browser-client";
 
 import { resolveDidDoc } from "../lib/api";
+import { takeCallbackParams } from "./return-to";
 import { oauthScopeStringToIds, scopeIdsToString } from "./scope-utils";
 import { Sessions, setAgent, setSessions } from "./state";
 
@@ -45,11 +46,9 @@ export const loadHandleForSession = async (did: Did, storedSessions: Sessions) =
 
 export const retrieveSession = async (): Promise<void> => {
   const init = async (): Promise<Session | undefined> => {
-    const params = new URLSearchParams(decodeURIComponent(location.hash.slice(1)));
+    const params = takeCallbackParams();
 
-    if (params.has("state") && (params.has("code") || params.has("error"))) {
-      history.replaceState(null, "", location.pathname + location.search);
-
+    if (params) {
       const auth = await finalizeAuthorization(params);
       const did = auth.session.info.sub;
 
