@@ -86,7 +86,7 @@ export const RecordRow = (props: RecordRowProps) => {
     </>
   );
 
-  const triggerClass = "flex w-full min-w-0 flex-col px-1 py-0.5 text-left select-none";
+  const triggerClass = "flex w-full min-w-0 flex-col px-2 py-0.5 text-left select-none";
 
   return (
     <HoverCard

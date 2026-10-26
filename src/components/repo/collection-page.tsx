@@ -317,7 +317,7 @@ export const CollectionPage = (props: {
         </Show>
 
         <Show when={!lexicon.showSchema()}>
-          <div class="flex w-full max-w-full flex-col px-1 pb-24 font-mono">
+          <div class="flex w-full max-w-full flex-col pb-24 font-mono">
             <Show when={loading() && !loaded()}>
               <LoadingState label="Loading records…" />
             </Show>
