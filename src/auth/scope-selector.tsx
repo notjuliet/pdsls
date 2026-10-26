@@ -27,7 +27,7 @@ const PermissionRow = (props: {
     type="button"
     aria-pressed={props.checked}
     onclick={props.onClick}
-    class="group flex w-full items-center gap-3 rounded-md py-2 text-left hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+    class="group -mx-2 flex w-[calc(100%+1rem)] items-center gap-3 rounded-md px-2 py-2 text-left hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
   >
     <div
       class="flex size-5 shrink-0 items-center justify-center rounded border-2"
@@ -155,7 +155,7 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
     <div class="flex flex-col gap-y-3">
       <div class="flex flex-col gap-4">
         <section>
-          <div class="mb-1 text-xs font-semibold tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
+          <div class="mb-2 flex h-5 items-center text-xs font-semibold tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
             Repository
           </div>
           <div class="flex flex-col">
@@ -175,7 +175,7 @@ export const ScopeSelector = (props: ScopeSelectorProps) => {
         </section>
 
         <section>
-          <div class="mb-2 flex items-center gap-2">
+          <div class="mb-2 flex h-5 items-center gap-2">
             <span class="text-xs font-semibold tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
               Spaces
             </span>
