@@ -52,6 +52,11 @@ interface HoverCardProps {
   previewClass?: string;
   /** Preview placement preference (default: auto) */
   previewPlacement?: "auto" | "side";
+  /**
+   * Above or below the trigger, the preview lets the mouse through to what it covers, e.g. the
+   * next rows of a list; only beside the trigger can you move into it.
+   */
+  passThroughWhenCovering?: boolean;
   /** Where a preview to the right starts; defaults to the trigger's right edge. */
   sideStart?: (trigger: HTMLElement) => number;
   /** Whether the preview container should be visible once hover is active */
@@ -227,6 +232,10 @@ const HoverCard = (props: HoverCardProps) => {
     }
   };
 
+  const passThrough = () =>
+    props.passThroughWhenCovering &&
+    (lockedPlacement() === "above" || lockedPlacement() === "below");
+
   const previewVisible = () => active() && canHover && (props.showPreview ?? true);
 
   return (
@@ -249,7 +258,7 @@ const HoverCard = (props: HoverCardProps) => {
             style={getPreviewStyle()}
             onMouseEnter={clearHideTimeout}
             onMouseLeave={scheduleHide}
-            class={`dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto fixed z-50 block overflow-hidden rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 shadow-md dark:border-neutral-700 ${props.previewClass ?? "max-h-80 w-max max-w-sm font-mono text-xs whitespace-pre-wrap sm:max-h-112 lg:max-w-lg"}`}
+            class={`dark:bg-dark-300 dark:shadow-dark-700 ${passThrough() ? "pointer-events-none" : "pointer-events-auto"} fixed z-50 block overflow-hidden rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 shadow-md dark:border-neutral-700 ${props.previewClass ?? "max-h-80 w-max max-w-sm font-mono text-xs whitespace-pre-wrap sm:max-h-112 lg:max-w-lg"}`}
           >
             <HoverCardContext.Provider value={{ group: previewDescendantGroup }}>
               <div

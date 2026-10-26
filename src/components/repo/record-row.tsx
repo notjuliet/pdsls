@@ -95,6 +95,7 @@ export const RecordRow = (props: RecordRowProps) => {
       }
       previewPlacement="side"
       sideStart={measureTextEnd}
+      passThroughWhenCovering
       previewClass="max-h-80 w-max max-w-[min(32rem,calc(100vw-1rem))] font-mono text-xs whitespace-pre-wrap sm:max-h-112"
       trigger={
         <Show
