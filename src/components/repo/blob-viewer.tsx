@@ -1,5 +1,4 @@
 import * as CID from "@atcute/cid";
-import { A } from "@solidjs/router";
 import {
   createEffect,
   createMemo,
@@ -13,6 +12,7 @@ import {
 } from "solid-js";
 
 import { formatFileSize } from "../../lib/format.js";
+import { BackLink } from "../ui/back-link.jsx";
 import { Button } from "../ui/button.jsx";
 import { ExternalLink } from "../ui/external-link.jsx";
 import { Spinner } from "../ui/states.jsx";
@@ -148,13 +148,10 @@ export const BlobViewer = (props: {
       )}
     >
       <div class="mx-auto flex w-full max-w-3xl flex-col gap-4 px-3 pb-20">
-        <A
-          href={props.backHref}
-          class="flex w-fit items-center gap-1 text-sm text-blue-500 hover:underline dark:text-blue-400"
-        >
-          <span class="iconify lucide--arrow-left" />
+        {/* Pulled into the padding so the label lines up with the content below. */}
+        <BackLink href={props.backHref} class="-mx-2">
           {props.backLabel}
-        </A>
+        </BackLink>
 
         <Show when={!parsedCid().ok}>
           <div class="rounded border border-red-500 px-3 py-2 text-red-500">

@@ -1,9 +1,10 @@
 import { useParams } from "@solidjs/router";
-import { children, createResource, type JSX } from "solid-js";
+import { children, createResource, type JSX, Show } from "solid-js";
 
 import { resolveDidInfo } from "../../components/hover-card/did.jsx";
 import { timestampFromRkey } from "../../components/repo/record-row.jsx";
 import { nsidDomain, type Stage, StageNav } from "../../components/repo/stage-nav.jsx";
+import { BackLink } from "../../components/ui/back-link.jsx";
 import { localDateFromTimestamp } from "../../lib/format.js";
 import { makeSpaceCollectionPath, makeSpacePath, makeSpaceRepoPath } from "./context.jsx";
 
@@ -24,15 +25,9 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
   const hasSpace = () => !!params.spaceAuthority && !!params.spaceType && !!params.skey;
 
   const stages = (): Stage[] => {
-    const result: Stage[] = [
-      {
-        kind: "Spaces",
-        label: "All spaces",
-        href: hasSpace() ? "/spaces" : undefined,
-        trailing: action(),
-      },
-    ];
-    if (!hasSpace()) return result;
+    // The spaces list is the root: its own page shows it as the only row, deeper pages link back above.
+    if (!hasSpace()) return [{ label: "All spaces", trailing: action() }];
+    const result: Stage[] = [];
 
     const authority = params.spaceAuthority!;
     const spaceType = params.spaceType!;
@@ -87,5 +82,12 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
     return result;
   };
 
-  return <StageNav stages={stages()} />;
+  return (
+    <div class="flex w-full flex-col">
+      <Show when={hasSpace()}>
+        <BackLink href="/spaces">All spaces</BackLink>
+      </Show>
+      <StageNav stages={stages()} />
+    </div>
+  );
 };
