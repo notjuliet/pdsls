@@ -39,9 +39,16 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
     const skey = params.skey!;
     result.push({
       kind: "Space",
-      label: spaceType,
+      // Type and key identify the space, shown like the spaces list does; the owner is the detail.
+      label: (
+        <>
+          {spaceType}
+          <span class="font-normal text-neutral-400 dark:text-neutral-500"> / </span>
+          {skey}
+        </>
+      ),
       favicon: nsidDomain(spaceType),
-      detail: `${skey} · ${authorityHandle() ?? authority}`,
+      detail: authorityHandle() ?? authority,
       detailHref: authorityHandle() ? `/at://${authority}` : undefined,
       href: params.spaceRepo ? makeSpacePath(authority, spaceType, skey) : undefined,
       copy: { label: "owner DID", value: authority },
@@ -49,8 +56,9 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
 
     const repo = params.spaceRepo;
     if (!repo) return result;
+    // A member's records within the space, not their whole repo.
     result.push({
-      kind: "Repo",
+      kind: "Member",
       label: repoHandle() ?? repo,
       detail: repoHandle() ? repo : undefined,
       detailHref: repoHandle() ? `/at://${repo}` : undefined,

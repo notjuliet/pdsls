@@ -98,11 +98,11 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
             {props.stage.kind}
           </span>
         </Show>
-        <span class="pointer-events-none relative flex min-w-0 items-baseline gap-2">
+        <span class="pointer-events-none relative flex min-w-0 flex-wrap items-baseline gap-x-2 sm:flex-nowrap">
           <span
             class={`min-w-0 truncate py-0.5 font-medium ${props.stage.labelClass ?? ""}`}
             classList={{
-              "shrink-0 max-w-full": !!props.stage.detail,
+              "sm:shrink-0 max-w-full": !!props.stage.detail,
               "text-blue-500 dark:text-blue-400": !!props.stage.href,
               "group-hover/row:text-blue-600 dark:group-hover/row:text-blue-300":
                 !!props.stage.href && !detailHovered(),
@@ -120,25 +120,23 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
             )}
           </Show>
           <Show when={props.stage.detail}>
-            <Show
-              when={props.stage.detailHref}
-              fallback={
-                <span class="min-w-0 truncate text-xs text-neutral-500 sm:text-sm dark:text-neutral-400">
-                  {props.stage.detail}
-                </span>
-              }
-            >
-              {(detailHref) => (
-                <A
-                  href={detailHref()}
-                  class="pointer-events-auto relative z-10 min-w-0 truncate text-xs text-neutral-500 hover:text-blue-500 hover:underline sm:text-sm dark:text-neutral-400 dark:hover:text-blue-400"
-                  onMouseEnter={() => setDetailHovered(true)}
-                  onMouseLeave={() => setDetailHovered(false)}
-                >
-                  {props.stage.detail}
-                </A>
-              )}
-            </Show>
+            <span class="flex max-w-full min-w-0 items-baseline text-xs text-neutral-500 sm:text-sm dark:text-neutral-400">
+              <Show
+                when={props.stage.detailHref}
+                fallback={<span class="min-w-0 truncate">{props.stage.detail}</span>}
+              >
+                {(detailHref) => (
+                  <A
+                    href={detailHref()}
+                    class="pointer-events-auto relative z-10 min-w-0 truncate hover:text-blue-500 hover:underline dark:hover:text-blue-400"
+                    onMouseEnter={() => setDetailHovered(true)}
+                    onMouseLeave={() => setDetailHovered(false)}
+                  >
+                    {props.stage.detail}
+                  </A>
+                )}
+              </Show>
+            </span>
           </Show>
           {/* Copy appears after the value on hover; phones copy from the Info and Identity tabs. */}
           <Show when={canHover && props.stage.copy}>
