@@ -13,7 +13,6 @@ import {
   createResource,
   createSignal,
   ErrorBoundary,
-  For,
   type JSX,
   Show,
   Suspense,
@@ -241,7 +240,6 @@ const RepoView = () => {
   const params = useParams();
   const hidden = () => !!params.collection || !!params.cid;
   const location = useLocation();
-  const navigate = useNavigate();
   const [error, setError] = createSignal<string>();
   const [downloading, setDownloading] = createSignal(false);
   const [nsids, setNsids] = createSignal<string[]>();
@@ -342,29 +340,15 @@ const RepoView = () => {
       <Show when={repoData.state === "ready" || repo.error()}>
         <div class="flex w-full flex-col gap-3 wrap-break-word">
           <div class="flex items-center justify-between gap-2 px-2 text-sm sm:text-base">
-            <div class="relative min-w-0 flex-1 sm:hidden">
-              <select
-                aria-label="Repository section"
-                value={activeTab()}
-                class="dark:bg-dark-100 w-full appearance-none rounded-md border border-neutral-300 bg-neutral-50 px-2.5 py-1.5 pr-8 text-sm outline-none focus:border-neutral-400 dark:border-neutral-600 dark:scheme-dark dark:focus:border-neutral-500"
-                onChange={(event) => navigate(`/at://${params.repo}#${event.currentTarget.value}`)}
-              >
-                <For each={repoTabs()}>{(tab) => <option value={tab.tab}>{tab.label}</option>}</For>
-              </select>
-              <span class="iconify lucide--chevron-down pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-neutral-500 dark:text-neutral-400" />
-            </div>
-
-            <div class="hidden sm:block">
-              <Tabs
-                items={repoTabs().map((tab) => ({
-                  id: tab.tab,
-                  label: tab.label,
-                  href: `/at://${params.repo}#${tab.tab}`,
-                }))}
-                active={activeTab()}
-              />
-            </div>
-            <div class="flex gap-1">
+            <Tabs
+              items={repoTabs().map((tab) => ({
+                id: tab.tab,
+                label: tab.label,
+                href: `/at://${params.repo}#${tab.tab}`,
+              }))}
+              active={activeTab()}
+            />
+            <div class="flex shrink-0 gap-1">
               <Show when={error() && error() !== "Missing PDS"}>
                 <div class="flex items-center gap-1 rounded-md border border-red-500 px-1.5 py-0.5 text-xs font-medium text-red-500 sm:text-sm dark:border-red-400 dark:text-red-400">
                   <span
