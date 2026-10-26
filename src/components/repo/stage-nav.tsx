@@ -2,7 +2,6 @@ import type { Nsid } from "@atcute/lexicons";
 import { A } from "@solidjs/router";
 import { createResource, createSignal, For, Index, type JSX, Show } from "solid-js";
 
-import { canHover } from "../../layout";
 import { addToClipboard } from "../../lib/copy";
 import { resolveLexicon, schemaHref } from "../../lib/lexicon";
 import LexiconHoverCard from "../hover-card/lexicon";
@@ -49,7 +48,7 @@ export const nsidDomain = (nsid: string) => nsid.split(".").slice(0, 2).reverse(
 const iconLinkClass =
   "flex items-center rounded px-1.5 py-1 text-neutral-400 transition-colors hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-500 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70";
 
-const kindClass = "relative w-16 shrink-0 text-left text-xs sm:w-20";
+const kindClass = "relative text-left text-xs whitespace-nowrap";
 
 const ActionIcon = (props: { action: StageAction }) => {
   const icon = () => (
@@ -95,22 +94,18 @@ const StageKind = (props: { stage: Stage }) => (
       </span>
     }
   >
-    {(copy) => {
-      const button = (
+    {(copy) => (
+      <Tooltip text={`Copy ${copy().label}`} icon="lucide--copy">
         <button
           type="button"
           aria-label={`Copy ${copy().label}`}
-          class={`group/kind z-10 flex items-baseline gap-1 text-neutral-500 transition-colors hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 ${kindClass}`}
+          class={`z-10 text-neutral-500 transition-colors hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 ${kindClass}`}
           onClick={() => addToClipboard(copy().value)}
         >
           {props.stage.kind}
-          <Show when={canHover}>
-            <span class="iconify lucide--copy shrink-0 self-center opacity-0 transition-opacity group-hover/kind:opacity-100" />
-          </Show>
         </button>
-      );
-      return canHover ? <Tooltip text={`Copy ${copy().label}`}>{button}</Tooltip> : button;
-    }}
+      </Tooltip>
+    )}
   </Show>
 );
 
@@ -118,9 +113,11 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
   const [detailHovered, setDetailHovered] = createSignal(false);
 
   return (
-    <div class="flex w-full min-w-0 items-center gap-1">
+    // Rows share the nav's grid columns, so every label, value and action group lines up.
+    <div class="col-span-full grid grid-cols-subgrid items-center">
       <div
-        class="group/row relative flex min-h-7 min-w-0 flex-1 items-baseline gap-2 rounded-md px-2 transition-colors hover:bg-neutral-200/80 dark:hover:bg-neutral-700/50"
+        class="group/row relative grid grid-cols-subgrid items-baseline gap-x-4 rounded-md px-2 py-0.5 transition-colors hover:bg-neutral-200/80 sm:py-0 dark:hover:bg-neutral-700/50"
+        classList={{ "col-span-2": props.kindColumn }}
         onMouseLeave={() => setDetailHovered(false)}
       >
         <Show when={props.stage.href}>
@@ -133,7 +130,7 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
         <Show when={props.kindColumn}>
           <StageKind stage={props.stage} />
         </Show>
-        <span class="pointer-events-none relative flex min-w-0 flex-1 items-baseline gap-2">
+        <span class="pointer-events-none relative flex min-w-0 items-baseline gap-2">
           <span
             class={`min-w-0 truncate py-0.5 font-medium ${props.stage.labelClass ?? ""}`}
             classList={{
@@ -148,8 +145,8 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
           {/* Keyed so the favicon reloads when the domain changes. */}
           <Show when={props.stage.favicon} keyed>
             {(domain) => (
-              <span class="-ml-1 flex shrink-0 self-center">
-                <Favicon domain={domain} />
+              <span class="flex shrink-0 self-center">
+                <Favicon domain={domain} noFallback wrapper={(icon) => icon} />
               </span>
             )}
           </Show>
@@ -176,19 +173,24 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
           </Show>
         </span>
       </div>
-      <Show when={props.stage.trailing || props.stage.actions?.length}>
-        <span class="flex shrink-0 items-center pr-2 sm:gap-0.5">
-          {props.stage.trailing}
-          <For each={props.stage.actions}>{(action) => <ActionIcon action={action} />}</For>
-        </span>
-      </Show>
+      <span class="flex items-center justify-end pr-2 sm:gap-0.5">
+        {props.stage.trailing}
+        <For each={props.stage.actions}>{(action) => <ActionIcon action={action} />}</For>
+      </span>
     </div>
   );
 };
 
 /** The navigation at the top of a page: one labeled row per level, its actions beside it. */
 export const StageNav = (props: { stages: Stage[] }) => (
-  <nav class="flex w-full flex-col text-sm wrap-anywhere sm:text-base">
+  // The label column fits its longest label; the action column fits the widest action group.
+  <nav
+    class="grid w-full gap-x-1 text-sm wrap-anywhere sm:text-base"
+    classList={{
+      "grid-cols-[auto_minmax(0,1fr)_auto]": props.stages.some((item) => item.kind),
+      "grid-cols-[minmax(0,1fr)_auto]": !props.stages.some((item) => item.kind),
+    }}
+  >
     {/* Index keeps each row mounted while its stage updates. */}
     <Index each={props.stages}>
       {(stage) => <StageRow stage={stage()} kindColumn={props.stages.some((item) => item.kind)} />}
