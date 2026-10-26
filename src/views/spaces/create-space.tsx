@@ -3,11 +3,13 @@ import { createSignal, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { SPACE_MANAGE_SPACES_SCOPE_ID } from "../../auth/scope-utils.js";
-import { Button } from "../../components/button.jsx";
-import { Modal } from "../../components/modal.jsx";
-import { addNotification } from "../../components/notification.jsx";
-import { PermissionButton } from "../../components/permission-button.jsx";
-import { TextInput } from "../../components/text-input.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { IconButton } from "../../components/ui/icon-button.jsx";
+import { Modal } from "../../components/ui/modal.jsx";
+import { addNotification } from "../../components/ui/notification.jsx";
+import { PermissionButton } from "../../components/ui/permission-button.jsx";
+import { Spinner } from "../../components/ui/states.jsx";
+import { TextInput } from "../../components/ui/text-input.jsx";
 import {
   createSimpleSpace,
   parseSpaceUri,
@@ -116,18 +118,11 @@ export const CreateSpaceDialog = (props: CreateSpaceDialogProps) => {
         onClose={closeDialog}
         closeOnClick={false}
         alignTop
-        contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto flex max-h-[calc(100vh-5rem)] w-[calc(100%-1rem)] max-w-[30.5rem] flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
+        contentClass="flex max-h-[calc(100vh-5rem)] w-[calc(100%-1rem)] max-w-[30.5rem] flex-col"
       >
         <div class="mb-3 flex items-center justify-between">
           <h2 class="font-semibold">Create Space</h2>
-          <button
-            type="button"
-            aria-label="Close"
-            onclick={closeDialog}
-            class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-          >
-            <span class="iconify lucide--x" />
-          </button>
+          <IconButton icon="lucide--x" label="Close" tooltip={false} onClick={closeDialog} />
         </div>
 
         <form
@@ -173,15 +168,9 @@ export const CreateSpaceDialog = (props: CreateSpaceDialogProps) => {
           </Show>
 
           <div class="flex justify-end">
-            <Button
-              type="submit"
-              disabled={submitting()}
-              classList={{
-                "bg-blue-500! text-white! hover:bg-blue-600! active:bg-blue-700! dark:bg-blue-600! dark:hover:bg-blue-500! dark:active:bg-blue-400! border-none! disabled:opacity-60": true,
-              }}
-            >
+            <Button type="submit" disabled={submitting()} variant="primary">
               <Show when={submitting()} fallback={<span class="iconify lucide--plus" />}>
-                <span class="iconify lucide--loader-circle animate-spin" />
+                <Spinner />
               </Show>
               Create
             </Button>

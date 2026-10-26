@@ -2,8 +2,9 @@ import { Handle } from "@atcute/lexicons";
 import { createSignal, Show } from "solid-js";
 
 import { resolveHandle } from "../../lib/api";
-import { Button } from "../button.jsx";
-import { TextInput } from "../text-input.jsx";
+import { Button } from "../ui/button.jsx";
+import { Spinner } from "../ui/states.jsx";
+import { TextInput } from "../ui/text-input.jsx";
 
 export const HandleInput = (props: { onInsert: (text: string) => void; onClose: () => void }) => {
   const [resolving, setResolving] = createSignal(false);
@@ -63,17 +64,12 @@ export const HandleInput = (props: { onInsert: (text: string) => void; onClose: 
           </Button>
           <Show when={resolving()}>
             <div class="flex items-center gap-1">
-              <span class="iconify lucide--loader-circle animate-spin"></span>
+              <Spinner />
               <span>Resolving</span>
             </div>
           </Show>
           <Show when={!resolving()}>
-            <Button
-              type="submit"
-              classList={{
-                "bg-blue-500! text-white! border-none! hover:bg-blue-600! active:bg-blue-700! dark:bg-blue-600! dark:hover:bg-blue-500! dark:active:bg-blue-400!": true,
-              }}
-            >
+            <Button type="submit" variant="primary">
               Insert
             </Button>
           </Show>

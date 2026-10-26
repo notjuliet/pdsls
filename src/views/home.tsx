@@ -4,13 +4,13 @@ import { For, JSX } from "solid-js";
 const repositoryExamples = [
   {
     type: "Repo",
-    value: "@retr0.id",
-    href: "/at://did:plc:vwzwgnygau7ed7b7wt5ux7y2",
+    value: "@atproto.com",
+    href: "/at://did:plc:ewvi7nxzyoun6zhxrhs64oiz",
   },
   {
     type: "Record",
-    value: "at://futur.blue/app.bsky.actor.profile/self",
-    href: "/at://did:plc:uu5axsmbm2or2dngy4gwchec/app.bsky.actor.profile/self",
+    value: "at://mary.my.id/app.bsky.actor.profile/self",
+    href: "/at://did:plc:ia76kvnndjutgedggx2ibrem/app.bsky.actor.profile/self",
   },
   {
     type: "PDS",
@@ -19,8 +19,8 @@ const repositoryExamples = [
   },
   {
     type: "Lexicon",
-    value: "site.standard.document",
-    href: "/at://did:plc:re3ebnp5v7ffagz6rb6xfei4/com.atproto.lexicon.schema/site.standard.document#schema",
+    value: "place.stream.chat.message",
+    href: "/at://did:web:stream.place/com.atproto.lexicon.schema/place.stream.chat.message#schema",
   },
   {
     type: "Labels",
@@ -29,8 +29,8 @@ const repositoryExamples = [
   },
   {
     type: "Backlinks",
-    value: "mary.my.id",
-    href: "/at://did:plc:ia76kvnndjutgedggx2ibrem#backlinks",
+    value: "microcosm.blue",
+    href: "/at://did:plc:lulmyldiq4sb2ikags5sfb25#backlinks",
   },
 ];
 
@@ -94,7 +94,7 @@ export const Home = () => {
           About AT Protocol
         </a>
 
-        <div class="mt-6 w-full max-w-lg text-left">
+        <div class="mt-6 w-full text-left">
           <div class="rounded-lg border border-neutral-200 p-2 sm:p-3 dark:border-neutral-700">
             <h2 class="px-2 py-1 text-sm font-medium sm:text-base">Browse</h2>
             <div class="mt-1 grid grid-cols-1 gap-x-3 sm:grid-cols-2">

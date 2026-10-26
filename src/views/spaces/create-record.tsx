@@ -4,14 +4,16 @@ import type { EditorView } from "codemirror";
 import { createSignal, lazy, Show, Suspense } from "solid-js";
 
 import { hasUserScope, SPACE_MANAGE_RECORDS_SCOPE_ID } from "../../auth/scope-utils.js";
-import { Button } from "../../components/button.jsx";
 import { ConfirmSubmit } from "../../components/create/confirm-submit.jsx";
 import { InsertMenu } from "../../components/create/insert-menu.jsx";
 import type { JSONType } from "../../components/json.jsx";
-import { Modal } from "../../components/modal.jsx";
-import { addNotification } from "../../components/notification.jsx";
-import { PermissionButton } from "../../components/permission-button.jsx";
-import { TextInput } from "../../components/text-input.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { IconButton } from "../../components/ui/icon-button.jsx";
+import { Modal } from "../../components/ui/modal.jsx";
+import { addNotification } from "../../components/ui/notification.jsx";
+import { PermissionButton } from "../../components/ui/permission-button.jsx";
+import { Spinner } from "../../components/ui/states.jsx";
+import { TextInput } from "../../components/ui/text-input.jsx";
 import {
   createSpaceRecord,
   putSpaceRecord,
@@ -20,7 +22,7 @@ import {
 import { makeSpaceRecordPath, useSpaceRecords, useSpacesAuth } from "./context.jsx";
 
 const Editor = lazy(() =>
-  import("../../components/editor.jsx").then((m) => ({ default: m.Editor })),
+  import("../../components/ui/editor.jsx").then((m) => ({ default: m.Editor })),
 );
 
 interface SpaceRecordEditorProps {
@@ -198,12 +200,12 @@ export const SpaceRecordEditor = (props: SpaceRecordEditorProps) => {
         class={
           props.label
             ? "flex items-center gap-1 rounded-md border border-neutral-300 px-1.5 py-0.5 text-xs transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 sm:px-2 sm:py-0.75 sm:text-sm dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-            : `flex items-center p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 ${editing() ? "rounded-sm" : "rounded-md"}`
+            : undefined
         }
         disabledClass={
           props.label
             ? "flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs opacity-40 sm:px-2 sm:py-1 sm:text-sm"
-            : `flex items-center p-1.5 opacity-40 ${editing() ? "rounded-sm" : "rounded-md"}`
+            : undefined
         }
         onClick={openEditor}
       >
@@ -217,38 +219,30 @@ export const SpaceRecordEditor = (props: SpaceRecordEditorProps) => {
         closeOnClick={false}
         nonBlocking={isMinimized()}
         alignTop
-        contentClass={`dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto flex flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700 ${isMaximized() ? "h-[85vh] w-[calc(100%-1rem)] max-w-7xl" : "h-[65vh] w-[calc(100%-1rem)] max-w-3xl"} ${isMinimized() ? "hidden" : ""}`}
+        contentClass={`flex flex-col ${isMaximized() ? "h-[85vh] w-[calc(100%-1rem)] max-w-7xl" : "h-[65vh] w-[calc(100%-1rem)] max-w-3xl"} ${isMinimized() ? "hidden" : ""}`}
       >
         <div class="mb-2 flex items-center justify-between">
           <h2 class="font-semibold">{editing() ? "Editing record" : "Creating record"}</h2>
           <div class="flex items-center gap-1">
-            <button
-              type="button"
-              aria-label="Minimize"
-              onclick={() => setIsMinimized(true)}
-              class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-            >
-              <span class="iconify lucide--minus" />
-            </button>
-            <button
-              type="button"
-              aria-label={isMaximized() ? "Restore window" : "Maximize"}
-              onclick={() => setIsMaximized(!isMaximized())}
-              class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-            >
-              <span
-                class={`iconify ${isMaximized() ? "lucide--minimize-2" : "lucide--maximize-2"}`}
-              />
-            </button>
-            <button
-              type="button"
-              aria-label="Close"
+            <IconButton
+              icon="lucide--minus"
+              label="Minimize"
+              tooltip={false}
+              onClick={() => setIsMinimized(true)}
+            />
+            <IconButton
+              icon={isMaximized() ? "lucide--minimize-2" : "lucide--maximize-2"}
+              label={isMaximized() ? "Restore window" : "Maximize"}
+              tooltip={false}
+              onClick={() => setIsMaximized(!isMaximized())}
+            />
+            <IconButton
+              icon="lucide--x"
+              label="Close"
+              tooltip={false}
               disabled={submitting()}
-              onclick={closeEditor}
-              class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 disabled:opacity-40 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-            >
-              <span class="iconify lucide--x" />
-            </button>
+              onClick={closeEditor}
+            />
           </div>
         </div>
 
@@ -284,7 +278,7 @@ export const SpaceRecordEditor = (props: SpaceRecordEditorProps) => {
             <Suspense
               fallback={
                 <div class="flex h-full items-center justify-center">
-                  <span class="iconify lucide--loader-circle animate-spin text-xl" />
+                  <Spinner class="text-xl" />
                 </div>
               }
             >
@@ -304,12 +298,12 @@ export const SpaceRecordEditor = (props: SpaceRecordEditorProps) => {
               editor={() => editorView}
               repo={auth().sub}
               canUpload={hasUserScope("blob")}
-              dialogClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[calc(100%-2rem)] max-w-xs rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
+              dialogClass="w-[calc(100%-2rem)] max-w-xs"
             />
             <Modal
               open={openAdvanced()}
               onClose={() => setOpenAdvanced(false)}
-              contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto w-[calc(100%-2rem)] max-w-sm rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
+              contentClass="w-[calc(100%-2rem)] max-w-sm"
             >
               <ConfirmSubmit
                 isCreate
@@ -322,15 +316,9 @@ export const SpaceRecordEditor = (props: SpaceRecordEditorProps) => {
             </Modal>
             <div class="flex items-center justify-end gap-2">
               <Button onClick={() => setOpenAdvanced(true)}>Advanced</Button>
-              <Button
-                type="submit"
-                disabled={submitting()}
-                classList={{
-                  "border-none! bg-blue-500! text-white! hover:bg-blue-600! active:bg-blue-700! disabled:opacity-60 dark:bg-blue-600! dark:hover:bg-blue-500! dark:active:bg-blue-400!": true,
-                }}
-              >
+              <Button type="submit" disabled={submitting()} variant="primary">
                 <Show when={submitting()}>
-                  <span class="iconify lucide--loader-circle animate-spin" />
+                  <Spinner />
                 </Show>
                 {submitting()
                   ? editing()

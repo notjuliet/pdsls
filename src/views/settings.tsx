@@ -1,9 +1,10 @@
-import { createSignal } from "solid-js";
+import { createSignal, For } from "solid-js";
 
-import { TextInput } from "../components/text-input.jsx";
-import { ThemeSelection } from "../components/theme.jsx";
+import { TextInput } from "../components/ui/text-input.jsx";
+import { ThemeSelection } from "../components/ui/theme.jsx";
 
-export const [hideMedia, setHideMedia] = createSignal(localStorage.hideMedia === "true");
+const [hideMedia, setHideMedia] = createSignal(localStorage.hideMedia === "true");
+export { hideMedia };
 const [plcDirectory, setPlcDirectory] = createSignal(
   localStorage.plcDirectory || "https://plc.directory",
 );
@@ -48,6 +49,35 @@ const Settings = () => {
         />
       </div>
       <ThemeSelection />
+      <div class="flex flex-col gap-1">
+        <label class="font-medium select-none">Media in records</label>
+        <div class="flex gap-2">
+          <For
+            each={[
+              { hide: false, label: "Show" },
+              { hide: true, label: "Hide" },
+            ]}
+          >
+            {(option) => (
+              <button
+                classList={{
+                  "flex items-center min-w-21 justify-center rounded-xl border px-3 py-2": true,
+                  "bg-neutral-200/60 border-neutral-300 dark:border-neutral-500 dark:bg-neutral-700":
+                    hideMedia() === option.hide,
+                  "border-neutral-200 dark:border-neutral-600 hover:bg-neutral-200/30 dark:hover:bg-neutral-800":
+                    hideMedia() !== option.hide,
+                }}
+                onClick={() => {
+                  localStorage.hideMedia = String(option.hide);
+                  setHideMedia(option.hide);
+                }}
+              >
+                {option.label}
+              </button>
+            )}
+          </For>
+        </div>
+      </div>
       <div class="flex flex-col gap-1">
         <label class="font-medium select-none">Version</label>
         <div class="text-sm text-neutral-600 dark:text-neutral-400">

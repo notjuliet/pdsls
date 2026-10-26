@@ -3,6 +3,8 @@ import { createSignal, JSX, Match, Show, Switch } from "solid-js";
 export const Favicon = (props: {
   domain: string;
   reverse?: boolean;
+  /** Shows nothing until the favicon loads, instead of a globe. */
+  noFallback?: boolean;
   wrapper?: (children: JSX.Element) => JSX.Element;
 }) => {
   const [loaded, setLoaded] = createSignal(false);
@@ -18,7 +20,7 @@ export const Favicon = (props: {
         <span class="iconify i-tangled size-4 text-neutral-900 dark:text-neutral-100" />
       </Match>
       <Match when={true}>
-        <Show when={!loaded()}>
+        <Show when={!loaded() && !props.noFallback}>
           <span class="iconify lucide--globe size-4 text-neutral-400 dark:text-neutral-500" />
         </Show>
         <img

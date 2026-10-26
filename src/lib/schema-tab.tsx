@@ -6,13 +6,18 @@ import { createEffect, createSignal, ErrorBoundary, Show } from "solid-js";
 import { LexiconSchemaView } from "../components/lexicon-schema.jsx";
 import { resolveLexicon } from "./lexicon.js";
 
-export const useLexiconSchema = (collection: () => string | undefined) => {
+export const useLexiconSchema = (
+  collection: () => string | undefined,
+  /** Whether the schema tab is showing; defaults to the URL hash. */
+  active?: () => boolean,
+) => {
   const location = useLocation();
   const [schema, setSchema] = createSignal<ResolvedSchema>();
   const [error, setError] = createSignal<string>();
   const [loading, setLoading] = createSignal(false);
 
-  const showSchema = () => location.hash === "#schema" || location.hash.startsWith("#schema:");
+  const showSchema = () =>
+    active ? active() : location.hash === "#schema" || location.hash.startsWith("#schema:");
 
   createEffect(() => {
     const col = collection();

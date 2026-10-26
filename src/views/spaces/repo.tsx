@@ -1,9 +1,11 @@
-import { A, type RouteSectionProps, useLocation, useParams } from "@solidjs/router";
-import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import { type RouteSectionProps, useLocation, useParams } from "@solidjs/router";
+import { createEffect, createMemo, createSignal, Show } from "solid-js";
 
-import { Button } from "../../components/button.jsx";
-import { Favicon } from "../../components/favicon.jsx";
-import { NestedLayout } from "../../components/nested-layout.jsx";
+import { CollectionList } from "../../components/repo/collection-list.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { NestedLayout } from "../../components/ui/nested-layout.jsx";
+import { Spinner, EmptyState, ErrorNotice, LoadingState } from "../../components/ui/states.jsx";
+import { Tabs } from "../../components/ui/tabs.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { listSpaceRecords, type SpaceRecord } from "../../lib/spaces.js";
 import { SpaceBlobList } from "./blobs.jsx";
@@ -15,7 +17,6 @@ import {
   useSpacesAuth,
 } from "./context.jsx";
 import { SpaceRecordEditor } from "./create-record.jsx";
-import { EmptyState, ErrorNotice, LoadingState } from "./shared.jsx";
 
 const SpaceRepoView = () => {
   const auth = useSpacesAuth();
@@ -34,6 +35,8 @@ const SpaceRepoView = () => {
   let requestVersion = 0;
 
   const space = () => makeSpaceRef(params.spaceAuthority!, params.spaceType!, params.skey!);
+  const repoPath = () =>
+    makeSpaceRepoPath(params.spaceAuthority!, params.spaceType!, params.skey!, repo());
 
   const collections = createMemo(() => {
     const grouped = new Map<string, number>();
@@ -83,32 +86,17 @@ const SpaceRepoView = () => {
     }
   });
 
-  const SpaceRepoTab = (props: { tab: "collections" | "blobs"; label: string }) => (
-    <A
-      classList={{
-        "border-b-2 font-medium transition-colors": true,
-        "border-transparent not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80":
-          selectedTab() !== props.tab,
-      }}
-      href={`${makeSpaceRepoPath(
-        params.spaceAuthority!,
-        params.spaceType!,
-        params.skey!,
-        repo(),
-      )}#${props.tab}`}
-    >
-      {props.label}
-    </A>
-  );
-
   return (
     <Show when={!hidden()}>
       <div class="flex w-full flex-col gap-3 py-2 pb-10">
         <div class="flex min-h-7 items-center justify-between px-2 text-sm sm:text-base">
-          <div class="flex items-center gap-3 sm:gap-4">
-            <SpaceRepoTab tab="collections" label="Collections" />
-            <SpaceRepoTab tab="blobs" label="Blobs" />
-          </div>
+          <Tabs
+            items={[
+              { id: "collections", label: "Collections", href: `${repoPath()}#collections` },
+              { id: "blobs", label: "Blobs", href: `${repoPath()}#blobs` },
+            ]}
+            active={selectedTab()}
+          />
           <Show when={selectedTab() === "collections" && repo() === auth().sub}>
             <SpaceRecordEditor
               authority={params.spaceAuthority!}
@@ -128,40 +116,22 @@ const SpaceRepoView = () => {
           <Show when={error()}>{(message) => <ErrorNotice message={message()} />}</Show>
 
           <Show when={loaded() && (!error() || records().length > 0)}>
-            <ul class="flex flex-col">
-              <For each={collections()}>
-                {([collection, count]) => {
-                  const authority = () => collection.split(".").slice(0, 2).join(".");
-                  return (
-                    <li>
-                      <A
-                        href={makeSpaceCollectionPath(
-                          params.spaceAuthority!,
-                          params.spaceType!,
-                          params.skey!,
-                          repo(),
-                          collection,
-                        )}
-                        class="flex w-full items-center gap-2 rounded p-2 text-left text-sm hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-                      >
-                        <Favicon domain={authority()} reverse />
-                        <span class="min-w-0 truncate font-medium text-blue-500 dark:text-blue-400">
-                          {collection}
-                        </span>
-                        <span class="ml-auto shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
-                          {count.toLocaleString()}
-                          {cursor() ? "+" : ""}
-                        </span>
-                      </A>
-                    </li>
-                  );
-                }}
-              </For>
-            </ul>
-
-            <Show when={collections().length === 0}>
-              <EmptyState icon="lucide--folder-open" message="No collections found" />
-            </Show>
+            <div class="px-2">
+              <CollectionList
+                collections={collections().map(([collection, count]) => ({
+                  nsid: collection,
+                  count: `${count.toLocaleString()}${cursor() ? "+" : ""}`,
+                  href: makeSpaceCollectionPath(
+                    params.spaceAuthority!,
+                    params.spaceType!,
+                    params.skey!,
+                    repo(),
+                    collection,
+                  ),
+                }))}
+                fallback={<EmptyState icon="lucide--folder-open" message="No collections found" />}
+              />
+            </div>
 
             <Show when={cursor()}>
               <Button
@@ -170,7 +140,7 @@ const SpaceRepoView = () => {
                 classList={{ "w-fit self-center": true }}
               >
                 <Show when={loading()} fallback={<span class="iconify lucide--chevrons-down" />}>
-                  <span class="iconify lucide--loader-circle animate-spin" />
+                  <Spinner />
                 </Show>
                 Load more records
               </Button>

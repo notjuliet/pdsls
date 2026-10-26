@@ -2,7 +2,6 @@ import { Client, simpleFetchHandler } from "@atcute/client";
 import { DidDocument } from "@atcute/identity";
 import { ActorIdentifier, Handle, Nsid } from "@atcute/lexicons";
 import {
-  A,
   type RoutePreloadFunc,
   type RouteSectionProps,
   useLocation,
@@ -16,27 +15,26 @@ import {
   ErrorBoundary,
   For,
   type JSX,
-  onMount,
   Show,
   Suspense,
 } from "solid-js";
 
-import { Backlinks } from "../../components/backlinks.jsx";
+import { Backlinks } from "../../components/repo/backlinks.jsx";
 import {
-  DomainGroup,
-  DomainGroupRows,
-  domainGroupRowClasses,
-} from "../../components/domain-group.jsx";
-import { ActionMenu, DropdownMenu, MenuProvider, NavMenu } from "../../components/dropdown.jsx";
-import { FilterInput } from "../../components/filter-input.jsx";
-import { setPDS } from "../../components/navbar.jsx";
-import { NestedLayout } from "../../components/nested-layout.jsx";
+  CollectionList,
+  CollectionListControls,
+  createCollapseState,
+} from "../../components/repo/collection-list.jsx";
+import { setPDS } from "../../components/repo/navbar.jsx";
+import { IconButton } from "../../components/ui/icon-button.jsx";
+import { NestedLayout } from "../../components/ui/nested-layout.jsx";
 import {
   addNotification,
   removeNotification,
   updateNotification,
-} from "../../components/notification.jsx";
-import { Spinner } from "../../components/spinner.jsx";
+} from "../../components/ui/notification.jsx";
+import { Spinner } from "../../components/ui/states.jsx";
+import { Tabs } from "../../components/ui/tabs.jsx";
 import {
   didDocCache,
   getPDS,
@@ -45,7 +43,6 @@ import {
   resolveLexiconAuthority,
 } from "../../lib/api.js";
 import { createLatch } from "../../lib/create-latch.js";
-import { useFilterShortcut } from "../../lib/keyboard.js";
 import { RepoProvider, useRepo } from "../../lib/repo-context.jsx";
 import { LabelFeed } from "../labels.jsx";
 import { plcDirectory } from "../settings.jsx";
@@ -55,11 +52,7 @@ import { PlcLogView } from "./logs.jsx";
 
 const LazyTab = (props: { children: JSX.Element }) => (
   <ErrorBoundary fallback={(err) => <div class="wrap-break-word">Error: {err.message}</div>}>
-    <Suspense
-      fallback={<div class="iconify lucide--loader-circle mt-2 animate-spin self-center text-xl" />}
-    >
-      {props.children}
-    </Suspense>
+    <Suspense fallback={<Spinner class="mt-2 self-center text-xl" />}>{props.children}</Suspense>
   </ErrorBoundary>
 );
 
@@ -243,8 +236,6 @@ const downloadRepo = async (pdsUrl: string, did: string) => {
   }
 };
 
-const displayNsidDomain = (authority: string) => authority.split(".").reverse().join(".");
-
 const RepoView = () => {
   const repo = useRepo();
   const params = useParams();
@@ -253,15 +244,11 @@ const RepoView = () => {
   const navigate = useNavigate();
   const [error, setError] = createSignal<string>();
   const [downloading, setDownloading] = createSignal(false);
-  const [nsids, setNsids] = createSignal<Record<string, { hidden: boolean; nsids: string[] }>>();
-  const [filter, setFilter] = createSignal<string>();
+  const [nsids, setNsids] = createSignal<string[]>();
+  const [filter, setFilter] = createSignal("");
+  const collapse = createCollapseState();
   const [rotationKeys, setRotationKeys] = createSignal<Array<string>>([]);
-  let filterInputRef: HTMLInputElement | undefined;
   const did = repo.did();
-
-  onMount(() => {
-    useFilterShortcut(() => filterInputRef);
-  });
 
   const activeTab = (): RepoTabId => {
     if (!location.hash) return error() ? "identity" : "collections";
@@ -284,21 +271,6 @@ const RepoView = () => {
       ] satisfies { tab: RepoTabId; label: string; show: boolean }[]
     ).filter((tab) => tab.show);
 
-  const RepoTab = (props: { tab: RepoTabId; label: string }) => {
-    return (
-      <A
-        classList={{
-          "border-b-2 font-medium transition-colors": true,
-          "border-transparent not-hover:text-neutral-600 not-hover:dark:text-neutral-300/80":
-            activeTab() !== props.tab,
-        }}
-        href={`/at://${params.repo}#${props.tab}`}
-      >
-        {props.label}
-      </A>
-    );
-  };
-
   const getRotationKeys = async () => {
     const res = await fetch(`${plcDirectory()}/${did}/log/last`);
     const json = await res.json();
@@ -320,18 +292,7 @@ const RepoView = () => {
         params: { repo: did as ActorIdentifier },
       });
       if (res.ok) {
-        const collections: Record<string, { hidden: boolean; nsids: string[] }> = {};
-        res.data.collections.forEach((c) => {
-          const nsid = c.split(".");
-          if (nsid.length > 2) {
-            const authority = `${nsid[0]}.${nsid[1]}`;
-            collections[authority] = {
-              nsids: (collections[authority]?.nsids ?? []).concat(nsid.slice(2).join(".")),
-              hidden: false,
-            };
-          }
-        });
-        setNsids(collections);
+        setNsids(res.data.collections.filter((nsid) => nsid.split(".").length > 2));
       } else {
         console.error(res.data.error);
         switch (res.data.error) {
@@ -356,25 +317,6 @@ const RepoView = () => {
 
   const [repoData] = createResource(shouldFetch, fetchRepo);
 
-  const toggleCollapsed = (authority: string) => {
-    setNsids((prev) => ({
-      ...prev!,
-      [authority]: { ...prev![authority], hidden: !prev![authority].hidden },
-    }));
-  };
-
-  const collapseAll = () => {
-    setNsids((prev) =>
-      Object.fromEntries(Object.entries(prev!).map(([k, v]) => [k, { ...v, hidden: true }])),
-    );
-  };
-
-  const expandAll = () => {
-    setNsids((prev) =>
-      Object.fromEntries(Object.entries(prev!).map(([k, v]) => [k, { ...v, hidden: false }])),
-    );
-  };
-
   const handleDownload = async () => {
     const pdsUrl = repo.pds();
     if (!pdsUrl) return;
@@ -395,7 +337,7 @@ const RepoView = () => {
   return (
     <Show when={!hidden()}>
       <Show when={repoData.state === "unresolved" || repoData.loading}>
-        <Spinner />
+        <Spinner centered class="text-xl" />
       </Show>
       <Show when={repoData.state === "ready" || repo.error()}>
         <div class="flex w-full flex-col gap-3 wrap-break-word">
@@ -412,8 +354,15 @@ const RepoView = () => {
               <span class="iconify lucide--chevron-down pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-neutral-500 dark:text-neutral-400" />
             </div>
 
-            <div class="hidden items-center gap-4 sm:flex">
-              <For each={repoTabs()}>{(tab) => <RepoTab tab={tab.tab} label={tab.label} />}</For>
+            <div class="hidden sm:block">
+              <Tabs
+                items={repoTabs().map((tab) => ({
+                  id: tab.tab,
+                  label: tab.label,
+                  href: `/at://${params.repo}#${tab.tab}`,
+                }))}
+                active={activeTab()}
+              />
             </div>
             <div class="flex gap-1">
               <Show when={error() && error() !== "Missing PDS"}>
@@ -430,24 +379,14 @@ const RepoView = () => {
                   <span>{error()}</span>
                 </div>
               </Show>
-              <MenuProvider>
-                <DropdownMenu icon="lucide--ellipsis" buttonClass="rounded-sm p-1.5">
-                  <NavMenu
-                    href={`/streams?type=jetstream&dids=${encodeURIComponent(params.repo!)}`}
-                    label="Jetstream"
-                    icon="lucide--radio-tower"
-                  />
-                  <Show when={error()?.length === 0 || error() === undefined}>
-                    <ActionMenu
-                      label="Download repo"
-                      icon={
-                        downloading() ? "lucide--loader-circle animate-spin" : "lucide--download"
-                      }
-                      onClick={handleDownload}
-                    />
-                  </Show>
-                </DropdownMenu>
-              </MenuProvider>
+              <Show when={error()?.length === 0 || error() === undefined}>
+                <IconButton
+                  icon={downloading() ? "lucide--loader-circle animate-spin" : "lucide--download"}
+                  label="Download repo"
+                  disabled={downloading()}
+                  onClick={handleDownload}
+                />
+              </Show>
             </div>
           </div>
           <div class="flex w-full flex-col gap-1 px-2">
@@ -472,68 +411,19 @@ const RepoView = () => {
               </LazyTab>
             </Show>
             <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
-              <div class="flex flex-col gap-1 pb-22 text-sm wrap-anywhere sm:gap-0">
+              <div class="pb-22">
                 <Show
-                  when={Object.keys(nsids() ?? {}).length != 0}
+                  when={nsids()?.length}
                   fallback={<span class="mt-3 text-center text-base">No collections found.</span>}
                 >
-                  <For
-                    each={Object.keys(nsids() ?? {})
-                      .filter((authority) =>
-                        filter()
-                          ? authority.includes(filter()!) ||
-                            displayNsidDomain(authority).includes(filter()!) ||
-                            nsids()?.[authority].nsids.some((nsid) =>
-                              `${authority}.${nsid}`.includes(filter()!),
-                            )
-                          : true,
-                      )
-                      .sort((a, b) => displayNsidDomain(a).localeCompare(displayNsidDomain(b)))}
-                  >
-                    {(authority) => {
-                      const isCollapsed = () => nsids()?.[authority].hidden ?? false;
-                      const domain = displayNsidDomain(authority);
-                      const collectionCount = () => nsids()?.[authority].nsids.length ?? 0;
-
-                      return (
-                        <DomainGroup
-                          domain={domain}
-                          domainTitle={`${domain} (${authority})`}
-                          groupLabel="collections"
-                          sticky
-                          collapsed={isCollapsed()}
-                          collapsedLabel={
-                            <>
-                              {collectionCount()}{" "}
-                              {collectionCount() === 1 ? "collection" : "collections"}
-                            </>
-                          }
-                          onToggle={() => toggleCollapsed(authority)}
-                        >
-                          <DomainGroupRows>
-                            <For
-                              each={nsids()?.[authority].nsids.filter((nsid) =>
-                                filter() ? `${authority}.${nsid}`.includes(filter()!) : true,
-                              )}
-                            >
-                              {(nsid) => (
-                                <A
-                                  href={`/at://${did}/${authority}.${nsid}`}
-                                  class={`truncate hover:underline active:underline ${domainGroupRowClasses}`}
-                                  title={`${authority}.${nsid}`}
-                                >
-                                  <span class="text-neutral-500 dark:text-neutral-400">
-                                    {authority}.
-                                  </span>
-                                  {nsid}
-                                </A>
-                              )}
-                            </For>
-                          </DomainGroupRows>
-                        </DomainGroup>
-                      );
-                    }}
-                  </For>
+                  <CollectionList
+                    collections={(nsids() ?? []).map((nsid) => ({
+                      nsid,
+                      href: `/at://${did}/${nsid}`,
+                    }))}
+                    filter={filter()}
+                    collapse={collapse}
+                  />
                 </Show>
               </div>
             </Show>
@@ -546,30 +436,12 @@ const RepoView = () => {
         </div>
 
         <Show when={nsids() && (!location.hash || location.hash.startsWith("#collections"))}>
-          <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
-            <FilterInput
-              class="w-full max-w-[34.5rem]"
-              inputRef={(input) => (filterInputRef = input)}
-              name="filter"
-              placeholder="Filter collections..."
-              value={filter() ?? ""}
-              onInput={(value) => setFilter(value.toLowerCase())}
-            />
-            <div class="flex w-full max-w-[34.5rem] justify-end gap-1">
-              <button
-                class="rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
-                onClick={expandAll}
-              >
-                Expand all
-              </button>
-              <button
-                class="rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 active:bg-neutral-300 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 dark:active:bg-neutral-600"
-                onClick={collapseAll}
-              >
-                Collapse all
-              </button>
-            </div>
-          </div>
+          <CollectionListControls
+            filter={filter()}
+            onFilter={setFilter}
+            collapse={collapse}
+            nsids={nsids() ?? []}
+          />
         </Show>
       </Show>
     </Show>

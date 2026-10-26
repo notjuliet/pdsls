@@ -2,7 +2,7 @@ import { isDid } from "@atcute/lexicons/syntax";
 import { For, Show } from "solid-js";
 import type { SetStoreFunction } from "solid-js/store";
 
-import { TextInput } from "../../components/text-input.jsx";
+import { TextInput } from "../../components/ui/text-input.jsx";
 import type {
   NewSimpleSpaceAppAccess,
   NewSimpleSpacePolicy,

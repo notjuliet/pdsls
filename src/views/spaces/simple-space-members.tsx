@@ -4,12 +4,14 @@ import { A } from "@solidjs/router";
 import { createEffect, createSignal, For, Show } from "solid-js";
 
 import { SPACE_MANAGE_SPACES_SCOPE_ID } from "../../auth/scope-utils.js";
-import { Button } from "../../components/button.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
-import { Modal } from "../../components/modal.jsx";
-import { addNotification } from "../../components/notification.jsx";
-import { PermissionButton } from "../../components/permission-button.jsx";
-import { TextInput } from "../../components/text-input.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { IconButton } from "../../components/ui/icon-button.jsx";
+import { Modal } from "../../components/ui/modal.jsx";
+import { addNotification } from "../../components/ui/notification.jsx";
+import { PermissionButton } from "../../components/ui/permission-button.jsx";
+import { Spinner, ErrorNotice, LoadingState } from "../../components/ui/states.jsx";
+import { TextInput } from "../../components/ui/text-input.jsx";
 import { resolveHandle } from "../../lib/api.js";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import {
@@ -19,7 +21,6 @@ import {
   type SimpleSpaceMember,
 } from "../../lib/spaces.js";
 import { useSpacesAuth } from "./context.jsx";
-import { ErrorNotice, LoadingState } from "./shared.jsx";
 
 type MemberDialog =
   | { kind: "add" }
@@ -267,7 +268,7 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
               classList={{ "w-fit self-center": true }}
             >
               <Show when={loading()} fallback={<span class="iconify lucide--chevrons-down" />}>
-                <span class="iconify lucide--loader-circle animate-spin" />
+                <Spinner />
               </Show>
               Load more members
             </Button>
@@ -285,20 +286,13 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
         onClose={closeDialog}
         closeOnClick={false}
         alignTop
-        contentClass="dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto flex w-[calc(100%-1rem)] max-w-sm flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700"
+        contentClass="flex w-[calc(100%-1rem)] max-w-sm flex-col"
       >
         <div class="mb-3 flex items-center justify-between">
           <h2 class="font-semibold">
             {removingDid() ? "Remove member?" : editing() ? "Edit member access" : "Add member"}
           </h2>
-          <button
-            type="button"
-            aria-label="Close"
-            onclick={closeDialog}
-            class="flex items-center rounded-lg p-1.5 hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-          >
-            <span class="iconify lucide--x" />
-          </button>
+          <IconButton icon="lucide--x" label="Close" tooltip={false} onClick={closeDialog} />
         </div>
 
         <form
@@ -370,15 +364,10 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
             <Button
               type="submit"
               disabled={submitting()}
-              classList={{
-                "bg-blue-500! text-white! hover:bg-blue-600! active:bg-blue-700! dark:bg-blue-600! dark:hover:bg-blue-500! dark:active:bg-blue-400! border-none! disabled:opacity-60":
-                  !removingDid(),
-                "bg-red-500! border-none! text-white! hover:bg-red-400! active:bg-red-400! disabled:opacity-60":
-                  !!removingDid(),
-              }}
+              variant={removingDid() ? "danger" : "primary"}
             >
               <Show when={submitting()}>
-                <span class="iconify lucide--loader-circle animate-spin" />
+                <Spinner />
               </Show>
               {submitting()
                 ? removingDid()

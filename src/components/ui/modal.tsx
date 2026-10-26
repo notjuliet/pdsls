@@ -7,8 +7,12 @@ interface ModalProps extends Pick<ComponentProps<"svg">, "children"> {
   closeOnClick?: boolean;
   nonBlocking?: boolean;
   alignTop?: boolean;
+  /** Extra classes for the panel, typically its size. */
   contentClass?: string;
 }
+
+const panelClass =
+  "dark:bg-dark-300 dark:shadow-dark-700 pointer-events-auto rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-4 shadow-md dark:border-neutral-700";
 
 const CLOSE_DURATION = 200;
 
@@ -77,7 +81,7 @@ export const Modal = (props: ModalProps) => {
         }}
       >
         <div
-          class={`transition-all starting:scale-95 starting:opacity-0 ${props.contentClass ?? ""}`}
+          class={`transition-all starting:scale-95 starting:opacity-0 ${panelClass} ${props.contentClass ?? ""}`}
           classList={{ "scale-95 opacity-0": closing() }}
           style={{ "transition-duration": `${CLOSE_DURATION}ms` }}
         >

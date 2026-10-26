@@ -2,15 +2,15 @@ import * as TID from "@atcute/tid";
 import { A, useLocation } from "@solidjs/router";
 import { createResource, createSignal, For, onMount, Show } from "solid-js";
 
-import { getAllBacklinks, getRecordBacklinks, LinksWithRecords } from "../lib/api.js";
-import { LoadMoreSentinel } from "../lib/infinite-scroll.jsx";
-import { useRepo } from "../lib/repo-context.jsx";
-import { localDateFromTimestamp } from "../utils/format.js";
-import { Button } from "./button.jsx";
-import { DomainGroup, DomainGroupRows, domainGroupRowClasses } from "./domain-group.jsx";
-import { Favicon } from "./favicon.jsx";
-import DidHoverCard from "./hover-card/did.jsx";
-import RecordHoverCard from "./hover-card/record.jsx";
+import { getAllBacklinks, getRecordBacklinks, LinksWithRecords } from "../../lib/api.js";
+import { localDateFromTimestamp } from "../../lib/format.js";
+import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
+import { useRepo } from "../../lib/repo-context.jsx";
+import DidHoverCard from "../hover-card/did.jsx";
+import RecordHoverCard from "../hover-card/record.jsx";
+import { Button } from "../ui/button.jsx";
+import { DomainGroup, DomainGroupRows, domainGroupRowClasses } from "../ui/domain-group.jsx";
+import { Favicon } from "../ui/favicon.jsx";
 
 type BacklinksProps = {
   target: string;

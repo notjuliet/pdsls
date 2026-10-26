@@ -3,10 +3,10 @@ import { A } from "@solidjs/router";
 import type { Accessor } from "solid-js";
 import { createEffect, createSignal, For, Show } from "solid-js";
 
-import { Button } from "../../components/button.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { Spinner, ErrorNotice, LoadingState } from "../../components/ui/states.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { listSpaceBlobs } from "../../lib/spaces.js";
-import { ErrorNotice, LoadingState } from "./shared.jsx";
 
 export const SpaceBlobList = (props: {
   auth: Accessor<OAuthUserAgent>;
@@ -99,10 +99,7 @@ export const SpaceBlobList = (props: {
                 disabled={loading()}
                 classList={{ "w-20 h-7.5 justify-center": true }}
               >
-                <Show
-                  when={!loading()}
-                  fallback={<span class="iconify lucide--loader-circle animate-spin text-base" />}
-                >
+                <Show when={!loading()} fallback={<Spinner class="text-base" />}>
                   Load more
                 </Show>
               </Button>

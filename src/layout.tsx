@@ -5,12 +5,12 @@ import { AccountManager } from "./auth/account.jsx";
 import { agent } from "./auth/state.js";
 import { CarDropOverlay } from "./components/car-drop-overlay.jsx";
 import { RecordEditor } from "./components/create";
-import { NavBar } from "./components/navbar.jsx";
-import { NotificationContainer } from "./components/notification.jsx";
-import { PermissionPromptContainer } from "./components/permission-prompt.jsx";
+import { NavBar } from "./components/repo/navbar.jsx";
 import { Search } from "./components/search.jsx";
-import { Spinner } from "./components/spinner.jsx";
-import { themeEvent } from "./components/theme.jsx";
+import { NotificationContainer } from "./components/ui/notification.jsx";
+import { PermissionPromptContainer } from "./components/ui/permission-prompt.jsx";
+import { Spinner } from "./components/ui/states.jsx";
+import { themeEvent } from "./components/ui/theme.jsx";
 import { plcDirectory } from "./views/settings.jsx";
 
 export const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -180,7 +180,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
   });
 
   return (
-    <div id="main" class="mx-auto mb-8 flex max-w-xl flex-col items-center p-3">
+    <div id="main" class="mx-auto mb-8 flex max-w-2xl flex-col items-center p-3">
       <header class="mb-3 flex h-10 w-full items-center gap-2 px-1 sm:gap-4">
         <A
           href="/"
@@ -227,7 +227,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
             return <div class="mt-3 wrap-anywhere">Error: {err.message}</div>;
           }}
         >
-          <Suspense fallback={<Spinner />}>
+          <Suspense fallback={<Spinner centered class="text-xl" />}>
             <Show
               when={
                 !isRouting() ||
@@ -235,7 +235,7 @@ const Layout = (props: RouteSectionProps<unknown>) => {
                 stablePath.startsWith(location.pathname) ||
                 location.pathname.startsWith(stablePath)
               }
-              fallback={<Spinner />}
+              fallback={<Spinner centered class="text-xl" />}
             >
               {props.children}
             </Show>

@@ -11,13 +11,13 @@ import {
   Show,
 } from "solid-js";
 
-import { Button } from "../../components/button";
 import DidHoverCard from "../../components/hover-card/did";
 import { JSONValue } from "../../components/json";
-import { TagInput } from "../../components/tag-input";
-import { TextInput } from "../../components/text-input";
-import { addToClipboard } from "../../utils/copy";
-import { websocketCloseReasons } from "../../utils/websocket";
+import { Button } from "../../components/ui/button";
+import { TagInput } from "../../components/ui/tag-input";
+import { TextInput } from "../../components/ui/text-input";
+import { addToClipboard } from "../../lib/copy";
+import { websocketCloseReasons } from "../../lib/websocket";
 import { getStreamType, STREAM_CONFIGS, STREAM_TYPES, StreamType } from "./config";
 import { StreamStats, StreamStatsPanel } from "./stats";
 

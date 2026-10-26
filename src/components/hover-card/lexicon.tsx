@@ -46,7 +46,7 @@ const LexiconHoverCard = (props: LexiconHoverCardProps) => {
       hoverDelay={props.hoverDelay ?? 300}
       trigger={trigger()}
       class={props.class}
-      previewClass="max-h-[32rem] w-[min(36rem,calc(100vw-2rem))] font-sans text-sm"
+      previewClass="max-h-[32rem] w-[min(32rem,calc(100vw-2rem))] font-sans text-sm"
       showPreview={hasPreview()}
     >
       <Show when={preview.state().error}>

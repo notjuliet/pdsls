@@ -5,31 +5,30 @@ import { Did } from "@atcute/lexicons";
 import { fromStream, isCommit } from "@atcute/repo";
 import * as TID from "@atcute/tid";
 import { zip, type ZipEntry } from "@mary/zip";
-import { useLocation, useNavigate } from "@solidjs/router";
-import {
-  createEffect,
-  createMemo,
-  createSignal,
-  For,
-  Match,
-  Show,
-  Switch,
-  untrack,
-} from "solid-js";
+import { useLocation, useNavigate, useParams } from "@solidjs/router";
+import { createEffect, createMemo, createSignal, Match, Show, Switch } from "solid-js";
 
-import { Button } from "../../components/button.jsx";
-import {
-  DomainGroup,
-  DomainGroupRows,
-  domainGroupRowClasses,
-} from "../../components/domain-group.jsx";
-import HoverCard from "../../components/hover-card/base";
 import { JSONValue, type JSONType } from "../../components/json.jsx";
-import { TextInput } from "../../components/text-input.jsx";
+import {
+  CollectionList,
+  CollectionListControls,
+  createCollapseState,
+} from "../../components/repo/collection-list.jsx";
+import { CollectionPage, type CollectionSource } from "../../components/repo/collection-page.jsx";
+import {
+  RecordInfo,
+  RecordPage,
+  recordTabFromHash,
+  useRecordSchemaValidation,
+} from "../../components/repo/record-page.jsx";
+import { timestampFromRkey } from "../../components/repo/record-row.jsx";
+import { nsidDomain, type Stage, StageNav } from "../../components/repo/stage-nav.jsx";
+import { IconButton } from "../../components/ui/icon-button.jsx";
+import { Spinner, EmptyState, ErrorNotice } from "../../components/ui/states.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
-import { createDebouncedValue } from "../../lib/debounced.js";
-import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
-import { localDateFromTimestamp } from "../../utils/format.js";
+import { addToClipboard } from "../../lib/copy";
+import { localDateFromTimestamp } from "../../lib/format.js";
+import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import { carFileAccept, createFileChangeHandler, isIOS } from "./file-handlers.js";
 import { clearQueuedCarFile, queuedCarFile } from "./state.js";
 
@@ -116,7 +115,7 @@ const WelcomeView = (props: {
           when={!props.loading}
           fallback={
             <div class="flex flex-col items-center gap-2">
-              <span class="iconify lucide--loader-circle animate-spin text-3xl text-neutral-400" />
+              <Spinner class="text-3xl text-neutral-400" />
               <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
                 Reading CAR file...
               </span>
@@ -148,48 +147,34 @@ const WelcomeView = (props: {
         </Show>
       </div>
 
-      <Show when={props.error}>
-        <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
-          {props.error}
-        </div>
-      </Show>
+      <Show when={props.error}>{(message) => <ErrorNotice message={message()} />}</Show>
     </div>
   );
 };
 
-const viewToHash = (view: View): string => {
+const viewToPath = (view: View): string => {
   switch (view.type) {
     case "repo":
-      return "";
+      return "/car";
     case "collection":
-      return `#${view.collection.name}`;
+      return `/car/${view.collection.name}`;
     case "record":
-      return `#${view.collection.name}/${view.record.key}`;
+      return `/car/${view.collection.name}/${view.record.key}`;
   }
 };
 
-const hashToView = (hash: string, archive: Archive): View => {
-  if (!hash || hash === "#") return { type: "repo" };
-
-  const raw = hash.startsWith("#") ? hash.slice(1) : hash;
-  const slashIdx = raw.indexOf("/");
-
-  if (slashIdx === -1) {
-    const collection = archive.entries.find((e) => e.name === raw);
-    if (collection) return { type: "collection", collection };
-    return { type: "repo" };
-  }
-
-  const collectionName = raw.slice(0, slashIdx);
-  const recordKey = raw.slice(slashIdx + 1);
+/** Resolves `/car/<collection>/<rkey>` against the loaded archive, falling back to the nearest level. */
+const pathToView = (
+  collectionName: string | undefined,
+  recordKey: string | undefined,
+  archive: Archive,
+): View => {
   const collection = archive.entries.find((e) => e.name === collectionName);
-  if (collection) {
-    const record = collection.entries.find((r) => r.key === recordKey);
-    if (record) return { type: "record", collection, record };
-    return { type: "collection", collection };
-  }
+  if (!collection) return { type: "repo" };
 
-  return { type: "repo" };
+  const record = recordKey ? collection.entries.find((r) => r.key === recordKey) : undefined;
+  if (record) return { type: "record", collection, record };
+  return { type: "collection", collection };
 };
 
 // Check if browser natively supports File System Access API
@@ -206,6 +191,7 @@ const filenamify = (name: string) => {
 
 export const CarView = () => {
   const location = useLocation();
+  const params = useParams();
   const navigate = useNavigate();
   const initialQueuedFile = queuedCarFile();
 
@@ -217,15 +203,12 @@ export const CarView = () => {
   const view = createMemo((): View => {
     const arch = archive();
     if (!arch) return { type: "repo" };
-    return hashToView(location.hash, arch);
+    return pathToView(params.collection, params.rkey, arch);
   });
 
-  const navigateToView = (newView: View) => {
-    const hash = viewToHash(newView);
-    navigate(`${location.pathname}${hash}`);
-  };
-
   const parseCarFile = async (file: File) => {
+    // Swap to the progress screen, also when replacing an archive that's already open.
+    setArchive(null);
     setLoading(true);
     setProgress(0);
     setError(undefined);
@@ -306,7 +289,7 @@ export const CarView = () => {
       }
 
       setArchive(result);
-      if (location.hash) navigate(location.pathname, { replace: true });
+      if (location.pathname !== "/car" || location.hash) navigate("/car", { replace: true });
     } catch (err) {
       console.error("Failed to parse CAR file:", err);
       setError(err instanceof Error ? err.message : "Failed to parse CAR file");
@@ -325,12 +308,6 @@ export const CarView = () => {
     }
   });
 
-  const reset = () => {
-    setArchive(null);
-    setError(undefined);
-    if (location.hash) navigate(location.pathname, { replace: true });
-  };
-
   document.title = "CAR explorer - PDSls";
   return (
     <>
@@ -347,9 +324,7 @@ export const CarView = () => {
           />
         }
       >
-        {(arch) => (
-          <ExploreView archive={arch()} view={view} setView={navigateToView} onClose={reset} />
-        )}
+        {(arch) => <ExploreView archive={arch()} view={view} />}
       </Show>
     </>
   );
@@ -432,12 +407,7 @@ const exportToZip = async (
   }
 };
 
-const ExploreView = (props: {
-  archive: Archive;
-  view: () => View;
-  setView: (view: View) => void;
-  onClose: () => void;
-}) => {
+const ExploreView = (props: { archive: Archive; view: () => View }) => {
   const [exporting, setExporting] = createSignal(false);
   const [exportCount, setExportCount] = createSignal(0);
   const [exportSaving, setExportSaving] = createSignal(false);
@@ -460,156 +430,73 @@ const ExploreView = (props: {
     }
   };
 
-  const handle =
+  const handle = () =>
     didDocCache[props.archive.did]?.alsoKnownAs
       ?.filter((alias) => alias.startsWith("at://"))[0]
       ?.split("at://")[1] ?? props.archive.did;
 
+  const stages = (): Stage[] => {
+    const view = props.view();
+    const did = props.archive.did;
+    const hasHandle = handle() !== did;
+    const result: Stage[] = [
+      {
+        kind: "Repo",
+        label: handle(),
+        detail: hasHandle ? did : undefined,
+        href: view.type !== "repo" ? "/car" : undefined,
+        copy: { label: "DID", value: did },
+        trailing: exporting() ? (
+          <div class="flex items-center gap-2 px-1.5 py-1">
+            <Spinner class="text-neutral-400" />
+            <span class="w-[4ch] text-right text-xs text-neutral-500 dark:text-neutral-400">
+              {exportSaving() ? "" : `${Math.round((exportCount() / totalRecords()) * 100)}%`}
+            </span>
+          </div>
+        ) : undefined,
+        actions: exporting()
+          ? undefined
+          : [
+              {
+                label: "Export ZIP",
+                icon: "lucide--download",
+                onClick: handleExport,
+              },
+            ],
+      },
+    ];
+    if (view.type === "repo") return result;
+
+    result.push({
+      kind: "Collection",
+      label: view.collection.name,
+      favicon: nsidDomain(view.collection.name),
+      href:
+        view.type === "record"
+          ? viewToPath({ type: "collection", collection: view.collection })
+          : undefined,
+      copy: { label: "NSID", value: view.collection.name },
+    });
+    if (view.type !== "record") return result;
+
+    const timestamp = timestampFromRkey(view.record.key);
+    result.push({
+      kind: "Record",
+      label: view.record.key,
+      detail: timestamp ? localDateFromTimestamp(timestamp) : undefined,
+      copy: { label: "record key", value: view.record.key },
+    });
+    return result;
+  };
+
   return (
     <div class="flex w-full flex-col">
-      <nav class="flex w-full flex-col text-sm wrap-anywhere sm:text-base">
-        {/* DID / Repository Level */}
-        <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-          <Show
-            when={props.view().type !== "repo"}
-            fallback={
-              <div class="flex min-h-6 min-w-0 basis-full items-center gap-2 px-2 sm:min-h-7">
-                <span class="iconify lucide--book-user shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-                <span class="flex min-w-0 items-baseline gap-2 py-0.5 font-medium">
-                  <Show
-                    when={handle !== props.archive.did}
-                    fallback={<span class="truncate">{props.archive.did}</span>}
-                  >
-                    <span class="shrink-0">{handle}</span>
-                    <span class="truncate text-xs font-normal text-neutral-500 sm:text-sm dark:text-neutral-400">
-                      {props.archive.did}
-                    </span>
-                  </Show>
-                </span>
-              </div>
-            }
-          >
-            <button
-              type="button"
-              onClick={() => props.setView({ type: "repo" })}
-              class="flex min-h-6 min-w-0 basis-full items-center gap-2 px-2 sm:min-h-7"
-            >
-              <span class="iconify lucide--book-user shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-              <span class="flex min-w-0 items-baseline gap-2 py-0.5 font-medium text-blue-500 transition-colors duration-150 group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-300">
-                <Show
-                  when={handle !== props.archive.did}
-                  fallback={<span class="truncate">{props.archive.did}</span>}
-                >
-                  <span class="shrink-0">{handle}</span>
-                  <span class="truncate text-xs font-normal text-neutral-500 sm:text-sm dark:text-neutral-400">
-                    {props.archive.did}
-                  </span>
-                </Show>
-              </span>
-            </button>
-          </Show>
-          <div class="flex shrink-0 items-center gap-0.5">
-            <Show
-              when={exporting()}
-              fallback={
-                <button
-                  type="button"
-                  onClick={handleExport}
-                  class="flex shrink-0 items-center rounded px-2 py-1 text-xs text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70"
-                >
-                  Export ZIP
-                </button>
-              }
-            >
-              <div class="flex items-center gap-2 px-2 py-1 sm:py-1.5">
-                <span class="iconify lucide--loader-circle animate-spin text-neutral-400" />
-                <span class="w-[4ch] text-right text-xs text-neutral-500 dark:text-neutral-400">
-                  {exportSaving() ? "" : `${Math.round((exportCount() / totalRecords()) * 100)}%`}
-                </span>
-              </div>
-            </Show>
-            <button
-              type="button"
-              onClick={props.onClose}
-              class="flex shrink-0 items-center rounded px-2 py-1 text-neutral-500 transition-all duration-200 hover:bg-neutral-200/70 hover:text-neutral-600 active:bg-neutral-300/70 sm:py-1.5 dark:text-neutral-400 dark:hover:bg-neutral-700/70 dark:hover:text-neutral-300 dark:active:bg-neutral-600/70"
-            >
-              <span class="iconify lucide--x" />
-            </button>
-          </div>
-        </div>
+      <StageNav stages={stages()} />
 
-        {/* Collection Level */}
-        <Show
-          when={(() => {
-            const v = props.view();
-            return v.type === "collection" || v.type === "record" ? v.collection : null;
-          })()}
-        >
-          {(collection) => (
-            <Show
-              when={props.view().type === "record"}
-              fallback={
-                <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-                  <div class="flex min-h-6 min-w-0 basis-full items-center gap-2 sm:min-h-7">
-                    <span class="iconify lucide--folder-open shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-                    <span class="truncate py-0.5 font-medium">{collection().name}</span>
-                  </div>
-                </div>
-              }
-            >
-              <button
-                type="button"
-                onClick={() => props.setView({ type: "collection", collection: collection() })}
-                class="group relative flex w-full items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40"
-              >
-                <div class="flex min-h-6 min-w-0 basis-full items-center gap-2 sm:min-h-7">
-                  <span class="iconify lucide--folder-open shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-                  <span class="truncate py-0.5 font-medium text-blue-500 transition-colors duration-150 group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-300">
-                    {collection().name}
-                  </span>
-                </div>
-              </button>
-            </Show>
-          )}
-        </Show>
-
-        {/* Record Level */}
-        <Show
-          when={(() => {
-            const v = props.view();
-            return v.type === "record" ? v.record : null;
-          })()}
-        >
-          {(record) => {
-            const rkeyTimestamp = createMemo(() => {
-              if (!record().key || !TID.validate(record().key)) return undefined;
-              const timestamp = TID.parse(record().key).timestamp / 1000;
-              return timestamp <= Date.now() ? timestamp : undefined;
-            });
-
-            return (
-              <div class="group relative flex items-center justify-between gap-1 rounded-md border-[0.5px] border-transparent bg-transparent px-2 transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50/40 dark:hover:border-neutral-600 dark:hover:bg-neutral-800/40">
-                <div class="flex min-h-6 min-w-0 basis-full items-center gap-2 sm:min-h-7">
-                  <span class="iconify lucide--file-json shrink-0 text-neutral-500 transition-colors duration-200 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200" />
-                  <div class="flex min-w-0 items-baseline gap-2 py-0.5 font-medium">
-                    <span class="shrink-0">{record().key}</span>
-                    <Show when={rkeyTimestamp()}>
-                      <span class="truncate text-xs font-normal text-neutral-500 sm:text-sm dark:text-neutral-400">
-                        {localDateFromTimestamp(rkeyTimestamp()!)}
-                      </span>
-                    </Show>
-                  </div>
-                </div>
-              </div>
-            );
-          }}
-        </Show>
-      </nav>
-
-      <div class="px-2 py-2">
+      <div class="pt-3 pb-2">
         <Switch>
           <Match when={props.view().type === "repo"}>
-            <RepoSubview archive={props.archive} onRoute={props.setView} />
+            <RepoSubview archive={props.archive} />
           </Match>
 
           <Match
@@ -620,11 +507,7 @@ const ExploreView = (props: {
             keyed
           >
             {({ collection }) => (
-              <CollectionSubview
-                archive={props.archive}
-                collection={collection}
-                onRoute={props.setView}
-              />
+              <CollectionSubview archive={props.archive} collection={collection} />
             )}
           </Match>
 
@@ -645,282 +528,70 @@ const ExploreView = (props: {
   );
 };
 
-const RepoSubview = (props: { archive: Archive; onRoute: (view: View) => void }) => {
+const RepoSubview = (props: { archive: Archive }) => {
   const [filter, setFilter] = createSignal("");
-  const [collapsedDomains, setCollapsedDomains] = createSignal<Set<string>>(new Set());
-
-  const sortedEntries = createMemo(() => {
-    return [...props.archive.entries].sort((a, b) => a.name.localeCompare(b.name));
-  });
-
-  const filteredEntries = createMemo(() => {
-    const f = filter().toLowerCase().trim();
-    if (!f) return sortedEntries();
-    return sortedEntries().filter((entry) => entry.name.toLowerCase().includes(f));
-  });
-
-  const groupedEntries = createMemo(() => {
-    const groups = new Map<string, CollectionEntry[]>();
-
-    for (const entry of filteredEntries()) {
-      const authority = entry.name.split(".").slice(0, 2).join(".");
-      const existing = groups.get(authority);
-      if (existing) existing.push(entry);
-      else groups.set(authority, [entry]);
-    }
-
-    return Array.from(groups, ([authority, entries]) => ({
-      authority,
-      domain: authority.split(".").reverse().join("."),
-      entries,
-    })).sort((a, b) => a.domain.localeCompare(b.domain));
-  });
-
-  const toggleDomain = (authority: string) => {
-    setCollapsedDomains((current) => {
-      const next = new Set(current);
-      if (next.has(authority)) next.delete(authority);
-      else next.add(authority);
-      return next;
-    });
-  };
-
+  const collapse = createCollapseState();
   const totalRecords = createMemo(() =>
     props.archive.entries.reduce((sum, entry) => sum + entry.entries.length, 0),
   );
 
   return (
-    <div class="flex flex-col gap-3">
-      <div class="text-sm text-neutral-600 dark:text-neutral-400">
-        {props.archive.entries.length} collection{props.archive.entries.length !== 1 ? "s" : ""}
-        <span class="text-neutral-400 dark:text-neutral-600"> · </span>
-        {totalRecords()} record{totalRecords() !== 1 ? "s" : ""}
-      </div>
-
-      <TextInput
-        placeholder="Filter collections"
-        value={filter()}
-        onInput={(e) => setFilter(e.currentTarget.value)}
-        class="text-sm"
+    <div class="flex flex-col gap-3 px-2 pb-22">
+      <CollectionList
+        collections={props.archive.entries.map((entry) => ({
+          nsid: entry.name,
+          count: entry.entries.length,
+          href: viewToPath({ type: "collection", collection: entry }),
+        }))}
+        filter={filter()}
+        collapse={collapse}
+        fallback={
+          <Show when={filter()}>
+            <EmptyState icon="lucide--search-x" message="No collections match your filter" />
+          </Show>
+        }
       />
 
-      <div class="flex flex-col gap-2 sm:gap-0">
-        <For each={groupedEntries()}>
-          {(group) => {
-            const isCollapsed = () => collapsedDomains().has(group.authority);
-
-            return (
-              <DomainGroup
-                domain={group.domain}
-                domainTitle={`${group.domain} (${group.authority})`}
-                groupLabel="collections"
-                sticky
-                collapsed={isCollapsed()}
-                collapsedLabel={
-                  <>
-                    {group.entries.length}{" "}
-                    {group.entries.length === 1 ? "collection" : "collections"}
-                  </>
-                }
-                onToggle={() => toggleDomain(group.authority)}
-              >
-                <DomainGroupRows as="ul">
-                  <For each={group.entries}>
-                    {(entry) => {
-                      const label = entry.name.split(".").slice(2).join(".") || entry.name;
-
-                      return (
-                        <li>
-                          <button
-                            onClick={() => props.onRoute({ type: "collection", collection: entry })}
-                            class={`flex w-full min-w-0 items-center gap-2 rounded text-left text-sm hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700 ${domainGroupRowClasses}`}
-                            title={entry.name}
-                          >
-                            <span class="truncate font-medium text-neutral-700 dark:text-neutral-300">
-                              <Show when={label !== entry.name}>
-                                <span class="text-neutral-500 dark:text-neutral-400">
-                                  {group.authority}.
-                                </span>
-                              </Show>
-                              {label}
-                            </span>
-
-                            <span class="ml-auto text-xs text-neutral-500">
-                              {entry.entries.length}
-                            </span>
-                          </button>
-                        </li>
-                      );
-                    }}
-                  </For>
-                </DomainGroupRows>
-              </DomainGroup>
-            );
-          }}
-        </For>
-      </div>
-
-      <Show when={filteredEntries().length === 0 && filter()}>
-        <div class="flex flex-col items-center justify-center py-8 text-center">
-          <span class="iconify lucide--search-x mb-2 text-3xl text-neutral-400" />
-          <p class="text-sm text-neutral-600 dark:text-neutral-400">
-            No collections match your filter
-          </p>
-        </div>
-      </Show>
+      <CollectionListControls
+        filter={filter()}
+        onFilter={setFilter}
+        collapse={collapse}
+        nsids={props.archive.entries.map((entry) => entry.name)}
+        summary={`${totalRecords().toLocaleString()} record${totalRecords() === 1 ? "" : "s"}`}
+      />
     </div>
   );
 };
 
-const RECORDS_PER_PAGE = 100;
+/** Newest first by TID; records with other keys go last. */
+const compareRecordKeys = (a: RecordEntry, b: RecordEntry) => {
+  const aIsTid = TID.validate(a.key);
+  const bIsTid = TID.validate(b.key);
+  if (aIsTid && bIsTid) return TID.parse(b.key).timestamp - TID.parse(a.key).timestamp;
+  if (aIsTid) return -1;
+  if (bIsTid) return 1;
+  return b.key.localeCompare(a.key);
+};
 
-const CollectionSubview = (props: {
-  archive: Archive;
-  collection: CollectionEntry;
-  onRoute: (view: View) => void;
-}) => {
-  const [filter, setFilter] = createSignal("");
-  const debouncedFilter = createDebouncedValue(filter, 150);
-  const [displayCount, setDisplayCount] = createSignal(RECORDS_PER_PAGE);
-
-  // Sort entries by TID timestamp (most recent first), non-TID entries go to the end
-  const sortedEntries = createMemo(() => {
-    return [...props.collection.entries].sort((a, b) => {
-      const aIsTid = TID.validate(a.key);
-      const bIsTid = TID.validate(b.key);
-
-      if (aIsTid && bIsTid) {
-        return TID.parse(b.key).timestamp - TID.parse(a.key).timestamp;
-      }
-      if (aIsTid) return -1;
-      if (bIsTid) return 1;
-      return b.key.localeCompare(a.key);
-    });
+const CollectionSubview = (props: { archive: Archive; collection: CollectionEntry }) => {
+  const source = (): CollectionSource => ({
+    key: `${props.archive.did}/${props.collection.name}`,
+    repo: props.archive.did,
+    collection: props.collection.name,
+    collectionHref: viewToPath({ type: "collection", collection: props.collection }),
+    recordHref: (rkey) =>
+      `${viewToPath({ type: "collection", collection: props.collection })}/${rkey}`,
+    // The archive is already in memory, so the whole collection is one page.
+    listRecords: async ({ reverse }) => {
+      const sorted = [...props.collection.entries].sort(compareRecordKeys);
+      if (reverse) sorted.reverse();
+      return {
+        records: sorted.map((entry) => ({ rkey: entry.key, cid: entry.cid, value: entry.record })),
+      };
+    },
   });
 
-  const searchableEntries = createMemo(() => {
-    return sortedEntries().map((entry) => ({
-      entry,
-      searchText: JSON.stringify(entry.record).toLowerCase(),
-    }));
-  });
-
-  const filteredEntries = createMemo(() => {
-    const f = debouncedFilter().toLowerCase().trim();
-    if (!f) return sortedEntries();
-    return searchableEntries()
-      .filter(({ searchText }) => searchText.includes(f))
-      .map(({ entry }) => entry);
-  });
-
-  createEffect(() => {
-    debouncedFilter();
-    untrack(() => setDisplayCount(RECORDS_PER_PAGE));
-  });
-
-  const displayedEntries = createMemo(() => {
-    return filteredEntries().slice(0, displayCount());
-  });
-
-  const hasMore = createMemo(() => filteredEntries().length > displayCount());
-
-  const loadMore = () => {
-    setDisplayCount((prev) => prev + RECORDS_PER_PAGE);
-  };
-
-  return (
-    <div class="flex flex-col gap-3">
-      <span class="text-sm text-neutral-600 dark:text-neutral-400">
-        {filteredEntries().length} record{filteredEntries().length !== 1 ? "s" : ""}
-        {filter() && filteredEntries().length !== props.collection.entries.length && (
-          <span class="text-neutral-400 dark:text-neutral-500">
-            {" "}
-            (of {props.collection.entries.length})
-          </span>
-        )}
-      </span>
-
-      <div class="flex items-center gap-2">
-        <TextInput
-          placeholder="Filter records"
-          value={filter()}
-          onInput={(e) => setFilter(e.currentTarget.value)}
-          class="grow text-sm"
-        />
-
-        <Show when={hasMore()}>
-          <span class="text-sm text-neutral-600 dark:text-neutral-400">
-            {displayedEntries().length}/{filteredEntries().length}
-          </span>
-
-          <Button onClick={loadMore}>Load more</Button>
-        </Show>
-      </div>
-
-      <div class="flex flex-col font-mono">
-        <For each={displayedEntries()}>
-          {(entry) => {
-            const isTid = TID.validate(entry.key);
-            const timestamp = isTid ? TID.parse(entry.key).timestamp / 1_000 : null;
-
-            return (
-              <HoverCard
-                class="flex w-full items-baseline gap-1 rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                activeClass="bg-neutral-200 dark:bg-neutral-700"
-                previewPlacement="side"
-                trigger={
-                  <button
-                    onClick={() => {
-                      props.onRoute({
-                        type: "record",
-                        collection: props.collection,
-                        record: entry,
-                      });
-                    }}
-                    class="flex w-full items-baseline gap-1 px-1 py-0.5"
-                  >
-                    <span class="max-w-full shrink-0 truncate text-sm text-blue-500 dark:text-blue-400">
-                      {entry.key}
-                    </span>
-                    <span class="truncate text-xs text-neutral-400 dark:text-neutral-500" dir="rtl">
-                      {entry.cid}
-                    </span>
-                    <Show when={timestamp}>
-                      {(ts) => (
-                        <span class="ml-auto shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
-                          {localDateFromTimestamp(ts())}
-                        </span>
-                      )}
-                    </Show>
-                  </button>
-                }
-              >
-                <JSONValue
-                  data={entry.record}
-                  repo={props.archive.did}
-                  truncate
-                  hideBlobs
-                  preview
-                />
-              </HoverCard>
-            );
-          }}
-        </For>
-        <LoadMoreSentinel
-          hasMore={() => hasMore()}
-          loading={() => false}
-          onLoadMore={() => loadMore()}
-        />
-      </div>
-
-      <Show when={filteredEntries().length === 0 && filter()}>
-        <div class="flex flex-col items-center justify-center py-8 text-center">
-          <span class="iconify lucide--search-x mb-2 text-3xl text-neutral-400" />
-          <p class="text-sm text-neutral-600 dark:text-neutral-400">No records match your filter</p>
-        </div>
-      </Show>
-    </div>
-  );
+  return <CollectionPage source={source()} />;
 };
 
 const RecordSubview = (props: {
@@ -928,25 +599,62 @@ const RecordSubview = (props: {
   collection: CollectionEntry;
   record: RecordEntry;
 }) => {
-  return (
-    <div class="flex flex-col items-center gap-3">
-      <div class="flex w-full items-center gap-2 text-sm text-neutral-600 sm:text-base dark:text-neutral-400">
-        <span class="iconify lucide--box shrink-0" />
-        <span class="text-xs break-all">{props.record.cid}</span>
-      </div>
+  const location = useLocation();
+  const lexicon = useLexiconSchema(() => props.collection.name);
+  const schemaValidation = useRecordSchemaValidation(
+    () => props.collection.name,
+    () => props.record.key,
+  );
 
-      <Show
-        when={props.record.record !== null}
-        fallback={
-          <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
-            Failed to decode record
-          </div>
-        }
-      >
-        <div class="max-w-full min-w-full font-mono text-xs wrap-anywhere whitespace-pre-wrap sm:w-max sm:max-w-screen sm:px-4 sm:text-sm md:max-w-3xl">
+  createEffect(() => {
+    if (props.record.record !== null) schemaValidation.validateLocal(props.record.record);
+    else schemaValidation.reset();
+  });
+
+  return (
+    <RecordPage
+      tabs={[
+        { id: "record", label: "Record" },
+        { id: "schema", label: "Schema" },
+        { id: "info", label: "Info", error: schemaValidation.valid() === false },
+      ]}
+      activeTab={recordTabFromHash(location.hash)}
+      tabHref={(tab) =>
+        `${viewToPath({ type: "record", collection: props.collection, record: props.record })}#${tab}`
+      }
+      actions={
+        <IconButton
+          icon="lucide--copy"
+          label="Copy record"
+          onClick={() => addToClipboard(JSON.stringify(props.record.record, null, 2))}
+        />
+      }
+      record={
+        <Show
+          when={props.record.record !== null}
+          fallback={<ErrorNotice message="Failed to decode record" />}
+        >
           <JSONValue data={props.record.record} repo={props.archive.did || ""} newTab hideBlobs />
-        </div>
-      </Show>
-    </div>
+        </Show>
+      }
+      schema={
+        <SchemaTabContent
+          schema={lexicon.schema()}
+          loading={lexicon.loading()}
+          error={lexicon.error()}
+          fallbackSchema={
+            props.collection.name === "com.atproto.lexicon.schema" ? props.record.record : undefined
+          }
+        />
+      }
+      info={
+        <RecordInfo
+          uri={`at://${props.archive.did}/${props.collection.name}/${props.record.key}`}
+          cid={props.record.cid}
+          schema={schemaValidation}
+          value={props.record.record}
+        />
+      }
+    />
   );
 };

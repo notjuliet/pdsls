@@ -1,5 +1,5 @@
-import { canHover } from "../layout.jsx";
-import { addToClipboard } from "../utils/copy.js";
+import { canHover } from "../../layout.jsx";
+import { addToClipboard } from "../../lib/copy.js";
 
 export const CopyableInfoField = (props: { label: string; value: string }) => (
   <div>

@@ -6,16 +6,16 @@ import { A, type RouteSectionProps, useLocation, useParams } from "@solidjs/rout
 import { createWindowVirtualizer } from "@tanstack/solid-virtual";
 import { createEffect, createResource, createSignal, For, on, onCleanup, Show } from "solid-js";
 
-import { Button } from "../components/button";
-import { setPDS } from "../components/navbar";
-import { NestedLayout } from "../components/nested-layout.jsx";
-import { Spinner } from "../components/spinner.jsx";
+import { setPDS } from "../components/repo/navbar";
+import { Button } from "../components/ui/button";
+import { NestedLayout } from "../components/ui/nested-layout.jsx";
+import { Spinner } from "../components/ui/states.jsx";
+import { Tabs } from "../components/ui/tabs.jsx";
 import { canHover } from "../layout";
 import { didDocCache, resolveDidDoc } from "../lib/api";
 import { createLatch } from "../lib/create-latch.js";
+import { localDateFromTimestamp, formatFileSize } from "../lib/format";
 import { LoadMoreSentinel } from "../lib/infinite-scroll";
-import { localDateFromTimestamp } from "../utils/format";
-import { formatFileSize } from "../utils/format";
 
 const LIMIT = 1000;
 
@@ -296,38 +296,23 @@ const PdsView = () => {
     return parseInt(indexStr, 10);
   };
 
-  const Tab = (props: { tab: "repos" | "info" | "firehose"; label: string }) => (
-    <A
-      classList={{
-        "border-b-2 font-medium transition-colors": true,
-        "border-transparent not-hover:dark:text-neutral-300/80 not-hover:text-neutral-600":
-          (!!location.hash && location.hash !== `#${props.tab}`) ||
-          (!location.hash && props.tab !== "repos"),
-      }}
-      href={
-        props.tab === "firehose"
-          ? `/streams?type=firehose&instance=${encodeURIComponent(`wss://${params.pds}`)}`
-          : `/${params.pds}#${props.tab}`
-      }
-    >
-      {props.label}
-    </A>
-  );
-
   if (!hidden()) document.title = `${params.pds} - PDSls`;
 
   return (
     <>
       <Show when={!hidden() && !repos() && (response.state === "unresolved" || response.loading)}>
-        <Spinner />
+        <Spinner centered class="text-xl" />
       </Show>
       <Show when={!hidden() && (repos() || response.state === "ready")}>
         <div class="flex w-full flex-col px-2">
-          <div class="mb-3 flex gap-4 text-sm sm:text-base">
-            <Tab tab="repos" label="Repositories" />
-            <Tab tab="info" label="Info" />
-            <Tab tab="firehose" label="Firehose" />
-          </div>
+          <Tabs
+            class="mb-3 text-sm sm:text-base"
+            items={[
+              { id: "repos", label: "Repositories", href: `/${params.pds}#repos` },
+              { id: "info", label: "Info", href: `/${params.pds}#info` },
+            ]}
+            active={location.hash ? location.hash.slice(1) : "repos"}
+          />
           <Show when={!location.hash || location.hash === "#repos"}>
             <div
               class="-mx-2 mb-10"
@@ -478,10 +463,7 @@ const PdsView = () => {
                   disabled={response.loading}
                   classList={{ "w-20 h-7.5 justify-center": true }}
                 >
-                  <Show
-                    when={!response.loading}
-                    fallback={<span class="iconify lucide--loader-circle animate-spin text-base" />}
-                  >
+                  <Show when={!response.loading} fallback={<Spinner class="text-base" />}>
                     Load more
                   </Show>
                 </Button>

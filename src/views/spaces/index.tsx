@@ -3,10 +3,11 @@ import { createEffect, createMemo, createSignal, For, type JSX, Show } from "sol
 
 import { hasUserScope, SPACE_READ_SCOPE_ID } from "../../auth/scope-utils";
 import { agent } from "../../auth/state";
-import { Button } from "../../components/button.jsx";
-import { DomainGroup, domainGroupRowClasses } from "../../components/domain-group.jsx";
 import DidHoverCard from "../../components/hover-card/did.jsx";
-import { NestedLayout } from "../../components/nested-layout.jsx";
+import { Button } from "../../components/ui/button.jsx";
+import { DomainGroup, domainGroupRowClasses } from "../../components/ui/domain-group.jsx";
+import { NestedLayout } from "../../components/ui/nested-layout.jsx";
+import { Spinner, EmptyState, ErrorNotice, LoadingState } from "../../components/ui/states.jsx";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { listSpaces, parseSpaceUri, type SpaceView } from "../../lib/spaces.js";
 import {
@@ -18,7 +19,6 @@ import {
 } from "./context.jsx";
 import { CreateSpaceDialog } from "./create-space.jsx";
 import { SpacesNav } from "./nav.jsx";
-import { EmptyState, ErrorNotice, LoadingState } from "./shared.jsx";
 import { SpaceLayout } from "./space.jsx";
 
 const SignInPrompt = () => {
@@ -32,10 +32,7 @@ const SignInPrompt = () => {
           Spaces require OAuth permissions.
         </p>
       </div>
-      <Button
-        onClick={() => navigate("/account/add")}
-        classList={{ "bg-blue-500! text-white! border-blue-500!": true }}
-      >
+      <Button onClick={() => navigate("/account/add")} variant="primary">
         <span class="iconify lucide--log-in" />
         Sign in
       </Button>
@@ -59,10 +56,7 @@ const PermissionPrompt = () => {
           Re-authorize this account and enable “View non-public records”.
         </p>
       </div>
-      <Button
-        onClick={editPermissions}
-        classList={{ "bg-blue-500! text-white! border-blue-500!": true }}
-      >
+      <Button onClick={editPermissions} variant="primary">
         <span class="iconify lucide--key-round" />
         Edit permissions
       </Button>
@@ -292,7 +286,7 @@ const SpacesIndex = () => {
             classList={{ "w-fit self-center": true }}
           >
             <Show when={loading()} fallback={<span class="iconify lucide--chevrons-down" />}>
-              <span class="iconify lucide--loader-circle animate-spin" />
+              <Spinner />
             </Show>
             Load more Spaces
           </Button>

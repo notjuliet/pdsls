@@ -1,6 +1,6 @@
 import { JSX, Show, Suspense } from "solid-js";
 
-import { Spinner } from "./spinner.jsx";
+import { Spinner } from "./states.jsx";
 
 export const NestedLayout = (props: {
   key: string | undefined;
@@ -12,7 +12,7 @@ export const NestedLayout = (props: {
     {(_) => (
       <>
         <Show when={props.hasChild}>
-          <Suspense fallback={<Spinner />}>{props.children}</Suspense>
+          <Suspense fallback={<Spinner centered class="text-xl" />}>{props.children}</Suspense>
         </Show>
         {props.view()}
       </>
