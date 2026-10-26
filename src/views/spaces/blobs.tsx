@@ -68,13 +68,13 @@ export const SpaceBlobList = (props: {
       <Show when={error()}>{(message) => <ErrorNotice message={message()} />}</Show>
 
       <Show when={loaded() && (!error() || cids().length > 0)}>
-        <div class="flex w-full flex-col gap-0.5 pb-20 font-mono text-xs sm:text-sm">
+        <div class="flex w-full flex-col gap-0.5 pb-20 font-mono text-sm">
           <For each={cids()}>
             {(cid) => (
               <A
                 href={`${props.repoPath}/blob/${cid}`}
                 state={{ from: `${props.repoPath}#blobs`, label: "Back to blobs" }}
-                class="truncate rounded px-0.5 text-left text-blue-500 hover:bg-neutral-200 active:bg-neutral-300 dark:text-blue-400 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
+                class="w-fit max-w-full truncate rounded px-0.5 text-left text-blue-500 hover:bg-neutral-200 active:bg-neutral-300 dark:text-blue-400 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
                 dir="rtl"
               >
                 {cid}
