@@ -8,6 +8,7 @@ import { CarDropOverlay } from "./components/car-drop-overlay.jsx";
 import { RecordEditor } from "./components/create";
 import { NavBar } from "./components/repo/navbar.jsx";
 import { Search } from "./components/search.jsx";
+import { BackToTop } from "./components/ui/back-to-top.jsx";
 import { NotificationContainer } from "./components/ui/notification.jsx";
 import { PermissionPromptContainer } from "./components/ui/permission-prompt.jsx";
 import { Spinner } from "./components/ui/states.jsx";
@@ -244,11 +245,15 @@ const Layout = (props: RouteSectionProps<unknown>) => {
           </Suspense>
         </ErrorBoundary>
       </div>
+      <BackToTop />
       <CarDropOverlay />
       <NotificationContainer />
       <PermissionPromptContainer />
       <Show when={plcDirectory() !== "https://plc.directory"}>
-        <div class="dark:bg-dark-500 fixed right-0 bottom-0 left-0 z-10 flex items-center justify-center bg-neutral-100 px-3 py-1 text-xs">
+        <div
+          data-bottom-bar
+          class="dark:bg-dark-500 fixed right-0 bottom-0 left-0 z-10 flex items-center justify-center bg-neutral-100 px-3 py-1 text-xs"
+        >
           <span>
             PLC directory: <span class="font-medium">{plcDirectory()}</span>
           </span>
