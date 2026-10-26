@@ -16,6 +16,7 @@ import { agent, avatars, sessions } from "../auth/state.js";
 import { resolveLexiconAuthority, resolveLexiconAuthorityDirect } from "../lib/api";
 import { appHandleLink, appList, AppUrl } from "../lib/app-urls";
 import { createDebouncedValue } from "../lib/debounced";
+import { pageStreams } from "../lib/page-streams";
 import { carFileAccept, createFileChangeHandler } from "../views/car/file-handlers.js";
 import { queueCarFile } from "../views/car/state.js";
 
@@ -30,7 +31,41 @@ type Destination = {
   label: string;
   icon: string;
   avatar?: string;
+  /** A muted line under the label, e.g. what a stream is filtered to. */
+  target?: string;
 };
+
+/** A shortcut in the search dropdown: an icon and name, with an optional muted line under it. */
+const DestinationCell = (props: {
+  destination: Destination;
+  class?: string;
+  onClick: () => void;
+}) => (
+  <A
+    href={props.destination.href}
+    class={`flex min-w-0 flex-col items-center justify-center rounded-lg px-1.5 py-2 hover:bg-neutral-200/60 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 ${props.class ?? ""}`}
+    onClick={() => props.onClick()}
+  >
+    <span class="flex min-w-0 items-center gap-1.5">
+      <Show
+        when={props.destination.avatar}
+        fallback={
+          <span
+            class={`iconify ${props.destination.icon} shrink-0 text-neutral-500 dark:text-neutral-400`}
+          />
+        }
+      >
+        <img src={props.destination.avatar} alt="" class="size-4 shrink-0 rounded-full" />
+      </Show>
+      <span class="truncate">{props.destination.label}</span>
+    </span>
+    <Show when={props.destination.target}>
+      <span class="max-w-full truncate text-xs text-neutral-500 dark:text-neutral-400">
+        {props.destination.target}
+      </span>
+    </Show>
+  </A>
+);
 
 const RECENT_SEARCHES_KEY = "recent-searches";
 const MAX_RECENT_SEARCHES = 5;
@@ -137,40 +172,47 @@ export const Search = () => {
       ? [
           {
             href: `/at://${currentAgent.sub}`,
-            label: sessions[currentAgent.sub]?.handle ?? currentAgent.sub,
+            label: "Your repo",
             icon: "lucide--circle-user-round",
             avatar: avatars[currentAgent.sub]?.replace("img/avatar/", "img/avatar_thumbnail/"),
+            target: sessions[currentAgent.sub]?.handle ?? currentAgent.sub,
           },
           {
             href: "/spaces",
             label: "Spaces",
             icon: "lucide--lock-keyhole",
+            target: "Non-public data",
           },
         ]
       : [
           {
             href: "/account/add",
-            label: "Sign in to manage records",
+            label: "Sign in",
             icon: "lucide--log-in",
+            target: "Manage your own records",
           },
         ];
   };
 
-  const streamDestinations: Destination[] = [
+  // On a repo or PDS page, the streams open filtered to it.
+  const streamDestinations = (): Destination[] => [
     {
-      href: "/streams?type=jetstream",
+      href: pageStreams().jetstream?.href ?? "/streams?type=jetstream",
       label: "Jetstream",
       icon: "lucide--radio-tower",
+      target: pageStreams().jetstream?.target,
     },
     {
-      href: "/streams?type=firehose",
+      href: pageStreams().firehose?.href ?? "/streams?type=firehose",
       label: "Firehose",
       icon: "lucide--rss",
+      target: pageStreams().firehose?.target,
     },
     {
-      href: "/streams?type=spacedust",
+      href: pageStreams().spacedust?.href ?? "/streams?type=spacedust",
       label: "Spacedust",
       icon: "lucide--sparkles",
+      target: pageStreams().spacedust?.target,
     },
   ];
 
@@ -447,41 +489,19 @@ export const Search = () => {
               <div class="grid grid-cols-2 gap-1">
                 <For each={accountDestinations()}>
                   {(destination) => (
-                    <A
-                      href={destination.href}
-                      class="flex min-w-0 items-center justify-center gap-2 rounded-lg px-2 py-2 hover:bg-neutral-200/60 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                      classList={{ "col-span-2": !agent() }}
-                      onClick={() => closeSearch()}
-                    >
-                      <Show
-                        when={destination.avatar}
-                        fallback={
-                          <span
-                            class={`iconify ${destination.icon} shrink-0 text-base text-neutral-500 dark:text-neutral-400`}
-                          />
-                        }
-                      >
-                        <img src={destination.avatar} alt="" class="size-4 shrink-0 rounded-full" />
-                      </Show>
-                      <span class="truncate">{destination.label}</span>
-                    </A>
+                    <DestinationCell
+                      destination={destination}
+                      class={agent() ? undefined : "col-span-2"}
+                      onClick={closeSearch}
+                    />
                   )}
                 </For>
               </div>
 
               <div class="mt-1 grid grid-cols-3 gap-1 border-t border-neutral-200 pt-1 dark:border-neutral-700">
-                <For each={streamDestinations}>
+                <For each={streamDestinations()}>
                   {(destination) => (
-                    <A
-                      href={destination.href}
-                      class="flex min-w-0 items-center justify-center gap-1.5 rounded-lg px-1.5 py-2 hover:bg-neutral-200/60 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                      onClick={() => closeSearch()}
-                    >
-                      <span
-                        class={`iconify ${destination.icon} shrink-0 text-neutral-500 dark:text-neutral-400`}
-                      />
-                      <span class="truncate">{destination.label}</span>
-                    </A>
+                    <DestinationCell destination={destination} onClick={closeSearch} />
                   )}
                 </For>
               </div>

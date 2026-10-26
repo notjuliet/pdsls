@@ -1,8 +1,9 @@
 import { useParams } from "@solidjs/router";
-import { createEffect, createSignal } from "solid-js";
+import { createEffect, createSignal, onCleanup } from "solid-js";
 
 import { didDocCache } from "../../lib/api";
 import { localDateFromTimestamp } from "../../lib/format";
+import { setPageStreams } from "../../lib/page-streams";
 import { timestampFromRkey } from "./record-row";
 import { nsidDomain, type Stage, StageNav, useSchemaAction } from "./stage-nav";
 
@@ -25,6 +26,42 @@ export const NavBar = () => {
     setHandle(hdl);
   });
 
+  // Offer this page's streams in the search dropdown, the deepest level first.
+  createEffect(() => {
+    const host = pds() && !missingPds() ? pds() : undefined;
+    const repo = params.repo;
+    const collection = params.collection;
+    const recordUri =
+      repo && collection && params.rkey ? `at://${repo}/${collection}/${params.rkey}` : undefined;
+    setPageStreams({
+      firehose: host
+        ? {
+            href: `/streams?type=firehose&instance=${encodeURIComponent(`wss://${host}`)}`,
+            target: host,
+          }
+        : undefined,
+      jetstream: repo
+        ? {
+            href: `/streams?type=jetstream${collection ? `&collections=${encodeURIComponent(collection)}` : ""}&dids=${encodeURIComponent(repo)}`,
+            target: collection ?? handle() ?? repo,
+          }
+        : undefined,
+      // Spacedust streams links pointing at something: the open record, else the repo's account.
+      spacedust: recordUri
+        ? {
+            href: `/streams?type=spacedust&subjects=${encodeURIComponent(recordUri)}`,
+            target: params.rkey!,
+          }
+        : repo
+          ? {
+              href: `/streams?type=spacedust&subjectDids=${encodeURIComponent(repo)}`,
+              target: handle() ?? repo,
+            }
+          : undefined,
+    });
+  });
+  onCleanup(() => setPageStreams({}));
+
   const rkeyDate = () => {
     const timestamp = params.rkey ? timestampFromRkey(params.rkey) : undefined;
     return timestamp === undefined ? undefined : localDateFromTimestamp(timestamp);
@@ -40,15 +77,6 @@ export const NavBar = () => {
         labelClass: missingPds() ? "text-red-500 dark:text-red-400" : undefined,
         href: params.repo && host ? `/${host}` : undefined,
         copy: host ? { label: "host", value: host } : undefined,
-        actions: host
-          ? [
-              {
-                label: "Firehose",
-                icon: "lucide--rss",
-                href: `/streams?type=firehose&instance=${encodeURIComponent(`wss://${host}`)}`,
-              },
-            ]
-          : undefined,
       },
     ];
 
@@ -60,13 +88,6 @@ export const NavBar = () => {
         detail: hasHandle ? params.repo : undefined,
         href: params.collection ? `/at://${params.repo}` : undefined,
         copy: { label: "DID", value: params.repo },
-        actions: [
-          {
-            label: "Jetstream",
-            icon: "lucide--radio-tower",
-            href: `/streams?type=jetstream&dids=${encodeURIComponent(params.repo)}`,
-          },
-        ],
       });
     }
 
@@ -77,14 +98,7 @@ export const NavBar = () => {
         favicon: nsidDomain(params.collection),
         href: params.rkey ? `/at://${params.repo}/${params.collection}` : undefined,
         copy: { label: "AT URI", value: collectionUri },
-        actions: [
-          schemaAction()!,
-          {
-            label: "Jetstream",
-            icon: "lucide--radio-tower",
-            href: `/streams?type=jetstream&collections=${encodeURIComponent(params.collection)}&dids=${encodeURIComponent(params.repo!)}`,
-          },
-        ],
+        actions: [schemaAction()!],
       });
     }
 
