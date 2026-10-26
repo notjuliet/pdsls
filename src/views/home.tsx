@@ -9,13 +9,13 @@ const repositoryExamples = [
   },
   {
     type: "Record",
-    value: "at://mary.my.id/app.bsky.actor.profile/self",
-    href: "/at://did:plc:ia76kvnndjutgedggx2ibrem/app.bsky.actor.profile/self",
+    value: "at://pds.ls/app.bsky.actor.profile/self",
+    href: "/at://did:plc:6q5daed5gutiyerimlrnojnz/app.bsky.actor.profile/self",
   },
   {
     type: "PDS",
-    value: "pds.witchcraft.systems",
-    href: "/pds.witchcraft.systems",
+    value: "selfhosted.social",
+    href: "/selfhosted.social",
   },
   {
     type: "Lexicon",
@@ -24,8 +24,8 @@ const repositoryExamples = [
   },
   {
     type: "Labels",
-    value: "moderation.bsky.app",
-    href: "/at://did:plc:ar7c4by46qjdydhdevvrndac#labels",
+    value: "recordcollector.edavis.dev",
+    href: "/at://did:plc:vfibt4bgozsdx6rnnnpha3x7#labels",
   },
   {
     type: "Backlinks",
