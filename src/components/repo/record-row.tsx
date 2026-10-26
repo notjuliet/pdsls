@@ -31,20 +31,19 @@ export const timestampFromRkey = (rkey: string) => {
   return timestamp <= Date.now() ? timestamp : undefined;
 };
 
-/**
- * The row up to where its text ends, so a side preview can cover the empty end of the row
- * and get more width; the cursor is on the record key, at the start of the row.
- */
 /** Room left between a row's text and a side preview. */
 const PREVIEW_TEXT_GAP = 8;
 
+/**
+ * Where a side preview starts: just after the row's text, so it covers the empty end of the
+ * row and gets more width. The cursor is on the record key, at the start of the row.
+ */
 const measureTextEnd = (row: HTMLElement) => {
-  const rect = row.getBoundingClientRect();
-  let right = rect.left;
+  let right = row.getBoundingClientRect().left;
   for (const line of row.querySelectorAll("[data-preview-anchor]")) {
     for (const part of line.children) right = Math.max(right, part.getBoundingClientRect().right);
   }
-  return new DOMRect(rect.left, rect.top, right + PREVIEW_TEXT_GAP - rect.left, rect.height);
+  return right + PREVIEW_TEXT_GAP;
 };
 
 export const RecordRow = (props: RecordRowProps) => {
@@ -95,7 +94,8 @@ export const RecordRow = (props: RecordRowProps) => {
         props.selected ? "bg-blue-300/80 dark:bg-blue-700/50" : "bg-neutral-200 dark:bg-neutral-700"
       }
       previewPlacement="side"
-      measureAnchor={measureTextEnd}
+      sideStart={measureTextEnd}
+      previewClass="max-h-80 w-max max-w-[min(32rem,calc(100vw-1rem))] font-mono text-xs whitespace-pre-wrap sm:max-h-112"
       trigger={
         <Show
           when={props.onClick}

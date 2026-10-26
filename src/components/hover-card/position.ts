@@ -19,6 +19,8 @@ interface FloatingPositionOptions {
   sideBreakpoint?: number;
   /** Below this width beside the anchor, the preview goes above or below instead. */
   minSideWidth?: number;
+  /** Where a preview to the right starts, when not at the anchor's right edge. */
+  sideStart?: number;
 }
 
 export type FloatingPlacement = "above" | "below" | "left" | "right";
@@ -62,7 +64,8 @@ export const getFloatingPosition = (
     viewport.width >= (options.sideBreakpoint ?? SIDE_PLACEMENT_BREAKPOINT)
   ) {
     const minSideWidth = options.minSideWidth ?? MIN_SIDE_WIDTH;
-    const rightSpace = Math.max(0, viewport.width - padding - anchorRect.right - gap);
+    const rightStart = options.sideStart ?? anchorRect.right;
+    const rightSpace = Math.max(0, viewport.width - padding - rightStart - gap);
     const leftSpace = Math.max(0, anchorRect.left - gap - padding);
     // Right whenever it has room, so previews don't switch sides from row to row.
     const placeRight =
@@ -85,7 +88,7 @@ export const getFloatingPosition = (
       return {
         placement: placeRight ? "right" : "left",
         style: {
-          left: `${placeRight ? anchorRect.right + gap : anchorRect.left - gap}px`,
+          left: `${placeRight ? rightStart + gap : anchorRect.left - gap}px`,
           top: `${top}px`,
           ...(placeRight ? {} : { transform: "translateX(-100%)" }),
           "max-width": `${availableWidth}px`,

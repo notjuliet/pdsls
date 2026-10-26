@@ -52,8 +52,8 @@ interface HoverCardProps {
   previewClass?: string;
   /** Preview placement preference (default: auto) */
   previewPlacement?: "auto" | "side";
-  /** The box the preview is placed against; defaults to the whole trigger. */
-  measureAnchor?: (trigger: HTMLElement) => DOMRect;
+  /** Where a preview to the right starts; defaults to the trigger's right edge. */
+  sideStart?: (trigger: HTMLElement) => number;
   /** Whether the preview container should be visible once hover is active */
   showPreview?: boolean;
   /** Preview content */
@@ -68,6 +68,7 @@ const HoverCard = (props: HoverCardProps) => {
 
   const [previewSize, setPreviewSize] = createSignal({ width: 0, height: 0 });
   const [anchorRect, setAnchorRect] = createSignal<DOMRect | null>(null);
+  const [sideStart, setSideStart] = createSignal<number>();
   const [lockedPlacement, setLockedPlacement] = createSignal<FloatingPlacement | null>(null);
   let anchorRef!: HTMLSpanElement;
   let previewRef!: HTMLDivElement;
@@ -143,7 +144,8 @@ const HoverCard = (props: HoverCardProps) => {
 
   const updateAnchorRect = () => {
     if (!anchorRef) return;
-    setAnchorRect(props.measureAnchor?.(anchorRef) ?? anchorRef.getBoundingClientRect());
+    setAnchorRect(anchorRef.getBoundingClientRect());
+    setSideStart(props.sideStart?.(anchorRef));
   };
 
   const setupResizeObserver = (el: HTMLDivElement) => {
@@ -189,6 +191,7 @@ const HoverCard = (props: HoverCardProps) => {
 
     const position = getFloatingPosition(anchorRect(), size, getViewportSize(), {
       placement: props.previewPlacement,
+      sideStart: sideStart(),
     });
 
     if (position.placement) setLockedPlacement(position.placement);
@@ -198,6 +201,7 @@ const HoverCard = (props: HoverCardProps) => {
     return getFloatingPosition(anchorRect(), previewSize(), getViewportSize(), {
       placement: props.previewPlacement,
       lockedPlacement: lockedPlacement() ?? undefined,
+      sideStart: sideStart(),
     }).style;
   };
 
