@@ -81,21 +81,24 @@ const SpaceCollectionView = () => {
   };
 
   return (
-    <CollectionPage
-      source={source()}
-      hidden={!!params.rkey}
-      actions={
-        <Show when={repo() === auth().sub}>
-          <SpaceRecordEditor
-            authority={params.spaceAuthority!}
-            type={params.spaceType!}
-            skey={params.skey!}
-            space={space()}
-            collection={params.collection!}
-          />
-        </Show>
-      }
-    />
+    // Same top spacing as the Spaces record page; none while a record is open over it.
+    <div class="w-full" classList={{ "pt-2": !params.rkey }}>
+      <CollectionPage
+        source={source()}
+        hidden={!!params.rkey}
+        actions={
+          <Show when={repo() === auth().sub}>
+            <SpaceRecordEditor
+              authority={params.spaceAuthority!}
+              type={params.spaceType!}
+              skey={params.skey!}
+              space={space()}
+              collection={params.collection!}
+            />
+          </Show>
+        }
+      />
+    </div>
   );
 };
 
