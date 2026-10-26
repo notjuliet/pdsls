@@ -146,7 +146,8 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
                 !!props.stage.href && !detailHovered(),
             }}
           >
-            {props.stage.label}
+            {/* A space while the value loads keeps the row at its full height. */}
+            {props.stage.label || "\u00a0"}
           </span>
           {/* Keyed so the favicon reloads when the domain changes. */}
           <Show when={props.stage.favicon} keyed>
