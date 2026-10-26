@@ -77,7 +77,10 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
       kind: "Record",
       label: params.rkey,
       detail: timestamp === undefined ? undefined : localDateFromTimestamp(timestamp),
-      copy: { label: "record key", value: params.rkey },
+      copy: {
+        label: "AT URI",
+        value: `at://${authority}/space/${spaceType}/${skey}/${repo}/${collection}/${params.rkey}`,
+      },
     });
     return result;
   };
