@@ -142,12 +142,12 @@ export const BlobViewer = (props: {
   return (
     <ErrorBoundary
       fallback={(err) => (
-        <div class="mx-auto w-full max-w-3xl px-3">
+        <div class="mx-auto w-full max-w-3xl px-2">
           <div class="rounded border border-red-500 px-3 py-2 text-red-500">{String(err)}</div>
         </div>
       )}
     >
-      <div class="mx-auto flex w-full max-w-3xl flex-col gap-4 px-3 pb-20">
+      <div class="mx-auto flex w-full max-w-3xl flex-col gap-4 px-2 pb-20">
         {/* Pulled into the padding so the label lines up with the content below. */}
         <BackLink href={props.backHref} class="-mx-2">
           {props.backLabel}
