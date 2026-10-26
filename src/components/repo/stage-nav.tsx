@@ -2,6 +2,7 @@ import type { Nsid } from "@atcute/lexicons";
 import { A } from "@solidjs/router";
 import { createResource, createSignal, For, Index, type JSX, Show } from "solid-js";
 
+import { canHover } from "../../layout";
 import { addToClipboard } from "../../lib/copy";
 import { resolveLexicon, schemaHref } from "../../lib/lexicon";
 import LexiconHoverCard from "../hover-card/lexicon";
@@ -35,7 +36,7 @@ export interface Stage {
   href?: string;
   /** A domain whose favicon shows after the label, e.g. the app behind a collection. */
   favicon?: string;
-  /** What tapping the kind copies, e.g. the repo's DID. */
+  /** What the hover copy button copies, e.g. the repo's DID. */
   copy?: { label: string; value: string };
   /** Content before the actions, e.g. a button with its own state. */
   trailing?: JSX.Element;
@@ -90,31 +91,6 @@ const ActionIcon = (props: { action: StageAction }) => {
   );
 };
 
-/** The stage's kind, which copies its value when it has one. */
-const StageKind = (props: { stage: Stage }) => (
-  <Show
-    when={props.stage.copy}
-    fallback={
-      <span class={`pointer-events-none text-neutral-500 dark:text-neutral-400 ${kindClass}`}>
-        {props.stage.kind}
-      </span>
-    }
-  >
-    {(copy) => (
-      <Tooltip text={`Copy ${copy().label}`} icon="lucide--copy">
-        <button
-          type="button"
-          aria-label={`Copy ${copy().label}`}
-          class={`z-10 text-neutral-500 transition-colors hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 ${kindClass}`}
-          onClick={() => addToClipboard(copy().value)}
-        >
-          {props.stage.kind}
-        </button>
-      </Tooltip>
-    )}
-  </Show>
-);
-
 const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
   const [detailHovered, setDetailHovered] = createSignal(false);
 
@@ -134,7 +110,9 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
           )}
         </Show>
         <Show when={props.kindColumn}>
-          <StageKind stage={props.stage} />
+          <span class={`pointer-events-none text-neutral-500 dark:text-neutral-400 ${kindClass}`}>
+            {props.stage.kind}
+          </span>
         </Show>
         <span class="pointer-events-none relative flex min-w-0 items-baseline gap-2">
           <span
@@ -152,7 +130,7 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
           {/* Keyed so the favicon reloads when the domain changes. */}
           <Show when={props.stage.favicon} keyed>
             {(domain) => (
-              <span class="flex shrink-0 self-center">
+              <span class="flex shrink-0 self-center has-[img.hidden]:hidden">
                 <Favicon domain={domain} noFallback wrapper={(icon) => icon} />
               </span>
             )}
@@ -177,6 +155,23 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
                 </A>
               )}
             </Show>
+          </Show>
+          {/* Copy appears after the value on hover; phones copy from the Info and Identity tabs. */}
+          <Show when={canHover && props.stage.copy}>
+            {(copy) => (
+              <span class="pointer-events-auto relative z-10 flex shrink-0 self-center opacity-0 transition-opacity group-hover/row:opacity-100 has-focus-visible:opacity-100">
+                <Tooltip text={`Copy ${copy().label}`}>
+                  <button
+                    type="button"
+                    aria-label={`Copy ${copy().label}`}
+                    class="flex items-center p-0.5 text-neutral-400 transition-colors hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-200"
+                    onClick={() => addToClipboard(copy().value)}
+                  >
+                    <span class="iconify lucide--copy text-sm" />
+                  </button>
+                </Tooltip>
+              </span>
+            )}
           </Show>
         </span>
       </div>
