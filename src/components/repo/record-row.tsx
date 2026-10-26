@@ -31,6 +31,22 @@ export const timestampFromRkey = (rkey: string) => {
   return timestamp <= Date.now() ? timestamp : undefined;
 };
 
+/**
+ * The row up to where its text ends, so a side preview can cover the empty end of the row
+ * and get more width; the cursor is on the record key, at the start of the row.
+ */
+/** Room left between a row's text and a side preview. */
+const PREVIEW_TEXT_GAP = 8;
+
+const measureTextEnd = (row: HTMLElement) => {
+  const rect = row.getBoundingClientRect();
+  let right = rect.left;
+  for (const line of row.querySelectorAll("[data-preview-anchor]")) {
+    for (const part of line.children) right = Math.max(right, part.getBoundingClientRect().right);
+  }
+  return new DOMRect(rect.left, rect.top, right + PREVIEW_TEXT_GAP - rect.left, rect.height);
+};
+
 export const RecordRow = (props: RecordRowProps) => {
   const timestamp = () => timestampFromRkey(props.rkey);
 
@@ -44,7 +60,7 @@ export const RecordRow = (props: RecordRowProps) => {
 
   const content = (): JSX.Element => (
     <>
-      <span class="flex w-full min-w-0 items-baseline">
+      <span data-preview-anchor class="flex w-full min-w-0 items-baseline">
         <span class="max-w-full shrink-0 truncate text-sm text-blue-500 dark:text-blue-400">
           {props.rkey}
         </span>
@@ -61,7 +77,7 @@ export const RecordRow = (props: RecordRowProps) => {
       </span>
       <Show when={props.preview}>
         {(preview) => (
-          <span class="flex w-full min-w-0 items-baseline gap-1 text-xs">
+          <span data-preview-anchor class="flex w-full min-w-0 items-baseline gap-1 text-xs">
             <span class="shrink-0 text-neutral-500 dark:text-neutral-400">{preview().field}:</span>
             <span class="min-w-0 truncate">{preview().value}</span>
           </span>
@@ -79,6 +95,7 @@ export const RecordRow = (props: RecordRowProps) => {
         props.selected ? "bg-blue-300/80 dark:bg-blue-700/50" : "bg-neutral-200 dark:bg-neutral-700"
       }
       previewPlacement="side"
+      measureAnchor={measureTextEnd}
       trigger={
         <Show
           when={props.onClick}

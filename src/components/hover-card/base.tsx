@@ -52,6 +52,8 @@ interface HoverCardProps {
   previewClass?: string;
   /** Preview placement preference (default: auto) */
   previewPlacement?: "auto" | "side";
+  /** The box the preview is placed against; defaults to the whole trigger. */
+  measureAnchor?: (trigger: HTMLElement) => DOMRect;
   /** Whether the preview container should be visible once hover is active */
   showPreview?: boolean;
   /** Preview content */
@@ -140,7 +142,8 @@ const HoverCard = (props: HoverCardProps) => {
   };
 
   const updateAnchorRect = () => {
-    if (anchorRef) setAnchorRect(anchorRef.getBoundingClientRect());
+    if (!anchorRef) return;
+    setAnchorRect(props.measureAnchor?.(anchorRef) ?? anchorRef.getBoundingClientRect());
   };
 
   const setupResizeObserver = (el: HTMLDivElement) => {

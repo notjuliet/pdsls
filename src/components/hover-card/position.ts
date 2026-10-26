@@ -17,6 +17,8 @@ interface FloatingPositionOptions {
   placement?: "auto" | "side";
   lockedPlacement?: FloatingPlacement;
   sideBreakpoint?: number;
+  /** Below this width beside the anchor, the preview goes above or below instead. */
+  minSideWidth?: number;
 }
 
 export type FloatingPlacement = "above" | "below" | "left" | "right";
@@ -27,6 +29,7 @@ interface FloatingPosition {
 }
 
 const SIDE_PLACEMENT_BREAKPOINT = 1280;
+const MIN_SIDE_WIDTH = 400;
 
 export const measureFloatingElement = (element: HTMLElement): FloatingSize => ({
   width: element.offsetWidth,
@@ -58,17 +61,19 @@ export const getFloatingPosition = (
     effectiveWidth &&
     viewport.width >= (options.sideBreakpoint ?? SIDE_PLACEMENT_BREAKPOINT)
   ) {
+    const minSideWidth = options.minSideWidth ?? MIN_SIDE_WIDTH;
     const rightSpace = Math.max(0, viewport.width - padding - anchorRect.right - gap);
     const leftSpace = Math.max(0, anchorRect.left - gap - padding);
+    // Right whenever it has room, so previews don't switch sides from row to row.
     const placeRight =
       options.lockedPlacement === "right"
         ? true
         : options.lockedPlacement === "left"
           ? false
-          : rightSpace >= leftSpace;
+          : rightSpace >= minSideWidth || rightSpace >= leftSpace;
     const availableWidth = placeRight ? rightSpace : leftSpace;
 
-    if (availableWidth > 0) {
+    if (availableWidth >= minSideWidth) {
       const availableHeight = viewportMaxHeight;
       const visibleHeight = Math.min(floatingSize.height || availableHeight, availableHeight);
       const anchorCenterY = anchorRect.top + anchorRect.height / 2;
