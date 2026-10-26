@@ -1,11 +1,8 @@
-import type { Nsid } from "@atcute/lexicons";
 import { A } from "@solidjs/router";
-import { createResource, createSignal, For, Index, type JSX, Show } from "solid-js";
+import { createSignal, For, Index, type JSX, Show } from "solid-js";
 
 import { canHover } from "../../layout";
 import { addToClipboard } from "../../lib/copy";
-import { resolveLexicon, schemaHref } from "../../lib/lexicon";
-import LexiconHoverCard from "../hover-card/lexicon";
 import { Favicon } from "../ui/favicon";
 import Tooltip from "../ui/tooltip";
 
@@ -16,10 +13,6 @@ export interface StageAction {
   icon: string;
   href?: string;
   onClick?: () => void;
-  /** Draws the icon faded, e.g. when the target is known to be missing. */
-  dimmed?: boolean;
-  /** Wraps the icon, e.g. in a hover preview. */
-  wrap?: (trigger: JSX.Element) => JSX.Element;
 }
 
 /** One level of the hierarchy, e.g. a PDS, a repo, a collection or a record. */
@@ -58,12 +51,7 @@ const rowBoxClass = "grid grid-cols-subgrid items-baseline gap-x-4 px-2";
 const kindClass = "relative text-left text-xs whitespace-nowrap";
 
 const ActionIcon = (props: { action: StageAction }) => {
-  const icon = () => (
-    <span
-      class={`iconify ${props.action.icon}`}
-      classList={{ "opacity-40": props.action.dimmed }}
-    />
-  );
+  const icon = () => <span class={`iconify ${props.action.icon}`} />;
   const trigger = () =>
     props.action.href ? (
       <A href={props.action.href} aria-label={props.action.label} class={iconLinkClass}>
@@ -82,11 +70,7 @@ const ActionIcon = (props: { action: StageAction }) => {
 
   return (
     <span class="relative flex shrink-0 focus-within:z-20 hover:z-20">
-      {props.action.wrap ? (
-        props.action.wrap(trigger())
-      ) : (
-        <Tooltip text={props.action.label}>{trigger()}</Tooltip>
-      )}
+      <Tooltip text={props.action.label}>{trigger()}</Tooltip>
     </span>
   );
 };
@@ -207,25 +191,3 @@ export const StageNav = (props: { stages: Stage[] }) => (
     </Show>
   </nav>
 );
-
-/**
- * The schema action for a collection: previews its lexicon on hover and dims when none is
- * published. Resolving starts right away (cached per NSID) so the preview opens instantly.
- */
-export const useSchemaAction = (
-  nsid: () => string | undefined,
-): (() => StageAction | undefined) => {
-  const [lexicon] = createResource(nsid, (value) => resolveLexicon(value as Nsid));
-
-  return () => {
-    const value = nsid();
-    if (!value) return undefined;
-    return {
-      label: "Schema",
-      icon: "lucide--book-text",
-      href: schemaHref(value),
-      dimmed: !!lexicon.error,
-      wrap: (trigger) => <LexiconHoverCard lexicon={value} renderTrigger={() => trigger} />,
-    };
-  };
-};

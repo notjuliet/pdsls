@@ -20,21 +20,15 @@ import {
   RecordPage,
   recordTabFromHash,
   useRecordSchemaValidation,
-  isLexiconRecord,
-  LexiconDocument,
 } from "../../components/repo/record-page.jsx";
 import { timestampFromRkey } from "../../components/repo/record-row.jsx";
-import {
-  nsidDomain,
-  type Stage,
-  StageNav,
-  useSchemaAction,
-} from "../../components/repo/stage-nav.jsx";
+import { nsidDomain, type Stage, StageNav } from "../../components/repo/stage-nav.jsx";
 import { IconButton } from "../../components/ui/icon-button.jsx";
 import { Spinner, EmptyState, ErrorNotice } from "../../components/ui/states.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
 import { addToClipboard } from "../../lib/copy";
 import { localDateFromTimestamp } from "../../lib/format.js";
+import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import { carFileAccept, createFileChangeHandler, isIOS } from "./file-handlers.js";
 import { clearQueuedCarFile, queuedCarFile } from "./state.js";
 
@@ -441,11 +435,6 @@ const ExploreView = (props: { archive: Archive; view: () => View }) => {
       ?.filter((alias) => alias.startsWith("at://"))[0]
       ?.split("at://")[1] ?? props.archive.did;
 
-  const schemaAction = useSchemaAction(() => {
-    const view = props.view();
-    return view.type === "collection" || view.type === "record" ? view.collection.name : undefined;
-  });
-
   const stages = (): Stage[] => {
     const view = props.view();
     const did = props.archive.did;
@@ -487,7 +476,6 @@ const ExploreView = (props: { archive: Archive; view: () => View }) => {
           ? viewToPath({ type: "collection", collection: view.collection })
           : undefined,
       copy: { label: "NSID", value: view.collection.name },
-      actions: [schemaAction()!],
     });
     if (view.type !== "record") return result;
 
@@ -612,6 +600,7 @@ const RecordSubview = (props: {
   record: RecordEntry;
 }) => {
   const location = useLocation();
+  const lexicon = useLexiconSchema(() => props.collection.name);
   const schemaValidation = useRecordSchemaValidation(
     () => props.collection.name,
     () => props.record.key,
@@ -626,9 +615,7 @@ const RecordSubview = (props: {
     <RecordPage
       tabs={[
         { id: "record", label: "Record" },
-        ...(isLexiconRecord(props.collection.name)
-          ? [{ id: "schema" as const, label: "Schema" }]
-          : []),
+        { id: "schema", label: "Schema" },
         { id: "info", label: "Info", error: schemaValidation.valid() === false },
       ]}
       activeTab={recordTabFromHash(location.hash)}
@@ -650,7 +637,16 @@ const RecordSubview = (props: {
           <JSONValue data={props.record.record} repo={props.archive.did || ""} newTab hideBlobs />
         </Show>
       }
-      schema={<LexiconDocument schema={props.record.record} />}
+      schema={
+        <SchemaTabContent
+          schema={lexicon.schema()}
+          loading={lexicon.loading()}
+          error={lexicon.error()}
+          fallbackSchema={
+            props.collection.name === "com.atproto.lexicon.schema" ? props.record.record : undefined
+          }
+        />
+      }
       info={
         <RecordInfo
           uri={`at://${props.archive.did}/${props.collection.name}/${props.record.key}`}

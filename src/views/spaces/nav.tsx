@@ -3,12 +3,7 @@ import { children, createResource, type JSX } from "solid-js";
 
 import { resolveDidInfo } from "../../components/hover-card/did.jsx";
 import { timestampFromRkey } from "../../components/repo/record-row.jsx";
-import {
-  nsidDomain,
-  type Stage,
-  StageNav,
-  useSchemaAction,
-} from "../../components/repo/stage-nav.jsx";
+import { nsidDomain, type Stage, StageNav } from "../../components/repo/stage-nav.jsx";
 import { localDateFromTimestamp } from "../../lib/format.js";
 import { makeSpaceCollectionPath, makeSpacePath, makeSpaceRepoPath } from "./context.jsx";
 
@@ -26,7 +21,6 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
   const action = children(() => props.action);
   const [authorityHandle] = createResource(() => params.spaceAuthority, resolveDidHandle);
   const [repoHandle] = createResource(() => params.spaceRepo, resolveDidHandle);
-  const schemaAction = useSchemaAction(() => params.collection);
   const hasSpace = () => !!params.spaceAuthority && !!params.spaceType && !!params.skey;
 
   const stages = (): Stage[] => {
@@ -74,7 +68,6 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
         ? makeSpaceCollectionPath(authority, spaceType, skey, repo, collection)
         : undefined,
       copy: { label: "NSID", value: collection },
-      actions: [schemaAction()!],
     });
 
     if (!params.rkey) return result;

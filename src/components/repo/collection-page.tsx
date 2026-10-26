@@ -5,6 +5,7 @@ import type { ScopeId } from "../../auth/scope-utils";
 import { createDebouncedValue } from "../../lib/debounced.js";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { useFilterShortcut } from "../../lib/keyboard.js";
+import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import type { JSONType } from "../json.jsx";
 import { Button } from "../ui/button.jsx";
 import { ConfirmDialog } from "../ui/confirm-dialog.jsx";
@@ -78,6 +79,7 @@ export const CollectionPage = (props: {
   const [openDelete, setOpenDelete] = createSignal(false);
   const [recreate, setRecreate] = createSignal(false);
   const [deleting, setDeleting] = createSignal(false);
+  const lexicon = useLexiconSchema(() => (props.hidden ? undefined : props.source.collection));
   let filterInputRef: HTMLInputElement | undefined;
   let activeKey: string | undefined;
   let requestVersion = 0;
@@ -144,6 +146,13 @@ export const CollectionPage = (props: {
       resetListing();
     }
     if (!props.hidden && !loaded() && !loading()) void loadRecords(true);
+  });
+
+  createEffect(() => {
+    if (lexicon.showSchema()) {
+      stopManaging();
+      setOpenDelete(false);
+    }
   });
 
   // Large collections (e.g. from a CAR) are expensive to scan, so the filter waits for
@@ -241,86 +250,105 @@ export const CollectionPage = (props: {
       <div class="flex w-full flex-col items-center">
         <div class="mb-2 flex min-h-7 w-full items-center justify-between px-2 text-sm sm:text-base">
           <Tabs
-            items={[{ id: "records", label: "Records", href: props.source.collectionHref }]}
-            active="records"
+            items={[
+              { id: "records", label: "Records", href: props.source.collectionHref },
+              { id: "schema", label: "Schema", href: `${props.source.collectionHref}#schema` },
+            ]}
+            active={lexicon.showSchema() ? "schema" : "records"}
           />
-          <div class="flex items-center text-sm sm:gap-1">
-            <Show when={!managing()}>{props.actions}</Show>
-            <Show when={props.source.manage}>
-              {(manage) => (
-                <>
-                  <Show when={managing()}>
-                    <IconButton icon="lucide--list-checks" label="Select all" onClick={selectAll} />
-                    <Show when={manage().recreateScope}>
-                      {(scope) => (
-                        <IconButton
-                          icon="lucide--recycle"
-                          iconClass="text-green-500 dark:text-green-400"
-                          label="Recreate"
-                          scope={scope()}
-                          onClick={() => {
-                            setRecreate(true);
-                            setOpenDelete(true);
-                          }}
-                        />
-                      )}
+          <Show when={!lexicon.showSchema()}>
+            <div class="flex items-center text-sm sm:gap-1">
+              <Show when={!managing()}>{props.actions}</Show>
+              <Show when={props.source.manage}>
+                {(manage) => (
+                  <>
+                    <Show when={managing()}>
+                      <IconButton
+                        icon="lucide--list-checks"
+                        label="Select all"
+                        onClick={selectAll}
+                      />
+                      <Show when={manage().recreateScope}>
+                        {(scope) => (
+                          <IconButton
+                            icon="lucide--recycle"
+                            iconClass="text-green-500 dark:text-green-400"
+                            label="Recreate"
+                            scope={scope()}
+                            onClick={() => {
+                              setRecreate(true);
+                              setOpenDelete(true);
+                            }}
+                          />
+                        )}
+                      </Show>
+                      <IconButton
+                        icon="lucide--trash-2"
+                        iconClass="text-red-500 dark:text-red-400"
+                        label="Delete"
+                        disabled={selected().size === 0}
+                        onClick={() => {
+                          setRecreate(false);
+                          setOpenDelete(true);
+                        }}
+                      />
                     </Show>
-                    <IconButton
-                      icon="lucide--trash-2"
-                      iconClass="text-red-500 dark:text-red-400"
-                      label="Delete"
-                      disabled={selected().size === 0}
-                      onClick={() => {
-                        setRecreate(false);
-                        setOpenDelete(true);
-                      }}
-                    />
-                  </Show>
-                  <PermissionButton
-                    scope={manage().scope}
-                    class="flex items-center gap-1 rounded-md border border-neutral-300 px-2 py-0.75 transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-                    disabledClass="flex items-center gap-1 rounded-md px-2 py-1 opacity-40"
-                    onClick={() => (managing() ? stopManaging() : setManaging(true))}
-                  >
-                    {managing() ? "Cancel" : "Manage"}
-                  </PermissionButton>
-                </>
-              )}
-            </Show>
-          </div>
-        </div>
-
-        <div class="flex w-full max-w-full flex-col px-1 pb-24 font-mono">
-          <Show when={loading() && !loaded()}>
-            <LoadingState label="Loading records…" />
-          </Show>
-          <Show when={error()}>{(message) => <ErrorNotice message={message()} />}</Show>
-          <Show when={loaded() && filteredRecords().length === 0 && !error()}>
-            <div class="font-sans">
-              <EmptyState
-                icon={debouncedFilter() ? "lucide--search-x" : "lucide--file-json"}
-                message={debouncedFilter() ? "No records match your filter" : "No records found"}
-              />
+                    <PermissionButton
+                      scope={manage().scope}
+                      class="flex items-center gap-1 rounded-md border border-neutral-300 px-2 py-0.75 transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+                      disabledClass="flex items-center gap-1 rounded-md px-2 py-1 opacity-40"
+                      onClick={() => (managing() ? stopManaging() : setManaging(true))}
+                    >
+                      {managing() ? "Cancel" : "Manage"}
+                    </PermissionButton>
+                  </>
+                )}
+              </Show>
             </div>
           </Show>
-          <For each={visibleRecords()}>
-            {(record, index) => (
-              <RecordRow
-                rkey={record.rkey}
-                cid={record.cid}
-                value={record.value}
-                repo={props.source.repo}
-                href={props.source.recordHref(record.rkey)}
-                onClick={managing() ? (event) => toggleRecord(record, index(), event) : undefined}
-                preview={preview(record)}
-                selected={managing() && selected().has(record.rkey)}
-                prevSelected={selected().has(filteredRecords()[index() - 1]?.rkey)}
-                nextSelected={selected().has(filteredRecords()[index() + 1]?.rkey)}
-              />
-            )}
-          </For>
-          <LoadMoreSentinel hasMore={hasMore} loading={loading} onLoadMore={loadMore} />
         </div>
+
+        <Show when={lexicon.showSchema()}>
+          <SchemaTabContent
+            schema={lexicon.schema()}
+            loading={lexicon.loading()}
+            error={lexicon.error()}
+          />
+        </Show>
+
+        <Show when={!lexicon.showSchema()}>
+          <div class="flex w-full max-w-full flex-col px-1 pb-24 font-mono">
+            <Show when={loading() && !loaded()}>
+              <LoadingState label="Loading records…" />
+            </Show>
+            <Show when={error()}>{(message) => <ErrorNotice message={message()} />}</Show>
+            <Show when={loaded() && filteredRecords().length === 0 && !error()}>
+              <div class="font-sans">
+                <EmptyState
+                  icon={debouncedFilter() ? "lucide--search-x" : "lucide--file-json"}
+                  message={debouncedFilter() ? "No records match your filter" : "No records found"}
+                />
+              </div>
+            </Show>
+            <For each={visibleRecords()}>
+              {(record, index) => (
+                <RecordRow
+                  rkey={record.rkey}
+                  cid={record.cid}
+                  value={record.value}
+                  repo={props.source.repo}
+                  href={props.source.recordHref(record.rkey)}
+                  onClick={managing() ? (event) => toggleRecord(record, index(), event) : undefined}
+                  preview={preview(record)}
+                  selected={managing() && selected().has(record.rkey)}
+                  prevSelected={selected().has(filteredRecords()[index() - 1]?.rkey)}
+                  nextSelected={selected().has(filteredRecords()[index() + 1]?.rkey)}
+                />
+              )}
+            </For>
+            <LoadMoreSentinel hasMore={hasMore} loading={loading} onLoadMore={loadMore} />
+          </div>
+        </Show>
       </div>
 
       <ConfirmDialog
@@ -334,7 +362,7 @@ export const CollectionPage = (props: {
         busy={deleting()}
       />
 
-      <Show when={records().length > 1 || filter()}>
+      <Show when={!lexicon.showSchema() && (records().length > 1 || filter())}>
         <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 left-0 z-10 flex w-full flex-col items-center gap-2 bg-neutral-100 px-3 pt-3 pb-6">
           <div class="flex w-full max-w-[40.5rem] items-center gap-2">
             <FilterInput

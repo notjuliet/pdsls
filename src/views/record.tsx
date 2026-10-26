@@ -14,8 +14,6 @@ import {
   RecordPage,
   recordTabFromHash,
   useRecordSchemaValidation,
-  isLexiconRecord,
-  LexiconDocument,
 } from "../components/repo/record-page.jsx";
 import { ConfirmDialog } from "../components/ui/confirm-dialog.jsx";
 import { Favicon } from "../components/ui/favicon.jsx";
@@ -24,6 +22,7 @@ import { addNotification } from "../components/ui/notification.jsx";
 import { Spinner } from "../components/ui/states.jsx";
 import { addToClipboard } from "../lib/copy.js";
 import { useRepo } from "../lib/repo-context.jsx";
+import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
 import { AtUri, uriTemplates } from "../lib/templates.js";
 
 const faviconWrapper = (children: any) => (
@@ -64,6 +63,7 @@ export const RecordView = () => {
     () => params.collection!,
     () => params.rkey!,
   );
+  const lexicon = useLexiconSchema(() => params.collection);
   const did = repo.did();
 
   const fetchRecord = async () => {
@@ -171,9 +171,7 @@ export const RecordView = () => {
           <RecordPage
             tabs={[
               { id: "record", label: "Record" },
-              ...(isLexiconRecord(params.collection!)
-                ? [{ id: "schema" as const, label: "Schema" }]
-                : []),
+              { id: "schema", label: "Schema" },
               { id: "backlinks", label: "Backlinks" },
               {
                 id: "info",
@@ -277,7 +275,18 @@ export const RecordView = () => {
                 keyLinks
               />
             }
-            schema={<LexiconDocument schema={record()?.value} />}
+            schema={
+              <SchemaTabContent
+                schema={lexicon.schema()}
+                loading={lexicon.loading()}
+                error={lexicon.error()}
+                fallbackSchema={
+                  params.collection === "com.atproto.lexicon.schema"
+                    ? (record()?.value as any)
+                    : undefined
+                }
+              />
+            }
             backlinks={
               <ErrorBoundary
                 fallback={(err) => <div class="wrap-break-word">Error: {err.message}</div>}

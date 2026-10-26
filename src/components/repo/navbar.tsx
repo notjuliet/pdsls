@@ -5,7 +5,7 @@ import { didDocCache } from "../../lib/api";
 import { localDateFromTimestamp } from "../../lib/format";
 import { setPageStreams } from "../../lib/page-streams";
 import { timestampFromRkey } from "./record-row";
-import { nsidDomain, type Stage, StageNav, useSchemaAction } from "./stage-nav";
+import { nsidDomain, type Stage, StageNav } from "./stage-nav";
 
 const [pds, setPDS] = createSignal<string>();
 export { setPDS };
@@ -14,7 +14,6 @@ export const NavBar = () => {
   const params = useParams();
   const [handle, setHandle] = createSignal(params.repo);
   const missingPds = () => pds() === "Missing PDS";
-  const schemaAction = useSchemaAction(() => params.collection);
 
   createEffect(() => {
     pds();
@@ -98,7 +97,6 @@ export const NavBar = () => {
         favicon: nsidDomain(params.collection),
         href: params.rkey ? `/at://${params.repo}/${params.collection}` : undefined,
         copy: { label: "AT URI", value: collectionUri },
-        actions: [schemaAction()!],
       });
     }
 

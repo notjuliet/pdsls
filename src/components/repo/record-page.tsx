@@ -1,11 +1,10 @@
-import { createSignal, ErrorBoundary, type JSX, Match, Show, Switch } from "solid-js";
+import { createSignal, type JSX, Match, Show, Switch } from "solid-js";
 
 import {
   hasKnownRecordSchema,
   validateKnownRecordSchema,
   validateResolvedRecordSchema,
 } from "../../lib/record-validation.js";
-import { LexiconSchemaView } from "../lexicon-schema.jsx";
 import { Button } from "../ui/button.jsx";
 import { CopyableInfoField } from "../ui/copyable-info-field.jsx";
 import { ExternalLink } from "../ui/external-link.jsx";
@@ -21,22 +20,13 @@ export const recordTabFromHash = (hash: string): RecordTab => {
   return "record";
 };
 
-/** Lexicon records get a Schema tab that renders the lexicon they publish. */
-export const isLexiconRecord = (collection: string) => collection === "com.atproto.lexicon.schema";
-
-export const LexiconDocument = (props: { schema: unknown }) => (
-  <ErrorBoundary fallback={(err) => <div>Error: {err.message}</div>}>
-    <LexiconSchemaView schema={props.schema as any} />
-  </ErrorBoundary>
-);
-
 interface RecordPageProps {
   tabs: { id: RecordTab; label: string; error?: boolean }[];
   activeTab: RecordTab;
   tabHref: (tab: RecordTab) => string;
   actions?: JSX.Element;
   record: JSX.Element;
-  schema?: JSX.Element;
+  schema: JSX.Element;
   backlinks?: JSX.Element;
   info: JSX.Element;
 }
