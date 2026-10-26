@@ -84,7 +84,7 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
         <Show when={props.stage.href}>
           {(href) => (
             <A href={href()} class="absolute inset-0 rounded-md">
-              <span class="sr-only">Open {props.stage.label}</span>
+              <span class="sr-only">Open {props.stage.kind ?? "level"}</span>
             </A>
           )}
         </Show>
