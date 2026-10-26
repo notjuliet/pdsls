@@ -49,7 +49,6 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
       ),
       favicon: nsidDomain(spaceType),
       detail: authorityHandle() ?? authority,
-      detailHref: authorityHandle() ? `/at://${authority}` : undefined,
       href: params.spaceRepo ? makeSpacePath(authority, spaceType, skey) : undefined,
       copy: { label: "owner DID", value: authority },
     });
@@ -61,7 +60,6 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
       kind: "Member",
       label: repoHandle() ?? repo,
       detail: repoHandle() ? repo : undefined,
-      detailHref: repoHandle() ? `/at://${repo}` : undefined,
       href: params.collection ? makeSpaceRepoPath(authority, spaceType, skey, repo) : undefined,
       copy: { label: "DID", value: repo },
     });

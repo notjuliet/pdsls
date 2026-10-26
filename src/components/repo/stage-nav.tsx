@@ -1,5 +1,5 @@
 import { A } from "@solidjs/router";
-import { createSignal, For, Index, type JSX, Show } from "solid-js";
+import { For, Index, type JSX, Show } from "solid-js";
 
 import { canHover } from "../../layout";
 import { addToClipboard } from "../../lib/copy";
@@ -23,8 +23,6 @@ export interface Stage {
   labelClass?: string;
   /** Muted text after the label, e.g. a DID or a date. */
   detail?: JSX.Element;
-  /** Links the detail on its own, separately from the row. */
-  detailHref?: string;
   /** Links the row to its level; omitted for the current level. */
   href?: string;
   /** A domain whose favicon shows after the label, e.g. the app behind a collection. */
@@ -76,15 +74,12 @@ const ActionIcon = (props: { action: StageAction }) => {
 };
 
 const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
-  const [detailHovered, setDetailHovered] = createSignal(false);
-
   return (
     // Rows share the nav's grid columns, so every label, value and action group lines up.
     <div class="col-span-full grid grid-cols-subgrid items-center">
       <div
         class={`group/row relative rounded-md py-0.5 transition-colors hover:bg-neutral-200/80 sm:py-0 dark:hover:bg-neutral-700/50 ${rowBoxClass}`}
         classList={{ "col-span-2": props.kindColumn }}
-        onMouseLeave={() => setDetailHovered(false)}
       >
         <Show when={props.stage.href}>
           {(href) => (
@@ -105,7 +100,7 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
               "sm:shrink-0 max-w-full": !!props.stage.detail,
               "text-blue-500 dark:text-blue-400": !!props.stage.href,
               "group-hover/row:text-blue-600 dark:group-hover/row:text-blue-300":
-                !!props.stage.href && !detailHovered(),
+                !!props.stage.href,
             }}
           >
             {/* A space while the value loads keeps the row at its full height. */}
@@ -120,22 +115,8 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
             )}
           </Show>
           <Show when={props.stage.detail}>
-            <span class="flex max-w-full min-w-0 items-baseline text-xs text-neutral-500 sm:text-sm dark:text-neutral-400">
-              <Show
-                when={props.stage.detailHref}
-                fallback={<span class="min-w-0 truncate">{props.stage.detail}</span>}
-              >
-                {(detailHref) => (
-                  <A
-                    href={detailHref()}
-                    class="pointer-events-auto relative z-10 min-w-0 truncate hover:text-blue-500 hover:underline dark:hover:text-blue-400"
-                    onMouseEnter={() => setDetailHovered(true)}
-                    onMouseLeave={() => setDetailHovered(false)}
-                  >
-                    {props.stage.detail}
-                  </A>
-                )}
-              </Show>
+            <span class="max-w-full min-w-0 truncate text-xs text-neutral-500 sm:text-sm dark:text-neutral-400">
+              {props.stage.detail}
             </span>
           </Show>
           {/* Copy appears after the value on hover; phones copy from the Info and Identity tabs. */}
