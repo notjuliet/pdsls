@@ -56,7 +56,9 @@ const LexiconSchemaContext = createContext<{ inertRefs?: boolean }>();
 const useLexiconSchemaContext = () => useContext(LexiconSchemaContext) ?? {};
 
 const schemaDefId = (defName: string) => `schema:${defName}`;
-const SCHEMA_REF_TEXT_CLASS = "font-mono text-xs wrap-break-word text-blue-500 dark:text-blue-400";
+const SCHEMA_REF_TEXT_CLASS = "font-mono wrap-break-word text-blue-500 dark:text-blue-400";
+/** The size of a type or reference, unless it says otherwise. */
+const TYPE_SIZE = "text-xs";
 const SCHEMA_LINK_CLASS = `${SCHEMA_REF_TEXT_CLASS} cursor-pointer hover:underline`;
 const PREVIEW_DEFINITION_LIMIT = 6;
 
@@ -68,22 +70,27 @@ const LocalSchemaLink = (props: { defName: string; class: string; children: JSX.
   </a>
 );
 
-const SchemaRefLink = (props: { refType: string; children: JSX.Element }) => {
+const SchemaRefLink = (props: { refType: string; size?: string; children: JSX.Element }) => {
   const context = useLexiconSchemaContext();
+  const size = props.size ?? TYPE_SIZE;
 
   if (context.inertRefs) {
-    return <span class={SCHEMA_REF_TEXT_CLASS}>{props.children}</span>;
+    return <span class={`${SCHEMA_REF_TEXT_CLASS} ${size}`}>{props.children}</span>;
   }
 
   if (props.refType.startsWith("#")) {
     return (
-      <LocalSchemaLink defName={props.refType.slice(1)} class={SCHEMA_LINK_CLASS}>
+      <LocalSchemaLink defName={props.refType.slice(1)} class={`${SCHEMA_LINK_CLASS} ${size}`}>
         {props.children}
       </LocalSchemaLink>
     );
   }
 
-  return <SchemaRefHoverCard refType={props.refType}>{props.children}</SchemaRefHoverCard>;
+  return (
+    <SchemaRefHoverCard refType={props.refType} size={size}>
+      {props.children}
+    </SchemaRefHoverCard>
+  );
 };
 
 export interface LexiconSchema {
@@ -100,7 +107,7 @@ const fetchLexiconPreview = async (nsid: string): Promise<LexiconSchema> => {
   return schema.rawSchema as LexiconSchema;
 };
 
-function SchemaRefHoverCard(props: { refType: string; children: JSX.Element }) {
+function SchemaRefHoverCard(props: { refType: string; size: string; children: JSX.Element }) {
   const parsed = () => parseLexiconRef(props.refType);
   const preview = createHoverResource(() => parsed().nsid, fetchLexiconPreview, {
     getErrorMessage: (err) => (err instanceof Error ? err.message : "Failed to resolve schema"),
@@ -110,7 +117,7 @@ function SchemaRefHoverCard(props: { refType: string; children: JSX.Element }) {
   const trigger = () => (
     <A
       href={schemaHref(parsed().nsid, parsed().defName)}
-      class={SCHEMA_LINK_CLASS}
+      class={`${SCHEMA_LINK_CLASS} ${props.size}`}
       classList={{ "hover-card-trigger-loading": loading() }}
     >
       {props.children}
@@ -122,7 +129,7 @@ function SchemaRefHoverCard(props: { refType: string; children: JSX.Element }) {
       onHover={preview.load}
       hoverDelay={300}
       trigger={trigger()}
-      class="inline text-xs leading-4"
+      class={`inline ${props.size} ${props.size === TYPE_SIZE ? "leading-4" : ""}`}
       previewClass="max-h-[32rem] w-[min(36rem,calc(100vw-2rem))] font-sans text-sm"
       showPreview={hasPreview()}
     >
@@ -218,7 +225,15 @@ interface LexiconProperty {
   maxSize?: number;
 }
 
-const TypeBadge = (props: { type: string; format?: string; refType?: string }) => {
+const TypeBadge = (props: {
+  type: string;
+  format?: string;
+  refType?: string;
+  /** The text color, muted unless the type is a value, e.g. after `items:`. */
+  color?: string;
+  /** Larger next to a property's name. */
+  size?: string;
+}) => {
   const displayType = props.refType
     ? props.refType.replace(/^#/, "")
     : props.format
@@ -229,10 +244,16 @@ const TypeBadge = (props: { type: string; format?: string; refType?: string }) =
     <Show
       when={props.refType}
       fallback={
-        <span class="font-mono text-xs text-neutral-600 dark:text-neutral-400">{displayType}</span>
+        <span
+          class={`font-mono ${props.size ?? TYPE_SIZE} ${props.color ?? "text-neutral-600 dark:text-neutral-400"}`}
+        >
+          {displayType}
+        </span>
       }
     >
-      <SchemaRefLink refType={props.refType!}>{displayType}</SchemaRefLink>
+      <SchemaRefLink refType={props.refType!} size={props.size}>
+        {displayType}
+      </SchemaRefLink>
     </Show>
   );
 };
@@ -243,73 +264,76 @@ const UnionBadges = (props: { refs: string[] }) => (
   </div>
 );
 
+const CONSTRAINT_VALUE_CLASS = "text-neutral-700 dark:text-neutral-300";
+
 const ConstraintsList = (props: { property: LexiconProperty }) => {
-  const valueClass = "text-neutral-600 dark:text-neutral-400";
   return (
-    <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+    <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-500 dark:text-neutral-400">
       <Show when={props.property.minLength !== undefined}>
         <span>
-          minLength: <span class={valueClass}>{props.property.minLength}</span>
+          minLength: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.minLength}</span>
         </span>
       </Show>
       <Show when={props.property.maxLength !== undefined}>
         <span>
-          maxLength: <span class={valueClass}>{props.property.maxLength}</span>
+          maxLength: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.maxLength}</span>
         </span>
       </Show>
       <Show when={props.property.maxGraphemes !== undefined}>
         <span>
-          maxGraphemes: <span class={valueClass}>{props.property.maxGraphemes}</span>
+          maxGraphemes: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.maxGraphemes}</span>
         </span>
       </Show>
       <Show when={props.property.minGraphemes !== undefined}>
         <span>
-          minGraphemes: <span class={valueClass}>{props.property.minGraphemes}</span>
+          minGraphemes: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.minGraphemes}</span>
         </span>
       </Show>
       <Show when={props.property.minimum !== undefined}>
         <span>
-          min: <span class={valueClass}>{props.property.minimum}</span>
+          min: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.minimum}</span>
         </span>
       </Show>
       <Show when={props.property.maximum !== undefined}>
         <span>
-          max: <span class={valueClass}>{props.property.maximum}</span>
+          max: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.maximum}</span>
         </span>
       </Show>
       <Show when={props.property.maxSize !== undefined}>
         <span>
-          maxSize: <span class={valueClass}>{props.property.maxSize}</span>
+          maxSize: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.maxSize}</span>
         </span>
       </Show>
       <Show when={props.property.accept}>
         <span>
-          accept: <span class={valueClass}>[{props.property.accept!.join(", ")}]</span>
+          accept: <span class={CONSTRAINT_VALUE_CLASS}>[{props.property.accept!.join(", ")}]</span>
         </span>
       </Show>
       <Show when={props.property.enum}>
         <span>
-          enum: <span class={valueClass}>[{props.property.enum!.join(", ")}]</span>
+          enum: <span class={CONSTRAINT_VALUE_CLASS}>[{props.property.enum!.join(", ")}]</span>
         </span>
       </Show>
       <Show when={props.property.const}>
         <span>
-          const: <span class={valueClass}>{props.property.const?.toString()}</span>
+          const: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.const?.toString()}</span>
         </span>
       </Show>
       <Show when={props.property.default !== undefined}>
         <span>
-          default: <span class={valueClass}>{JSON.stringify(props.property.default)}</span>
+          default:{" "}
+          <span class={CONSTRAINT_VALUE_CLASS}>{JSON.stringify(props.property.default)}</span>
         </span>
       </Show>
       <Show when={props.property.knownValues}>
         <span>
-          knownValues: <span class={valueClass}>[{props.property.knownValues!.join(", ")}]</span>
+          knownValues:{" "}
+          <span class={CONSTRAINT_VALUE_CLASS}>[{props.property.knownValues!.join(", ")}]</span>
         </span>
       </Show>
       <Show when={props.property.closed}>
         <span>
-          closed: <span class={valueClass}>true</span>
+          closed: <span class={CONSTRAINT_VALUE_CLASS}>true</span>
         </span>
       </Show>
     </div>
@@ -332,13 +356,14 @@ const PropertyRow = (props: {
               type={props.property.type}
               format={props.property.format}
               refType={props.property.ref}
+              size="text-sm"
             />
           </Show>
           <Show when={props.property.refs}>
-            <span class="font-mono text-xs text-neutral-600 dark:text-neutral-400">union</span>
+            <span class="font-mono text-sm text-neutral-600 dark:text-neutral-400">union</span>
           </Show>
           <Show when={props.required}>
-            <span class="text-xs font-medium text-red-500 dark:text-red-400">required</span>
+            <span class="text-sm text-red-500 dark:text-red-400">required</span>
           </Show>
         </div>
       </Show>
@@ -351,25 +376,31 @@ const PropertyRow = (props: {
       <Show when={props.property.items}>
         <div class="flex flex-col gap-2">
           <div class="flex items-baseline gap-2 text-xs">
-            <span class="font-medium">items:</span>
+            <span class="text-neutral-500 dark:text-neutral-400">items:</span>
             <Show when={!props.property.items!.refs}>
               <TypeBadge
                 type={props.property.items!.type}
                 format={props.property.items!.format}
                 refType={props.property.items!.ref}
+                color={CONSTRAINT_VALUE_CLASS}
               />
             </Show>
             <Show when={props.property.items!.refs}>
-              <span class="font-mono text-xs text-neutral-600 dark:text-neutral-400">union</span>
+              <span class={`font-mono text-xs ${CONSTRAINT_VALUE_CLASS}`}>union</span>
             </Show>
           </div>
-          <Show when={props.property.items!.refs}>
-            <UnionBadges refs={props.property.items!.refs!} />
+          {/* Nested under the items line, so they don't read as the array's own. */}
+          <Show when={props.property.items!.refs || hasConstraints(props.property.items!)}>
+            <div class="ml-1 flex flex-col gap-2 border-l border-neutral-300 pl-3 dark:border-neutral-600">
+              <Show when={props.property.items!.refs}>
+                <UnionBadges refs={props.property.items!.refs!} />
+              </Show>
+              <Show when={hasConstraints(props.property.items!)}>
+                <ConstraintsList property={props.property.items!} />
+              </Show>
+            </div>
           </Show>
         </div>
-      </Show>
-      <Show when={props.property.items && hasConstraints(props.property.items)}>
-        <ConstraintsList property={props.property.items!} />
       </Show>
       <Show when={props.property.description && !props.hideNameType}>
         <p class="text-sm wrap-break-word whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
@@ -390,9 +421,7 @@ const resourceColor = (resource: string) =>
 const SchemaSection = (props: { title: string; encoding: string; schema?: LexiconObject }) => {
   return (
     <div class="flex flex-col gap-2">
-      <h4 class="text-sm font-semibold text-neutral-600 uppercase dark:text-neutral-400">
-        {props.title}
-      </h4>
+      <h4 class="text-sm font-medium text-neutral-800 dark:text-neutral-200">{props.title}</h4>
       <div class={CARD_CLASS}>
         <div class="text-sm">
           <span class="font-semibold">Encoding: </span>
@@ -503,6 +532,15 @@ const PermissionRow = (props: { permission: LexiconPermission; index: number }) 
   );
 };
 
+/** What a record key type means, for its tooltip. */
+const describeRecordKey = (key: string) => {
+  if (key === "tid") return "TID (timestamp ID): based on when the record was created";
+  if (key === "nsid") return "An NSID, e.g. com.example.thing";
+  if (key === "any") return "Any valid record key";
+  if (key.startsWith("literal:")) return `Always "${key.slice(8)}": one record per account`;
+  return undefined;
+};
+
 const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean }) => {
   const defTypeColor = () =>
     DEF_TYPE_COLORS[props.def.type as keyof typeof DEF_TYPE_COLORS] || DEF_TYPE_COLORS.default;
@@ -522,11 +560,19 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
         </LocalSchemaLink>
         <span class={`rounded px-1.5 py-0.5 text-xs font-semibold ${defTypeColor()}`}>
           <span class="uppercase">{props.def.type.replace("-", " ")}</span>
-          <Show when={props.def.key}>
-            <span class=""> · {props.def.key}</span>
-          </Show>
         </span>
       </div>
+
+      <Show when={props.def.key}>
+        {(key) => (
+          <span
+            class="w-fit text-sm text-neutral-500 dark:text-neutral-400"
+            title={describeRecordKey(key())}
+          >
+            Record key: <span class="text-neutral-700 dark:text-neutral-300">{key()}</span>
+          </span>
+        )}
+      </Show>
 
       <Show when={props.def.description}>
         <p class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
@@ -607,9 +653,7 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
         }
       >
         <div class="flex flex-col gap-2">
-          <h4 class="text-sm font-semibold text-neutral-600 uppercase dark:text-neutral-400">
-            Permissions
-          </h4>
+          <h4 class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Permissions</h4>
           <div class={CONTAINER_CLASS}>
             <For
               each={props.def.permissions!.filter(
@@ -627,9 +671,7 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
         when={Object.keys(props.def.properties || props.def.record?.properties || {}).length > 0}
       >
         <div class="flex flex-col gap-2">
-          <h4 class="text-sm font-semibold text-neutral-600 uppercase dark:text-neutral-400">
-            Properties
-          </h4>
+          <h4 class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Properties</h4>
           <div class={CONTAINER_CLASS}>
             <For each={Object.entries(props.def.properties || props.def.record?.properties || {})}>
               {([name, property]) => (
@@ -652,9 +694,7 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
         }
       >
         <div class="flex flex-col gap-2">
-          <h4 class="text-sm font-semibold text-neutral-600 uppercase dark:text-neutral-400">
-            Parameters
-          </h4>
+          <h4 class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Parameters</h4>
           <div class={CONTAINER_CLASS}>
             <For each={Object.entries(props.def.parameters!.properties!)}>
               {([name, property]) => (
@@ -690,9 +730,7 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
       {/* Errors */}
       <Show when={props.def.errors && props.def.errors.length > 0}>
         <div class="flex flex-col gap-2">
-          <h4 class="text-sm font-semibold text-neutral-600 uppercase dark:text-neutral-400">
-            Errors
-          </h4>
+          <h4 class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Errors</h4>
           <div class={CONTAINER_CLASS}>
             <For each={props.def.errors}>
               {(error) => (
