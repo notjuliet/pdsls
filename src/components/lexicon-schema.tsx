@@ -19,6 +19,16 @@ const CONTAINER_CLASS =
 const CARD_CLASS =
   "flex flex-col gap-2 rounded-lg border border-neutral-200 bg-neutral-50/50 p-3 dark:border-neutral-700 dark:bg-neutral-800/30";
 
+const SECTION_HEADING_CLASS = "text-sm font-medium text-neutral-800 dark:text-neutral-200";
+
+/** A muted label line under a heading, like "Record key:" or "Encoding:". */
+const INFO_LINE_CLASS = "w-fit text-sm text-neutral-500 dark:text-neutral-400";
+
+/** A value after a muted label, like a constraint's or the record key's. */
+const VALUE_CLASS = "text-neutral-700 dark:text-neutral-300";
+
+const DESCRIPTION_CLASS = "text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300";
+
 const RESOURCE_COLORS = {
   repo: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
   rpc: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
@@ -270,76 +280,72 @@ const UnionBadges = (props: { refs: string[] }) => (
   </div>
 );
 
-const CONSTRAINT_VALUE_CLASS = "text-neutral-700 dark:text-neutral-300";
-
 const ConstraintsList = (props: { property: LexiconProperty }) => {
   return (
     <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-500 dark:text-neutral-400">
       <Show when={props.property.minLength !== undefined}>
         <span>
-          minLength: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.minLength}</span>
+          minLength: <span class={VALUE_CLASS}>{props.property.minLength}</span>
         </span>
       </Show>
       <Show when={props.property.maxLength !== undefined}>
         <span>
-          maxLength: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.maxLength}</span>
+          maxLength: <span class={VALUE_CLASS}>{props.property.maxLength}</span>
         </span>
       </Show>
       <Show when={props.property.maxGraphemes !== undefined}>
         <span>
-          maxGraphemes: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.maxGraphemes}</span>
+          maxGraphemes: <span class={VALUE_CLASS}>{props.property.maxGraphemes}</span>
         </span>
       </Show>
       <Show when={props.property.minGraphemes !== undefined}>
         <span>
-          minGraphemes: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.minGraphemes}</span>
+          minGraphemes: <span class={VALUE_CLASS}>{props.property.minGraphemes}</span>
         </span>
       </Show>
       <Show when={props.property.minimum !== undefined}>
         <span>
-          min: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.minimum}</span>
+          min: <span class={VALUE_CLASS}>{props.property.minimum}</span>
         </span>
       </Show>
       <Show when={props.property.maximum !== undefined}>
         <span>
-          max: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.maximum}</span>
+          max: <span class={VALUE_CLASS}>{props.property.maximum}</span>
         </span>
       </Show>
       <Show when={props.property.maxSize !== undefined}>
         <span>
-          maxSize: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.maxSize}</span>
+          maxSize: <span class={VALUE_CLASS}>{props.property.maxSize}</span>
         </span>
       </Show>
       <Show when={props.property.accept}>
         <span>
-          accept: <span class={CONSTRAINT_VALUE_CLASS}>[{props.property.accept!.join(", ")}]</span>
+          accept: <span class={VALUE_CLASS}>[{props.property.accept!.join(", ")}]</span>
         </span>
       </Show>
       <Show when={props.property.enum}>
         <span>
-          enum: <span class={CONSTRAINT_VALUE_CLASS}>[{props.property.enum!.join(", ")}]</span>
+          enum: <span class={VALUE_CLASS}>[{props.property.enum!.join(", ")}]</span>
         </span>
       </Show>
       <Show when={props.property.const}>
         <span>
-          const: <span class={CONSTRAINT_VALUE_CLASS}>{props.property.const?.toString()}</span>
+          const: <span class={VALUE_CLASS}>{props.property.const?.toString()}</span>
         </span>
       </Show>
       <Show when={props.property.default !== undefined}>
         <span>
-          default:{" "}
-          <span class={CONSTRAINT_VALUE_CLASS}>{JSON.stringify(props.property.default)}</span>
+          default: <span class={VALUE_CLASS}>{JSON.stringify(props.property.default)}</span>
         </span>
       </Show>
       <Show when={props.property.knownValues}>
         <span>
-          knownValues:{" "}
-          <span class={CONSTRAINT_VALUE_CLASS}>[{props.property.knownValues!.join(", ")}]</span>
+          knownValues: <span class={VALUE_CLASS}>[{props.property.knownValues!.join(", ")}]</span>
         </span>
       </Show>
       <Show when={props.property.closed}>
         <span>
-          closed: <span class={CONSTRAINT_VALUE_CLASS}>true</span>
+          closed: <span class={VALUE_CLASS}>true</span>
         </span>
       </Show>
     </div>
@@ -366,7 +372,7 @@ const PropertyRow = (props: {
             />
           </Show>
           <Show when={props.property.refs}>
-            <span class="font-mono text-sm text-neutral-600 dark:text-neutral-400">union</span>
+            <TypeBadge type="union" size="text-sm" />
           </Show>
           <Show when={props.required}>
             <span class="text-sm text-red-500 dark:text-red-400">required</span>
@@ -388,11 +394,11 @@ const PropertyRow = (props: {
                 type={props.property.items!.type}
                 format={props.property.items!.format}
                 refType={props.property.items!.ref}
-                color={CONSTRAINT_VALUE_CLASS}
+                color={VALUE_CLASS}
               />
             </Show>
             <Show when={props.property.items!.refs}>
-              <span class={`font-mono text-xs ${CONSTRAINT_VALUE_CLASS}`}>union</span>
+              <TypeBadge type="union" color={VALUE_CLASS} />
             </Show>
           </div>
           {/* Nested under the items line, so they don't read as the array's own. */}
@@ -424,18 +430,14 @@ const NsidLink = (props: { nsid: string }) => {
 const resourceColor = (resource: string) =>
   RESOURCE_COLORS[resource as keyof typeof RESOURCE_COLORS] || RESOURCE_COLORS.default;
 
-/** The muted label style shared by the info lines under a heading, like "Record key:". */
-const INFO_LINE_CLASS = "w-fit text-sm text-neutral-500 dark:text-neutral-400";
-const DESCRIPTION_CLASS = "text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300";
-
 /** An input or output body: its encoding and descriptions, then its schema. */
 const SchemaSection = (props: { title: string; body: LexiconBody }) => {
   const schema = () => props.body.schema;
   return (
     <div class="flex flex-col gap-2">
-      <h4 class="text-sm font-medium text-neutral-800 dark:text-neutral-200">{props.title}</h4>
+      <h4 class={SECTION_HEADING_CLASS}>{props.title}</h4>
       <span class={INFO_LINE_CLASS}>
-        Encoding: <span class={CONSTRAINT_VALUE_CLASS}>{props.body.encoding}</span>
+        Encoding: <span class={VALUE_CLASS}>{props.body.encoding}</span>
       </span>
       <Show when={props.body.description}>
         <p class={DESCRIPTION_CLASS}>{props.body.description}</p>
@@ -451,7 +453,7 @@ const SchemaSection = (props: { title: string; body: LexiconBody }) => {
       </Show>
       <Show when={schema()?.refs}>
         <span class={INFO_LINE_CLASS}>
-          Schema: <span class={`font-mono ${CONSTRAINT_VALUE_CLASS}`}>union</span>
+          Schema: <TypeBadge type="union" size="text-sm" color={VALUE_CLASS} />
         </span>
         <div class="ml-1 border-l border-neutral-300 pl-3 dark:border-neutral-600">
           <UnionBadges refs={schema()!.refs!} />
@@ -581,7 +583,7 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
       <Show when={props.def.key}>
         {(key) => (
           <span class={INFO_LINE_CLASS} title={describeRecordKey(key())}>
-            Record key: <span class={CONSTRAINT_VALUE_CLASS}>{key()}</span>
+            Record key: <span class={VALUE_CLASS}>{key()}</span>
           </span>
         )}
       </Show>
@@ -663,7 +665,7 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
         }
       >
         <div class="flex flex-col gap-2">
-          <h4 class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Permissions</h4>
+          <h4 class={SECTION_HEADING_CLASS}>Permissions</h4>
           <div class={CONTAINER_CLASS}>
             <For
               each={props.def.permissions!.filter(
@@ -681,7 +683,7 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
         when={Object.keys(props.def.properties || props.def.record?.properties || {}).length > 0}
       >
         <div class="flex flex-col gap-2">
-          <h4 class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Properties</h4>
+          <h4 class={SECTION_HEADING_CLASS}>Properties</h4>
           <div class={CONTAINER_CLASS}>
             <For each={Object.entries(props.def.properties || props.def.record?.properties || {})}>
               {([name, property]) => (
@@ -704,7 +706,7 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
         }
       >
         <div class="flex flex-col gap-2">
-          <h4 class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Parameters</h4>
+          <h4 class={SECTION_HEADING_CLASS}>Parameters</h4>
           <div class={CONTAINER_CLASS}>
             <For each={Object.entries(props.def.parameters!.properties!)}>
               {([name, property]) => (
@@ -732,16 +734,14 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
       {/* Errors */}
       <Show when={props.def.errors && props.def.errors.length > 0}>
         <div class="flex flex-col gap-2">
-          <h4 class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Errors</h4>
+          <h4 class={SECTION_HEADING_CLASS}>Errors</h4>
           <div class={CONTAINER_CLASS}>
             <For each={props.def.errors}>
               {(error) => (
                 <div class="flex flex-col gap-1 py-2">
                   <div class="font-semibold">{error.name}</div>
                   <Show when={error.description}>
-                    <p class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
-                      {error.description}
-                    </p>
+                    <p class={DESCRIPTION_CLASS}>{error.description}</p>
                   </Show>
                 </div>
               )}
