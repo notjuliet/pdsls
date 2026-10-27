@@ -167,7 +167,7 @@ const RepoCard = (props: {
             <Show when={TID.validate(props.repo.rev)}>
               <div class="flex gap-1 text-neutral-700 dark:text-neutral-300">
                 <span>{props.repo.rev}</span>
-                <span>•</span>
+                <span>·</span>
                 <span>{localDateFromTimestamp(TID.parse(props.repo.rev).timestamp / 1000)}</span>
               </div>
             </Show>
