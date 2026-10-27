@@ -162,8 +162,8 @@ interface LexiconDef {
   key?: string;
   record?: LexiconObject;
   parameters?: LexiconObject;
-  input?: { encoding: string; schema?: LexiconObject };
-  output?: { encoding: string; schema?: LexiconObject };
+  input?: LexiconBody;
+  output?: LexiconBody;
   errors?: Array<{ name: string; description?: string }>;
   properties?: { [key: string]: LexiconProperty };
   required?: string[];
@@ -190,6 +190,12 @@ interface LexiconDef {
   detail?: string;
   "detail:lang"?: { [lang: string]: string };
   permissions?: LexiconPermission[];
+}
+
+interface LexiconBody {
+  encoding: string;
+  description?: string;
+  schema?: LexiconObject;
 }
 
 interface LexiconObject {
@@ -418,43 +424,52 @@ const NsidLink = (props: { nsid: string }) => {
 const resourceColor = (resource: string) =>
   RESOURCE_COLORS[resource as keyof typeof RESOURCE_COLORS] || RESOURCE_COLORS.default;
 
-const SchemaSection = (props: { title: string; encoding: string; schema?: LexiconObject }) => {
+/** The muted label style shared by the info lines under a heading, like "Record key:". */
+const INFO_LINE_CLASS = "w-fit text-sm text-neutral-500 dark:text-neutral-400";
+const DESCRIPTION_CLASS = "text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300";
+
+/** An input or output body: its encoding and descriptions, then its schema. */
+const SchemaSection = (props: { title: string; body: LexiconBody }) => {
+  const schema = () => props.body.schema;
   return (
     <div class="flex flex-col gap-2">
       <h4 class="text-sm font-medium text-neutral-800 dark:text-neutral-200">{props.title}</h4>
-      <div class={CARD_CLASS}>
-        <div class="text-sm">
-          <span class="font-semibold">Encoding: </span>
-          <span class="font-mono">{props.encoding}</span>
+      <span class={INFO_LINE_CLASS}>
+        Encoding: <span class={CONSTRAINT_VALUE_CLASS}>{props.body.encoding}</span>
+      </span>
+      <Show when={props.body.description}>
+        <p class={DESCRIPTION_CLASS}>{props.body.description}</p>
+      </Show>
+      <Show when={schema()?.description}>
+        <p class={DESCRIPTION_CLASS}>{schema()!.description}</p>
+      </Show>
+      <Show when={schema()?.ref}>
+        <span class={`flex items-baseline gap-2 ${INFO_LINE_CLASS}`}>
+          Schema:
+          <TypeBadge type="ref" refType={schema()!.ref} size="text-sm" />
+        </span>
+      </Show>
+      <Show when={schema()?.refs}>
+        <span class={INFO_LINE_CLASS}>
+          Schema: <span class={`font-mono ${CONSTRAINT_VALUE_CLASS}`}>union</span>
+        </span>
+        <div class="ml-1 border-l border-neutral-300 pl-3 dark:border-neutral-600">
+          <UnionBadges refs={schema()!.refs!} />
         </div>
-        <Show when={props.schema?.ref}>
-          <div class="flex items-center gap-2">
-            <span class="text-sm font-semibold">Schema:</span>
-            <TypeBadge type="ref" refType={props.schema!.ref} />
-          </div>
-        </Show>
-        <Show when={props.schema?.refs}>
-          <div class="flex flex-col gap-2">
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-semibold">Schema (union):</span>
-            </div>
-            <UnionBadges refs={props.schema!.refs!} />
-          </div>
-        </Show>
-        <Show when={props.schema?.properties && Object.keys(props.schema.properties).length > 0}>
-          <div class={CONTAINER_CLASS}>
-            <For each={Object.entries(props.schema!.properties!)}>
-              {([name, property]) => (
-                <PropertyRow
-                  name={name}
-                  property={property}
-                  required={(props.schema?.required || []).includes(name)}
-                />
-              )}
-            </For>
-          </div>
-        </Show>
-      </div>
+      </Show>
+      <Show when={schema()?.properties && Object.keys(schema()!.properties!).length > 0}>
+        <div class={CONTAINER_CLASS}>
+          <For each={Object.entries(schema()!.properties!)}>
+            {([name, property]) => (
+              <PropertyRow
+                name={name}
+                property={property}
+                required={(schema()?.required || []).includes(name)}
+              />
+            )}
+          </For>
+        </div>
+      </Show>
     </div>
   );
 };
@@ -565,19 +580,14 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
 
       <Show when={props.def.key}>
         {(key) => (
-          <span
-            class="w-fit text-sm text-neutral-500 dark:text-neutral-400"
-            title={describeRecordKey(key())}
-          >
-            Record key: <span class="text-neutral-700 dark:text-neutral-300">{key()}</span>
+          <span class={INFO_LINE_CLASS} title={describeRecordKey(key())}>
+            Record key: <span class={CONSTRAINT_VALUE_CLASS}>{key()}</span>
           </span>
         )}
       </Show>
 
       <Show when={props.def.description}>
-        <p class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
-          {props.def.description}
-        </p>
+        <p class={DESCRIPTION_CLASS}>{props.def.description}</p>
       </Show>
 
       {/* Permission-set: Title and Detail */}
@@ -711,20 +721,12 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
 
       {/* Input */}
       <Show when={props.def.input}>
-        <SchemaSection
-          title="Input"
-          encoding={props.def.input!.encoding}
-          schema={props.def.input!.schema}
-        />
+        <SchemaSection title="Input" body={props.def.input!} />
       </Show>
 
       {/* Output */}
       <Show when={props.def.output}>
-        <SchemaSection
-          title="Output"
-          encoding={props.def.output!.encoding}
-          schema={props.def.output!.schema}
-        />
+        <SchemaSection title="Output" body={props.def.output!} />
       </Show>
 
       {/* Errors */}
