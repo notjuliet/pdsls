@@ -157,6 +157,8 @@ const CopyValue = (props: {
   mono?: boolean;
   /** A muted label before the value, like a key's type, in a fixed width so values line up. */
   label?: string;
+  /** Leaves out the copy icon on touch screens, where it would show on every row; a tap still copies. */
+  quiet?: boolean;
 }) => (
   <button
     type="button"
@@ -172,10 +174,12 @@ const CopyValue = (props: {
       <span class="truncate">{props.value.slice(0, -VISIBLE_END)}</span>
       <span class="shrink-0">{props.value.slice(-VISIBLE_END)}</span>
     </span>
-    <span
-      class="iconify lucide--copy shrink-0 font-sans"
-      classList={{ "opacity-0 group-hover:opacity-100": canHover }}
-    />
+    <Show when={canHover || !props.quiet}>
+      <span
+        class="iconify lucide--copy shrink-0 font-sans"
+        classList={{ "opacity-0 group-hover:opacity-100": canHover }}
+      />
+    </Show>
   </button>
 );
 
@@ -267,7 +271,7 @@ export const IdentityView = (props: { didDoc: DidDocument; rotationKeys: string[
                   {(key) => (
                     <div class="flex flex-col gap-0.5 text-sm">
                       <EntryHeader id={verif.id} />
-                      <CopyValue value={key()} label={detectKeyType(key())} mono />
+                      <CopyValue value={key()} label={detectKeyType(key())} mono quiet />
                     </div>
                   )}
                 </Show>
@@ -288,6 +292,7 @@ export const IdentityView = (props: { didDoc: DidDocument; rotationKeys: string[
                   copy={key}
                   label={detectDidKeyType(key)}
                   mono
+                  quiet
                 />
               )}
             </For>
