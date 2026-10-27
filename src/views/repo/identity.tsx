@@ -122,10 +122,13 @@ const AliasEntry = (props: { alias: string; did: string; valid: boolean | undefi
 const HEADING_CLASS = "mb-1 text-sm font-medium text-neutral-800 dark:text-neutral-200";
 
 /**
- * The muted label before a key or endpoint, like its type. A minimum width lines up the values
- * after it; a longer label only pushes its own row.
+ * The label before a key or endpoint. A minimum width lines up the values after it; a longer label
+ * only pushes its own row. A key's type is muted, but a service's name isn't: it names the entry,
+ * like a key's `#atproto` id.
  */
-const LABEL_COLUMN_CLASS = "min-w-18 shrink-0 font-sans text-neutral-500 dark:text-neutral-400";
+const LABEL_COLUMN_CLASS = "min-w-18 shrink-0 font-sans";
+const MUTED_CLASS = "text-neutral-500 dark:text-neutral-400";
+const NAME_CLASS = "text-neutral-700 dark:text-neutral-300";
 
 /** Known service types: a short name, and the id they're normally listed under. */
 const KNOWN_SERVICES: Record<string, { label: string; id: string }> = {
@@ -163,7 +166,7 @@ const CopyValue = (props: {
     onClick={() => addToClipboard(props.copy ?? props.value)}
   >
     <Show when={props.label}>
-      <span class={LABEL_COLUMN_CLASS}>{props.label}</span>
+      <span class={`${LABEL_COLUMN_CLASS} ${MUTED_CLASS}`}>{props.label}</span>
     </Show>
     <span class="flex min-w-0">
       <span class="truncate">{props.value.slice(0, -VISIBLE_END)}</span>
@@ -181,7 +184,7 @@ const fragment = (id: string) => id.split("#")[1];
 
 /** A DID document entry's fragment id, like `#atproto_pds`. */
 const EntryHeader = (props: { id: string }) => (
-  <span class="font-mono text-neutral-800 dark:text-neutral-200">#{fragment(props.id)}</span>
+  <span class={`font-mono ${NAME_CLASS}`}>#{fragment(props.id)}</span>
 );
 
 const handleValidationCache = new Map<string, Record<string, boolean>>();
@@ -235,7 +238,10 @@ export const IdentityView = (props: { didDoc: DidDocument; rotationKeys: string[
                     <EntryHeader id={service.id} />
                   </Show>
                   <div class="flex items-center gap-1">
-                    <span class={LABEL_COLUMN_CLASS} title={service.type.toString()}>
+                    <span
+                      class={`${LABEL_COLUMN_CLASS} ${NAME_CLASS}`}
+                      title={service.type.toString()}
+                    >
                       {serviceLabel(service.type.toString())}
                     </span>
                     <span class="min-w-0">
