@@ -66,7 +66,7 @@ const AliasEntry = (props: { alias: string; did: string; valid: boolean | undefi
     >
       <div class="flex flex-col gap-1">
         <button
-          class="-ml-1 flex w-fit max-w-full items-center gap-1 rounded px-1 py-0.5 text-left text-sm text-neutral-700 hover:bg-neutral-200 active:bg-neutral-200 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-700"
+          class="-ml-1 flex w-fit max-w-full items-center gap-1 rounded-md px-1 py-0.5 text-left text-sm text-neutral-700 transition-colors hover:bg-neutral-200/80 dark:text-neutral-300 dark:hover:bg-neutral-700/50"
           aria-expanded={expanded()}
           onClick={async () => {
             if (expanded()) {
