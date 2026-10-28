@@ -14,12 +14,14 @@ import {
 import DidHoverCard from "../../components/hover-card/did";
 import { JSONValue } from "../../components/json";
 import { Button } from "../../components/ui/button";
+import { HEADING_TEXT_CLASS, InfoRow } from "../../components/ui/info";
 import { TagInput } from "../../components/ui/tag-input";
 import { TextInput } from "../../components/ui/text-input";
 import { addToClipboard } from "../../lib/copy";
+import { localDateFromTimestamp } from "../../lib/format";
 import { websocketCloseReasons } from "../../lib/websocket";
 import { getStreamType, STREAM_CONFIGS, STREAM_TYPES, StreamType } from "./config";
-import { StreamStats, StreamStatsPanel } from "./stats";
+import { StreamCounts, StreamStats, TopCollections } from "./stats";
 
 const LIMIT = 20;
 
@@ -37,12 +39,21 @@ const datetimeLocalToMicros = (dt: string): string => {
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  create: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
-  update: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
-  delete: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
-  identity: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
-  account: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-  sync: "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300",
+  create: "text-green-600 dark:text-green-400",
+  update: "text-orange-600 dark:text-orange-400",
+  delete: "text-red-500 dark:text-red-400",
+  identity: "text-purple-600 dark:text-purple-400",
+  account: "text-blue-500 dark:text-blue-400",
+  sync: "text-pink-600 dark:text-pink-400",
+};
+
+/**
+ * An event's time without the date when it's from today, which in a live stream is nearly every
+ * event. A cursor can replay older ones, which keep their date.
+ */
+const shortTime = (time: string) => {
+  const [date, clock] = time.split(" ");
+  return date === localDateFromTimestamp(Date.now()).split(" ")[0] ? clock : time;
 };
 
 const StreamRecordItem = (props: { record: any; streamType: StreamType }) => {
@@ -62,62 +73,68 @@ const StreamRecordItem = (props: { record: any; streamType: StreamType }) => {
 
   return (
     <div class="flex flex-col gap-2">
-      <div class="flex items-start gap-1">
-        <button
-          type="button"
-          onclick={() => setExpanded(!expanded())}
-          class="dark:hover:bg-dark-200 flex min-w-0 flex-1 items-start gap-2 px-2 py-2 text-left transition-colors hover:bg-blue-50 active:bg-blue-100/70"
-        >
-          <span class="mt-0.5 shrink-0 text-neutral-400 dark:text-neutral-500">
-            {expanded() ? (
-              <span class="iconify lucide--chevron-down"></span>
-            ) : (
-              <span class="iconify lucide--chevron-right"></span>
-            )}
-          </span>
-          <div class="flex min-w-0 flex-1 flex-col gap-0.5">
-            <div class="flex items-center gap-x-1.5 sm:gap-x-2">
-              <span
-                class={`shrink-0 rounded px-1.5 py-0.5 text-xs font-medium ${TYPE_COLORS[displayType()!] || "bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300"}`}
-              >
-                {displayType()}
+      <button
+        type="button"
+        onclick={() => setExpanded(!expanded())}
+        class="flex min-w-0 flex-1 items-start gap-2 px-2 py-2 text-left transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+      >
+        <span class="mt-0.5 shrink-0 text-neutral-400 dark:text-neutral-500">
+          {expanded() ? (
+            <span class="iconify lucide--chevron-down"></span>
+          ) : (
+            <span class="iconify lucide--chevron-right"></span>
+          )}
+        </span>
+        <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+          <div class="flex items-baseline gap-x-1.5 sm:gap-x-2">
+            <span
+              class={`shrink-0 font-medium ${TYPE_COLORS[displayType()!] || "text-neutral-500 dark:text-neutral-400"}`}
+            >
+              {displayType()}
+            </span>
+            <Show when={info().collection && info().collection !== info().type}>
+              <span class="min-w-0 truncate text-neutral-600 dark:text-neutral-300">
+                {info().collection}
               </span>
-              <Show when={info().collection && info().collection !== info().type}>
-                <span class="min-w-0 truncate text-neutral-600 dark:text-neutral-300">
-                  {info().collection}
-                </span>
-              </Show>
-              <Show when={info().rkey}>
-                <span class="truncate text-neutral-400 dark:text-neutral-500">{info().rkey}</span>
-              </Show>
-            </div>
-            <div class="flex flex-col gap-x-2 gap-y-0.5 text-xs text-neutral-500 sm:flex-row sm:items-center dark:text-neutral-400">
-              <Show when={info().did}>
-                <span class="w-fit" onclick={(e) => e.stopPropagation()}>
-                  <DidHoverCard newTab did={info().did!} />
-                </span>
-              </Show>
-              <Show when={info().time}>
-                <span>{info().time}</span>
-              </Show>
-            </div>
+            </Show>
+            <Show when={info().rkey}>
+              <span class="truncate text-neutral-400 dark:text-neutral-500">{info().rkey}</span>
+            </Show>
           </div>
-        </button>
-        <Show when={expanded()}>
-          <button
-            type="button"
-            onclick={copyRecord}
-            class="mt-2 mr-2 flex size-6 shrink-0 items-center justify-center rounded text-neutral-500 transition-colors hover:bg-blue-50 hover:text-neutral-600 active:bg-blue-100 sm:size-7 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:active:bg-neutral-600"
-          >
-            <span class="iconify lucide--copy"></span>
-          </button>
-        </Show>
-      </div>
+          {/* The time shares the DID's line, leaving the first line's width to the collection. */}
+          <div class="flex items-baseline gap-2 text-xs">
+            <Show when={info().did}>
+              <span class="min-w-0 truncate" onclick={(e) => e.stopPropagation()}>
+                <DidHoverCard newTab did={info().did!} />
+              </span>
+            </Show>
+            <Show when={info().time}>
+              {(time) => (
+                <span
+                  class="ml-auto shrink-0 text-neutral-500 tabular-nums dark:text-neutral-400"
+                  title={time()}
+                >
+                  {shortTime(time())}
+                </span>
+              )}
+            </Show>
+          </div>
+        </div>
+      </button>
       <Show when={expanded()}>
-        <div class="mr-2 mb-2 ml-8">
+        <div class="mr-2 mb-2 ml-8 flex flex-col items-start gap-1.5">
           <div class="w-full text-xs wrap-anywhere whitespace-pre-wrap md:w-2xl">
             <JSONValue newTab data={props.record} repo={info().did ?? ""} hideBlobs />
           </div>
+          {/* Under the JSON it copies, so expanding a row doesn't narrow it. */}
+          <button
+            type="button"
+            onClick={copyRecord}
+            class="flex items-center gap-1 font-sans text-xs text-neutral-500 transition-colors hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200"
+          >
+            <span class="iconify lucide--copy" />
+            Copy JSON
+          </button>
         </div>
       </Show>
     </div>
@@ -133,8 +150,8 @@ export const StreamView = () => {
   const [connected, setConnected] = createSignal(false);
   const [paused, setPaused] = createSignal(false);
   const [notice, setNotice] = createSignal("");
+  const [connectedInstance, setConnectedInstance] = createSignal("");
   const [parameters, setParameters] = createSignal<{ name: string; value?: string }[]>([]);
-  const [connectedPanel, setConnectedPanel] = createSignal<"statistics" | "options">("statistics");
   const [stats, setStats] = createSignal<StreamStats>({
     totalEvents: 0,
     eventsPerSecond: 0,
@@ -229,7 +246,6 @@ export const StreamView = () => {
       return;
     }
     setRecords([]);
-    setConnectedPanel("statistics");
 
     const instance = formData.get("instance")?.toString() ?? config().defaultInstance;
     const url = config().buildUrl(instance, formData);
@@ -241,15 +257,20 @@ export const StreamView = () => {
     });
     setSearchParams(params);
 
-    // Build parameters display
+    // What the stream was connected with, shown while it runs. Checkboxes share one row, since
+    // their labels are too long for the label column.
+    const checked = config()
+      .fields.filter((f) => f.type === "checkbox" && formData.get(f.name) === "on")
+      .map((f) => f.label);
+    setConnectedInstance(instance.replace(/^wss?:\/\//, "").replace(/\/subscribe$/, ""));
     setParameters([
-      { name: "Instance", value: instance },
       ...config()
         .fields.filter((f) => f.type !== "checkbox")
-        .map((f) => ({ name: f.label, value: formData.get(f.name)?.toString() })),
-      ...config()
-        .fields.filter((f) => f.type === "checkbox" && formData.get(f.name) === "on")
-        .map((f) => ({ name: f.label, value: "Enabled" })),
+        .map((f) => ({
+          name: f.label,
+          value: formData.get(f.name)?.toString().split(",").join(", "),
+        })),
+      { name: "Options", value: checked.join(", ") },
     ]);
 
     setConnected(true);
@@ -352,8 +373,9 @@ export const StreamView = () => {
   createEffect(
     on(
       streamType,
-      (_type, previousType) => {
-        if (!previousType) return;
+      // Deferred, so this only runs on a switch. (A deferred `on` never passes the previous type
+      // on its first switch, so don't check for one.)
+      () => {
         if (connected()) disconnect();
         setRecords([]);
         setNotice("");
@@ -399,14 +421,14 @@ export const StreamView = () => {
         </For>
       </nav>
 
-      <div class="flex w-full flex-col gap-2">
-        <p class="px-1 text-xs text-neutral-500 dark:text-neutral-400">{config().description}</p>
+      <div class="flex w-full flex-col gap-4">
+        <p class="px-2 text-xs text-neutral-500 dark:text-neutral-400">{config().description}</p>
 
-        <section class="w-full rounded-lg border border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800">
+        <section class="w-full">
           <Show when={!connected()}>
             <form
               ref={formRef}
-              class="flex w-full flex-col gap-4 p-3 text-sm"
+              class="flex w-full flex-col gap-4 px-2 text-sm"
               onSubmit={(event) => {
                 event.preventDefault();
                 void connectStream(new FormData(formRef));
@@ -497,7 +519,7 @@ export const StreamView = () => {
                 </For>
                 <div class="ml-auto">
                   <Button type="submit">
-                    <span class="iconify lucide--radio" />
+                    <span class="iconify lucide--play" />
                     Connect
                   </Button>
                 </div>
@@ -506,77 +528,40 @@ export const StreamView = () => {
           </Show>
 
           <Show when={connected()}>
-            <div class="flex w-full flex-col gap-3 p-3">
-              <div
-                role="tablist"
-                aria-label="Connection information"
-                class="flex gap-4 border-b border-neutral-200 text-sm dark:border-neutral-700"
-              >
-                <For each={["statistics", "options"] as const}>
-                  {(panel) => (
-                    <button
-                      type="button"
-                      role="tab"
-                      aria-selected={connectedPanel() === panel}
-                      class="border-b-2 pb-1 font-medium transition-colors"
-                      classList={{
-                        "border-neutral-700 text-neutral-900 dark:border-neutral-200 dark:text-neutral-100":
-                          connectedPanel() === panel,
-                        "border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200":
-                          connectedPanel() !== panel,
-                      }}
-                      onClick={() => setConnectedPanel(panel)}
-                    >
-                      {panel === "statistics" ? "Statistics" : "Options"}
-                    </button>
-                  )}
+            <div class="flex w-full flex-col gap-4 px-2">
+              {/* The instance heads the settings it was connected with. */}
+              <div class="flex flex-col gap-0.5">
+                <p class={`mb-0.5 min-w-0 truncate ${HEADING_TEXT_CLASS}`}>
+                  <span class="font-normal text-neutral-500 dark:text-neutral-400">
+                    Connected to{" "}
+                  </span>
+                  {connectedInstance()}
+                </p>
+                <For each={parameters().filter((param) => param.value)}>
+                  {(param) => <InfoRow label={param.name}>{param.value}</InfoRow>}
                 </For>
               </div>
-
-              <div>
-                <Show when={connectedPanel() === "statistics"}>
-                  <StreamStatsPanel
-                    stats={stats()}
-                    currentTime={currentTime()}
-                    streamType={streamType()}
-                    showCollections={shouldShowTopCollections()}
-                  />
-                </Show>
-
-                <Show when={connectedPanel() === "options"}>
-                  <div class="grid gap-2 text-sm wrap-anywhere">
-                    <For each={parameters()}>
-                      {(param) => (
-                        <Show when={param.value}>
-                          <div class="min-w-0">
-                            <div class="text-xs text-neutral-500 dark:text-neutral-400">
-                              {param.name}
-                            </div>
-                            <div class="text-neutral-700 dark:text-neutral-300">{param.value}</div>
-                          </div>
-                        </Show>
-                      )}
-                    </For>
-                  </div>
-                </Show>
-              </div>
+              <Show when={shouldShowTopCollections()}>
+                <TopCollections stats={stats()} streamType={streamType()} />
+              </Show>
             </div>
           </Show>
         </section>
       </div>
 
       <Show when={notice().length}>
-        <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
-          {notice()}
-        </div>
+        <div class="px-2 text-sm text-red-600 dark:text-red-400">{notice()}</div>
       </Show>
 
       <Show when={connected() || records().length > 0}>
         <section class="flex w-full flex-col gap-2">
-          <div class="flex items-center justify-between px-1">
-            <h2 class="text-sm font-medium">Events</h2>
+          <div class="flex items-center gap-2 pl-2">
+            <h2 class="text-sm text-neutral-500 dark:text-neutral-400">Events</h2>
             <Show when={connected()}>
-              <div class="flex gap-2">
+              <StreamCounts stats={stats()} currentTime={currentTime()} />
+            </Show>
+            <Show when={connected()}>
+              <div class="ml-auto flex shrink-0 gap-2">
                 <Button
                   ontouchstart={(e) => {
                     e.preventDefault();
@@ -585,7 +570,8 @@ export const StreamView = () => {
                   onClick={() => setPaused(!paused())}
                 >
                   <span class={`iconify ${paused() ? "lucide--play" : "lucide--pause"}`} />
-                  {paused() ? "Resume" : "Pause"}
+                  {/* Both buttons are only icons on phones, so the event counts fit beside them. */}
+                  <span class="max-sm:sr-only">{paused() ? "Resume" : "Pause"}</span>
                 </Button>
                 <Button
                   ontouchstart={(e) => {
@@ -594,7 +580,8 @@ export const StreamView = () => {
                   }}
                   onClick={disconnect}
                 >
-                  Disconnect
+                  <span class="iconify lucide--square" />
+                  <span class="max-sm:sr-only">Disconnect</span>
                 </Button>
               </div>
             </Show>
@@ -602,12 +589,12 @@ export const StreamView = () => {
           <Show
             when={records().length > 0}
             fallback={
-              <div class="rounded-lg border border-neutral-200 py-8 text-center text-sm text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">
+              <div class="px-2 py-4 text-sm text-neutral-500 dark:text-neutral-400">
                 Waiting for events…
               </div>
             }
           >
-            <div class="w-full divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50 font-mono text-xs [overflow-anchor:auto] sm:text-sm dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800">
+            <div class="w-full divide-y divide-neutral-200 font-mono text-xs [overflow-anchor:auto] sm:text-sm dark:divide-neutral-700/60">
               <For each={records().toReversed()}>
                 {(rec) => (
                   <div class="[overflow-anchor:none]">

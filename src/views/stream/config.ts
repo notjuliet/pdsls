@@ -39,7 +39,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
     icon: "lucide--radio-tower",
     defaultInstance: "wss://jetstream1.us-east.bsky.network/subscribe",
     useFirehoseLib: false,
-    collectionsLabel: "Top Collections",
+    collectionsLabel: "Top collections",
     fields: [
       {
         name: "collections",
@@ -103,7 +103,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
     icon: "lucide--rss",
     defaultInstance: "wss://bsky.network",
     useFirehoseLib: true,
-    collectionsLabel: "Top Collections",
+    collectionsLabel: "Top collections",
     fields: [
       {
         name: "cursor",
@@ -138,7 +138,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
     icon: "lucide--sparkles",
     defaultInstance: "wss://spacedust.microcosm.blue/subscribe",
     useFirehoseLib: false,
-    collectionsLabel: "Top Sources",
+    collectionsLabel: "Top sources",
     fields: [
       {
         name: "sources",

@@ -1,5 +1,6 @@
-import { For, Show } from "solid-js";
+import { For } from "solid-js";
 
+import { HEADING_TEXT_CLASS, MUTED_CLASS, VALUE_CLASS } from "../../components/ui/info";
 import { STREAM_CONFIGS, StreamType } from "./config";
 
 const TOP_COLLECTION_LIMIT = 5;
@@ -11,80 +12,60 @@ export type StreamStats = {
   collections: Record<string, number>;
 };
 
+/** Time connected as a clock, e.g. "0:04", "12:30" or "1:02:03". */
 const formatUptime = (ms: number) => {
   const seconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-
-  if (hours > 0) {
-    return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
-  } else if (minutes > 0) {
-    return `${minutes}m ${seconds % 60}s`;
-  } else {
-    return `${seconds}s`;
-  }
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  const hours = Math.floor(seconds / 3600);
+  const clock = `${pad(Math.floor(seconds / 60) % 60)}:${pad(seconds % 60)}`;
+  return hours > 0 ? `${hours}:${clock}` : clock.replace(/^0/, "");
 };
 
-export const StreamStatsPanel = (props: {
-  stats: StreamStats;
-  currentTime: number;
-  streamType: StreamType;
-  showCollections?: boolean;
-}) => {
-  const config = () => STREAM_CONFIGS[props.streamType];
+/** How many events came in, how fast, and for how long, e.g. "2,204 total  413/s  0:05". */
+export const StreamCounts = (props: { stats: StreamStats; currentTime: number }) => {
   const uptime = () => (props.stats.connectedAt ? props.currentTime - props.stats.connectedAt : 0);
 
+  return (
+    <span class={`min-w-0 truncate tabular-nums ${HEADING_TEXT_CLASS}`}>
+      {props.stats.totalEvents.toLocaleString()}
+      <span class={`font-normal ${MUTED_CLASS}`}> total</span>
+      <span class="ml-3">{props.stats.eventsPerSecond.toLocaleString()}</span>
+      <span class={`font-normal ${MUTED_CLASS}`}>/s</span>
+      <span class="ml-3" title="Connected for">
+        {formatUptime(uptime())}
+      </span>
+    </span>
+  );
+};
+
+/** The collections (or sources) with the most events so far. */
+export const TopCollections = (props: { stats: StreamStats; streamType: StreamType }) => {
   const topCollections = () =>
     Object.entries(props.stats.collections)
       .sort(([, a], [, b]) => b - a)
       .slice(0, TOP_COLLECTION_LIMIT);
 
   return (
-    <Show when={props.stats.connectedAt !== undefined}>
-      <div class="w-full text-sm">
-        <div class="grid grid-cols-3 gap-x-4 gap-y-2">
-          <div>
-            <div class="text-xs text-neutral-500 dark:text-neutral-400">Uptime</div>
-            <div class="font-mono">{formatUptime(uptime())}</div>
-          </div>
-          <div class="text-center">
-            <div class="text-xs text-neutral-500 dark:text-neutral-400">Total Events</div>
-            <div class="font-mono">{props.stats.totalEvents.toLocaleString()}</div>
-          </div>
-          <div class="text-right">
-            <div class="text-xs text-neutral-500 dark:text-neutral-400">Events/sec</div>
-            <div class="font-mono">{props.stats.eventsPerSecond.toFixed(1)}</div>
-          </div>
-        </div>
-
-        <Show when={props.showCollections !== false}>
-          <div class="mt-2">
-            <div class="mb-1 text-xs text-neutral-500 dark:text-neutral-400">
-              {config().collectionsLabel}
-            </div>
-            <div class="grid min-h-22 grid-cols-[1fr_5rem_3rem] content-start gap-x-1 gap-y-0.5 font-mono text-xs sm:gap-x-4">
-              <For each={topCollections()}>
-                {([collection, count]) => {
-                  const percentage = ((count / props.stats.totalEvents) * 100).toFixed(1);
-                  return (
-                    <>
-                      <span class="min-w-0 truncate text-neutral-700 dark:text-neutral-300">
-                        {collection}
-                      </span>
-                      <span class="text-right text-neutral-600 tabular-nums dark:text-neutral-400">
-                        {count.toLocaleString()}
-                      </span>
-                      <span class="text-right text-neutral-400 tabular-nums dark:text-neutral-500">
-                        {percentage}%
-                      </span>
-                    </>
-                  );
-                }}
-              </For>
-            </div>
-          </div>
-        </Show>
+    // Muted like "Connected to" above, since the rows below are full-color values.
+    <section>
+      <h3 class={`mb-1 text-sm ${MUTED_CLASS}`}>
+        {STREAM_CONFIGS[props.streamType].collectionsLabel}
+      </h3>
+      <div class="grid grid-cols-[minmax(0,1fr)_auto_3.5rem] content-start gap-x-4 gap-y-0.5 text-sm">
+        <For each={topCollections()}>
+          {([collection, count]) => (
+            <>
+              <span class={`min-w-0 truncate ${VALUE_CLASS}`} title={collection}>
+                {collection}
+              </span>
+              <span class={`text-right tabular-nums ${VALUE_CLASS}`}>{count.toLocaleString()}</span>
+              <span class={`text-right tabular-nums ${MUTED_CLASS}`}>
+                {((count / props.stats.totalEvents) * 100).toFixed(1)}%
+              </span>
+            </>
+          )}
+        </For>
       </div>
-    </Show>
+    </section>
   );
 };

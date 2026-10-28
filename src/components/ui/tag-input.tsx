@@ -24,12 +24,27 @@ export const TagInput = (props: {
     }
   };
 
+  // A pasted list, split by spaces or commas, becomes a tag per value; the last one stays to edit.
+  const onInput = (input: HTMLInputElement) => {
+    const parts = input.value.split(/[\s,]+/);
+    const rest = parts.pop()!;
+    const added = parts.filter(
+      (part, i) => part && !tags().includes(part) && parts.indexOf(part) === i,
+    );
+    if (parts.length > 0) {
+      input.value = rest;
+      if (added.length > 0) updateTags([...tags(), ...added]);
+    }
+    setInputValue(rest);
+  };
+
   const removeTag = (index: number) => {
     updateTags(tags().filter((_, i) => i !== index));
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Enter") {
+    // Values like NSIDs and DIDs never contain spaces, so a space ends one.
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       addTag();
     }
@@ -45,7 +60,7 @@ export const TagInput = (props: {
       <div class="flex gap-1.5">
         <TextInput
           value={inputValue()}
-          onInput={(e) => setInputValue(e.currentTarget.value)}
+          onInput={(e) => onInput(e.currentTarget)}
           onKeyDown={onKeyDown}
           placeholder={props.placeholder}
           class="min-w-0 grow"
