@@ -184,12 +184,12 @@ const Layout = (props: RouteSectionProps<unknown>) => {
 
   return (
     <div id="main" class="mx-auto mb-8 flex max-w-2xl flex-col items-center p-3">
-      <header class="mb-3 flex h-10 w-full items-center gap-2 px-1 sm:gap-4">
+      <header class="mb-3 flex h-10 w-full items-center gap-2 sm:gap-4">
         <A
           href="/"
           aria-label="PDSls"
           style='font-feature-settings: "ss02"'
-          class="relative -ml-1 flex h-9 shrink-0 items-center gap-1 rounded-md px-1.5 text-xl font-semibold hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700"
+          class="relative flex h-9 shrink-0 items-center gap-1 rounded-md px-1.5 text-xl font-semibold hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700"
         >
           <img src="/pdsls-logo.svg" alt="" class="size-5" />
           <span class="max-sm:hidden">PDSls</span>

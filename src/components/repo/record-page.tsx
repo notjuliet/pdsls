@@ -38,7 +38,7 @@ export const RecordPage = (props: RecordPageProps) => {
 
   return (
     <div class="flex w-full flex-col items-center">
-      <div class="mb-3 flex min-h-7 w-full items-center justify-between px-2 text-sm sm:text-base">
+      <div class="mb-3 flex min-h-7 w-full items-center justify-between pl-2 text-sm sm:text-base">
         <Tabs
           items={props.tabs.map((tab) => ({ ...tab, href: props.tabHref(tab.id) }))}
           active={activeTab()}

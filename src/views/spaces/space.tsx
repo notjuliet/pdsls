@@ -178,7 +178,7 @@ const SpaceView = () => {
   return (
     <Show when={!hidden()}>
       <div class="flex w-full flex-col gap-3 py-2 pb-10">
-        <div class="flex min-h-7 items-center justify-between px-2 text-sm sm:text-base">
+        <div class="flex min-h-7 items-center justify-between pl-2 text-sm sm:text-base">
           <Tabs
             items={[
               { id: "writers", label: "Writers", href: spacePath() },

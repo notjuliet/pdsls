@@ -73,7 +73,7 @@ const ActionIcon = (props: { action: StageAction }) => {
   );
 };
 
-const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
+const StageRow = (props: { stage: Stage; kindColumn: boolean; actionColumn: boolean }) => {
   return (
     // Rows share the nav's grid columns, so every label, value and action group lines up.
     <div class="col-span-full grid grid-cols-subgrid items-center">
@@ -138,35 +138,48 @@ const StageRow = (props: { stage: Stage; kindColumn: boolean }) => {
           </Show>
         </span>
       </div>
-      <span class="flex items-center justify-end pr-2 sm:gap-0.5">
-        {props.stage.trailing}
-        <For each={props.stage.actions}>{(action) => <ActionIcon action={action} />}</For>
-      </span>
+      <Show when={props.actionColumn}>
+        <span class="flex items-center justify-end sm:gap-0.5">
+          {props.stage.trailing}
+          <For each={props.stage.actions}>{(action) => <ActionIcon action={action} />}</For>
+        </span>
+      </Show>
     </div>
   );
 };
 
 /** The navigation at the top of a page: one labeled row per level, its actions beside it. */
-export const StageNav = (props: { stages: Stage[] }) => (
-  // The label column fits its longest label; the action column fits the widest action group.
-  <nav
-    class="grid w-full gap-x-1 text-sm wrap-anywhere sm:text-base"
-    classList={{
-      "grid-cols-[auto_minmax(0,1fr)_auto]": props.stages.some((item) => item.kind),
-      "grid-cols-[minmax(0,1fr)_auto]": !props.stages.some((item) => item.kind),
-    }}
-  >
-    {/* Index keeps each row mounted while its stage updates. */}
-    <Index each={props.stages}>
-      {(stage) => <StageRow stage={stage()} kindColumn={props.stages.some((item) => item.kind)} />}
-    </Index>
-    {/* An invisible row with the longest label keeps the column the same width at every
+export const StageNav = (props: { stages: Stage[] }) => {
+  const kindColumn = () => props.stages.some((item) => item.kind);
+  // Without any actions there's no action column, so the rows reach the content's right edge.
+  const actionColumn = () =>
+    props.stages.some((item) => item.trailing || (item.actions?.length ?? 0) > 0);
+
+  return (
+    // The label column fits its longest label; the action column fits the widest action group.
+    <nav
+      class="grid w-full gap-x-1 text-sm wrap-anywhere sm:text-base"
+      classList={{
+        "grid-cols-[auto_minmax(0,1fr)_auto]": kindColumn() && actionColumn(),
+        "grid-cols-[auto_minmax(0,1fr)]": kindColumn() && !actionColumn(),
+        "grid-cols-[minmax(0,1fr)_auto]": !kindColumn() && actionColumn(),
+        "grid-cols-[minmax(0,1fr)]": !kindColumn() && !actionColumn(),
+      }}
+    >
+      {/* Index keeps each row mounted while its stage updates. */}
+      <Index each={props.stages}>
+        {(stage) => (
+          <StageRow stage={stage()} kindColumn={kindColumn()} actionColumn={actionColumn()} />
+        )}
+      </Index>
+      {/* An invisible row with the longest label keeps the column the same width at every
         level, so values don't shift as you go deeper. It copies the row box's grid, gap and
         padding so it sizes the column exactly like a real row. */}
-    <Show when={props.stages.some((item) => item.kind)}>
-      <div aria-hidden="true" class={`invisible h-0 ${rowBoxClass} col-span-2`}>
-        <span class={kindClass}>{LONGEST_KIND}</span>
-      </div>
-    </Show>
-  </nav>
-);
+      <Show when={kindColumn()}>
+        <div aria-hidden="true" class={`invisible h-0 ${rowBoxClass} col-span-2`}>
+          <span class={kindClass}>{LONGEST_KIND}</span>
+        </div>
+      </Show>
+    </nav>
+  );
+};
