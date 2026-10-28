@@ -554,7 +554,8 @@ export const StreamView = () => {
       </Show>
 
       <Show when={connected() || records().length > 0}>
-        <section class="flex w-full flex-col gap-2">
+        {/* Set apart from the settings above: the framed list is the live part of the page. */}
+        <section class="mt-3 flex w-full flex-col gap-2">
           <div class="flex items-center gap-2 pl-2">
             <h2 class="text-sm text-neutral-500 dark:text-neutral-400">Events</h2>
             <Show when={connected()}>
@@ -589,12 +590,12 @@ export const StreamView = () => {
           <Show
             when={records().length > 0}
             fallback={
-              <div class="px-2 py-4 text-sm text-neutral-500 dark:text-neutral-400">
+              <div class="rounded-lg border border-neutral-200 px-2 py-4 text-sm text-neutral-500 dark:border-neutral-700/60 dark:text-neutral-400">
                 Waiting for events…
               </div>
             }
           >
-            <div class="w-full divide-y divide-neutral-200 font-mono text-xs [overflow-anchor:auto] sm:text-sm dark:divide-neutral-700/60">
+            <div class="w-full divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 font-mono text-xs [overflow-anchor:auto] sm:text-sm dark:divide-neutral-700/60 dark:border-neutral-700/60">
               <For each={records().toReversed()}>
                 {(rec) => (
                   <div class="[overflow-anchor:none]">
