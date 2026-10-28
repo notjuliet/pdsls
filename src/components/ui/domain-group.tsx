@@ -18,7 +18,7 @@ type DomainGroupRowsProps = {
   as?: "div" | "ul";
 };
 
-export const domainGroupRowClasses = "min-h-6 px-2 py-0.5";
+export const domainGroupRowClasses = "min-h-6 py-0.5 pl-2";
 
 export const DomainGroupRows = (props: DomainGroupRowsProps) => {
   const classes = "flex min-w-0 flex-col";
