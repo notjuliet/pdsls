@@ -129,7 +129,7 @@ const CheckRow = (props: {
               {(onCheck) => (
                 <button
                   type="button"
-                  class="rounded-md border border-neutral-300 px-1.5 text-xs leading-5 transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+                  class="rounded-md border border-neutral-300 px-1.5 text-xs leading-4.5 transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
                   onClick={() => onCheck()()}
                 >
                   Resolve and check
