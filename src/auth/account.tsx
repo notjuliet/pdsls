@@ -96,7 +96,7 @@ export const AccountManager = (props: { onCreateRecord?: () => void }) => {
     <MenuProvider>
       <DropdownMenu
         buttonLabel="Account"
-        buttonClass="size-9 justify-center rounded-md"
+        buttonClass="h-9 justify-center rounded-md px-2"
         buttonContent={
           agent() && avatars[agent()!.sub] ? (
             <img src={getThumbnailUrl(avatars[agent()!.sub])} class="size-6 rounded-full" />
