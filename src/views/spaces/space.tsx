@@ -63,6 +63,13 @@ const SpaceView = () => {
     }),
   );
   const hasOwnRepo = createMemo(() => repos().some((repo) => repo.did === auth().sub));
+  /**
+   * Whether the writer list failed outright, e.g. for someone who left the Space. Their own
+   * records are still on their PDS, so their row is shown on its own.
+   */
+  const writersDenied = () => !!error() && repos().length === 0;
+  const shownRepos = () =>
+    writersDenied() ? [{ did: auth().sub, rev: "" } satisfies SpaceRepo] : orderedRepos();
 
   const loadRepos = async (reset = false, version = requestVersion) => {
     if (loading() && !reset) return;
@@ -214,11 +221,13 @@ const SpaceView = () => {
             <LoadingState label="Loading writers…" />
           </Show>
 
-          <Show when={error()}>{(message) => <ErrorNotice message={message()} />}</Show>
+          <Show when={!writersDenied() && error()}>
+            {(message) => <ErrorNotice message={message()} />}
+          </Show>
 
-          <Show when={loaded() && (!error() || repos().length > 0)}>
+          <Show when={loaded()}>
             <ul class="flex flex-col">
-              <For each={orderedRepos()}>
+              <For each={shownRepos()}>
                 {(repo) => (
                   <li>
                     <DidHoverCard
@@ -254,7 +263,15 @@ const SpaceView = () => {
               </For>
             </ul>
 
-            <Show when={repos().length === 0}>
+            <Show when={writersDenied() && error()}>
+              {(message) => (
+                <p class="px-2 text-sm text-neutral-500 dark:text-neutral-400">
+                  The other writers couldn’t be loaded: {message().replace(/\.$/, "")}.
+                </p>
+              )}
+            </Show>
+
+            <Show when={repos().length === 0 && !error()}>
               <EmptyState icon="lucide--book-user" message="No writers found" />
             </Show>
 
