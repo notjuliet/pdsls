@@ -422,7 +422,10 @@ export const StreamView = () => {
       </nav>
 
       <div class="flex w-full flex-col gap-4">
-        <p class="px-2 text-xs text-neutral-500 dark:text-neutral-400">{config().description}</p>
+        {/* Explains the stream while choosing its settings; once connected, the settings say enough. */}
+        <Show when={!connected()}>
+          <p class="px-2 text-xs text-neutral-500 dark:text-neutral-400">{config().description}</p>
+        </Show>
 
         <section class="w-full">
           <Show when={!connected()}>
