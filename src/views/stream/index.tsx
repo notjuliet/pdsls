@@ -413,13 +413,13 @@ export const StreamView = () => {
     <div class="flex w-full flex-col gap-3">
       <nav
         aria-label="Stream type"
-        class="grid grid-cols-3 border-b border-neutral-200 text-sm dark:border-neutral-700"
+        class="mx-2 grid grid-cols-3 border-b border-neutral-200 text-sm dark:border-neutral-700"
       >
         <For each={STREAM_TYPES}>
           {(type) => (
             <A
               end
-              class="flex min-w-0 items-center justify-center gap-1.5 border-b-2 px-2 py-2 transition-colors"
+              class="-mb-px flex min-w-0 items-center justify-center gap-1.5 border-b-2 px-2 py-2 transition-colors"
               classList={{
                 "border-neutral-700 text-neutral-900 dark:border-neutral-200 dark:text-neutral-100":
                   streamType() === type,
