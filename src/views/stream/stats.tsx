@@ -3,7 +3,7 @@ import { For } from "solid-js";
 import { HEADING_TEXT_CLASS, MUTED_CLASS, VALUE_CLASS } from "../../components/ui/info";
 import { STREAM_CONFIGS, StreamType } from "./config";
 
-const TOP_COLLECTION_LIMIT = 5;
+export const TOP_COLLECTION_LIMIT = 5;
 
 export type StreamStats = {
   connectedAt?: number;
@@ -39,7 +39,12 @@ export const StreamCounts = (props: { stats: StreamStats; currentTime: number })
 };
 
 /** The collections (or sources) with the most events so far. */
-export const TopCollections = (props: { stats: StreamStats; streamType: StreamType }) => {
+export const TopCollections = (props: {
+  stats: StreamStats;
+  streamType: StreamType;
+  /** How many rows to keep room for, so the events below don't move as collections come in. */
+  rows: number;
+}) => {
   const topCollections = () =>
     Object.entries(props.stats.collections)
       .sort(([, a], [, b]) => b - a)
@@ -51,7 +56,11 @@ export const TopCollections = (props: { stats: StreamStats; streamType: StreamTy
       <h3 class={`mb-1 text-sm ${MUTED_CLASS}`}>
         {STREAM_CONFIGS[props.streamType].collectionsLabel}
       </h3>
-      <div class="grid grid-cols-[minmax(0,1fr)_auto_3.5rem] content-start gap-x-4 gap-y-0.5 text-sm">
+      {/* Rows are 20px tall with 2px between them. */}
+      <div
+        class="grid grid-cols-[minmax(0,1fr)_auto_3.5rem] content-start gap-x-4 gap-y-0.5 text-sm"
+        style={{ "min-height": `${props.rows * 22 - 2}px` }}
+      >
         <For each={topCollections()}>
           {([collection, count]) => (
             <>

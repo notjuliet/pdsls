@@ -21,7 +21,7 @@ import { addToClipboard } from "../../lib/copy";
 import { localDateFromTimestamp } from "../../lib/format";
 import { websocketCloseReasons } from "../../lib/websocket";
 import { getStreamType, STREAM_CONFIGS, STREAM_TYPES, StreamType } from "./config";
-import { StreamCounts, StreamStats, TopCollections } from "./stats";
+import { StreamCounts, StreamStats, TOP_COLLECTION_LIMIT, TopCollections } from "./stats";
 
 const LIMIT = 20;
 
@@ -170,12 +170,26 @@ export const StreamView = () => {
   let totalEventsCount = 0;
   let collectionsMap: Record<string, number> = {};
 
-  const shouldShowTopCollections = () =>
-    streamType() !== "jetstream" ||
+  const filteredCollections = () =>
     searchParams.collections
       ?.toString()
       .split(",")
-      .filter((collection) => collection.trim()).length !== 1;
+      .filter((collection) => collection.trim()) ?? [];
+
+  const shouldShowTopCollections = () =>
+    streamType() !== "jetstream" || filteredCollections().length !== 1;
+
+  /**
+   * How many top collections can appear: a Jetstream filtered to a few exact collections can't
+   * show more than those. Wildcards and other streams can fill every row.
+   */
+  const topCollectionRows = () => {
+    const collections = filteredCollections();
+    const exact = streamType() === "jetstream" && collections.length > 0;
+    return exact && !collections.some((collection) => collection.includes("*"))
+      ? Math.min(collections.length, TOP_COLLECTION_LIMIT)
+      : TOP_COLLECTION_LIMIT;
+  };
 
   const addRecord = (record: any) => {
     currentSecondEventCount++;
@@ -545,7 +559,11 @@ export const StreamView = () => {
                 </For>
               </div>
               <Show when={shouldShowTopCollections()}>
-                <TopCollections stats={stats()} streamType={streamType()} />
+                <TopCollections
+                  stats={stats()}
+                  streamType={streamType()}
+                  rows={topCollectionRows()}
+                />
               </Show>
             </div>
           </Show>
