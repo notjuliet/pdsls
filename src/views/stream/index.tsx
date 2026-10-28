@@ -624,8 +624,10 @@ export const StreamView = () => {
                   </div>
                 )}
               </For>
-              <div class="h-px [overflow-anchor:auto]" />
             </div>
+            {/* Anchors the scroll position as events come in. Outside the list, so the last event
+                doesn't get a divider above the list's own border. */}
+            <div class="h-px [overflow-anchor:auto]" />
           </Show>
         </section>
       </Show>
