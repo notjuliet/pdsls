@@ -576,8 +576,8 @@ export const StreamView = () => {
 
       <Show when={connected() || records().length > 0}>
         {/* Set apart from the settings above: the framed list is the live part of the page. */}
-        <section class="mt-3 flex w-full flex-col gap-2">
-          <div class="flex items-center gap-2 pl-2">
+        <section class="mt-3 flex w-full flex-col gap-2 px-2">
+          <div class="flex items-center gap-2">
             <h2 class="text-sm text-neutral-500 dark:text-neutral-400">Events</h2>
             <Show when={connected()}>
               <StreamCounts stats={stats()} currentTime={currentTime()} />
