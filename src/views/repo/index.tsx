@@ -339,7 +339,7 @@ const RepoView = () => {
       </Show>
       <Show when={repoData.state === "ready" || repo.error()}>
         <div class="flex w-full flex-col gap-3 wrap-break-word">
-          <div class="flex items-center justify-between gap-2 pl-2 text-sm sm:text-base">
+          <div class="mb-2 flex items-center justify-between gap-2 pl-2 text-sm sm:text-base">
             <Tabs
               items={repoTabs().map((tab) => ({
                 id: tab.tab,

@@ -1,6 +1,7 @@
 import { A } from "@solidjs/router";
 import { For, Show } from "solid-js";
 
+import { InfoRow, InfoSection, MUTED_CLASS } from "../../components/ui/info.jsx";
 import { schemaHref } from "../../lib/lexicon.js";
 
 export interface SpaceTypeInfo {
@@ -54,53 +55,37 @@ export const SpaceTypeDetails = (props: {
   loading: boolean;
   error?: string;
 }) => (
-  <section class="flex flex-col gap-2 px-2">
-    <dl class="grid grid-cols-[max-content_minmax(0,1fr)] items-baseline gap-x-4 gap-y-2 text-sm">
-      <Show when={props.info?.name}>
-        <dt class="text-neutral-500 dark:text-neutral-400">Name</dt>
-        <dd>{props.info!.name}</dd>
-      </Show>
-
+  <InfoSection title="About">
+    <div class="flex flex-col gap-1">
+      <Show when={props.info?.name}>{(name) => <InfoRow label="Name">{name()}</InfoRow>}</Show>
       <Show when={props.info?.description}>
-        <dt class="text-neutral-500 dark:text-neutral-400">Description</dt>
-        <dd>{props.info!.description}</dd>
+        {(description) => <InfoRow label="Description">{description()}</InfoRow>}
       </Show>
-
-      <Show when={props.info?.key}>
-        <dt class="text-neutral-500 dark:text-neutral-400">Key</dt>
-        <dd>{props.info!.key}</dd>
-      </Show>
-
+      <Show when={props.info?.key}>{(key) => <InfoRow label="Key">{key()}</InfoRow>}</Show>
       <Show when={props.info?.collections}>
         {(collections) => (
-          <>
-            <dt class="text-neutral-500 dark:text-neutral-400">Collections</dt>
-            <dd class="min-w-0">
-              <ul class="flex flex-col gap-1 wrap-anywhere">
-                <For each={collections()}>
-                  {(collection) => (
-                    <li>
-                      <A
-                        href={schemaHref(collection)}
-                        class="text-blue-500 hover:underline dark:text-blue-400"
-                      >
-                        {collection}
-                      </A>
-                    </li>
-                  )}
-                </For>
-              </ul>
-            </dd>
-          </>
+          <InfoRow label="Collections">
+            <span class="flex flex-col">
+              <For each={collections()}>
+                {(collection) => (
+                  <A
+                    href={schemaHref(collection)}
+                    class="w-fit text-blue-500 hover:underline dark:text-blue-400"
+                  >
+                    {collection}
+                  </A>
+                )}
+              </For>
+            </span>
+          </InfoRow>
         )}
       </Show>
-    </dl>
-
-    <Show when={props.loading}>
-      <p class="text-xs text-neutral-500 dark:text-neutral-400">Resolving type declaration…</p>
-    </Show>
-    <Show when={props.error}>
-      {(message) => <p class="text-xs text-red-500 dark:text-red-400">{message()}</p>}
-    </Show>
-  </section>
+      <Show when={props.loading}>
+        <p class={`text-sm ${MUTED_CLASS}`}>Resolving type declaration…</p>
+      </Show>
+      <Show when={props.error}>
+        {(message) => <p class="text-sm text-red-500 dark:text-red-400">{message()}</p>}
+      </Show>
+    </div>
+  </InfoSection>
 );

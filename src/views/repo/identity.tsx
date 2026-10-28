@@ -4,10 +4,14 @@ import { createSignal, For, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { ExternalLink } from "../../components/ui/external-link.jsx";
+import {
+  CopyValue,
+  HEADING_CLASS,
+  LABEL_COLUMN_CLASS,
+  VALUE_CLASS,
+} from "../../components/ui/info.jsx";
 import { Spinner } from "../../components/ui/states.jsx";
-import { canHover } from "../../layout.jsx";
 import { type HandleResolveResult, resolveHandleDetailed, validateHandle } from "../../lib/api.js";
-import { addToClipboard } from "../../lib/copy.js";
 import { detectDidKeyType, detectKeyType } from "../../lib/key.js";
 import { plcDirectory } from "../settings.jsx";
 
@@ -119,17 +123,6 @@ const AliasEntry = (props: { alias: string; did: string; valid: boolean | undefi
   );
 };
 
-const HEADING_CLASS = "mb-1 text-sm font-medium text-neutral-800 dark:text-neutral-200";
-
-/**
- * The label before a key or endpoint. A minimum width lines up the values after it; a longer label
- * only pushes its own row. A key's type is muted, but a service's name isn't: it names the entry,
- * like a key's `#atproto` id.
- */
-const LABEL_COLUMN_CLASS = "min-w-18 shrink-0 font-sans";
-const MUTED_CLASS = "text-neutral-500 dark:text-neutral-400";
-const NAME_CLASS = "text-neutral-700 dark:text-neutral-300";
-
 /** Known service types: a short name, and the id they're normally listed under. */
 const KNOWN_SERVICES: Record<string, { label: string; id: string }> = {
   AtprotoPersonalDataServer: { label: "PDS", id: "atproto_pds" },
@@ -144,51 +137,12 @@ const serviceLabel = (type: string) => KNOWN_SERVICES[type]?.label ?? type;
 const hasStandardId = (service: { id: string; type: unknown }) =>
   KNOWN_SERVICES[String(service.type)]?.id === fragment(service.id);
 
-/** How many characters stay visible at the end of a value cut in the middle. */
-const VISIBLE_END = 8;
-
-/**
- * A long value on one line that copies on click. It's cut in the middle, so both ends stay
- * readable, e.g. to compare keys. `copy` is copied instead of the shown value.
- */
-const CopyValue = (props: {
-  value: string;
-  copy?: string;
-  mono?: boolean;
-  /** A muted label before the value, like a key's type, in a fixed width so values line up. */
-  label?: string;
-  /** Leaves out the copy icon on touch screens, where it would show on every row; a tap still copies. */
-  quiet?: boolean;
-}) => (
-  <button
-    type="button"
-    title={props.value}
-    class="group flex w-full min-w-0 items-center gap-1 text-left text-sm text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-200"
-    classList={{ "font-mono": props.mono }}
-    onClick={() => addToClipboard(props.copy ?? props.value)}
-  >
-    <Show when={props.label}>
-      <span class={`${LABEL_COLUMN_CLASS} ${MUTED_CLASS}`}>{props.label}</span>
-    </Show>
-    <span class="flex min-w-0">
-      <span class="truncate">{props.value.slice(0, -VISIBLE_END)}</span>
-      <span class="shrink-0">{props.value.slice(-VISIBLE_END)}</span>
-    </span>
-    <Show when={canHover || !props.quiet}>
-      <span
-        class="iconify lucide--copy shrink-0 font-sans"
-        classList={{ "opacity-0 group-hover:opacity-100": canHover }}
-      />
-    </Show>
-  </button>
-);
-
 /** The part of a DID document id after `#`. */
 const fragment = (id: string) => id.split("#")[1];
 
 /** A DID document entry's fragment id, like `#atproto_pds`. */
 const EntryHeader = (props: { id: string }) => (
-  <span class={`font-mono ${NAME_CLASS}`}>#{fragment(props.id)}</span>
+  <span class={`font-mono ${VALUE_CLASS}`}>#{fragment(props.id)}</span>
 );
 
 const handleValidationCache = new Map<string, Record<string, boolean>>();
@@ -242,8 +196,9 @@ export const IdentityView = (props: { didDoc: DidDocument; rotationKeys: string[
                     <EntryHeader id={service.id} />
                   </Show>
                   <div class="flex items-center gap-1">
+                    {/* Not muted like a key's type: it names the entry, like a key's `#atproto` id. */}
                     <span
-                      class={`${LABEL_COLUMN_CLASS} ${NAME_CLASS}`}
+                      class={`${LABEL_COLUMN_CLASS} ${VALUE_CLASS}`}
                       title={service.type.toString()}
                     >
                       {serviceLabel(service.type.toString())}

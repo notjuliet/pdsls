@@ -7,6 +7,7 @@ import { SPACE_MANAGE_SPACES_SCOPE_ID } from "../../auth/scope-utils.js";
 import DidHoverCard from "../../components/hover-card/did.jsx";
 import { Button } from "../../components/ui/button.jsx";
 import { IconButton } from "../../components/ui/icon-button.jsx";
+import { HEADING_TEXT_CLASS, MUTED_CLASS } from "../../components/ui/info.jsx";
 import { Modal } from "../../components/ui/modal.jsx";
 import { addNotification } from "../../components/ui/notification.jsx";
 import { PermissionButton } from "../../components/ui/permission-button.jsx";
@@ -27,8 +28,9 @@ type MemberDialog =
   | { kind: "edit"; did: string }
   | { kind: "remove"; did: string };
 
+/** A small bordered button beside the heading, like the record Info tab's "Resolve and check". */
 const actionButtonClass =
-  "flex self-center items-center gap-1 rounded-md border border-neutral-300 px-1.5 py-0.5 text-xs transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 sm:px-2 sm:py-0.75 dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700";
+  "flex items-center gap-1 rounded-md border border-neutral-300 px-1.5 text-xs leading-5 transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700";
 
 export const SimpleSpaceMembers = (props: { space: string; authority: string }) => {
   const auth = useSpacesAuth();
@@ -168,11 +170,11 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
   };
 
   return (
-    <section class="flex flex-col gap-2">
-      <div class="flex items-baseline gap-2 px-2 text-sm">
-        <h2 class="text-base font-medium">Members</h2>
+    <section class="flex flex-col gap-1">
+      <div class="flex items-center gap-2 text-sm">
+        <h3 class={HEADING_TEXT_CLASS}>Members</h3>
         <Show when={canManage() && loaded()}>
-          <span class="text-xs text-neutral-500 dark:text-neutral-400">
+          <span class={MUTED_CLASS}>
             {members().length.toLocaleString()} {cursor() ? "loaded" : ""}
           </span>
         </Show>
@@ -192,7 +194,7 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
       <Show
         when={canManage()}
         fallback={
-          <p class="px-2 text-xs text-neutral-500 dark:text-neutral-400">
+          <p class={`text-sm ${MUTED_CLASS}`}>
             The member list is only available to the Space authority.
           </p>
         }
@@ -204,7 +206,8 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
         <Show when={error()}>{(message) => <ErrorNotice message={message()} />}</Show>
 
         <Show when={loaded()}>
-          <ul class="flex flex-col">
+          {/* Rows pad themselves for their hover highlight, so the list reaches out by that much. */}
+          <ul class="-mx-2 flex flex-col">
             <For each={members()}>
               {(member) => (
                 <li class="group relative flex min-w-0 items-center rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700">
@@ -256,9 +259,7 @@ export const SimpleSpaceMembers = (props: { space: string; authority: string }) 
           </ul>
 
           <Show when={members().length === 0 && !error()}>
-            <p class="px-2 text-xs text-neutral-500 dark:text-neutral-400">
-              No additional members.
-            </p>
+            <p class={`text-sm ${MUTED_CLASS}`}>No additional members.</p>
           </Show>
 
           <Show when={cursor()}>

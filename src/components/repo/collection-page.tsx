@@ -248,7 +248,7 @@ export const CollectionPage = (props: {
   return (
     <Show when={!props.hidden}>
       <div class="flex w-full flex-col items-center">
-        <div class="mb-2 flex min-h-7 w-full items-center justify-between pl-2 text-sm sm:text-base">
+        <div class="mb-5 flex min-h-7 w-full items-center justify-between pl-2 text-sm sm:text-base">
           <Tabs
             items={[
               { id: "records", label: "Records", href: props.source.collectionHref },

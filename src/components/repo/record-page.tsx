@@ -5,9 +5,8 @@ import {
   validateKnownRecordSchema,
   validateResolvedRecordSchema,
 } from "../../lib/record-validation.js";
-import { Button } from "../ui/button.jsx";
-import { CopyableInfoField } from "../ui/copyable-info-field.jsx";
 import { ExternalLink } from "../ui/external-link.jsx";
+import { CopyValue, InfoRow, InfoSection, MUTED_CLASS, UNDER_VALUE_CLASS } from "../ui/info.jsx";
 import { Tabs } from "../ui/tabs.jsx";
 
 export type RecordTab = "record" | "schema" | "backlinks" | "info";
@@ -38,7 +37,7 @@ export const RecordPage = (props: RecordPageProps) => {
 
   return (
     <div class="flex w-full flex-col items-center">
-      <div class="mb-3 flex min-h-7 w-full items-center justify-between pl-2 text-sm sm:text-base">
+      <div class="mb-5 flex min-h-7 w-full items-center justify-between pl-2 text-sm sm:text-base">
         <Tabs
           items={props.tabs.map((tab) => ({ ...tab, href: props.tabHref(tab.id) }))}
           active={activeTab()}
@@ -55,7 +54,7 @@ export const RecordPage = (props: RecordPageProps) => {
         <Match when={activeTab() === "schema"}>{props.schema}</Match>
         <Match when={activeTab() === "backlinks"}>{props.backlinks}</Match>
         <Match when={activeTab() === "info"}>
-          <div class="flex w-full flex-col gap-3 px-2">{props.info}</div>
+          <div class="w-full px-2">{props.info}</div>
         </Match>
       </Switch>
     </div>
@@ -110,29 +109,67 @@ export const useRecordSchemaValidation = (collection: () => string, rkey: () => 
 
 export type RecordSchemaValidationState = ReturnType<typeof useRecordSchemaValidation>;
 
-/** A titled check with its result: a spinner while running, then a check or a cross and the reason. */
+/**
+ * A check and its result: a spinner while it runs, then a check or a cross and, if it failed,
+ * why. Before it has run, `onCheck` offers to run it in place of "Not checked".
+ */
 const CheckRow = (props: {
-  title: string;
+  label: string;
   valid: boolean | undefined;
   error: string;
   running: boolean;
-  children?: JSX.Element;
+  onCheck?: () => void;
 }) => (
-  <div>
-    <div class="flex items-center gap-1">
-      <p class="font-semibold">{props.title}</p>
-      <span
-        classList={{
-          "iconify lucide--check text-green-500 dark:text-green-400": props.valid === true,
-          "iconify lucide--x text-red-500 dark:text-red-400": props.valid === false,
-          "iconify lucide--loader-circle animate-spin": props.valid === undefined && props.running,
-        }}
-      />
-    </div>
-    <Show when={props.valid === false}>
-      <div class="text-xs wrap-break-word">{props.error}</div>
+  <div class="flex flex-col gap-1">
+    <InfoRow label={props.label} center>
+      <span class="flex items-center">
+        <Switch
+          fallback={
+            <Show when={props.onCheck} fallback={<span class={MUTED_CLASS}>Not checked</span>}>
+              {(onCheck) => (
+                <button
+                  type="button"
+                  class="rounded-md border border-neutral-300 px-1.5 text-xs leading-5 transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+                  onClick={() => onCheck()()}
+                >
+                  Resolve and check
+                </button>
+              )}
+            </Show>
+          }
+        >
+          <Match when={props.valid === true}>
+            <span
+              role="img"
+              aria-label="Valid"
+              title="Valid"
+              class="iconify lucide--check text-green-600 dark:text-green-400"
+            />
+          </Match>
+          <Match when={props.valid === false}>
+            <span
+              role="img"
+              aria-label="Invalid"
+              title="Invalid"
+              class="iconify lucide--x text-red-500 dark:text-red-400"
+            />
+          </Match>
+          <Match when={props.running}>
+            <span
+              role="img"
+              aria-label="Checking"
+              title="Checking"
+              class={`iconify lucide--loader-circle animate-spin ${MUTED_CLASS}`}
+            />
+          </Match>
+        </Switch>
+      </span>
+    </InfoRow>
+    <Show when={props.valid === false && props.error}>
+      <p class={`${UNDER_VALUE_CLASS} text-xs wrap-break-word text-red-500 dark:text-red-400`}>
+        {props.error}
+      </p>
     </Show>
-    {props.children}
   </div>
 );
 
@@ -147,39 +184,45 @@ export const RecordInfo = (props: {
   schema: RecordSchemaValidationState;
   value: unknown;
 }) => (
-  <>
-    <CopyableInfoField label="AT URI" value={props.uri} />
-    <Show when={props.cid}>{(cid) => <CopyableInfoField label="CID" value={cid()} />}</Show>
-    <Show when={props.verification}>
-      {(verification) => (
-        <CheckRow
-          title="Record verification"
-          valid={verification().valid}
-          error={verification().error}
-          running
-        />
+  <div class="flex flex-col gap-4 wrap-anywhere">
+    {/* Headed like Identity's DID, so the long values get the full width. */}
+    <InfoSection title="AT URI">
+      <CopyValue value={props.uri} />
+    </InfoSection>
+    <Show when={props.cid}>
+      {(cid) => (
+        <InfoSection title="CID">
+          <CopyValue value={cid()} />
+        </InfoSection>
       )}
     </Show>
-    <CheckRow
-      title="Schema validation"
-      valid={props.schema.valid()}
-      error={props.schema.error()}
-      running={props.schema.resolving()}
-    >
-      <Show
-        when={
-          !props.schema.resolving() &&
-          props.schema.valid() === undefined &&
-          props.schema.canResolve()
-        }
-      >
-        <Button onClick={() => void props.schema.validateRemote(props.value)}>
-          Validate via resolution
-        </Button>
-      </Show>
-    </CheckRow>
+    <InfoSection title="Validation">
+      <div class="flex flex-col gap-1">
+        <Show when={props.verification}>
+          {(verification) => (
+            <CheckRow
+              label="Record"
+              valid={verification().valid}
+              error={verification().error}
+              running
+            />
+          )}
+        </Show>
+        <CheckRow
+          label="Schema"
+          valid={props.schema.valid()}
+          error={props.schema.error()}
+          running={props.schema.resolving()}
+          onCheck={
+            props.schema.canResolve()
+              ? () => void props.schema.validateRemote(props.value)
+              : undefined
+          }
+        />
+      </div>
+    </InfoSection>
     <Show when={props.rawHref}>
       {(href) => <ExternalLink href={href()}>Open on PDS</ExternalLink>}
     </Show>
-  </>
+  </div>
 );

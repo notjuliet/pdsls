@@ -8,6 +8,8 @@ import { createEffect, createResource, createSignal, For, on, onCleanup, Show } 
 
 import { setPDS } from "../components/repo/navbar";
 import { Button } from "../components/ui/button";
+import { ExternalLink } from "../components/ui/external-link.jsx";
+import { CopyValue, InfoRow, InfoSection } from "../components/ui/info.jsx";
 import { NestedLayout } from "../components/ui/nested-layout.jsx";
 import { Spinner } from "../components/ui/states.jsx";
 import { Tabs } from "../components/ui/tabs.jsx";
@@ -181,13 +183,6 @@ const RepoCard = (props: {
   );
 };
 
-const InfoField = (props: { label: string; children: any }) => (
-  <div class="flex flex-col">
-    <span class="font-semibold">{props.label}</span>
-    {props.children}
-  </div>
-);
-
 export const PdsLayout = (props: RouteSectionProps) => {
   const params = useParams();
   const hasChild = () => !!params.repo;
@@ -306,7 +301,7 @@ const PdsView = () => {
       <Show when={!hidden() && (repos() || response.state === "ready")}>
         <div class="flex w-full flex-col px-2">
           <Tabs
-            class="mb-3 text-sm sm:text-base"
+            class="mb-5 text-sm sm:text-base"
             items={[
               { id: "repos", label: "Repositories", href: `/${params.pds}#repos` },
               { id: "info", label: "Info", href: `/${params.pds}#info` },
@@ -354,92 +349,82 @@ const PdsView = () => {
               }}
             />
           </Show>
-          <div class="flex flex-col gap-3">
-            <Show when={location.hash === "#info"}>
-              <Show when={version()}>
-                {(version) => (
-                  <InfoField label="Version">
-                    <span class="text-sm text-neutral-700 dark:text-neutral-300">{version()}</span>
-                  </InfoField>
-                )}
+          <Show when={location.hash === "#info"}>
+            <div class="flex flex-col gap-4 wrap-anywhere">
+              <Show when={version() || serverInfos()}>
+                <InfoSection title="Server">
+                  <div class="flex flex-col gap-1">
+                    {/* Usually `did:web:` and the host, which the nav already shows. */}
+                    <Show
+                      when={
+                        serverInfos()?.did !== `did:web:${params.pds!.replace(":", "%3A")}` &&
+                        serverInfos()?.did
+                      }
+                    >
+                      {(did) => <CopyValue value={did()} label="DID" />}
+                    </Show>
+                    <Show when={version()}>
+                      {(version) => <InfoRow label="Version">{version()}</InfoRow>}
+                    </Show>
+                    <Show when={serverInfos()?.blobUploadLimit}>
+                      {(limit) => (
+                        <InfoRow label="Blob limit" title={`${limit().toLocaleString()} bytes`}>
+                          {formatFileSize(limit())}
+                        </InfoRow>
+                      )}
+                    </Show>
+                  </div>
+                </InfoSection>
               </Show>
               <Show when={serverInfos()}>
                 {(server) => (
                   <>
-                    <InfoField label="DID">
-                      <span class="text-sm text-neutral-700 dark:text-neutral-300">
-                        {server().did}
-                      </span>
-                    </InfoField>
-                    <Show when={server().blobUploadLimit != null}>
-                      <InfoField label="Blob Upload Limit">
-                        <span
-                          class="text-sm text-neutral-700 dark:text-neutral-300"
-                          title={`${server().blobUploadLimit!.toLocaleString()} bytes`}
-                        >
-                          {formatFileSize(server().blobUploadLimit!)}
-                        </span>
-                      </InfoField>
-                    </Show>
-                    <div class="flex items-center gap-1">
-                      <span class="font-semibold">Invite Code Required</span>
-                      <span
-                        classList={{
-                          "iconify lucide--check text-green-500 dark:text-green-400":
-                            server().inviteCodeRequired === true,
-                          "iconify lucide--x text-red-500 dark:text-red-400":
-                            !server().inviteCodeRequired,
-                        }}
-                      ></span>
-                    </div>
-                    <Show when={server().phoneVerificationRequired}>
-                      <div class="flex items-center gap-1">
-                        <span class="font-semibold">Captcha Verification Required</span>
-                        <span class="iconify lucide--check text-green-500 dark:text-green-400"></span>
+                    <InfoSection title="Sign-up">
+                      <div class="flex flex-col gap-1">
+                        <InfoRow label="Invite code">
+                          {server().inviteCodeRequired ? "Required" : "Not required"}
+                        </InfoRow>
+                        <Show when={server().phoneVerificationRequired}>
+                          <InfoRow label="Captcha">Required</InfoRow>
+                        </Show>
+                        <Show when={server().availableUserDomains.length}>
+                          <InfoRow label="Handles">
+                            <span class="flex flex-col">
+                              <For each={server().availableUserDomains}>
+                                {(domain) => <span>{domain}</span>}
+                              </For>
+                            </span>
+                          </InfoRow>
+                        </Show>
+                      </div>
+                    </InfoSection>
+                    <Show
+                      when={
+                        server().links?.privacyPolicy ||
+                        server().links?.termsOfService ||
+                        server().contact?.email
+                      }
+                    >
+                      {/* Named links need no heading, like Identity's "DID document". */}
+                      <div class="flex flex-col gap-1">
+                        <Show when={server().links?.privacyPolicy}>
+                          {(url) => <ExternalLink href={url()}>Privacy policy</ExternalLink>}
+                        </Show>
+                        <Show when={server().links?.termsOfService}>
+                          {(url) => <ExternalLink href={url()}>Terms of service</ExternalLink>}
+                        </Show>
+                        <Show when={server().contact?.email}>
+                          {(email) => (
+                            <ExternalLink href={`mailto:${email()}`}>Contact</ExternalLink>
+                          )}
+                        </Show>
                       </div>
                     </Show>
-                    <Show when={server().availableUserDomains.length}>
-                      <InfoField label="Available User Domains">
-                        <For each={server().availableUserDomains}>
-                          {(domain) => (
-                            <span class="text-sm wrap-anywhere text-neutral-700 dark:text-neutral-300">
-                              {domain}
-                            </span>
-                          )}
-                        </For>
-                      </InfoField>
-                    </Show>
-                    <For
-                      each={[
-                        { label: "Privacy Policy", url: server().links?.privacyPolicy },
-                        { label: "Terms of Service", url: server().links?.termsOfService },
-                        {
-                          label: "Contact",
-                          url: server().contact?.email
-                            ? `mailto:${server().contact?.email}`
-                            : undefined,
-                          display: server().contact?.email,
-                        },
-                      ].filter((l) => l.url)}
-                    >
-                      {(link) => (
-                        <InfoField label={link.label}>
-                          <a
-                            href={link.url}
-                            class="text-sm text-neutral-700 hover:underline dark:text-neutral-300"
-                            target="_blank"
-                            rel="noopener"
-                          >
-                            {link.display ?? link.url}
-                          </a>
-                        </InfoField>
-                      )}
-                    </For>
                   </>
                 )}
               </Show>
-            </Show>
-          </div>
+            </div>
+          </Show>
         </div>
         <Show when={!location.hash || location.hash === "#repos"}>
           <div class="bottom-controls-fade dark:bg-dark-500 fixed bottom-0 z-5 flex w-screen justify-center bg-neutral-100 pt-3 pb-6">

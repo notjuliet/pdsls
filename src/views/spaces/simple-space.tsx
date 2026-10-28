@@ -1,5 +1,6 @@
 import { For, Show } from "solid-js";
 
+import { InfoRow, InfoSection, MUTED_CLASS } from "../../components/ui/info.jsx";
 import { type SimpleSpaceInfo, type SimpleSpacePolicy } from "../../lib/spaces.js";
 import { SimpleSpaceMembers } from "./simple-space-members.jsx";
 
@@ -37,49 +38,35 @@ export const SimpleSpaceDetails = (props: {
 }) => {
   return (
     <>
-      <section class="flex flex-col gap-2 px-2">
-        <h2 class="font-medium">Access</h2>
-        <dl class="grid grid-cols-[max-content_minmax(0,1fr)] items-baseline gap-x-4 gap-y-2 text-sm">
+      <InfoSection title="Access">
+        <div class="flex flex-col gap-1">
           <For each={["readPolicy", "writePolicy"] as const}>
             {(key) => (
-              <>
-                <dt class="text-neutral-500 dark:text-neutral-400">
-                  {key === "readPolicy" ? "Read access" : "Write access"}
-                </dt>
-                <dd>{policyLabel(props.info[key])}</dd>
-                <Show when={managingApp(props.info[key])}>
-                  {(app) => (
-                    <>
-                      <dt class="text-neutral-500 dark:text-neutral-400">
-                        {key === "readPolicy" ? "Read managing app" : "Write managing app"}
-                      </dt>
-                      <dd class="min-w-0 wrap-anywhere">{app()}</dd>
-                    </>
-                  )}
-                </Show>
-              </>
+              <InfoRow label={key === "readPolicy" ? "Read" : "Write"}>
+                <span class="flex flex-col">
+                  <span>{policyLabel(props.info[key])}</span>
+                  {/* The app that decides access, under the policy that names it. */}
+                  <Show when={managingApp(props.info[key])}>
+                    {(app) => <span class={MUTED_CLASS}>{app()}</span>}
+                  </Show>
+                </span>
+              </InfoRow>
             )}
           </For>
-
-          <dt class="text-neutral-500 dark:text-neutral-400">Application access</dt>
-          <dd>{appAccessLabel(props.info)}</dd>
-
-          <Show when={props.info.appAccess.kind === "allow-list"}>
-            <dt class="text-neutral-500 dark:text-neutral-400">Allowed applications</dt>
-            <dd class="min-w-0">
-              <ul class="flex flex-col gap-1 wrap-anywhere">
-                <For
-                  each={
-                    props.info.appAccess.kind === "allow-list" ? props.info.appAccess.allowed : []
-                  }
-                >
-                  {(clientId) => <li>{clientId}</li>}
-                </For>
-              </ul>
-            </dd>
-          </Show>
-        </dl>
-      </section>
+          <InfoRow label="Apps">
+            <span class="flex flex-col">
+              <span>{appAccessLabel(props.info)}</span>
+              <For
+                each={
+                  props.info.appAccess.kind === "allow-list" ? props.info.appAccess.allowed : []
+                }
+              >
+                {(clientId) => <span class={MUTED_CLASS}>{clientId}</span>}
+              </For>
+            </span>
+          </InfoRow>
+        </div>
+      </InfoSection>
 
       <Show
         when={
