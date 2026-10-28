@@ -101,7 +101,10 @@ export const AccountManager = (props: { onCreateRecord?: () => void }) => {
           agent() && avatars[agent()!.sub] ? (
             <img src={getThumbnailUrl(avatars[agent()!.sub])} class="size-6 rounded-full" />
           ) : (
-            <span class="iconify lucide--circle-user-round text-xl" />
+            // Same box as the avatar, so the button keeps its width when switching accounts.
+            <span class="flex size-6 items-center justify-center">
+              <span class="iconify lucide--circle-user-round text-xl" />
+            </span>
           )
         }
         menuWidth={304}
