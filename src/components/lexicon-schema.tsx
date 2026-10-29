@@ -59,8 +59,10 @@ const hasConstraints = (property: LexiconProperty | LexiconDef) =>
   property.enum ||
   property.const ||
   property.default !== undefined ||
-  property.knownValues ||
-  property.closed;
+  property.knownValues;
+
+/** A union's type as shown: "closed union" when only its listed types are allowed. */
+const unionType = (union: { closed?: boolean }) => (union.closed ? "closed union" : "union");
 
 const LexiconSchemaContext = createContext<{ inertRefs?: boolean }>();
 const useLexiconSchemaContext = () => useContext(LexiconSchemaContext) ?? {};
@@ -371,11 +373,6 @@ const ConstraintsList = (props: { property: LexiconProperty }) => {
           knownValues: <span class={VALUE_CLASS}>[{props.property.knownValues!.join(", ")}]</span>
         </span>
       </Show>
-      <Show when={props.property.closed}>
-        <span>
-          closed: <span class={VALUE_CLASS}>true</span>
-        </span>
-      </Show>
     </div>
   );
 };
@@ -404,7 +401,7 @@ const PropertyRow = (props: {
             />
           </Show>
           <Show when={props.property.refs}>
-            <TypeBadge type="union" size="text-sm" />
+            <TypeBadge type={unionType(props.property)} size="text-sm" />
           </Show>
           <Show when={props.required}>
             <span class="text-sm text-amber-600 dark:text-amber-500">required</span>
@@ -430,7 +427,7 @@ const PropertyRow = (props: {
               />
             </Show>
             <Show when={props.property.items!.refs}>
-              <TypeBadge type="union" color={VALUE_CLASS} />
+              <TypeBadge type={unionType(props.property.items!)} color={VALUE_CLASS} />
             </Show>
           </div>
           {/* Nested under the items line, so they don't read as the array's own. */}
@@ -485,7 +482,7 @@ const SchemaSection = (props: { title: string; body: LexiconBody }) => {
       </Show>
       <Show when={schema()?.refs}>
         <span class={INFO_LINE_CLASS}>
-          Schema: <TypeBadge type="union" size="text-sm" color={VALUE_CLASS} />
+          Schema: <TypeBadge type={unionType(schema()!)} size="text-sm" color={VALUE_CLASS} />
         </span>
         <div class="ml-1 border-l border-neutral-300 pl-3 dark:border-neutral-600">
           <UnionBadges refs={schema()!.refs!} />

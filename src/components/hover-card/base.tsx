@@ -61,6 +61,11 @@ interface HoverCardProps {
   sideStart?: (trigger: HTMLElement) => number;
   /** Whether the preview container should be visible once hover is active */
   showPreview?: boolean;
+  /**
+   * Where there's no hover, e.g. on phones, a tap opens the preview and a tap anywhere else
+   * closes it. Without it, previews only open on hover.
+   */
+  openOnTap?: boolean;
   /** Preview content */
   children: JSX.Element;
 }
@@ -210,7 +215,32 @@ const HoverCard = (props: HoverCardProps) => {
     }).style;
   };
 
+  // Taps stand in for hover where there's none, so the emulated mouse events a tap also fires
+  // are ignored rather than opening the preview a second time.
+  const tapMode = () => !canHover && !!props.openOnTap;
+
+  const handleTap = () => {
+    if (!tapMode()) return;
+    if (show()) {
+      hidePreview();
+      return;
+    }
+    updateAnchorRect();
+    showPreview();
+  };
+
+  createEffect(() => {
+    if (!tapMode() || !show()) return;
+    const closeOnTapOutside = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (!anchorRef.contains(target) && !previewRef?.contains(target)) hidePreview();
+    };
+    document.addEventListener("pointerdown", closeOnTapOutside);
+    onCleanup(() => document.removeEventListener("pointerdown", closeOnTapOutside));
+  });
+
   const handleMouseEnter = () => {
+    if (tapMode()) return;
     const delay = props.hoverDelay ?? 0;
     updateAnchorRect();
     clearHoverTimeout();
@@ -236,7 +266,7 @@ const HoverCard = (props: HoverCardProps) => {
     props.passThroughWhenCovering &&
     (lockedPlacement() === "above" || lockedPlacement() === "below");
 
-  const previewVisible = () => active() && canHover && (props.showPreview ?? true);
+  const previewVisible = () => active() && (canHover || tapMode()) && (props.showPreview ?? true);
 
   return (
     <>
@@ -247,7 +277,8 @@ const HoverCard = (props: HoverCardProps) => {
           ref={anchorRef}
           class={`group/hover-card relative ${props.class || "inline"} ${previewVisible() ? (props.activeClass ?? "") : ""}`}
           onMouseEnter={handleMouseEnter}
-          onMouseLeave={scheduleHide}
+          onMouseLeave={() => !tapMode() && scheduleHide()}
+          onClick={handleTap}
         >
           {props.trigger}
         </span>

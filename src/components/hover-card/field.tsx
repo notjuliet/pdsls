@@ -37,9 +37,11 @@ const FieldHoverCard = (props: {
       trigger={props.renderTrigger({ loading: preview.visibleLoading })}
       class="inline-flex"
       // The page's size, as on the Schema tab, so the field's name stays larger than its type.
-      previewClass="w-max max-w-sm font-sans text-base"
+      previewClass="w-max max-w-[min(24rem,calc(100vw-1rem))] font-sans text-base"
       // Nothing in it to click, so the mouse goes through to the JSON it covers.
       passThroughWhenCovering
+      // Phones can't hover, so a tap on the key opens it there.
+      openOnTap
       // A field with issues has a card even when its lexicon can't be described, once that's known.
       showPreview={
         !!preview.state().data?.field ||
