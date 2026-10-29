@@ -3,10 +3,12 @@ import { A, useLocation, useNavigate, useParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, For, type JSX, Show } from "solid-js";
 
 import DidHoverCard from "../../components/hover-card/did.jsx";
+import { timestampFromRkey } from "../../components/repo/record-row.jsx";
 import { Button } from "../../components/ui/button.jsx";
 import { NestedLayout } from "../../components/ui/nested-layout.jsx";
 import { Spinner, EmptyState, ErrorNotice, LoadingState } from "../../components/ui/states.jsx";
 import { Tabs } from "../../components/ui/tabs.jsx";
+import { localDateFromTimestamp, relativeTimeFromTimestamp } from "../../lib/format.js";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { resolveRawLexicon } from "../../lib/lexicon.js";
 import {
@@ -228,38 +230,62 @@ const SpaceView = () => {
           <Show when={loaded()}>
             <ul class="flex flex-col">
               <For each={shownRepos()}>
-                {(repo) => (
-                  <li>
-                    <DidHoverCard
-                      did={repo.did}
-                      class="flex w-full min-w-0 items-center rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-                      renderTrigger={({ loading: hoverLoading }) => (
-                        <A
-                          href={makeSpaceRepoPath(
-                            params.spaceAuthority!,
-                            params.spaceType!,
-                            params.skey!,
-                            repo.did,
-                          )}
-                          class="flex w-full min-w-0 items-baseline gap-2 p-2 text-left text-sm"
-                          classList={{ "hover-card-trigger-loading": hoverLoading() }}
-                        >
-                          <span class="min-w-0 truncate font-medium text-blue-500 dark:text-blue-400">
-                            {repo.did}
-                          </span>
-                          <Show when={repo.did === auth().sub}>
-                            <span class="shrink-0 self-center rounded border border-neutral-300 px-1 py-px text-[9px] leading-none text-neutral-500 uppercase dark:border-neutral-600 dark:text-neutral-400">
-                              You
-                            </span>
+                {(repo) => {
+                  // The repo's revision is a TID, so it says when they last wrote here.
+                  const lastChange = timestampFromRkey(repo.rev);
+                  return (
+                    <li>
+                      <DidHoverCard
+                        did={repo.did}
+                        class="flex w-full min-w-0 items-center rounded hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+                        extra={
+                          <Show when={lastChange}>
+                            {(timestamp) => (
+                              <div class="flex items-center gap-2">
+                                <span class="iconify lucide--clock text-neutral-500 dark:text-neutral-400" />
+                                <span>
+                                  {localDateFromTimestamp(timestamp())}{" "}
+                                  {/* The revision is the same TID, as the PDS stores it. */}
+                                  <span class="text-neutral-500 dark:text-neutral-400">
+                                    ({repo.rev})
+                                  </span>
+                                </span>
+                              </div>
+                            )}
                           </Show>
-                          <span class="ml-auto min-w-0 truncate text-xs text-neutral-500 dark:text-neutral-400">
-                            {repo.rev}
-                          </span>
-                        </A>
-                      )}
-                    />
-                  </li>
-                )}
+                        }
+                        renderTrigger={({ loading: hoverLoading }) => (
+                          <A
+                            href={makeSpaceRepoPath(
+                              params.spaceAuthority!,
+                              params.spaceType!,
+                              params.skey!,
+                              repo.did,
+                            )}
+                            class="flex w-full min-w-0 items-baseline gap-2 p-2 text-left text-sm"
+                            classList={{ "hover-card-trigger-loading": hoverLoading() }}
+                          >
+                            <span class="min-w-0 truncate font-medium text-blue-500 dark:text-blue-400">
+                              {repo.did}
+                            </span>
+                            <Show when={repo.did === auth().sub}>
+                              <span class="shrink-0 self-center rounded border border-neutral-300 px-1 py-px text-[9px] leading-none text-neutral-500 uppercase dark:border-neutral-600 dark:text-neutral-400">
+                                You
+                              </span>
+                            </Show>
+                            <Show when={lastChange}>
+                              {(timestamp) => (
+                                <span class="ml-auto shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
+                                  {relativeTimeFromTimestamp(timestamp())}
+                                </span>
+                              )}
+                            </Show>
+                          </A>
+                        )}
+                      />
+                    </li>
+                  );
+                }}
               </For>
             </ul>
 

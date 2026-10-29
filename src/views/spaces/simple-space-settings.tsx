@@ -25,8 +25,17 @@ interface SimpleSpaceSettingsDraft {
   allowedApps: string;
 }
 
+// The native arrow sits against the border whatever the padding, so it's hidden for a chevron
+// that keeps the same distance from the edge as the text.
 const selectClass =
-  "dark:bg-dark-100 w-full rounded-md border border-neutral-200 bg-white px-2 py-1.5 text-sm outline-none focus:border-neutral-400 dark:border-neutral-600 dark:focus:border-neutral-400";
+  "dark:bg-dark-100 w-full appearance-none rounded-md border border-neutral-200 bg-white py-1.5 pr-8 pl-2 text-sm outline-none focus:border-neutral-400 dark:border-neutral-600 dark:focus:border-neutral-400";
+
+const SelectChevron = () => (
+  <span
+    aria-hidden="true"
+    class="iconify lucide--chevron-down pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-neutral-500 dark:text-neutral-400"
+  />
+);
 
 const isServiceIdentifier = (value: string) => {
   const fragmentStart = value.indexOf("#");
@@ -118,17 +127,20 @@ export const SimpleSpaceSettingsFields = (props: {
         <>
           <label class="flex flex-col gap-1 text-sm">
             <span class="font-medium">{access === "read" ? "Read access" : "Write access"}</span>
-            <select
-              class={selectClass}
-              value={props.settings[access].policy}
-              onChange={(event) =>
-                props.setSettings(access, "policy", event.currentTarget.value as PolicyKind)
-              }
-            >
-              <option value="member-list">Member list</option>
-              <option value="public">Public</option>
-              <option value="managing-app">Managing app</option>
-            </select>
+            <span class="relative">
+              <select
+                class={selectClass}
+                value={props.settings[access].policy}
+                onChange={(event) =>
+                  props.setSettings(access, "policy", event.currentTarget.value as PolicyKind)
+                }
+              >
+                <option value="member-list">Member list</option>
+                <option value="public">Public</option>
+                <option value="managing-app">Managing app</option>
+              </select>
+              <SelectChevron />
+            </span>
             <span class="text-xs text-neutral-500 dark:text-neutral-400">
               {props.settings[access].policy === "member-list"
                 ? `Only members granted ${access} access may ${access} in this Space.`
@@ -162,16 +174,19 @@ export const SimpleSpaceSettingsFields = (props: {
 
     <label class="flex flex-col gap-1 text-sm">
       <span class="font-medium">Application access</span>
-      <select
-        class={selectClass}
-        value={props.settings.appAccess}
-        onChange={(event) =>
-          props.setSettings("appAccess", event.currentTarget.value as AppAccessKind)
-        }
-      >
-        <option value="open">Open</option>
-        <option value="allow-list">Allow list</option>
-      </select>
+      <span class="relative">
+        <select
+          class={selectClass}
+          value={props.settings.appAccess}
+          onChange={(event) =>
+            props.setSettings("appAccess", event.currentTarget.value as AppAccessKind)
+          }
+        >
+          <option value="open">Open</option>
+          <option value="allow-list">Allow list</option>
+        </select>
+        <SelectChevron />
+      </span>
       <span class="text-xs text-neutral-500 dark:text-neutral-400">
         {props.settings.appAccess === "open"
           ? "Any application used by an authorized reader may read the Space."

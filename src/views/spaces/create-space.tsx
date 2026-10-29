@@ -126,7 +126,7 @@ export const CreateSpaceDialog = (props: CreateSpaceDialogProps) => {
         </div>
 
         <form
-          class="flex min-h-0 flex-col gap-4 overflow-y-auto px-0.5"
+          class="-mx-0.5 flex min-h-0 flex-col gap-4 overflow-y-auto px-0.5"
           onSubmit={(event) => {
             event.preventDefault();
             void submit();

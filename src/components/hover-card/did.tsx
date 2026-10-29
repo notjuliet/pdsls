@@ -1,6 +1,6 @@
 import { getPdsEndpoint, type DidDocument } from "@atcute/identity";
 import { A } from "@solidjs/router";
-import { Show } from "solid-js";
+import { type JSX, Show } from "solid-js";
 
 import { resolveDidDoc } from "../../lib/api";
 import HoverCard, { HoverCardError, type HoverTriggerRenderer } from "./base";
@@ -13,6 +13,8 @@ interface DidHoverCardProps {
   labelClass?: string;
   renderTrigger?: HoverTriggerRenderer;
   hoverDelay?: number;
+  /** More lines under the handle and PDS, about this DID where it's shown, e.g. its last change. */
+  extra?: JSX.Element;
 }
 
 interface DidInfo {
@@ -91,6 +93,7 @@ const DidHoverCard = (props: DidHoverCardProps) => {
           <Show when={!preview.state().data?.handle && !preview.state().data?.pds}>
             <div class="text-neutral-500 dark:text-neutral-400">No info available</div>
           </Show>
+          {props.extra}
         </div>
       </Show>
     </HoverCard>

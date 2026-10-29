@@ -145,7 +145,7 @@ export const ManageSpaceDialog = (props: {
             </div>
           }
         >
-          <div class="min-h-0 overflow-y-auto px-0.5">
+          <div class="-mx-0.5 min-h-0 overflow-y-auto px-0.5">
             <form
               class="flex flex-col gap-4"
               onSubmit={(event) => {
