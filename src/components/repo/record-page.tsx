@@ -1,12 +1,10 @@
-import type { Nsid } from "@atcute/lexicons";
-import { isNsid } from "@atcute/lexicons/syntax";
 import type { Issue } from "@atcute/lexicons/validations";
-import { createSignal, type JSX, Match, Show, Switch } from "solid-js";
+import { createComputed, createSignal, type JSX, Match, Show, Switch } from "solid-js";
 
-import { resolveLexicon } from "../../lib/lexicon.js";
 import {
-  hasKnownRecordSchema,
-  validateKnownRecordSchema,
+  isLexiconRecord,
+  prefetchRecordLexicons,
+  validateLexiconRecord,
   validateResolvedRecordSchema,
 } from "../../lib/record-validation.js";
 import { ExternalLink } from "../ui/external-link.jsx";
@@ -24,7 +22,7 @@ export const recordTabFromHash = (hash: string): RecordTab => {
 };
 
 interface RecordPageProps {
-  tabs: { id: RecordTab; label: string; error?: boolean }[];
+  tabs: { id: RecordTab; label: string; error?: boolean; loading?: boolean }[];
   activeTab: RecordTab;
   tabHref: (tab: RecordTab) => string;
   actions?: JSX.Element;
@@ -79,6 +77,10 @@ export const useRecordSchemaValidation = (collection: () => string, rkey: () => 
   // Counts checks, so one that finishes after the record changed doesn't overwrite the newer one.
   let run = 0;
 
+  // The collection is known from the URL, well before its record loads. A computation rather
+  // than an effect, since a page loading under Suspense holds its effects until it's done.
+  createComputed(() => prefetchRecordLexicons(collection()));
+
   const reset = () => {
     run++;
     setValid(undefined);
@@ -96,11 +98,8 @@ export const useRecordSchemaValidation = (collection: () => string, rkey: () => 
 
   const validate = async (value: unknown) => {
     reset();
-    if (hasKnownRecordSchema(collection())) {
-      const result = validateKnownRecordSchema(collection(), value);
-      if (result) apply(result);
-      // Checking needed nothing fetched, but hovering a field will: load its lexicon ahead.
-      if (isNsid(collection())) resolveLexicon(collection() as Nsid).catch(() => {});
+    if (isLexiconRecord(collection())) {
+      apply(validateLexiconRecord(value));
       return;
     }
 

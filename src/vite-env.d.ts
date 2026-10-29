@@ -2,6 +2,7 @@
 /// <reference types="@atcute/bluesky/lexicons" />
 
 import type {} from "@atcute/atproto";
+import type {} from "@atcute/bluesky";
 
 declare global {
   interface ImportMetaEnv {

@@ -163,6 +163,7 @@ export const SpaceRecordView = () => {
                   id: "info",
                   label: "Info",
                   error: validRecord() === false || schemaValidation.valid() === false,
+                  loading: schemaValidation.resolving(),
                 },
               ]}
               activeTab={recordTabFromHash(location.hash)}

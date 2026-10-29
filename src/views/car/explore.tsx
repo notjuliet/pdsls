@@ -616,7 +616,12 @@ const RecordSubview = (props: {
       tabs={[
         { id: "record", label: "Record" },
         { id: "schema", label: "Schema" },
-        { id: "info", label: "Info", error: schemaValidation.valid() === false },
+        {
+          id: "info",
+          label: "Info",
+          error: schemaValidation.valid() === false,
+          loading: schemaValidation.resolving(),
+        },
       ]}
       activeTab={recordTabFromHash(location.hash)}
       tabHref={(tab) =>

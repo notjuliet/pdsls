@@ -1,12 +1,11 @@
 import { lexiconDoc, type LexiconDoc } from "@atcute/lexicon-doc";
 import { RecordValidator } from "@atcute/lexicon-doc/validations";
-import { type Nsid, safeParse } from "@atcute/lexicons";
+import type { Nsid } from "@atcute/lexicons";
 import { isNsid } from "@atcute/lexicons/syntax";
 import type { Issue } from "@atcute/lexicons/validations";
 import * as v from "valibot";
 
 import { resolveLexicon } from "./lexicon.js";
-import { lexicons } from "./types/lexicons.js";
 
 interface RecordSchemaValidation {
   valid: boolean;
@@ -126,29 +125,22 @@ const resolveAllLexicons = async (
   return { resolved, failed };
 };
 
-export const hasKnownRecordSchema = (collection: string) =>
-  collection === "com.atproto.lexicon.schema" || collection in lexicons;
+/** Lexicon records are checked as lexicon documents, which their own lexicon can't fully describe. */
+export const isLexiconRecord = (collection: string) => collection === "com.atproto.lexicon.schema";
 
-export const validateKnownRecordSchema = (
-  collection: string,
-  value: unknown,
-): RecordSchemaValidation | undefined => {
-  if (collection === "com.atproto.lexicon.schema") {
-    const result = v.safeParse(lexiconDoc, value);
-    return result.success
-      ? { valid: true }
-      : { valid: false, error: result.issues[0]?.message ?? "Invalid Lexicon schema record" };
-  }
-
-  if (!(collection in lexicons)) return;
-  const result = safeParse(lexicons[collection], value);
-  return result.ok
+export const validateLexiconRecord = (value: unknown): RecordSchemaValidation => {
+  const result = v.safeParse(lexiconDoc, value);
+  return result.success
     ? { valid: true }
-    : {
-        valid: false,
-        error: "Record does not match the bundled Lexicon schema",
-        issues: result.issues,
-      };
+    : { valid: false, error: result.issues[0]?.message ?? "Invalid Lexicon schema record" };
+};
+
+/**
+ * Starts loading a collection's lexicons, and the ones they reference, before its record has
+ * arrived, so checking the record can start from the cache.
+ */
+export const prefetchRecordLexicons = (collection: string) => {
+  if (isNsid(collection) && !isLexiconRecord(collection)) void resolveAllLexicons(collection);
 };
 
 /** Checks a record against its published lexicons; throws only when they can't be resolved. */

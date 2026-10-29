@@ -6,6 +6,8 @@ export interface TabItem {
   href: string;
   /** Marks the tab with a red cross, e.g. when a check on that tab failed. */
   error?: boolean;
+  /** Marks the tab with a spinner while its content is still working, e.g. a check running. */
+  loading?: boolean;
 }
 
 /** How far the fade at a scrolled edge reaches. */
@@ -75,7 +77,14 @@ export const Tabs = (props: { items: TabItem[]; active?: string; class?: string 
             }}
           >
             {tab.label}
-            <Show when={tab.error}>
+            <Show
+              when={tab.error}
+              fallback={
+                <Show when={tab.loading}>
+                  <span class="iconify lucide--loader-circle animate-spin text-neutral-500 dark:text-neutral-400" />
+                </Show>
+              }
+            >
               <span class="iconify lucide--x text-red-500 dark:text-red-400" />
             </Show>
           </a>
