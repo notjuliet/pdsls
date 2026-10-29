@@ -634,7 +634,13 @@ const RecordSubview = (props: {
           when={props.record.record !== null}
           fallback={<ErrorNotice message="Failed to decode record" />}
         >
-          <JSONValue data={props.record.record} repo={props.archive.did || ""} newTab hideBlobs />
+          <JSONValue
+            data={props.record.record}
+            repo={props.archive.did || ""}
+            newTab
+            hideBlobs
+            schema={props.collection.name}
+          />
         </Show>
       }
       schema={

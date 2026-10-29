@@ -216,6 +216,7 @@ export const SpaceRecordView = () => {
                       cid,
                     )
                   }
+                  schema={params.collection}
                 />
               }
               schema={
