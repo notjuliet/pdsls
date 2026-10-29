@@ -1,6 +1,7 @@
 import { A } from "@solidjs/router";
 import { For, JSX } from "solid-js";
 
+import { agent } from "../auth/state.js";
 import { STREAM_CONFIGS, STREAM_TYPES } from "./stream/config";
 
 const repositoryExamples = [
@@ -36,8 +37,13 @@ const repositoryExamples = [
   },
 ];
 
-const manageLinks = [
-  { label: "Add account", summary: "Manage your records", href: "/account/add" },
+// Signed out, adding an account is signing in.
+const manageLinks = () => [
+  {
+    label: agent() ? "Add account" : "Sign in",
+    summary: "Manage your records",
+    href: "/account/add",
+  },
   { label: "Spaces", summary: "Non-public data", href: "/spaces" },
 ];
 
@@ -127,7 +133,7 @@ export const Home = () => {
           <div class="mt-3 rounded-lg border border-neutral-200 p-2 sm:p-3 dark:border-neutral-700">
             <h2 class="px-2 py-1 text-sm font-medium sm:text-base">Manage</h2>
             <div class="grid grid-cols-2 gap-1">
-              <For each={manageLinks}>
+              <For each={manageLinks()}>
                 {(link) => (
                   <A
                     href={link.href}
