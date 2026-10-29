@@ -36,6 +36,11 @@ const repositoryExamples = [
   },
 ];
 
+const manageLinks = [
+  { label: "Add account", summary: "Manage your records", href: "/account/add" },
+  { label: "Spaces", summary: "Non-public data", href: "/spaces" },
+];
+
 const defaultAtProtocolUrl = "https://atproto.com";
 const atProtoRefererUrl = "https://at-proto.com";
 
@@ -122,20 +127,19 @@ export const Home = () => {
           <div class="mt-3 rounded-lg border border-neutral-200 p-2 sm:p-3 dark:border-neutral-700">
             <h2 class="px-2 py-1 text-sm font-medium sm:text-base">Manage</h2>
             <div class="grid grid-cols-2 gap-1">
-              <A
-                href="/account/add"
-                class="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-center text-xs text-neutral-800 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-200 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-              >
-                <span class="iconify lucide--user-round-plus shrink-0 text-neutral-500 dark:text-neutral-400" />
-                Add account
-              </A>
-              <A
-                href="/spaces"
-                class="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-center text-xs text-neutral-800 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-200 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-              >
-                <span class="iconify lucide--lock-keyhole shrink-0 text-neutral-500 dark:text-neutral-400" />
-                Spaces
-              </A>
+              <For each={manageLinks}>
+                {(link) => (
+                  <A
+                    href={link.href}
+                    class="flex min-w-0 flex-col items-center justify-center rounded-md px-1.5 py-1.5 text-xs text-neutral-800 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-200 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+                  >
+                    <span class="max-w-full truncate">{link.label}</span>
+                    <span class="max-w-full truncate text-xs text-neutral-500 dark:text-neutral-400">
+                      {link.summary}
+                    </span>
+                  </A>
+                )}
+              </For>
             </div>
           </div>
         </div>

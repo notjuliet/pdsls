@@ -192,7 +192,7 @@ export const Search = () => {
             href: "/account/add",
             label: "Sign in",
             icon: "lucide--log-in",
-            target: "Manage your own records",
+            target: "Manage your records",
           },
         ];
   };
