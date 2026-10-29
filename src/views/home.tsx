@@ -171,7 +171,7 @@ export const Home = () => {
           Bluesky
         </FooterLink>
         <FooterLink
-          href="https://tangled.org/did:plc:6q5daed5gutiyerimlrnojnz/3lvzxnfwb7u22"
+          href="https://tangled.org/pds.ls/pdsls"
           color="after:text-black"
           darkColor="dark:after:text-white"
         >
