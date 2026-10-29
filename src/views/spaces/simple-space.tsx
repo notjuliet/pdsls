@@ -74,7 +74,12 @@ export const SimpleSpaceDetails = (props: {
           props.info.writePolicy.kind === "member-list"
         }
       >
-        <SimpleSpaceMembers space={props.space} authority={props.authority} />
+        <SimpleSpaceMembers
+          space={props.space}
+          authority={props.authority}
+          readUsesMembers={props.info.readPolicy.kind === "member-list"}
+          writeUsesMembers={props.info.writePolicy.kind === "member-list"}
+        />
       </Show>
     </>
   );
