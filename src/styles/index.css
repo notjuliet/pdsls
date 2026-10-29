@@ -33,6 +33,37 @@ html {
   scrollbar-gutter: stable both-edges;
 }
 
+/* Record editor colours, read by components/ui/editor.tsx. */
+.cm-editor {
+  --cm-bg: var(--color-white);
+  --cm-fg: var(--color-neutral-800);
+  --cm-muted: var(--color-neutral-400);
+  --cm-punct: var(--color-neutral-500);
+  --cm-key: var(--color-indigo-500);
+  --cm-bool: var(--color-amber-500);
+  --cm-invalid: var(--color-red-500);
+  --cm-active: color-mix(in oklab, var(--color-neutral-500) 7%, transparent);
+  --cm-selection: color-mix(in oklab, var(--color-blue-500) 22%, transparent);
+  --cm-match: color-mix(in oklab, var(--color-neutral-500) 20%, transparent);
+  --cm-panel: var(--color-neutral-50);
+  --cm-border: var(--color-neutral-300);
+}
+
+.dark .cm-editor {
+  --cm-bg: var(--color-dark-500);
+  --cm-fg: var(--color-neutral-200);
+  --cm-muted: var(--color-neutral-500);
+  --cm-punct: var(--color-neutral-400);
+  --cm-key: var(--color-indigo-400);
+  --cm-bool: var(--color-amber-400);
+  --cm-invalid: var(--color-red-400);
+  --cm-active: color-mix(in oklab, var(--color-white) 5%, transparent);
+  --cm-selection: color-mix(in oklab, var(--color-blue-400) 30%, transparent);
+  --cm-match: color-mix(in oklab, var(--color-white) 14%, transparent);
+  --cm-panel: var(--color-dark-300);
+  --cm-border: var(--color-neutral-700);
+}
+
 .hover-card-trigger-loading {
   animation: hover-card-trigger-pulse 0.9s ease-in-out infinite;
 }
