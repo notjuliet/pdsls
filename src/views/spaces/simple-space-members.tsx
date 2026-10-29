@@ -1,7 +1,7 @@
 import type { Handle } from "@atcute/lexicons";
 import { isDid, isHandle } from "@atcute/lexicons/syntax";
 import { A } from "@solidjs/router";
-import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import { createEffect, createSignal, For, Show } from "solid-js";
 
 import { hasUserScope, SPACE_MANAGE_SPACES_SCOPE_ID } from "../../auth/scope-utils.js";
 import DidHoverCard from "../../components/hover-card/did.jsx";
@@ -23,8 +23,6 @@ import {
   type SimpleSpaceMember,
 } from "../../lib/spaces.js";
 import { useSpacesAuth } from "./context.jsx";
-
-type MemberDialog = { kind: "add" } | { kind: "remove"; did: string };
 
 /** The access a member can be given. Neither is left out: a member with no access is a removal. */
 const ACCESS_OPTIONS = [
@@ -54,7 +52,7 @@ export const SimpleSpaceMembers = (props: {
   const [loaded, setLoaded] = createSignal(false);
   const [loading, setLoading] = createSignal(false);
   const [error, setError] = createSignal<string>();
-  const [dialog, setDialog] = createSignal<MemberDialog>();
+  const [adding, setAdding] = createSignal(false);
   const [memberIdentifier, setMemberIdentifier] = createSignal("");
   const [readAccess, setReadAccess] = createSignal(true);
   const [writeAccess, setWriteAccess] = createSignal(true);
@@ -62,17 +60,13 @@ export const SimpleSpaceMembers = (props: {
   const [dialogError, setDialogError] = createSignal("");
   // The member whose access is being saved from their row.
   const [savingDid, setSavingDid] = createSignal<string>();
+  // The member whose row asks to confirm removing them, and whether that's going through.
+  const [confirmingDid, setConfirmingDid] = createSignal<string>();
+  const [removing, setRemoving] = createSignal(false);
   let activeKey = "";
   let requestVersion = 0;
 
   const canManage = () => props.authority === auth().sub;
-  // The last dialog opened, kept while the modal fades out after closing, so it doesn't switch to
-  // the Add form on its way out.
-  const shownDialog = createMemo<MemberDialog | undefined>((previous) => dialog() ?? previous);
-  const removingDid = () => {
-    const current = shownDialog();
-    return current?.kind === "remove" ? current.did : undefined;
-  };
 
   const loadMembers = async (reset = false, version = requestVersion) => {
     if (loading() && !reset) return;
@@ -114,7 +108,8 @@ export const SimpleSpaceMembers = (props: {
       setLoaded(false);
       setLoading(false);
       setError(undefined);
-      setDialog(undefined);
+      setAdding(false);
+      setConfirmingDid(undefined);
     }
     if (canManage() && !loaded() && !loading()) void loadMembers(true, requestVersion);
   });
@@ -124,7 +119,7 @@ export const SimpleSpaceMembers = (props: {
     setReadAccess(true);
     setWriteAccess(true);
     setDialogError("");
-    setDialog({ kind: "add" });
+    setAdding(true);
   };
 
   /** Saves a member's access as soon as it's picked on their row. */
@@ -160,13 +155,27 @@ export const SimpleSpaceMembers = (props: {
     }
   };
 
-  const openRemoveDialog = (did: string) => {
-    setDialogError("");
-    setDialog({ kind: "remove", did });
+  const removeMember = async (did: string) => {
+    if (removing()) return;
+    setRemoving(true);
+    try {
+      await removeSimpleSpaceMember(auth(), props.space, did);
+      setMembers((current) => current.filter((member) => member.did !== did));
+      setConfirmingDid(undefined);
+      addNotification({ message: "Member removed", type: "success", duration: 3000 });
+    } catch (err) {
+      addNotification({
+        message: err instanceof Error ? err.message : "Could not remove the member",
+        type: "error",
+        duration: 5000,
+      });
+    } finally {
+      setRemoving(false);
+    }
   };
 
   const closeDialog = () => {
-    if (!submitting()) setDialog(undefined);
+    if (!submitting()) setAdding(false);
   };
 
   const resolveMemberDid = async () => {
@@ -182,28 +191,22 @@ export const SimpleSpaceMembers = (props: {
   };
 
   const submit = async () => {
-    const current = dialog();
-    if (submitting() || !current) return;
+    if (submitting()) return;
 
     setSubmitting(true);
     setDialogError("");
     try {
-      if (current.kind === "remove") {
-        await removeSimpleSpaceMember(auth(), props.space, current.did);
-        addNotification({ message: "Member removed", type: "success", duration: 3000 });
-      } else {
-        const did = await resolveMemberDid();
-        await putSimpleSpaceMember(auth(), props.space, {
-          did,
-          read: readAccess(),
-          write: writeAccess(),
-        });
-        addNotification({ message: "Member added", type: "success", duration: 3000 });
-      }
-      setDialog(undefined);
+      const did = await resolveMemberDid();
+      await putSimpleSpaceMember(auth(), props.space, {
+        did,
+        read: readAccess(),
+        write: writeAccess(),
+      });
+      addNotification({ message: "Member added", type: "success", duration: 3000 });
+      setAdding(false);
       refreshMembers();
     } catch (err) {
-      setDialogError(err instanceof Error ? err.message : "Could not update the member list");
+      setDialogError(err instanceof Error ? err.message : "Could not add the member");
     } finally {
       setSubmitting(false);
     }
@@ -266,58 +269,98 @@ export const SimpleSpaceMembers = (props: {
                       </A>
                     )}
                   />
-                  {/* A label over a native select, like the Logs tab's event filter: the access
+                  {/* Removing asks on the row itself, in place of the access and remove controls. */}
+                  <Show
+                    when={confirmingDid() === member.did}
+                    fallback={
+                      <>
+                        {/* A label over a native select, like the Logs tab's event filter: the access
                       saves as soon as it's picked, without a dialog. */}
-                  <label
-                    class="relative flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-xs text-neutral-500 transition-colors hover:text-neutral-800 has-[:focus-visible]:outline has-[:focus-visible]:outline-neutral-400 dark:text-neutral-400 dark:hover:text-neutral-200"
-                    onPointerDown={(event) => {
-                      if (hasUserScope(SPACE_MANAGE_SPACES_SCOPE_ID)) return;
-                      event.preventDefault();
-                      showPermissionPrompt(SPACE_MANAGE_SPACES_SCOPE_ID);
-                    }}
+                        <label
+                          class="relative flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-xs text-neutral-500 transition-colors hover:text-neutral-800 has-[:focus-visible]:outline has-[:focus-visible]:outline-neutral-400 dark:text-neutral-400 dark:hover:text-neutral-200"
+                          onPointerDown={(event) => {
+                            if (hasUserScope(SPACE_MANAGE_SPACES_SCOPE_ID)) return;
+                            event.preventDefault();
+                            showPermissionPrompt(SPACE_MANAGE_SPACES_SCOPE_ID);
+                          }}
+                        >
+                          <span aria-hidden="true">
+                            {ACCESS_OPTIONS.find((option) => option.value === accessValue(member))
+                              ?.label ?? "No access"}
+                          </span>
+                          <Show
+                            when={savingDid() === member.did}
+                            fallback={
+                              <span aria-hidden="true" class="iconify lucide--chevron-down" />
+                            }
+                          >
+                            <Spinner />
+                          </Show>
+                          <select
+                            aria-label={`Access for ${member.did}`}
+                            class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                            value={accessValue(member)}
+                            disabled={!!savingDid()}
+                            onChange={(event) => {
+                              const value = event.currentTarget.value;
+                              // Keep showing the saved access until the change goes through.
+                              event.currentTarget.value = accessValue(member);
+                              void changeAccess(member, value);
+                            }}
+                          >
+                            {/* Only for members saved without access before, so the select can show it. */}
+                            <Show when={accessValue(member) === "none"}>
+                              <option value="none" disabled>
+                                No access
+                              </option>
+                            </Show>
+                            <For each={ACCESS_OPTIONS}>
+                              {(option) => <option value={option.value}>{option.label}</option>}
+                            </For>
+                          </select>
+                        </label>
+                        <PermissionButton
+                          scope={SPACE_MANAGE_SPACES_SCOPE_ID}
+                          class="flex shrink-0 items-center rounded p-2 text-neutral-500 hover:text-red-500 dark:text-neutral-400 dark:hover:text-red-400"
+                          disabledClass="flex shrink-0 items-center rounded p-2 opacity-40"
+                          onClick={() => setConfirmingDid(member.did)}
+                        >
+                          <span class="iconify lucide--user-minus" />
+                          <span class="sr-only">Remove {member.did}</span>
+                        </PermissionButton>
+                      </>
+                    }
                   >
-                    <span aria-hidden="true">
-                      {ACCESS_OPTIONS.find((option) => option.value === accessValue(member))
-                        ?.label ?? "No access"}
-                    </span>
-                    <Show
-                      when={savingDid() === member.did}
-                      fallback={<span aria-hidden="true" class="iconify lucide--chevron-down" />}
-                    >
-                      <Spinner />
-                    </Show>
-                    <select
-                      aria-label={`Access for ${member.did}`}
-                      class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                      value={accessValue(member)}
-                      disabled={!!savingDid()}
-                      onChange={(event) => {
-                        const value = event.currentTarget.value;
-                        // Keep showing the saved access until the change goes through.
-                        event.currentTarget.value = accessValue(member);
-                        void changeAccess(member, value);
+                    <div
+                      class="flex shrink-0 items-center gap-1 pr-1 text-xs"
+                      onKeyDown={(event) => {
+                        if (event.key === "Escape" && !removing()) setConfirmingDid(undefined);
                       }}
                     >
-                      {/* Only for members saved without access before, so the select can show it. */}
-                      <Show when={accessValue(member) === "none"}>
-                        <option value="none" disabled>
-                          No access
-                        </option>
-                      </Show>
-                      <For each={ACCESS_OPTIONS}>
-                        {(option) => <option value={option.value}>{option.label}</option>}
-                      </For>
-                    </select>
-                  </label>
-                  <PermissionButton
-                    scope={SPACE_MANAGE_SPACES_SCOPE_ID}
-                    class="flex shrink-0 items-center rounded p-2 text-neutral-500 hover:text-red-500 dark:text-neutral-400 dark:hover:text-red-400"
-                    disabledClass="flex shrink-0 items-center rounded p-2 opacity-40"
-                    onClick={() => openRemoveDialog(member.did)}
-                  >
-                    <span class="iconify lucide--user-minus" />
-                    <span class="sr-only">Remove {member.did}</span>
-                  </PermissionButton>
+                      <span class={`px-1 ${MUTED_CLASS}`}>Remove?</span>
+                      <button
+                        type="button"
+                        // Focused first, so Enter right after clicking the icon doesn't remove.
+                        ref={(el) => queueMicrotask(() => el.focus())}
+                        disabled={removing()}
+                        onClick={() => setConfirmingDid(undefined)}
+                        class="rounded-md px-1.5 py-1 text-neutral-600 transition-colors hover:bg-neutral-300/60 disabled:opacity-40 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        disabled={removing()}
+                        onClick={() => void removeMember(member.did)}
+                        class="flex items-center gap-1 rounded-md px-1.5 py-1 font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-60 dark:text-red-400 dark:hover:bg-red-500/15"
+                      >
+                        <Show when={removing()}>
+                          <Spinner />
+                        </Show>
+                        {removing() ? "Removing…" : "Remove"}
+                      </button>
+                    </div>
+                  </Show>
                 </li>
               )}
             </For>
@@ -348,14 +391,14 @@ export const SimpleSpaceMembers = (props: {
       </Show>
 
       <Modal
-        open={dialog() !== undefined}
+        open={adding()}
         onClose={closeDialog}
         closeOnClick={false}
         alignTop
         contentClass="flex w-[calc(100%-1rem)] max-w-sm flex-col"
       >
         <div class="mb-3 flex items-center justify-between">
-          <h2 class="font-semibold">{removingDid() ? "Remove member?" : "Add member"}</h2>
+          <h2 class="font-semibold">Add member</h2>
           <IconButton icon="lucide--x" label="Close" tooltip={false} onClick={closeDialog} />
         </div>
 
@@ -366,60 +409,46 @@ export const SimpleSpaceMembers = (props: {
             void submit();
           }}
         >
-          <Show
-            when={removingDid()}
-            fallback={
-              <div class="flex flex-col gap-1">
-                <label for="simple-space-member" class="text-sm font-medium">
-                  Handle or DID
-                </label>
-                <TextInput
-                  id="simple-space-member"
-                  class="w-full"
-                  placeholder="alice.example.com"
-                  value={memberIdentifier()}
-                  disabled={submitting()}
-                  onInput={(event) => setMemberIdentifier(event.currentTarget.value)}
-                />
-              </div>
-            }
-          >
-            {(did) => (
-              <p class="text-sm wrap-anywhere text-neutral-600 dark:text-neutral-400">
-                Remove <span class="text-neutral-900 dark:text-neutral-200">{did()}</span> from this
-                Space?
-              </p>
-            )}
-          </Show>
+          <div class="flex flex-col gap-1">
+            <label for="simple-space-member" class="text-sm font-medium">
+              Handle or DID
+            </label>
+            <TextInput
+              id="simple-space-member"
+              class="w-full"
+              placeholder="alice.example.com"
+              value={memberIdentifier()}
+              disabled={submitting()}
+              onInput={(event) => setMemberIdentifier(event.currentTarget.value)}
+            />
+          </div>
 
-          <Show when={!removingDid()}>
-            <fieldset disabled={submitting()} class="flex flex-col gap-2 text-sm">
-              <legend class="mb-2 font-medium">Member access</legend>
-              <label class="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={readAccess()}
-                  onChange={(event) => setReadAccess(event.currentTarget.checked)}
-                />
-                Read
-              </label>
-              <label class="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={writeAccess()}
-                  onChange={(event) => setWriteAccess(event.currentTarget.checked)}
-                />
-                Write
-              </label>
-              {/* Only when one kind of access does nothing in this space. */}
-              <Show when={!props.readUsesMembers || !props.writeUsesMembers}>
-                <p class="text-xs text-neutral-500 dark:text-neutral-400">
-                  {props.readUsesMembers ? "Write" : "Read"} access does nothing here: this space's{" "}
-                  {props.readUsesMembers ? "write" : "read"} policy doesn't use the member list.
-                </p>
-              </Show>
-            </fieldset>
-          </Show>
+          <fieldset disabled={submitting()} class="flex flex-col gap-2 text-sm">
+            <legend class="mb-2 font-medium">Member access</legend>
+            <label class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={readAccess()}
+                onChange={(event) => setReadAccess(event.currentTarget.checked)}
+              />
+              Read
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={writeAccess()}
+                onChange={(event) => setWriteAccess(event.currentTarget.checked)}
+              />
+              Write
+            </label>
+            {/* Only when one kind of access does nothing in this space. */}
+            <Show when={!props.readUsesMembers || !props.writeUsesMembers}>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                {props.readUsesMembers ? "Write" : "Read"} access does nothing here: this space's{" "}
+                {props.readUsesMembers ? "write" : "read"} policy doesn't use the member list.
+              </p>
+            </Show>
+          </fieldset>
 
           <Show when={dialogError()}>
             <div class="text-sm text-red-500 dark:text-red-400">{dialogError()}</div>
@@ -432,19 +461,13 @@ export const SimpleSpaceMembers = (props: {
             <Button
               type="submit"
               // Adding someone with neither kind of access wouldn't let them do anything.
-              disabled={submitting() || (!removingDid() && !readAccess() && !writeAccess())}
-              variant={removingDid() ? "danger" : "primary"}
+              disabled={submitting() || (!readAccess() && !writeAccess())}
+              variant="primary"
             >
               <Show when={submitting()}>
                 <Spinner />
               </Show>
-              {submitting()
-                ? removingDid()
-                  ? "Removing…"
-                  : "Adding…"
-                : removingDid()
-                  ? "Remove"
-                  : "Add"}
+              {submitting() ? "Adding…" : "Add"}
             </Button>
           </div>
         </form>
