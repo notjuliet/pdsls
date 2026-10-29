@@ -14,7 +14,7 @@ import {
 import DidHoverCard from "../../components/hover-card/did";
 import { JSONValue } from "../../components/json";
 import { Button } from "../../components/ui/button";
-import { HEADING_TEXT_CLASS, InfoRow } from "../../components/ui/info";
+import { HEADING_TEXT_CLASS, InfoRow, MUTED_CLASS } from "../../components/ui/info";
 import { TagInput } from "../../components/ui/tag-input";
 import { TextInput } from "../../components/ui/text-input";
 import { addToClipboard } from "../../lib/copy";
@@ -37,6 +37,8 @@ const datetimeLocalToMicros = (dt: string): string => {
   if (!dt) return "";
   return (new Date(dt).getTime() * 1000).toString();
 };
+
+const CONNECTED_LABEL_CLASS = "min-w-24 shrink-0 font-sans";
 
 const TYPE_COLORS: Record<string, string> = {
   create: "text-green-600 dark:text-green-400",
@@ -556,14 +558,19 @@ export const StreamView = () => {
             <div class="flex w-full flex-col gap-4 px-2">
               {/* The instance heads the settings it was connected with. */}
               <div class="flex flex-col gap-0.5">
-                <p class={`mb-0.5 min-w-0 truncate ${HEADING_TEXT_CLASS}`}>
-                  <span class="font-normal text-neutral-500 dark:text-neutral-400">
-                    Connected to{" "}
+                {/* A label column wide enough for "Connected to", so the instance lines up with the values below. */}
+                <p class={`mb-0.5 flex items-baseline gap-1 ${HEADING_TEXT_CLASS}`}>
+                  <span class={`${CONNECTED_LABEL_CLASS} font-normal ${MUTED_CLASS}`}>
+                    Connected to
                   </span>
-                  {connectedInstance()}
+                  <span class="min-w-0 truncate">{connectedInstance()}</span>
                 </p>
                 <For each={parameters().filter((param) => param.value)}>
-                  {(param) => <InfoRow label={param.name}>{param.value}</InfoRow>}
+                  {(param) => (
+                    <InfoRow label={param.name} labelClass={CONNECTED_LABEL_CLASS}>
+                      {param.value}
+                    </InfoRow>
+                  )}
                 </For>
               </div>
               <Show when={shouldShowTopCollections()}>

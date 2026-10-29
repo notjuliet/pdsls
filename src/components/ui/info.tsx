@@ -37,13 +37,15 @@ export const InfoRow = (props: {
   label: string;
   title?: string;
   center?: boolean;
+  /** In place of the label column's class, e.g. to widen it for a longer label above the rows. */
+  labelClass?: string;
   children: JSX.Element;
 }) => (
   <div
     class="flex gap-1 text-sm"
     classList={{ "items-baseline": !props.center, "items-center": props.center }}
   >
-    <span class={`${LABEL_COLUMN_CLASS} ${MUTED_CLASS}`}>{props.label}</span>
+    <span class={`${props.labelClass ?? LABEL_COLUMN_CLASS} ${MUTED_CLASS}`}>{props.label}</span>
     <span class={`min-w-0 wrap-anywhere ${VALUE_CLASS}`} title={props.title}>
       {props.children}
     </span>
