@@ -88,10 +88,10 @@ export const Home = () => {
                     href={example.href}
                     class="flex min-w-0 items-baseline gap-2 rounded-md px-2 py-1 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-1.5 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
                   >
-                    <span class="w-16 shrink-0 text-[10px] font-medium tracking-wide text-neutral-400 uppercase dark:text-neutral-500">
+                    <span class="w-16 shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
                       {example.type}
                     </span>
-                    <span class="truncate text-xs text-neutral-600 dark:text-neutral-300">
+                    <span class="truncate text-xs text-neutral-800 dark:text-neutral-200">
                       {example.value}
                     </span>
                   </A>
@@ -107,10 +107,10 @@ export const Home = () => {
                 {(type) => (
                   <A
                     href={`/streams?type=${type}`}
-                    class="flex min-w-0 flex-col items-center justify-center rounded-md px-1.5 py-1.5 text-xs text-neutral-600 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+                    class="flex min-w-0 flex-col items-center justify-center rounded-md px-1.5 py-1.5 text-xs text-neutral-800 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-200 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
                   >
                     <span class="max-w-full truncate">{STREAM_CONFIGS[type].label}</span>
-                    <span class="max-w-full truncate text-xs text-neutral-400 dark:text-neutral-500">
+                    <span class="max-w-full truncate text-xs text-neutral-500 dark:text-neutral-400">
                       {STREAM_CONFIGS[type].summary}
                     </span>
                   </A>
@@ -124,14 +124,14 @@ export const Home = () => {
             <div class="grid grid-cols-2 gap-1">
               <A
                 href="/account/add"
-                class="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-center text-xs text-neutral-600 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+                class="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-center text-xs text-neutral-800 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-200 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
               >
                 <span class="iconify lucide--user-round-plus shrink-0 text-neutral-500 dark:text-neutral-400" />
                 Add account
               </A>
               <A
                 href="/spaces"
-                class="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-center text-xs text-neutral-600 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+                class="flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-center text-xs text-neutral-800 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-200 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
               >
                 <span class="iconify lucide--lock-keyhole shrink-0 text-neutral-500 dark:text-neutral-400" />
                 Spaces
