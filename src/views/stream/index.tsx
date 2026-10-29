@@ -602,7 +602,7 @@ export const StreamView = () => {
                 <div class="ml-auto">
                   <Button type="submit">
                     <span class="iconify lucide--play" />
-                    Connect
+                    Start
                   </Button>
                 </div>
               </div>
@@ -675,7 +675,7 @@ export const StreamView = () => {
                   onClick={disconnect}
                 >
                   <span class="iconify lucide--square" />
-                  <span class="max-sm:sr-only">Disconnect</span>
+                  <span class="max-sm:sr-only">Stop</span>
                 </Button>
               </div>
             </Show>
