@@ -36,6 +36,7 @@ export const ManageSpaceDialog = (props: {
     const current = editableSettings();
     if (current) setSettings(current);
     setNotice("");
+    setOpenDelete(false);
     setOpen(true);
   };
 
@@ -80,7 +81,7 @@ export const ManageSpaceDialog = (props: {
     setDeleting(true);
     try {
       await deleteSimpleSpace(auth(), props.space);
-      setOpenDelete(false);
+      // Stays on the delete step while the dialog fades out; opening it again starts over.
       setOpen(false);
 
       addNotification({ message: "Space deleted", type: "success", duration: 3000 });
