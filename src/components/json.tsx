@@ -12,9 +12,11 @@ import {
   useContext,
 } from "solid-js";
 
+import type { FieldStep } from "../lib/field-schema";
 import { formatFileSize } from "../lib/format";
 import { hideMedia } from "../views/settings";
 import DidHoverCard from "./hover-card/did";
+import FieldHoverCard from "./hover-card/field";
 import LexiconHoverCard from "./hover-card/lexicon";
 import RecordHoverCard from "./hover-card/record";
 import { Spinner } from "./ui/states.jsx";
@@ -34,6 +36,10 @@ interface JSONContext {
   depth?: number;
   fetchBlob?: (cid: string) => Promise<Blob>;
   blobHref?: (cid: string) => string;
+  /** The record's collection, so hovering a key shows what its lexicon says about the field. */
+  schema?: string;
+  /** The way to the current value from the record's root, for finding it in the lexicon. */
+  steps?: FieldStep[];
 }
 
 const JSONCtx = createContext<JSONContext>();
@@ -140,9 +146,18 @@ const CollapsibleItem = (props: {
   isSize?: boolean;
   isIndex?: boolean;
   parentIsBlob?: boolean;
+  /** The `$type` of the object this key is in, which picks the definition from a union. */
+  objectType?: string;
 }) => {
   const ctx = useJSONCtx();
   const location = useLocation();
+  const steps = (): FieldStep[] => [
+    ...(ctx.steps ?? []),
+    {
+      key: props.isIndex ? Number(String(props.label).slice(1)) : String(props.label),
+      objectType: props.objectType,
+    },
+  ];
   const isObject = () => props.value === Object(props.value);
   const isEmpty = () =>
     Array.isArray(props.value)
@@ -187,6 +202,47 @@ const CollapsibleItem = (props: {
     return `{ ${len} ${len === 1 ? "key" : "keys"} }`;
   };
 
+  // The key itself, which a lexicon's field card opens from when the record's schema is known.
+  const keyLabel = (state: { loading: () => boolean }) => (
+    <Show
+      when={ctx.keyLinks}
+      fallback={
+        <span
+          classList={{
+            "text-indigo-500 dark:text-indigo-400": !props.isIndex,
+            "text-violet-500 dark:text-violet-400": props.isIndex,
+          }}
+        >
+          {props.label}
+          <span class="text-neutral-500 dark:text-neutral-400">:</span>
+        </span>
+      }
+    >
+      <a
+        href={`#record:${fullPath()}`}
+        id={`key-${fullPath()}`}
+        class="group/key rounded"
+        classList={{
+          "hover-card-trigger-loading": state.loading(),
+          "text-indigo-500 hover:text-indigo-700 active:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 dark:active:text-indigo-200":
+            !props.isIndex && !isHighlighted(),
+          "text-violet-500 hover:text-violet-700 active:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 dark:active:text-violet-200":
+            props.isIndex && !isHighlighted(),
+          "bg-indigo-200 text-indigo-700 dark:bg-indigo-500/60 dark:text-indigo-200":
+            isHighlighted() && !props.isIndex,
+          "bg-violet-200 text-violet-700 dark:bg-violet-500/60 dark:text-violet-200":
+            isHighlighted() && props.isIndex,
+        }}
+      >
+        <span class="absolute top-1/2 -left-3.5 flex -translate-y-1/2 items-center text-xs text-neutral-500 opacity-0 transition-opacity group-hover/key:opacity-100 dark:text-neutral-400">
+          <span class="iconify lucide--link"></span>
+        </span>
+        {props.label}
+        <span class="text-neutral-500 dark:text-neutral-400">:</span>
+      </a>
+    </Show>
+  );
+
   return (
     <span
       classList={{
@@ -203,41 +259,20 @@ const CollapsibleItem = (props: {
             props.maxWidth !== undefined && typeof props.value === "boolean",
         }}
       >
-        <Show
-          when={ctx.keyLinks}
-          fallback={
-            <span
-              classList={{
-                "text-indigo-500 dark:text-indigo-400": !props.isIndex,
-                "text-violet-500 dark:text-violet-400": props.isIndex,
-              }}
-            >
-              {props.label}
-              <span class="text-neutral-500 dark:text-neutral-400">:</span>
-            </span>
-          }
-        >
-          <a
-            href={`#record:${fullPath()}`}
-            id={`key-${fullPath()}`}
-            class="group/key rounded"
-            classList={{
-              "text-indigo-500 hover:text-indigo-700 active:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 dark:active:text-indigo-200":
-                !props.isIndex && !isHighlighted(),
-              "text-violet-500 hover:text-violet-700 active:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 dark:active:text-violet-200":
-                props.isIndex && !isHighlighted(),
-              "bg-indigo-200 text-indigo-700 dark:bg-indigo-500/60 dark:text-indigo-200":
-                isHighlighted() && !props.isIndex,
-              "bg-violet-200 text-violet-700 dark:bg-violet-500/60 dark:text-violet-200":
-                isHighlighted() && props.isIndex,
-            }}
-          >
-            <span class="absolute top-1/2 -left-3.5 flex -translate-y-1/2 items-center text-xs text-neutral-500 opacity-0 transition-opacity group-hover/key:opacity-100 dark:text-neutral-400">
-              <span class="iconify lucide--link"></span>
-            </span>
-            {props.label}
-            <span class="text-neutral-500 dark:text-neutral-400">:</span>
-          </a>
+        <Show when={ctx.schema} fallback={keyLabel({ loading: () => false })}>
+          {(collection) => (
+            <FieldHoverCard
+              collection={collection()}
+              steps={steps()}
+              name={props.isIndex ? "item" : String(props.label)}
+              valueType={
+                isObject() && typeof (props.value as { $type?: unknown }).$type === "string"
+                  ? (props.value as { $type: string }).$type
+                  : undefined
+              }
+              renderTrigger={keyLabel}
+            />
+          )}
         </Show>
         <Show when={!show() && summary()}>
           <button
@@ -265,7 +300,13 @@ const CollapsibleItem = (props: {
           </span>
         </Show>
         <JSONCtx.Provider
-          value={{ ...ctx, parentIsBlob: isBlobContext, path: fullPath(), depth: valueDepth() }}
+          value={{
+            ...ctx,
+            parentIsBlob: isBlobContext,
+            path: fullPath(),
+            depth: valueDepth(),
+            steps: steps(),
+          }}
         >
           <Show when={!ctx.preview || show()}>
             <JSONValueInner
@@ -298,6 +339,7 @@ const JSONObject = (props: { data: { [x: string]: JSONType } }) => {
           isLink={key === "$link"}
           isSize={key === "size" && isBlob}
           parentIsBlob={isBlobContext}
+          objectType={typeof props.data.$type === "string" ? props.data.$type : undefined}
         />
       )}
     </For>
@@ -470,6 +512,7 @@ export const JSONValue = (props: {
   preview?: boolean;
   fetchBlob?: (cid: string) => Promise<Blob>;
   blobHref?: (cid: string) => string;
+  schema?: string;
 }) => {
   return (
     <JSONCtx.Provider
@@ -483,6 +526,7 @@ export const JSONValue = (props: {
         preview: props.preview,
         fetchBlob: props.fetchBlob,
         blobHref: props.blobHref,
+        schema: props.schema,
       }}
     >
       <JSONValueInner data={props.data} />

@@ -273,6 +273,7 @@ export const RecordView = () => {
                 repo={record()!.uri.split("/")[2]}
                 pds={repo.pds()}
                 keyLinks
+                schema={params.collection}
               />
             }
             schema={

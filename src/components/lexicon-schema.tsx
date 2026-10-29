@@ -80,12 +80,25 @@ const LocalSchemaLink = (props: { defName: string; class: string; children: JSX.
   </a>
 );
 
-const SchemaRefLink = (props: { refType: string; size?: string; children: JSX.Element }) => {
+const SchemaRefLink = (props: {
+  refType: string;
+  size?: string;
+  /** The color when it isn't a link. */
+  color?: string;
+  children: JSX.Element;
+}) => {
   const context = useLexiconSchemaContext();
   const size = props.size ?? TYPE_SIZE;
 
+  // Not a link here, so colored like any other type rather than blue.
   if (context.inertRefs) {
-    return <span class={`${SCHEMA_REF_TEXT_CLASS} ${size}`}>{props.children}</span>;
+    return (
+      <span
+        class={`font-mono wrap-break-word ${props.color ?? "text-neutral-600 dark:text-neutral-300"} ${size}`}
+      >
+        {props.children}
+      </span>
+    );
   }
 
   if (props.refType.startsWith("#")) {
@@ -166,7 +179,7 @@ interface LexiconPermission {
   inheritAud?: boolean;
 }
 
-interface LexiconDef {
+export interface LexiconDef {
   type: string;
   description?: string;
   key?: string;
@@ -219,7 +232,7 @@ interface LexiconObject {
   nullable?: string[];
 }
 
-interface LexiconProperty {
+export interface LexiconProperty {
   type: string;
   description?: string;
   ref?: string;
@@ -261,22 +274,37 @@ const TypeBadge = (props: {
       when={props.refType}
       fallback={
         <span
-          class={`font-mono ${props.size ?? TYPE_SIZE} ${props.color ?? "text-neutral-600 dark:text-neutral-400"}`}
+          class={`font-mono ${props.size ?? TYPE_SIZE} ${props.color ?? "text-neutral-600 dark:text-neutral-300"}`}
         >
           {displayType}
         </span>
       }
     >
-      <SchemaRefLink refType={props.refType!} size={props.size}>
+      <SchemaRefLink refType={props.refType!} size={props.size} color={props.color}>
         {displayType}
       </SchemaRefLink>
     </Show>
   );
 };
 
-const UnionBadges = (props: { refs: string[] }) => (
+/**
+ * A union's types. With `current`, the one a record's value has, that one comes first in bold,
+ * ahead of the others it could have been.
+ */
+const UnionBadges = (props: { refs: string[]; current?: string }) => (
   <div class="flex flex-col items-start gap-1">
-    <For each={props.refs}>{(refType) => <TypeBadge type="union" refType={refType} />}</For>
+    <Show when={props.current && props.refs.includes(props.current) && props.current}>
+      {(current) => (
+        <TypeBadge
+          type="union"
+          refType={current()}
+          color="font-medium text-neutral-900 dark:text-neutral-100"
+        />
+      )}
+    </Show>
+    <For each={props.refs.filter((refType) => refType !== props.current)}>
+      {(refType) => <TypeBadge type="union" refType={refType} />}
+    </For>
   </div>
 );
 
@@ -357,9 +385,13 @@ const PropertyRow = (props: {
   property: LexiconProperty;
   required?: boolean;
   hideNameType?: boolean;
+  /** In place of the row's vertical padding, e.g. none in a hover card. */
+  class?: string;
+  /** For a union, the type a record's value has, as written in the union's list. */
+  currentType?: string;
 }) => {
   return (
-    <div class="flex flex-col gap-2 py-3">
+    <div class={`flex flex-col gap-2 ${props.class ?? "py-3"}`}>
       <Show when={!props.hideNameType}>
         <div class="flex flex-wrap items-baseline gap-2">
           <span class="font-semibold">{props.name}</span>
@@ -380,7 +412,7 @@ const PropertyRow = (props: {
         </div>
       </Show>
       <Show when={props.property.refs}>
-        <UnionBadges refs={props.property.refs!} />
+        <UnionBadges refs={props.property.refs!} current={props.currentType} />
       </Show>
       <Show when={hasConstraints(props.property)}>
         <ConstraintsList property={props.property} />
@@ -770,6 +802,25 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
     </div>
   );
 };
+
+/** One property as the Schema tab shows it, e.g. for a record's field in a hover card. */
+export const LexiconPropertyView = (props: {
+  name: string;
+  property: LexiconProperty;
+  required?: boolean;
+  /** For a union, the type the record's value has, which is listed first. */
+  currentType?: string;
+}) => (
+  <LexiconSchemaContext.Provider value={{ inertRefs: true }}>
+    <PropertyRow
+      name={props.name}
+      property={props.property}
+      required={props.required}
+      currentType={props.currentType}
+      class=""
+    />
+  </LexiconSchemaContext.Provider>
+);
 
 export const LexiconSchemaView = (props: {
   schema: LexiconSchema;
