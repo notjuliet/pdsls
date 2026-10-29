@@ -13,7 +13,7 @@ const activeClass = "bg-neutral-200 font-medium dark:bg-neutral-600";
 const inactiveClass = "hover:bg-neutral-100 dark:hover:bg-neutral-700";
 
 export const ConfirmSubmit = (props: {
-  isCreate: boolean;
+  allowRecreate: boolean;
   validate: boolean | undefined;
   setValidate: (v: boolean | undefined) => void;
   recreate: boolean;
@@ -47,7 +47,7 @@ export const ConfirmSubmit = (props: {
         </p>
       </div>
 
-      <Show when={!props.isCreate}>
+      <Show when={props.allowRecreate}>
         <div class="flex flex-col gap-1.5">
           <label
             class={`flex items-center gap-2 text-sm ${!hasUserScope("create") ? "opacity-40" : ""}`}
@@ -59,7 +59,8 @@ export const ConfirmSubmit = (props: {
               onChange={(e) => props.setRecreate(e.currentTarget.checked)}
               class="h-3.5 w-3.5 accent-blue-500"
             />
-            Recreate{!hasUserScope("create") ? " (create and edit permission needed)" : ""}
+            Recreate
+            {!hasUserScope("create") ? " (create and edit permission needed)" : ""}
           </label>
           <p class="text-xs text-neutral-500 dark:text-neutral-400">
             Delete the existing record and create a new one with the same record key.

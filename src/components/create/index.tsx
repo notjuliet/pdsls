@@ -1,35 +1,16 @@
 import { Client } from "@atcute/client";
 import { Did } from "@atcute/lexicons";
-import { isNsid, isRecordKey } from "@atcute/lexicons/syntax";
 import { getSession, OAuthUserAgent } from "@atcute/oauth-browser-client";
 import { useNavigate, useParams } from "@solidjs/router";
-import type { EditorView } from "codemirror";
-import {
-  createEffect,
-  createSignal,
-  For,
-  lazy,
-  onCleanup,
-  onMount,
-  Show,
-  Suspense,
-} from "solid-js";
+import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 
 import { hasAccountScope, hasUserScope } from "../../auth/scope-utils";
 import { agent, sessions } from "../../auth/state";
-import { Button } from "../ui/button.jsx";
-import { IconButton } from "../ui/icon-button.jsx";
-import { Modal } from "../ui/modal.jsx";
 import { addNotification } from "../ui/notification.jsx";
 import { iconButtonClass } from "../ui/permission-button.jsx";
 import { showPermissionPrompt } from "../ui/permission-prompt";
-import { Spinner } from "../ui/states.jsx";
-import { TextInput } from "../ui/text-input.jsx";
 import Tooltip from "../ui/tooltip.jsx";
-import { ConfirmSubmit } from "./confirm-submit";
-import { InsertMenu } from "./insert-menu.jsx";
-
-const Editor = lazy(() => import("../ui/editor.jsx").then((m) => ({ default: m.Editor })));
+import { RecordEditorDialog, type RecordWrite } from "./editor-dialog.jsx";
 
 const [placeholder, setPlaceholder] = createSignal<any>();
 export { setPlaceholder };
@@ -45,10 +26,6 @@ export const RecordEditor = (props: {
   const navigate = useNavigate();
   const params = useParams();
   const [openDialog, setOpenDialog] = createSignal(false);
-  const [notice, setNotice] = createSignal("");
-  const [openConfirmDialog, setOpenConfirmDialog] = createSignal(false);
-  const [validate, setValidate] = createSignal<boolean | undefined>(undefined);
-  const [recreate, setRecreate] = createSignal(false);
   const [selectedRepo, setSelectedRepo] = createSignal<Did | undefined>(agent()?.sub);
 
   const hasPermission = () => !props.scope || hasUserScope(props.scope);
@@ -57,12 +34,6 @@ export const RecordEditor = (props: {
     const repo = uploadRepo();
     return repo ? hasAccountScope(repo, "blob") : false;
   };
-  const [isMaximized, setIsMaximized] = createSignal(false);
-  const [isMinimized, setIsMinimized] = createSignal(false);
-  const [collectionError, setCollectionError] = createSignal("");
-  const [rkeyError, setRkeyError] = createSignal("");
-  let editorView: EditorView | undefined;
-  let formRef!: HTMLFormElement;
 
   createEffect(() => {
     setSelectedRepo(agent()?.sub);
@@ -70,9 +41,7 @@ export const RecordEditor = (props: {
 
   const openEditor = () => {
     if (hasPermission()) {
-      setNotice("");
       setOpenDialog(true);
-      setIsMinimized(false);
     } else if (props.scope) {
       showPermissionPrompt(props.scope);
     }
@@ -80,28 +49,7 @@ export const RecordEditor = (props: {
 
   onMount(() => {
     props.registerOpen?.(openEditor);
-
-    const keyEvent = (ev: KeyboardEvent) => {
-      if (ev.target instanceof HTMLInputElement || ev.target instanceof HTMLTextAreaElement) return;
-      if ((ev.target as HTMLElement).closest("[data-modal]")) return;
-
-      const key = props.create ? "n" : "e";
-      if (ev.key === key) {
-        ev.preventDefault();
-
-        if (openDialog() && isMinimized()) {
-          setIsMinimized(false);
-        } else if (!openDialog() && !document.querySelector("[data-modal]")) {
-          setOpenDialog(true);
-        }
-      }
-    };
-
-    window.addEventListener("keydown", keyEvent);
-    onCleanup(() => {
-      window.removeEventListener("keydown", keyEvent);
-      props.registerOpen?.(undefined);
-    });
+    onCleanup(() => props.registerOpen?.(undefined));
   });
 
   const defaultPlaceholder = () => {
@@ -121,44 +69,23 @@ export const RecordEditor = (props: {
     };
   };
 
-  createEffect(() => {
-    if (openDialog()) {
-      setCollectionError("");
-      setRkeyError("");
-      setValidate(undefined);
-      setRecreate(false);
-    }
-  });
-
-  const createRecord = async (validate: boolean | undefined) => {
-    const formData = new FormData(formRef);
-    const repo = formData.get("repo")?.toString();
-    if (!repo) return;
-    const rpc = new Client({ handler: new OAuthUserAgent(await getSession(repo as Did)) });
-    const collection = formData.get("collection");
-    const rkey = formData.get("rkey");
-    let record: any;
-    try {
-      if (!editorView) throw new Error("Editor is still loading");
-      record = JSON.parse(editorView.state.doc.toString());
-    } catch (e: any) {
-      setNotice(e.message);
-      return;
-    }
+  const createRecord = async (write: RecordWrite) => {
+    const repo = selectedRepo();
+    if (!repo) throw new Error("Choose an account to create the record in");
+    const rpc = new Client({
+      handler: new OAuthUserAgent(await getSession(repo)),
+    });
     const res = await rpc.post("com.atproto.repo.createRecord", {
       input: {
-        repo: repo as Did,
-        collection: collection ? collection.toString() : record.$type,
-        rkey: rkey?.toString().length ? rkey?.toString() : undefined,
-        record: record,
-        validate: validate,
+        repo,
+        collection: write.collection as `${string}.${string}.${string}`,
+        rkey: write.rkey,
+        record: write.record,
+        validate: write.validate,
       },
     });
-    if (!res.ok) {
-      setNotice(`${res.data.error}: ${res.data.message}`);
-      return;
-    }
-    setOpenDialog(false);
+    if (!res.ok) throw new Error(`${res.data.error}: ${res.data.message}`);
+
     addNotification({
       message: "Record created",
       type: "success",
@@ -167,52 +94,46 @@ export const RecordEditor = (props: {
     navigate(`/${res.data.uri}`);
   };
 
-  const editRecord = async (validate: boolean | undefined, recreate: boolean) => {
-    const record = editorView?.state.doc.toString();
-    if (!record) return;
+  const editRecord = async (write: RecordWrite) => {
     const rpc = new Client({ handler: agent()! });
-    try {
-      const editedRecord = JSON.parse(record);
-      const collection = params.collection as `${string}.${string}.${string}`;
-      const rkey = params.rkey!;
-      const res = await rpc.post("com.atproto.repo.applyWrites", {
-        input: {
-          repo: agent()!.sub,
-          validate,
-          writes: recreate
-            ? [
-                { $type: "com.atproto.repo.applyWrites#delete", collection, rkey },
-                {
-                  $type: "com.atproto.repo.applyWrites#create",
-                  collection,
-                  rkey,
-                  value: editedRecord,
-                },
-              ]
-            : [
-                {
-                  $type: "com.atproto.repo.applyWrites#update",
-                  collection,
-                  rkey,
-                  value: editedRecord,
-                },
-              ],
-        },
-      });
-      if (!res.ok) {
-        setNotice(`${res.data.error}: ${res.data.message}`);
-        return;
-      }
-      setOpenDialog(false);
-      addNotification({
-        message: "Record edited",
-        type: "success",
-        duration: 3000,
-      });
-      props.refetch();
-    } catch (err: any) {
-      setNotice(err.message);
-    }
+    const collection = write.collection as `${string}.${string}.${string}`;
+    const rkey = write.rkey!;
+    const res = await rpc.post("com.atproto.repo.applyWrites", {
+      input: {
+        repo: agent()!.sub,
+        validate: write.validate,
+        writes: write.recreate
+          ? [
+              {
+                $type: "com.atproto.repo.applyWrites#delete",
+                collection,
+                rkey,
+              },
+              {
+                $type: "com.atproto.repo.applyWrites#create",
+                collection,
+                rkey,
+                value: write.record,
+              },
+            ]
+          : [
+              {
+                $type: "com.atproto.repo.applyWrites#update",
+                collection,
+                rkey,
+                value: write.record,
+              },
+            ],
+      },
+    });
+    if (!res.ok) throw new Error(`${res.data.error}: ${res.data.message}`);
+
+    addNotification({
+      message: "Record edited",
+      type: "success",
+      duration: 3000,
+    });
+    props.refetch();
   };
 
   const triggerButton = () => (
@@ -235,164 +156,42 @@ export const RecordEditor = (props: {
 
   return (
     <>
-      <Modal
+      <RecordEditorDialog
+        mode={props.create ? "create" : "edit"}
         open={openDialog()}
         onClose={() => setOpenDialog(false)}
-        closeOnClick={false}
-        nonBlocking={isMinimized()}
-        alignTop
-        contentClass={`flex flex-col ${isMaximized() ? "w-[calc(100%-1rem)] max-w-7xl h-[85vh]" : "w-[calc(100%-1rem)] max-w-3xl h-[65vh]"} ${isMinimized() ? "hidden" : ""}`}
-      >
-        <div class="mb-2 flex w-full justify-between text-base">
-          <div class="flex items-center gap-2">
-            <span class="font-semibold select-none">
-              {props.create ? "Creating" : "Editing"} record
-            </span>
-          </div>
-          <div class="flex items-center gap-1">
-            <IconButton
-              icon="lucide--minus"
-              label="Minimize"
-              tooltip={false}
-              onClick={() => setIsMinimized(true)}
-            />
-            <IconButton
-              icon={isMaximized() ? "lucide--minimize-2" : "lucide--maximize-2"}
-              label={isMaximized() ? "Restore window" : "Maximize"}
-              tooltip={false}
-              onClick={() => setIsMaximized(!isMaximized())}
-            />
-            <IconButton
-              icon="lucide--x"
-              label="Close"
-              tooltip={false}
-              onClick={() => setOpenDialog(false)}
-            />
-          </div>
-        </div>
-        <form ref={formRef} class="flex min-h-0 flex-1 flex-col gap-y-2">
-          <Show when={props.create}>
-            <div class="flex flex-wrap items-center gap-1 text-sm">
-              <span>at://</span>
-              <select
-                class="dark:bg-dark-100 max-w-40 truncate rounded-md border border-neutral-200 bg-white px-1 py-1 select-none focus:outline-1 focus:outline-neutral-400 dark:border-neutral-600 dark:focus:outline-neutral-400"
-                name="repo"
-                id="repo"
-                value={selectedRepo()}
-                onChange={(e) => setSelectedRepo(e.currentTarget.value as Did)}
-              >
-                <For each={Object.keys(sessions)}>
-                  {(session) => (
-                    <option value={session}>{sessions[session].handle ?? session}</option>
-                  )}
-                </For>
-              </select>
-              <span>/</span>
-              <TextInput
-                id="collection"
-                name="collection"
-                placeholder="Collection (default: $type)"
-                class={`w-40 placeholder:text-xs lg:w-52 ${collectionError() ? "border-red-500 focus:outline-red-500 dark:border-red-400 dark:focus:outline-red-400" : ""}`}
-                onInput={(e) => {
-                  const value = e.currentTarget.value;
-                  if (!value || isNsid(value)) setCollectionError("");
-                  else
-                    setCollectionError(
-                      "Invalid collection: use reverse domain format (e.g. app.bsky.feed.post)",
-                    );
-                }}
-              />
-              <span>/</span>
-              <TextInput
-                id="rkey"
-                name="rkey"
-                placeholder="Record key (default: TID)"
-                class={`w-40 placeholder:text-xs lg:w-52 ${rkeyError() ? "border-red-500 focus:outline-red-500 dark:border-red-400 dark:focus:outline-red-400" : ""}`}
-                onInput={(e) => {
-                  const value = e.currentTarget.value;
-                  if (!value || isRecordKey(value)) setRkeyError("");
-                  else setRkeyError("Invalid record key: 1-512 chars, use a-z A-Z 0-9 . _ ~ : -");
-                }}
-              />
-            </div>
-            <Show when={collectionError() || rkeyError()}>
-              <div class="text-xs text-red-500 dark:text-red-400">
-                <div>{collectionError()}</div>
-                <div>{rkeyError()}</div>
-              </div>
-            </Show>
-          </Show>
-          <div class="min-h-0 flex-1">
-            <Suspense
-              fallback={
-                <div class="flex h-full items-center justify-center">
-                  <Spinner class="text-xl" />
-                </div>
-              }
+        onRequestOpen={openEditor}
+        shortcut={props.create ? "n" : "e"}
+        content={JSON.stringify(
+          !props.create ? props.record : params.rkey ? placeholder() : defaultPlaceholder(),
+          null,
+          2,
+        )}
+        collection={props.create ? undefined : params.collection}
+        rkey={props.create ? undefined : params.rkey}
+        targetPrefix={
+          <>
+            <span>at://</span>
+            <select
+              class="dark:bg-dark-100 max-w-40 truncate rounded-md border border-neutral-200 bg-white px-1 py-1 select-none focus:outline-1 focus:outline-neutral-400 dark:border-neutral-600 dark:focus:outline-neutral-400"
+              name="repo"
+              value={selectedRepo()}
+              onChange={(e) => setSelectedRepo(e.currentTarget.value as Did)}
             >
-              <Editor
-                onReady={(view) => (editorView = view)}
-                content={JSON.stringify(
-                  !props.create ? props.record : params.rkey ? placeholder() : defaultPlaceholder(),
-                  null,
-                  2,
+              <For each={Object.keys(sessions)}>
+                {(session) => (
+                  <option value={session}>{sessions[session].handle ?? session}</option>
                 )}
-              />
-            </Suspense>
-          </div>
-          <div class="flex flex-col gap-2">
-            <Show when={notice()}>
-              <div class="text-sm text-red-500 dark:text-red-400">{notice()}</div>
-            </Show>
-            <div class="flex justify-between gap-2">
-              <InsertMenu
-                editor={() => editorView}
-                repo={uploadRepo()}
-                canUpload={canUploadBlob()}
-                dialogClass="w-[20rem]"
-              />
-              <Modal
-                open={openConfirmDialog()}
-                onClose={() => setOpenConfirmDialog(false)}
-                contentClass="w-[24rem]"
-              >
-                <ConfirmSubmit
-                  isCreate={props.create}
-                  validate={validate()}
-                  setValidate={setValidate}
-                  recreate={recreate()}
-                  setRecreate={setRecreate}
-                  onClose={() => setOpenConfirmDialog(false)}
-                />
-              </Modal>
-              <div class="flex items-center justify-end gap-2">
-                <Button onClick={() => setOpenConfirmDialog(true)}>Advanced</Button>
-                <Button
-                  onClick={() => {
-                    if (props.create) {
-                      createRecord(validate());
-                    } else {
-                      editRecord(validate(), recreate());
-                    }
-                  }}
-                  variant="primary"
-                >
-                  {props.create ? "Create" : "Edit"}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </form>
-      </Modal>
-      <Show when={isMinimized() && openDialog()}>
-        <button
-          class="dark:bg-dark-300 dark:hover:bg-dark-200 dark:active:bg-dark-100 fixed right-4 bottom-4 z-30 flex items-center gap-2 rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 px-3 py-2 shadow-md hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700"
-          onclick={() => setIsMinimized(false)}
-        >
-          <span class="iconify lucide--square-pen text-lg"></span>
-          <span class="text-sm font-medium">{props.create ? "Creating" : "Editing"} record</span>
-        </button>
-      </Show>
+              </For>
+            </select>
+            <span>/</span>
+          </>
+        }
+        uploadRepo={uploadRepo()}
+        canUpload={canUploadBlob()}
+        allowRecreate
+        onSubmit={props.create ? createRecord : editRecord}
+      />
       <Show when={props.showTrigger !== false}>
         <Show
           when={props.create}
