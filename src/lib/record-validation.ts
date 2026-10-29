@@ -1,14 +1,11 @@
-import { Client, simpleFetchHandler } from "@atcute/client";
-import { type DidDocument, getPdsEndpoint } from "@atcute/identity";
 import { lexiconDoc, type LexiconDoc } from "@atcute/lexicon-doc";
 import { RecordValidator } from "@atcute/lexicon-doc/validations";
-import { FailedLexiconResolutionError } from "@atcute/lexicon-resolver";
 import { type Nsid, safeParse } from "@atcute/lexicons";
-import { type AtprotoDid, isNsid } from "@atcute/lexicons/syntax";
+import { isNsid } from "@atcute/lexicons/syntax";
 import type { Issue } from "@atcute/lexicons/validations";
 import * as v from "valibot";
 
-import { didDocumentResolver, resolveLexiconAuthority } from "./api.js";
+import { resolveLexicon } from "./lexicon.js";
 import { lexicons } from "./types/lexicons.js";
 
 interface RecordSchemaValidation {
@@ -56,55 +53,6 @@ export const describeIssue = (issue: Issue): string => {
       return `Larger than ${formatBytes(issue.maxSize)}`;
     case "invalid_blob_mime_type":
       return `Should be ${issue.accept.join(" or ")}`;
-  }
-};
-
-const authorityCache = new Map<string, Promise<AtprotoDid>>();
-const documentCache = new Map<string, Promise<DidDocument>>();
-const schemaCache = new Map<string, Promise<LexiconDoc>>();
-
-const getAuthoritySegment = (nsid: string): string => {
-  const segments = nsid.split(".");
-  return segments.slice(0, -1).join(".");
-};
-
-const resolveSchema = async (authority: AtprotoDid, nsid: Nsid): Promise<LexiconDoc> => {
-  const cacheKey = `${authority}:${nsid}`;
-  const existing = schemaCache.get(cacheKey);
-  if (existing) return existing;
-
-  const pending = (async () => {
-    let document = documentCache.get(authority);
-    if (!document) {
-      document = didDocumentResolver().resolve(authority);
-      documentCache.set(authority, document);
-    }
-
-    const pds = getPdsEndpoint(await document);
-    if (!pds) {
-      throw new FailedLexiconResolutionError(nsid, {
-        cause: new TypeError(`no pds service in did document; did=${authority}`),
-      });
-    }
-
-    const rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
-    const response = await rpc.get("com.atproto.repo.getRecord", {
-      params: {
-        repo: authority,
-        collection: "com.atproto.lexicon.schema",
-        rkey: nsid,
-      },
-    });
-    if (!response.ok) throw new Error(`got http ${response.status}`);
-    return v.parse(lexiconDoc, response.data.value);
-  })();
-
-  schemaCache.set(cacheKey, pending);
-  try {
-    return await pending;
-  } catch (err) {
-    schemaCache.delete(cacheKey);
-    throw err;
   }
 };
 
@@ -156,28 +104,18 @@ const resolveAllLexicons = async (
   }
 
   const pending = (async () => {
-    let authority: AtprotoDid | undefined;
-    const authoritySegment = getAuthoritySegment(nsid);
     try {
-      let resolvedAuthority = authorityCache.get(authoritySegment);
-      if (!resolvedAuthority) {
-        resolvedAuthority = resolveLexiconAuthority(nsid);
-        authorityCache.set(authoritySegment, resolvedAuthority);
-      }
-
-      authority = await resolvedAuthority;
-      const schema = await resolveSchema(authority, nsid);
-      resolved.set(nsid, schema);
+      // The same lexicons the Schema tab and field cards load, so each is fetched once.
+      const { schema } = await resolveLexicon(nsid);
+      resolved.set(nsid, schema.schema);
       await Promise.all(
-        extractRefs(schema).map((ref) =>
+        extractRefs(schema.schema).map((ref) =>
           resolveAllLexicons(ref, depth + 1, resolved, failed, inFlight),
         ),
       );
-    } catch (err) {
-      console.error(`Failed to resolve lexicon ${nsid}:`, err);
+    } catch {
+      // Reported to the user as the lexicon being unavailable, which is common, not as an error.
       failed.add(nsid);
-      authorityCache.delete(authoritySegment);
-      if (authority) documentCache.delete(authority);
     } finally {
       inFlight.delete(nsid);
     }
@@ -232,9 +170,10 @@ export const validateResolvedRecordSchema = async (
   return {
     valid: false,
     error: result.message,
-    // Paths start at the validator's own input, of which the record is `object`.
-    issues: result.issues.map((issue) =>
-      issue.path[0] === "object" ? { ...issue, path: issue.path.slice(1) } : issue,
-    ),
+    // Paths start at the validator's own input: the record is `object`, beside its record `key`.
+    // Only the record's own issues have a field to show on; a bad key is in `error` above.
+    issues: result.issues
+      .filter((issue) => issue.path[0] === "object")
+      .map((issue) => ({ ...issue, path: issue.path.slice(1) })),
   };
 };

@@ -607,7 +607,7 @@ const RecordSubview = (props: {
   );
 
   createEffect(() => {
-    if (props.record.record !== null) schemaValidation.validateLocal(props.record.record);
+    if (props.record.record !== null) void schemaValidation.validate(props.record.record);
     else schemaValidation.reset();
   });
 
@@ -659,7 +659,6 @@ const RecordSubview = (props: {
           uri={`at://${props.archive.did}/${props.collection.name}/${props.record.key}`}
           cid={props.record.cid}
           schema={schemaValidation}
-          value={props.record.record}
         />
       }
     />

@@ -1,6 +1,9 @@
+import type { Nsid } from "@atcute/lexicons";
+import { isNsid } from "@atcute/lexicons/syntax";
 import type { Issue } from "@atcute/lexicons/validations";
 import { createSignal, type JSX, Match, Show, Switch } from "solid-js";
 
+import { resolveLexicon } from "../../lib/lexicon.js";
 import {
   hasKnownRecordSchema,
   validateKnownRecordSchema,
@@ -62,43 +65,54 @@ export const RecordPage = (props: RecordPageProps) => {
   );
 };
 
-/** Schema validation state for a record page: known schemas check locally, others on request. */
+/**
+ * Schema validation state for a record page. Bundled schemas check at once; others are resolved
+ * first, and a record whose lexicon can't be found is left unchecked rather than marked invalid.
+ */
 export const useRecordSchemaValidation = (collection: () => string, rkey: () => string) => {
   const [valid, setValid] = createSignal<boolean>();
   const [error, setError] = createSignal("");
   const [issues, setIssues] = createSignal<readonly Issue[]>([]);
   const [resolving, setResolving] = createSignal(false);
+  /** Why the record couldn't be checked, e.g. its lexicon isn't published. */
+  const [unavailable, setUnavailable] = createSignal("");
+  // Counts checks, so one that finishes after the record changed doesn't overwrite the newer one.
+  let run = 0;
 
   const reset = () => {
+    run++;
     setValid(undefined);
     setError("");
     setIssues([]);
     setResolving(false);
+    setUnavailable("");
   };
 
-  const validateLocal = (value: unknown) => {
-    reset();
-    const result = validateKnownRecordSchema(collection(), value);
-    if (!result) return;
+  const apply = (result: { valid: boolean; error?: string; issues?: readonly Issue[] }) => {
     setValid(result.valid);
     setError(result.error ?? "");
     setIssues(result.issues ?? []);
   };
 
-  const validateRemote = async (value: unknown) => {
+  const validate = async (value: unknown) => {
+    reset();
+    if (hasKnownRecordSchema(collection())) {
+      const result = validateKnownRecordSchema(collection(), value);
+      if (result) apply(result);
+      // Checking needed nothing fetched, but hovering a field will: load its lexicon ahead.
+      if (isNsid(collection())) resolveLexicon(collection() as Nsid).catch(() => {});
+      return;
+    }
+
+    const current = run;
+    setResolving(true);
     try {
-      setResolving(true);
-      setError("");
       const result = await validateResolvedRecordSchema(collection(), rkey(), value);
-      setValid(result.valid);
-      setError(result.error ?? "");
-      setIssues(result.issues ?? []);
+      if (current === run) apply(result);
     } catch (err) {
-      console.error("Schema validation error:", err);
-      setValid(false);
-      setError(err instanceof Error ? err.message : String(err));
+      if (current === run) setUnavailable(err instanceof Error ? err.message : String(err));
     } finally {
-      setResolving(false);
+      if (current === run) setResolving(false);
     }
   };
 
@@ -108,10 +122,9 @@ export const useRecordSchemaValidation = (collection: () => string, rkey: () => 
     /** What's wrong with the record, field by field, once it has been checked. */
     issues,
     resolving,
-    canResolve: () => !hasKnownRecordSchema(collection()),
+    unavailable,
     reset,
-    validateLocal,
-    validateRemote,
+    validate,
   };
 };
 
@@ -119,33 +132,26 @@ export type RecordSchemaValidationState = ReturnType<typeof useRecordSchemaValid
 
 /**
  * A check and its result: a spinner while it runs, then a check or a cross and, if it failed,
- * why. Before it has run, `onCheck` offers to run it in place of "Not checked".
+ * why. `unchecked` says why it couldn't run, e.g. there's no lexicon to check against.
  */
 const CheckRow = (props: {
   label: string;
   valid: boolean | undefined;
   error: string;
   running: boolean;
-  onCheck?: () => void;
+  unchecked?: string;
 }) => (
   <div class="flex flex-col gap-1">
     <InfoRow label={props.label} center>
       <span class="flex items-center">
-        <Switch
-          fallback={
-            <Show when={props.onCheck} fallback={<span class={MUTED_CLASS}>Not checked</span>}>
-              {(onCheck) => (
-                <button
-                  type="button"
-                  class="rounded-md border border-neutral-300 px-1.5 text-xs leading-4.5 transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-                  onClick={() => onCheck()()}
-                >
-                  Resolve and check
-                </button>
-              )}
-            </Show>
-          }
-        >
+        <Switch fallback={<span class={MUTED_CLASS}>Not checked</span>}>
+          <Match when={props.valid === undefined && !props.running && props.unchecked}>
+            {(reason) => (
+              <span class={MUTED_CLASS} title={reason()}>
+                No published lexicon
+              </span>
+            )}
+          </Match>
           <Match when={props.valid === true}>
             <span
               role="img"
@@ -190,7 +196,6 @@ export const RecordInfo = (props: {
   /** Omitted when the source offers no way to verify the record. */
   verification?: { valid: boolean | undefined; error: string };
   schema: RecordSchemaValidationState;
-  value: unknown;
 }) => (
   <div class="flex flex-col gap-4 wrap-anywhere">
     {/* Headed like Identity's DID, so the long values get the full width. */}
@@ -221,11 +226,7 @@ export const RecordInfo = (props: {
           valid={props.schema.valid()}
           error={props.schema.error()}
           running={props.schema.resolving()}
-          onCheck={
-            props.schema.canResolve()
-              ? () => void props.schema.validateRemote(props.value)
-              : undefined
-          }
+          unchecked={props.schema.unavailable()}
         />
       </div>
     </InfoSection>

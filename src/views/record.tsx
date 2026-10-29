@@ -87,7 +87,7 @@ export const RecordView = () => {
     setPlaceholder(res.data.value);
     setExternalLink(checkUri(res.data.uri, res.data.value));
     verifyRecordIntegrity(rpc, collection, rkey);
-    schemaValidation.validateLocal(res.data.value);
+    void schemaValidation.validate(res.data.value);
 
     return res.data;
   };
@@ -307,7 +307,6 @@ export const RecordView = () => {
                 rawHref={`${repo.pds()}/xrpc/com.atproto.repo.getRecord?repo=${params.repo}&collection=${params.collection}&rkey=${params.rkey}`}
                 verification={{ valid: validRecord(), error: verifyError() }}
                 schema={schemaValidation}
-                value={record()!.value}
               />
             }
           />

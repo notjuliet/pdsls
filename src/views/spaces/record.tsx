@@ -66,7 +66,7 @@ export const SpaceRecordView = () => {
 
   const showRecord = (result: GetSpaceRecordResult) => {
     setRecord(result);
-    schemaValidation.validateLocal(result.value);
+    void schemaValidation.validate(result.value);
   };
 
   createEffect(() => {
@@ -238,7 +238,6 @@ export const SpaceRecordView = () => {
                     value.mac ? { valid: validRecord(), error: verifyError() } : undefined
                   }
                   schema={schemaValidation}
-                  value={value.value}
                 />
               }
             />
