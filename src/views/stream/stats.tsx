@@ -10,6 +10,8 @@ export type StreamStats = {
   totalEvents: number;
   eventsPerSecond: number;
   collections: Record<string, number>;
+  /** Events by the type their rows show, e.g. "create". */
+  types: Record<string, number>;
 };
 
 /** Time connected as a clock, e.g. "0:04", "12:30" or "1:02:03". */

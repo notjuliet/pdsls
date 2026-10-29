@@ -23,6 +23,7 @@ import { websocketCloseReasons } from "../../lib/websocket";
 import { getStreamType, isChecked, STREAM_CONFIGS, STREAM_TYPES, StreamType } from "./config";
 import { StreamCounts, StreamStats, TOP_COLLECTION_LIMIT, TopCollections } from "./stats";
 
+/** How many events the list shows, and how many of each type are kept to fill it. */
 const LIMIT = 20;
 
 const microsToDatetimeLocal = (micros: string): string => {
@@ -36,6 +37,14 @@ const microsToDatetimeLocal = (micros: string): string => {
 const datetimeLocalToMicros = (dt: string): string => {
   if (!dt) return "";
   return (new Date(dt).getTime() * 1000).toString();
+};
+
+/** The order types are listed in, wherever they come in; types not listed follow in arrival order. */
+const TYPE_ORDER = ["create", "update", "delete", "tombstone", "identity", "account", "sync"];
+
+const typeRank = (type: string) => {
+  const index = TYPE_ORDER.indexOf(type);
+  return index === -1 ? TYPE_ORDER.length : index;
 };
 
 const CONNECTED_LABEL_CLASS = "min-w-24 shrink-0 font-sans";
@@ -59,15 +68,17 @@ const shortTime = (time: string) => {
   return date === localDateFromTimestamp(Date.now()).split(" ")[0] ? clock : time;
 };
 
+/** An event's type as its row shows it: commits and links by their action, e.g. "create". */
+const displayTypeOf = (streamType: StreamType, record: any) => {
+  const info = STREAM_CONFIGS[streamType].parseRecord(record);
+  return (info.type === "commit" || info.type === "link" ? info.action : info.type) ?? "unknown";
+};
+
 const StreamRecordItem = (props: { record: any; streamType: StreamType }) => {
   const [expanded, setExpanded] = createSignal(false);
   const config = () => STREAM_CONFIGS[props.streamType];
   const info = () => config().parseRecord(props.record);
-
-  const displayType = () => {
-    const i = info();
-    return i.type === "commit" || i.type === "link" ? i.action : i.type;
-  };
+  const displayType = () => displayTypeOf(props.streamType, props.record);
 
   const copyRecord = (e: MouseEvent) => {
     e.stopPropagation();
@@ -91,7 +102,7 @@ const StreamRecordItem = (props: { record: any; streamType: StreamType }) => {
         <div class="flex min-w-0 flex-1 flex-col gap-0.5">
           <div class="flex items-baseline gap-x-1.5 sm:gap-x-2">
             <span
-              class={`shrink-0 font-medium ${TYPE_COLORS[displayType()!] || "text-neutral-500 dark:text-neutral-400"}`}
+              class={`shrink-0 font-medium ${TYPE_COLORS[displayType()] || "text-neutral-500 dark:text-neutral-400"}`}
             >
               {displayType()}
             </span>
@@ -159,19 +170,26 @@ export const StreamView = () => {
     totalEvents: 0,
     eventsPerSecond: 0,
     collections: {},
+    types: {},
   });
+  // Types left out of the list while the stream runs. They still count.
+  const [hiddenTypes, setHiddenTypes] = createSignal<string[]>([]);
   const [currentTime, setCurrentTime] = createSignal(Date.now());
 
   let socket: WebSocket;
   let firehose: Firehose;
   let formRef!: HTMLFormElement;
-  let pendingRecords: any[] = [];
+  // The latest events of each type, so hiding a busy type fills the list with the others at once,
+  // and showing it again brings it straight back. `seq` keeps the arrival order across types.
+  let typeBuffers: Record<string, { record: any; seq: number }[]> = {};
+  let seq = 0;
   let rafId: number | null = null;
   let statsIntervalId: number | null = null;
   let statsUpdateIntervalId: number | null = null;
   let currentSecondEventCount = 0;
   let totalEventsCount = 0;
   let collectionsMap: Record<string, number> = {};
+  let typesMap: Record<string, number> = {};
 
   const shownParameters = () => parameters().filter((param) => param.value);
 
@@ -215,16 +233,40 @@ export const StreamView = () => {
       collectionsMap[collection] = (collectionsMap[collection] || 0) + 1;
     }
 
+    const type = displayTypeOf(streamType(), record);
+    typesMap[type] = (typesMap[type] || 0) + 1;
+
+    // Paused, the buffers hold still too, so filtering works on what was showing.
     if (!paused()) {
-      pendingRecords.push(record);
-      if (rafId === null) {
+      const buffer = (typeBuffers[type] ??= []);
+      buffer.push({ record, seq: seq++ });
+      if (buffer.length > LIMIT) buffer.shift();
+      if (rafId === null && !hiddenTypes().includes(type)) {
         rafId = requestAnimationFrame(() => {
-          setRecords(records().concat(pendingRecords).slice(-LIMIT));
-          pendingRecords = [];
           rafId = null;
+          showLatest();
         });
       }
     }
+  };
+
+  /** Shows the latest events of the types that aren't hidden. */
+  const showLatest = () => {
+    const visible = Object.entries(typeBuffers)
+      .filter(([type]) => !hiddenTypes().includes(type))
+      .flatMap(([, buffer]) => buffer)
+      .sort((a, b) => a.seq - b.seq)
+      .slice(-LIMIT);
+    setRecords(visible.map((entry) => entry.record));
+  };
+
+  const toggleType = (type: string) => {
+    setHiddenTypes(
+      hiddenTypes().includes(type)
+        ? hiddenTypes().filter((t) => t !== type)
+        : [...hiddenTypes(), type],
+    );
+    showLatest();
   };
 
   const disconnect = () => {
@@ -244,10 +286,10 @@ export const StreamView = () => {
       statsUpdateIntervalId = null;
     }
 
-    pendingRecords = [];
     totalEventsCount = 0;
     currentSecondEventCount = 0;
     collectionsMap = {};
+    typesMap = {};
     setConnected(false);
     setPaused(false);
     setStats((prev) => ({ ...prev, eventsPerSecond: 0 }));
@@ -303,12 +345,16 @@ export const StreamView = () => {
 
     totalEventsCount = 0;
     collectionsMap = {};
+    typesMap = {};
+    typeBuffers = {};
+    setHiddenTypes([]);
 
     setStats({
       connectedAt: now,
       totalEvents: 0,
       eventsPerSecond: 0,
       collections: {},
+      types: {},
     });
 
     statsUpdateIntervalId = window.setInterval(() => {
@@ -316,6 +362,7 @@ export const StreamView = () => {
         ...prev,
         totalEvents: totalEventsCount,
         collections: { ...collectionsMap },
+        types: { ...typesMap },
       }));
     }, 50);
 
@@ -405,6 +452,8 @@ export const StreamView = () => {
       () => {
         if (connected()) disconnect();
         setRecords([]);
+        typeBuffers = {};
+        setHiddenTypes([]);
         setNotice("");
       },
       { defer: true },
@@ -627,6 +676,39 @@ export const StreamView = () => {
               </div>
             </Show>
           </div>
+          {/* Hides or shows a type in the list as events come in, always in the same order. The row
+              keeps its height before the first event, so the list doesn't shift down. */}
+          <Show when={connected()}>
+            <div class="flex min-h-5.5 flex-wrap gap-1.5">
+              {/* Keyed by type, so a chip stays put as its count updates. */}
+              <For each={Object.keys(stats().types).sort((a, b) => typeRank(a) - typeRank(b))}>
+                {(type) => {
+                  const hidden = () => hiddenTypes().includes(type);
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => toggleType(type)}
+                      aria-pressed={!hidden()}
+                      title={hidden() ? `Show ${type} events` : `Hide ${type} events`}
+                      class="flex items-center gap-1.5 rounded-full border border-neutral-200 px-2 py-0.5 text-xs transition-colors hover:bg-neutral-200/50 dark:border-neutral-700/60 dark:hover:bg-neutral-800"
+                      classList={{ "opacity-40": hidden() }}
+                    >
+                      {/* Only the type is struck through: its count still goes up while it's hidden. */}
+                      <span
+                        class={`font-medium ${TYPE_COLORS[type] || "text-neutral-500 dark:text-neutral-400"}`}
+                        classList={{ "line-through": hidden() }}
+                      >
+                        {type}
+                      </span>
+                      <span class="text-neutral-500 tabular-nums dark:text-neutral-400">
+                        {stats().types[type].toLocaleString()}
+                      </span>
+                    </button>
+                  );
+                }}
+              </For>
+            </div>
+          </Show>
           <Show
             when={records().length > 0}
             fallback={
