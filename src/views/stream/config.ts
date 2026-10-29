@@ -29,7 +29,7 @@ type StreamConfig = {
   description: string;
   defaultInstance: string;
   fields: FormField[];
-  useFirehoseLib: boolean;
+  cborFrames: boolean;
   buildUrl: (instance: string, formData: FormData) => string;
   parseRecord: (record: any) => RecordInfo;
   collectionsLabel: string;
@@ -68,7 +68,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
     summary: "Simplified events",
     description: "A simplified event stream with support for collection and DID filtering.",
     defaultInstance: "wss://jetstream1.us-east.bsky.network/subscribe",
-    useFirehoseLib: false,
+    cborFrames: false,
     collectionsLabel: "Top collections",
     eventTypes: (formData) =>
       formData.get("allEvents") === "on"
@@ -136,7 +136,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
     summary: "Raw events",
     description: "The raw event stream from a relay or PDS.",
     defaultInstance: "wss://bsky.network",
-    useFirehoseLib: true,
+    cborFrames: true,
     collectionsLabel: "Top collections",
     eventTypes: () => ["create", "update", "delete", "identity", "account", "sync"],
     fields: [
@@ -172,7 +172,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
     summary: "Backlinks",
     description: "A stream of links showing interactions across the network.",
     defaultInstance: "wss://spacedust.microcosm.blue/subscribe",
-    useFirehoseLib: false,
+    cborFrames: false,
     collectionsLabel: "Top sources",
     // Spacedust drops deletes for now, so links only ever come in as creates.
     eventTypes: () => ["create"],
@@ -251,7 +251,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
     summary: "Operations",
     description: "The stream of did:plc operations from the PLC directory.",
     defaultInstance: "wss://plc.directory/export/stream",
-    useFirehoseLib: false,
+    cborFrames: false,
     collectionsLabel: "Top PDSes",
     eventTypes: () => ["create", "update", "tombstone"],
     fields: [

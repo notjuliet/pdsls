@@ -1,4 +1,3 @@
-import { Firehose } from "@skyware/firehose";
 import { A, useLocation, useNavigate, useSearchParams } from "@solidjs/router";
 import {
   createEffect,
@@ -21,6 +20,7 @@ import { addToClipboard } from "../../lib/copy";
 import { localDateFromTimestamp } from "../../lib/format";
 import { websocketCloseReasons } from "../../lib/websocket";
 import { getStreamType, isChecked, STREAM_CONFIGS, STREAM_TYPES, StreamType } from "./config";
+import { decodeFirehoseFrame } from "./firehose";
 import { StreamCounts, StreamStats, TOP_COLLECTION_LIMIT, TopCollections } from "./stats";
 
 /** How many events the list shows, and how many of each type are kept to fill it. */
@@ -177,7 +177,6 @@ export const StreamView = () => {
   const [currentTime, setCurrentTime] = createSignal(Date.now());
 
   let socket: WebSocket;
-  let firehose: Firehose;
   let formRef!: HTMLFormElement;
   // The latest events of each type, so hiding a busy type fills the list with the others at once,
   // and showing it again brings it straight back. `seq` keeps the arrival order across types.
@@ -271,7 +270,6 @@ export const StreamView = () => {
 
   const disconnect = () => {
     socket?.close();
-    firehose?.close();
 
     if (rafId !== null) {
       cancelAnimationFrame(rafId);
@@ -376,7 +374,13 @@ export const StreamView = () => {
       setCurrentTime(Date.now());
     }, 1000);
 
-    if (!config().useFirehoseLib) {
+    const onConnectionError = (message: string) => {
+      socket.removeEventListener("close", onWebsocketClose);
+      setNotice(message);
+      disconnect();
+    };
+
+    if (!config().cborFrames) {
       socket = new WebSocket(url);
       socket.addEventListener("message", (event) => {
         const rec = JSON.parse(event.data);
@@ -385,53 +389,24 @@ export const StreamView = () => {
         if (!isFilteredEvent || streamType() !== "jetstream" || searchParams.allEvents === "on")
           addRecord(rec);
       });
-      socket.addEventListener("close", onWebsocketClose);
-      socket.addEventListener("error", () => {
-        socket.removeEventListener("close", onWebsocketClose);
-        setNotice("Connection error");
-        disconnect();
-      });
     } else {
       const cursor = formData.get("cursor")?.toString();
-      firehose = new Firehose({
-        relay: url,
-        cursor: cursor,
-        autoReconnect: false,
-      });
-      firehose.ws.addEventListener("close", onWebsocketClose);
-      firehose.on("error", (err) => {
-        firehose.ws.removeEventListener("close", onWebsocketClose);
-        console.error(err);
-        const message = err instanceof Error ? err.message : "Unknown error";
-        setNotice(`Connection error: ${message}`);
-        disconnect();
-      });
-      firehose.on("commit", (commit) => {
-        for (const op of commit.ops) {
-          addRecord({
-            $type: commit.$type,
-            repo: commit.repo,
-            seq: commit.seq,
-            time: commit.time,
-            rev: commit.rev,
-            since: commit.since,
-            op: op,
-          });
+      const query = cursor ? `?cursor=${encodeURIComponent(cursor)}` : "";
+      socket = new WebSocket(`${url}/xrpc/com.atproto.sync.subscribeRepos${query}`);
+      socket.binaryType = "arraybuffer";
+      socket.addEventListener("message", (event) => {
+        try {
+          decodeFirehoseFrame(new Uint8Array(event.data)).forEach(addRecord);
+        } catch (err) {
+          console.error(err);
+          onConnectionError(
+            `Connection error: ${err instanceof Error ? err.message : "Unknown error"}`,
+          );
         }
       });
-      firehose.on("identity", (identity) => addRecord(identity));
-      firehose.on("account", (account) => addRecord(account));
-      firehose.on("sync", (sync) => {
-        addRecord({
-          $type: sync.$type,
-          did: sync.did,
-          rev: sync.rev,
-          seq: sync.seq,
-          time: sync.time,
-        });
-      });
-      firehose.start();
     }
+    socket.addEventListener("close", onWebsocketClose);
+    socket.addEventListener("error", () => onConnectionError("Connection error"));
   };
 
   onMount(() => {
@@ -466,7 +441,6 @@ export const StreamView = () => {
 
   onCleanup(() => {
     socket?.close();
-    firehose?.close();
     if (rafId !== null) cancelAnimationFrame(rafId);
     if (statsIntervalId !== null) clearInterval(statsIntervalId);
     if (statsUpdateIntervalId !== null) clearInterval(statsUpdateIntervalId);
