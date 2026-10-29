@@ -217,6 +217,7 @@ export const SpaceRecordView = () => {
                     )
                   }
                   schema={params.collection}
+                  issues={schemaValidation.issues()}
                 />
               }
               schema={

@@ -407,7 +407,7 @@ const PropertyRow = (props: {
             <TypeBadge type="union" size="text-sm" />
           </Show>
           <Show when={props.required}>
-            <span class="text-sm text-red-500 dark:text-red-400">required</span>
+            <span class="text-sm text-amber-600 dark:text-amber-500">required</span>
           </Show>
         </div>
       </Show>

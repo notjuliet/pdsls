@@ -1,3 +1,4 @@
+import type { Issue } from "@atcute/lexicons/validations";
 import { createSignal, type JSX, Match, Show, Switch } from "solid-js";
 
 import {
@@ -65,11 +66,13 @@ export const RecordPage = (props: RecordPageProps) => {
 export const useRecordSchemaValidation = (collection: () => string, rkey: () => string) => {
   const [valid, setValid] = createSignal<boolean>();
   const [error, setError] = createSignal("");
+  const [issues, setIssues] = createSignal<readonly Issue[]>([]);
   const [resolving, setResolving] = createSignal(false);
 
   const reset = () => {
     setValid(undefined);
     setError("");
+    setIssues([]);
     setResolving(false);
   };
 
@@ -79,14 +82,17 @@ export const useRecordSchemaValidation = (collection: () => string, rkey: () => 
     if (!result) return;
     setValid(result.valid);
     setError(result.error ?? "");
+    setIssues(result.issues ?? []);
   };
 
   const validateRemote = async (value: unknown) => {
     try {
       setResolving(true);
       setError("");
-      await validateResolvedRecordSchema(collection(), rkey(), value);
-      setValid(true);
+      const result = await validateResolvedRecordSchema(collection(), rkey(), value);
+      setValid(result.valid);
+      setError(result.error ?? "");
+      setIssues(result.issues ?? []);
     } catch (err) {
       console.error("Schema validation error:", err);
       setValid(false);
@@ -99,6 +105,8 @@ export const useRecordSchemaValidation = (collection: () => string, rkey: () => 
   return {
     valid,
     error,
+    /** What's wrong with the record, field by field, once it has been checked. */
+    issues,
     resolving,
     canResolve: () => !hasKnownRecordSchema(collection()),
     reset,

@@ -3,8 +3,9 @@ import { type DidDocument, getPdsEndpoint } from "@atcute/identity";
 import { lexiconDoc, type LexiconDoc } from "@atcute/lexicon-doc";
 import { RecordValidator } from "@atcute/lexicon-doc/validations";
 import { FailedLexiconResolutionError } from "@atcute/lexicon-resolver";
-import { is, type Nsid } from "@atcute/lexicons";
+import { type Nsid, safeParse } from "@atcute/lexicons";
 import { type AtprotoDid, isNsid } from "@atcute/lexicons/syntax";
+import type { Issue } from "@atcute/lexicons/validations";
 import * as v from "valibot";
 
 import { didDocumentResolver, resolveLexiconAuthority } from "./api.js";
@@ -13,7 +14,50 @@ import { lexicons } from "./types/lexicons.js";
 interface RecordSchemaValidation {
   valid: boolean;
   error?: string;
+  /** Each problem, with the path to the field it's on. */
+  issues?: readonly Issue[];
 }
+
+const formatBytes = (bytes: number) =>
+  bytes >= 1_000_000 ? `${+(bytes / 1_000_000).toFixed(1)} MB` : `${+(bytes / 1000).toFixed(1)} kB`;
+
+/** A limit with either end open, e.g. "at most 300", or "between 1 and 300". */
+const range = (min: number, max: number, unit: string) =>
+  min > 0 && Number.isFinite(max)
+    ? `between ${min} and ${max} ${unit}`
+    : min > 0
+      ? `at least ${min} ${unit}`
+      : `at most ${max} ${unit}`;
+
+/** What's wrong with a field, as a short sentence. */
+export const describeIssue = (issue: Issue): string => {
+  switch (issue.code) {
+    case "missing_value":
+      return `Missing required field ${issue.path.at(-1)}`;
+    case "invalid_type":
+      return `Should be ${issue.expected}`;
+    case "invalid_literal":
+      return `Should be ${issue.expected.map((value) => JSON.stringify(value)).join(" or ")}`;
+    case "invalid_variant":
+      return `Should be one of ${issue.expected.join(", ")}`;
+    case "invalid_integer_range":
+      return `Should be ${range(issue.min, issue.max, "").trim()}`;
+    case "invalid_string_format":
+      return `Not a valid ${issue.expected}`;
+    case "invalid_string_graphemes":
+      return `Should be ${range(issue.minGraphemes, issue.maxGraphemes, "graphemes")}`;
+    case "invalid_string_length":
+      return `Should be ${range(issue.minLength, issue.maxLength, "bytes")}`;
+    case "invalid_array_length":
+      return `Should have ${range(issue.minLength, issue.maxLength, "items")}`;
+    case "invalid_bytes_size":
+      return `Should be ${range(issue.minSize, issue.maxSize, "bytes")}`;
+    case "invalid_blob_size":
+      return `Larger than ${formatBytes(issue.maxSize)}`;
+    case "invalid_blob_mime_type":
+      return `Should be ${issue.accept.join(" or ")}`;
+  }
+};
 
 const authorityCache = new Map<string, Promise<AtprotoDid>>();
 const documentCache = new Map<string, Promise<DidDocument>>();
@@ -159,16 +203,22 @@ export const validateKnownRecordSchema = (
   }
 
   if (!(collection in lexicons)) return;
-  return is(lexicons[collection], value)
+  const result = safeParse(lexicons[collection], value);
+  return result.ok
     ? { valid: true }
-    : { valid: false, error: "Record does not match the bundled Lexicon schema" };
+    : {
+        valid: false,
+        error: "Record does not match the bundled Lexicon schema",
+        issues: result.issues,
+      };
 };
 
+/** Checks a record against its published lexicons; throws only when they can't be resolved. */
 export const validateResolvedRecordSchema = async (
   collection: string,
   rkey: string,
   value: unknown,
-): Promise<void> => {
+): Promise<RecordSchemaValidation> => {
   if (!isNsid(collection)) throw new Error("Collection is not a valid NSID");
 
   const { resolved, failed } = await resolveAllLexicons(collection);
@@ -177,5 +227,14 @@ export const validateResolvedRecordSchema = async (
   }
 
   const validator = new RecordValidator(Object.fromEntries(resolved), collection);
-  validator.parse({ key: rkey || null, object: value });
+  const result = validator.try({ key: rkey || null, object: value });
+  if (result.ok) return { valid: true };
+  return {
+    valid: false,
+    error: result.message,
+    // Paths start at the validator's own input, of which the record is `object`.
+    issues: result.issues.map((issue) =>
+      issue.path[0] === "object" ? { ...issue, path: issue.path.slice(1) } : issue,
+    ),
+  };
 };

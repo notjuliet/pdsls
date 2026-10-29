@@ -640,6 +640,7 @@ const RecordSubview = (props: {
             newTab
             hideBlobs
             schema={props.collection.name}
+            issues={schemaValidation.issues()}
           />
         </Show>
       }

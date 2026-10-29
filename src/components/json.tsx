@@ -1,8 +1,11 @@
 import { isCid, isDid, isNsid, isResourceUri } from "@atcute/lexicons/syntax";
+import type { Issue } from "@atcute/lexicons/validations";
 import { A, useLocation, useParams } from "@solidjs/router";
 import {
+  type Accessor,
   createContext,
   createEffect,
+  createMemo,
   createResource,
   createSignal,
   ErrorBoundary,
@@ -14,6 +17,7 @@ import {
 
 import type { FieldStep } from "../lib/field-schema";
 import { formatFileSize } from "../lib/format";
+import { describeIssue } from "../lib/record-validation";
 import { hideMedia } from "../views/settings";
 import DidHoverCard from "./hover-card/did";
 import FieldHoverCard from "./hover-card/field";
@@ -40,9 +44,32 @@ interface JSONContext {
   schema?: string;
   /** The way to the current value from the record's root, for finding it in the lexicon. */
   steps?: FieldStep[];
+  /** What validation found wrong, by the path of the field it's on, e.g. `embed.images.0.alt`. */
+  issues?: Accessor<Map<string, string[]>>;
 }
 
+/**
+ * Validation issues by field. A missing field has no key of its own to mark, so it's reported
+ * on the object it's missing from.
+ */
+const issuesByField = (issues: readonly Issue[] = []) => {
+  const byField = new Map<string, string[]>();
+  for (const issue of issues) {
+    const path = issue.code === "missing_value" ? issue.path.slice(0, -1) : issue.path;
+    const key = path.join(".");
+    byField.set(key, [...(byField.get(key) ?? []), describeIssue(issue)]);
+  }
+  return byField;
+};
+
 const JSONCtx = createContext<JSONContext>();
+
+/**
+ * A key whose field failed validation: its name underlined, not the colon after it, so it stands
+ * out without recoloring it. The wave runs unbroken under letters like "y" that dip below it.
+ */
+const INVALID_KEY_CLASS =
+  "underline decoration-red-500 decoration-wavy underline-offset-2 [text-decoration-skip-ink:none] dark:decoration-red-400";
 const useJSONCtx = () => useContext(JSONCtx)!;
 
 const PREVIEW_EXPANDED_DEPTH = 2;
@@ -151,6 +178,7 @@ const CollapsibleItem = (props: {
 }) => {
   const ctx = useJSONCtx();
   const location = useLocation();
+  const fieldIssues = () => ctx.issues?.().get(fullPath());
   const steps = (): FieldStep[] => [
     ...(ctx.steps ?? []),
     {
@@ -213,7 +241,7 @@ const CollapsibleItem = (props: {
             "text-violet-500 dark:text-violet-400": props.isIndex,
           }}
         >
-          {props.label}
+          <span classList={{ [INVALID_KEY_CLASS]: !!fieldIssues() }}>{props.label}</span>
           <span class="text-neutral-500 dark:text-neutral-400">:</span>
         </span>
       }
@@ -237,7 +265,7 @@ const CollapsibleItem = (props: {
         <span class="absolute top-1/2 -left-3.5 flex -translate-y-1/2 items-center text-xs text-neutral-500 opacity-0 transition-opacity group-hover/key:opacity-100 dark:text-neutral-400">
           <span class="iconify lucide--link"></span>
         </span>
-        {props.label}
+        <span classList={{ [INVALID_KEY_CLASS]: !!fieldIssues() }}>{props.label}</span>
         <span class="text-neutral-500 dark:text-neutral-400">:</span>
       </a>
     </Show>
@@ -275,6 +303,7 @@ const CollapsibleItem = (props: {
                   ? Object.keys(props.value as object)
                   : undefined
               }
+              issues={fieldIssues()}
               renderTrigger={keyLabel}
             />
           )}
@@ -518,7 +547,10 @@ export const JSONValue = (props: {
   fetchBlob?: (cid: string) => Promise<Blob>;
   blobHref?: (cid: string) => string;
   schema?: string;
+  /** What validation found wrong, marked on the fields it's on. */
+  issues?: readonly Issue[];
 }) => {
+  const issues = createMemo(() => issuesByField(props.issues));
   return (
     <JSONCtx.Provider
       value={{
@@ -532,6 +564,7 @@ export const JSONValue = (props: {
         fetchBlob: props.fetchBlob,
         blobHref: props.blobHref,
         schema: props.schema,
+        issues,
       }}
     >
       <JSONValueInner data={props.data} />

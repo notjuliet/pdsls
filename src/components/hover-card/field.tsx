@@ -20,6 +20,8 @@ const FieldHoverCard = (props: {
   valueType?: string;
   /** For an object value, the fields it has, so the ones it leaves out stand apart. */
   presentKeys?: string[];
+  /** What validation found wrong with the field, shown above what the lexicon says. */
+  issues?: string[];
   renderTrigger: HoverTriggerRenderer;
 }) => {
   // Wrapped, so a field the lexicon can't describe still counts as loaded.
@@ -38,18 +40,42 @@ const FieldHoverCard = (props: {
       previewClass="w-max max-w-sm font-sans text-base"
       // Nothing in it to click, so the mouse goes through to the JSON it covers.
       passThroughWhenCovering
-      showPreview={!!preview.state().data?.field}
+      // A field with issues has a card even when its lexicon can't be described, once that's known.
+      showPreview={
+        !!preview.state().data?.field ||
+        (!!props.issues?.length && !!(preview.state().data || preview.state().error))
+      }
     >
-      <Show when={preview.state().data?.field}>
-        {(field) => (
-          <FieldSchemaView
-            name={props.name}
-            field={field()}
-            valueType={props.valueType}
-            presentKeys={props.presentKeys}
-          />
-        )}
-      </Show>
+      <div class="flex flex-col gap-2">
+        <Show when={props.issues?.length}>
+          <ul
+            class="flex flex-col gap-0.5 text-sm text-red-600 dark:text-red-400"
+            classList={{
+              "border-b border-neutral-200 pb-2 dark:border-neutral-700":
+                !!preview.state().data?.field,
+            }}
+          >
+            <For each={props.issues}>
+              {(issue) => (
+                <li class="flex items-baseline gap-1.5">
+                  <span class="iconify lucide--circle-alert shrink-0 translate-y-0.5" />
+                  {issue}
+                </li>
+              )}
+            </For>
+          </ul>
+        </Show>
+        <Show when={preview.state().data?.field}>
+          {(field) => (
+            <FieldSchemaView
+              name={props.name}
+              field={field()}
+              valueType={props.valueType}
+              presentKeys={props.presentKeys}
+            />
+          )}
+        </Show>
+      </div>
     </HoverCard>
   );
 };
@@ -122,7 +148,7 @@ const FieldSchemaView = (props: {
               >
                 {property.name}
                 <Show when={property.required}>
-                  <span class="text-red-500 dark:text-red-400">*</span>
+                  <span class="text-amber-600 dark:text-amber-500">*</span>
                 </Show>
               </span>
             )}

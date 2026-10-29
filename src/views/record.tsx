@@ -274,6 +274,7 @@ export const RecordView = () => {
                 pds={repo.pds()}
                 keyLinks
                 schema={params.collection}
+                issues={schemaValidation.issues()}
               />
             }
             schema={
