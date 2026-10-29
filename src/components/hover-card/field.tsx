@@ -36,6 +36,8 @@ const FieldHoverCard = (props: {
       class="inline-flex"
       // The page's size, as on the Schema tab, so the field's name stays larger than its type.
       previewClass="w-max max-w-sm font-sans text-base"
+      // Nothing in it to click, so the mouse goes through to the JSON it covers.
+      passThroughWhenCovering
       showPreview={!!preview.state().data?.field}
     >
       <Show when={preview.state().data?.field}>
