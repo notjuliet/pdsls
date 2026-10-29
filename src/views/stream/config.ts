@@ -35,6 +35,11 @@ type StreamConfig = {
   collectionsLabel: string;
   /** What the top list counts an event under, when it isn't the event's collection. */
   topKey?: (record: any) => string | undefined;
+  /**
+   * The types the stream can send, as its rows show them, given the form it was connected with.
+   * They get filter chips from the start; a type not listed gets one when it first comes in.
+   */
+  eventTypes: (formData: FormData) => string[];
   /** Whether to show an event, given the form it was connected with. */
   filter?: (record: any, formData: FormData) => boolean;
 };
@@ -65,6 +70,10 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
     defaultInstance: "wss://jetstream1.us-east.bsky.network/subscribe",
     useFirehoseLib: false,
     collectionsLabel: "Top collections",
+    eventTypes: (formData) =>
+      formData.get("allEvents") === "on"
+        ? ["create", "update", "delete", "identity", "account"]
+        : ["create", "update", "delete"],
     fields: [
       {
         name: "collections",
@@ -129,6 +138,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
     defaultInstance: "wss://bsky.network",
     useFirehoseLib: true,
     collectionsLabel: "Top collections",
+    eventTypes: () => ["create", "update", "delete", "identity", "account", "sync"],
     fields: [
       {
         name: "cursor",
@@ -164,6 +174,8 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
     defaultInstance: "wss://spacedust.microcosm.blue/subscribe",
     useFirehoseLib: false,
     collectionsLabel: "Top sources",
+    // Spacedust drops deletes for now, so links only ever come in as creates.
+    eventTypes: () => ["create"],
     fields: [
       {
         name: "sources",
@@ -241,6 +253,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
     defaultInstance: "wss://plc.directory/export/stream",
     useFirehoseLib: false,
     collectionsLabel: "Top PDSes",
+    eventTypes: () => ["create", "update", "tombstone"],
     fields: [
       {
         name: "cursor",

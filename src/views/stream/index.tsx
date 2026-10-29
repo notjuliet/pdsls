@@ -345,7 +345,11 @@ export const StreamView = () => {
 
     totalEventsCount = 0;
     collectionsMap = {};
-    typesMap = {};
+    typesMap = Object.fromEntries(
+      config()
+        .eventTypes(formData)
+        .map((type) => [type, 0]),
+    );
     typeBuffers = {};
     setHiddenTypes([]);
 
@@ -354,7 +358,7 @@ export const StreamView = () => {
       totalEvents: 0,
       eventsPerSecond: 0,
       collections: {},
-      types: {},
+      types: { ...typesMap },
     });
 
     statsUpdateIntervalId = window.setInterval(() => {
@@ -676,10 +680,11 @@ export const StreamView = () => {
               </div>
             </Show>
           </div>
-          {/* Hides or shows a type in the list as events come in, always in the same order. The row
-              keeps its height before the first event, so the list doesn't shift down. */}
-          <Show when={connected()}>
-            <div class="flex min-h-5.5 flex-wrap gap-1.5">
+          {/* Hides or shows a type in the list, always in the same order. Every type the stream can
+              send is there from the start, so nothing moves as events come in, and the chips stay
+              after disconnecting to filter what's left. One type alone has nothing to filter. */}
+          <Show when={Object.keys(stats().types).length > 1}>
+            <div class="flex flex-wrap gap-1.5">
               {/* Keyed by type, so a chip stays put as its count updates. */}
               <For each={Object.keys(stats().types).sort((a, b) => typeRank(a) - typeRank(b))}>
                 {(type) => {
