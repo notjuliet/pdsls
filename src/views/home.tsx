@@ -1,6 +1,8 @@
 import { A } from "@solidjs/router";
 import { For, JSX } from "solid-js";
 
+import { STREAM_CONFIGS, STREAM_TYPES } from "./stream/config";
+
 const repositoryExamples = [
   {
     type: "Repo",
@@ -31,24 +33,6 @@ const repositoryExamples = [
     type: "Backlinks",
     value: "microcosm.blue",
     href: "/at://did:plc:lulmyldiq4sb2ikags5sfb25#backlinks",
-  },
-];
-
-const streamLinks = [
-  {
-    label: "Jetstream",
-    icon: "lucide--radio-tower",
-    href: "/streams?type=jetstream",
-  },
-  {
-    label: "Firehose",
-    icon: "lucide--rss",
-    href: "/streams?type=firehose",
-  },
-  {
-    label: "Spacedust",
-    icon: "lucide--sparkles",
-    href: "/streams?type=spacedust",
   },
 ];
 
@@ -118,17 +102,17 @@ export const Home = () => {
 
           <div class="mt-3 rounded-lg border border-neutral-200 p-2 sm:p-3 dark:border-neutral-700">
             <h2 class="px-2 py-1 text-sm font-medium sm:text-base">Stream</h2>
-            <div class="grid grid-cols-3 gap-1">
-              <For each={streamLinks}>
-                {(stream) => (
+            <div class="grid grid-cols-2 gap-1 sm:grid-cols-4">
+              <For each={STREAM_TYPES}>
+                {(type) => (
                   <A
-                    href={stream.href}
-                    class="flex min-w-0 items-center justify-center gap-1.5 rounded-md px-1.5 py-1.5 text-xs text-neutral-600 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
+                    href={`/streams?type=${type}`}
+                    class="flex min-w-0 flex-col items-center justify-center rounded-md px-1.5 py-1.5 text-xs text-neutral-600 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-300 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
                   >
-                    <span
-                      class={`iconify ${stream.icon} shrink-0 text-neutral-500 dark:text-neutral-400`}
-                    />
-                    <span class="truncate">{stream.label}</span>
+                    <span class="max-w-full truncate">{STREAM_CONFIGS[type].label}</span>
+                    <span class="max-w-full truncate text-xs text-neutral-400 dark:text-neutral-500">
+                      {STREAM_CONFIGS[type].summary}
+                    </span>
                   </A>
                 )}
               </For>

@@ -20,7 +20,7 @@ import { TextInput } from "../../components/ui/text-input";
 import { addToClipboard } from "../../lib/copy";
 import { localDateFromTimestamp } from "../../lib/format";
 import { websocketCloseReasons } from "../../lib/websocket";
-import { getStreamType, STREAM_CONFIGS, STREAM_TYPES, StreamType } from "./config";
+import { getStreamType, isChecked, STREAM_CONFIGS, STREAM_TYPES, StreamType } from "./config";
 import { StreamCounts, StreamStats, TOP_COLLECTION_LIMIT, TopCollections } from "./stats";
 
 const LIMIT = 20;
@@ -42,6 +42,7 @@ const TYPE_COLORS: Record<string, string> = {
   create: "text-green-600 dark:text-green-400",
   update: "text-orange-600 dark:text-orange-400",
   delete: "text-red-500 dark:text-red-400",
+  tombstone: "text-red-500 dark:text-red-400",
   identity: "text-purple-600 dark:text-purple-400",
   account: "text-blue-500 dark:text-blue-400",
   sync: "text-pink-600 dark:text-pink-400",
@@ -198,7 +199,10 @@ export const StreamView = () => {
     const rawEventType = record.kind || record.$type || "unknown";
     const eventType = rawEventType.includes("#") ? rawEventType.split("#").pop() : rawEventType;
 
-    if (eventType !== "account" && eventType !== "identity" && eventType !== "sync") {
+    if (config().topKey) {
+      const key = config().topKey!(record);
+      if (key) collectionsMap[key] = (collectionsMap[key] || 0) + 1;
+    } else if (eventType !== "account" && eventType !== "identity" && eventType !== "sync") {
       const collection =
         record.commit?.collection ||
         record.op?.path?.split("/")[0] ||
@@ -268,6 +272,8 @@ export const StreamView = () => {
     const params: Record<string, string | undefined> = { type: streamType(), instance };
     config().fields.forEach((field) => {
       params[field.searchParam] = formData.get(field.name)?.toString();
+      // An unchecked box sends nothing, so one that's on by default has to say it's off.
+      if (field.defaultChecked && !params[field.searchParam]) params[field.searchParam] = "off";
     });
     setSearchParams(params);
 
@@ -319,6 +325,7 @@ export const StreamView = () => {
       socket = new WebSocket(url);
       socket.addEventListener("message", (event) => {
         const rec = JSON.parse(event.data);
+        if (config().filter && !config().filter!(rec, formData)) return;
         const isFilteredEvent = rec.kind === "account" || rec.kind === "identity";
         if (!isFilteredEvent || streamType() !== "jetstream" || searchParams.allEvents === "on")
           addRecord(rec);
@@ -378,7 +385,9 @@ export const StreamView = () => {
       formData.append("instance", searchParams.instance.toString());
       config().fields.forEach((field) => {
         const value = searchParams[field.searchParam];
-        if (value) formData.append(field.name, value.toString());
+        if (field.type === "checkbox") {
+          if (isChecked(field, value)) formData.append(field.name, "on");
+        } else if (value) formData.append(field.name, value.toString());
       });
       connectStream(formData);
     }
@@ -413,13 +422,13 @@ export const StreamView = () => {
     <div class="flex w-full flex-col gap-3">
       <nav
         aria-label="Stream type"
-        class="mx-2 grid grid-cols-3 border-b border-neutral-200 text-sm dark:border-neutral-700"
+        class="mx-2 grid grid-cols-4 border-b border-neutral-200 text-sm dark:border-neutral-700"
       >
         <For each={STREAM_TYPES}>
           {(type) => (
             <A
               end
-              class="-mb-px flex min-w-0 items-center justify-center gap-1.5 border-b-2 px-2 py-2 transition-colors"
+              class="-mb-px flex min-w-0 items-center justify-center border-b-2 px-2 py-2 transition-colors"
               classList={{
                 "border-neutral-700 text-neutral-900 dark:border-neutral-200 dark:text-neutral-100":
                   streamType() === type,
@@ -428,7 +437,6 @@ export const StreamView = () => {
               }}
               href={`/streams?type=${type}`}
             >
-              <span class={`iconify ${STREAM_CONFIGS[type].icon} shrink-0`} />
               <span class="truncate">{STREAM_CONFIGS[type].label}</span>
             </A>
           )}
@@ -528,7 +536,7 @@ export const StreamView = () => {
                         type="checkbox"
                         name={field.name}
                         id={field.name}
-                        checked={searchParams[field.searchParam] === "on"}
+                        checked={isChecked(field, searchParams[field.searchParam])}
                       />
                       <span class="select-none">{field.label}</span>
                     </label>

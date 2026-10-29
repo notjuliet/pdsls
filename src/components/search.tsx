@@ -19,6 +19,7 @@ import { createDebouncedValue } from "../lib/debounced";
 import { pageStreams } from "../lib/page-streams";
 import { carFileAccept, createFileChangeHandler } from "../views/car/file-handlers.js";
 import { queueCarFile } from "../views/car/state.js";
+import { STREAM_CONFIGS, STREAM_TYPES } from "../views/stream/config";
 
 type RecentSearch = {
   path: string;
@@ -29,7 +30,7 @@ type RecentSearch = {
 type Destination = {
   href: string;
   label: string;
-  icon: string;
+  icon?: string;
   avatar?: string;
   /** A muted line under the label, e.g. what a stream is filtered to. */
   target?: string;
@@ -50,9 +51,11 @@ const DestinationCell = (props: {
       <Show
         when={props.destination.avatar}
         fallback={
-          <span
-            class={`iconify ${props.destination.icon} shrink-0 text-neutral-500 dark:text-neutral-400`}
-          />
+          <Show when={props.destination.icon}>
+            <span
+              class={`iconify ${props.destination.icon} shrink-0 text-neutral-500 dark:text-neutral-400`}
+            />
+          </Show>
         }
       >
         <img src={props.destination.avatar} alt="" class="size-4 shrink-0 rounded-full" />
@@ -194,27 +197,16 @@ export const Search = () => {
         ];
   };
 
-  // On a repo or PDS page, the streams open filtered to it.
-  const streamDestinations = (): Destination[] => [
-    {
-      href: pageStreams().jetstream?.href ?? "/streams?type=jetstream",
-      label: "Jetstream",
-      icon: "lucide--radio-tower",
-      target: pageStreams().jetstream?.target,
-    },
-    {
-      href: pageStreams().firehose?.href ?? "/streams?type=firehose",
-      label: "Firehose",
-      icon: "lucide--rss",
-      target: pageStreams().firehose?.target,
-    },
-    {
-      href: pageStreams().spacedust?.href ?? "/streams?type=spacedust",
-      label: "Spacedust",
-      icon: "lucide--sparkles",
-      target: pageStreams().spacedust?.target,
-    },
-  ];
+  // On a repo or PDS page, the streams open filtered to it and say to what.
+  const streamDestinations = (): Destination[] =>
+    STREAM_TYPES.map((type) => {
+      const pageStream = type === "plc" ? undefined : pageStreams()[type];
+      return {
+        href: pageStream?.href ?? `/streams?type=${type}`,
+        label: STREAM_CONFIGS[type].label,
+        target: pageStream?.target ?? STREAM_CONFIGS[type].summary,
+      };
+    });
 
   const updatePanelPosition = () => {
     if (!searchRoot) return;
@@ -498,7 +490,7 @@ export const Search = () => {
                 </For>
               </div>
 
-              <div class="mt-1 grid grid-cols-3 gap-1 border-t border-neutral-200 pt-1 dark:border-neutral-700">
+              <div class="mt-1 grid grid-cols-2 gap-1 border-t border-neutral-200 pt-1 sm:grid-cols-4 dark:border-neutral-700">
                 <For each={streamDestinations()}>
                   {(destination) => (
                     <DestinationCell destination={destination} onClick={closeSearch} />

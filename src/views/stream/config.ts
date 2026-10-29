@@ -1,12 +1,14 @@
 import { localDateFromTimestamp } from "../../lib/format";
 
-export type StreamType = "jetstream" | "firehose" | "spacedust";
+export type StreamType = "jetstream" | "firehose" | "spacedust" | "plc";
 
 type FormField = {
   name: string;
   label: string;
   type: "text" | "checkbox" | "tags";
   datetimePicker?: boolean;
+  /** For checkboxes: on unless the URL turns it off. */
+  defaultChecked?: boolean;
   placeholder?: string;
   searchParam: string;
 };
@@ -22,21 +24,44 @@ type RecordInfo = {
 
 type StreamConfig = {
   label: string;
+  /** What the stream carries, in a word or two, under its name on the homepage and in search. */
+  summary: string;
   description: string;
-  icon: string;
   defaultInstance: string;
   fields: FormField[];
   useFirehoseLib: boolean;
   buildUrl: (instance: string, formData: FormData) => string;
   parseRecord: (record: any) => RecordInfo;
   collectionsLabel: string;
+  /** What the top list counts an event under, when it isn't the event's collection. */
+  topKey?: (record: any) => string | undefined;
+  /** Whether to show an event, given the form it was connected with. */
+  filter?: (record: any, formData: FormData) => boolean;
 };
+
+/** PDSes that create accounts in bulk, drowning out everything else in the PLC stream. */
+const SPAM_PDS_HOSTS = ["pds.trump.com"];
+
+const plcPdsHost = (rec: any) => {
+  const op = rec.operation ?? {};
+  const endpoint = op.services?.atproto_pds?.endpoint ?? op.service;
+  if (!endpoint) return undefined;
+  try {
+    return new URL(endpoint).host;
+  } catch {
+    return endpoint;
+  }
+};
+
+/** Whether a checkbox is on, given its value from the URL or form. */
+export const isChecked = (field: FormField, value: unknown) =>
+  value === "on" || (!!field.defaultChecked && value !== "off");
 
 export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
   jetstream: {
     label: "Jetstream",
+    summary: "Simplified events",
     description: "A simplified event stream with support for collection and DID filtering.",
-    icon: "lucide--radio-tower",
     defaultInstance: "wss://jetstream1.us-east.bsky.network/subscribe",
     useFirehoseLib: false,
     collectionsLabel: "Top collections",
@@ -99,8 +124,8 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
 
   firehose: {
     label: "Firehose",
+    summary: "Raw events",
     description: "The raw event stream from a relay or PDS.",
-    icon: "lucide--rss",
     defaultInstance: "wss://bsky.network",
     useFirehoseLib: true,
     collectionsLabel: "Top collections",
@@ -134,8 +159,8 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
 
   spacedust: {
     label: "Spacedust",
+    summary: "Backlinks",
     description: "A stream of links showing interactions across the network.",
-    icon: "lucide--sparkles",
     defaultInstance: "wss://spacedust.microcosm.blue/subscribe",
     useFirehoseLib: false,
     collectionsLabel: "Top sources",
@@ -207,6 +232,47 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
         time: undefined,
       };
     },
+  },
+
+  plc: {
+    label: "PLC",
+    summary: "Operations",
+    description: "The stream of did:plc operations from the PLC directory.",
+    defaultInstance: "wss://plc.directory/export/stream",
+    useFirehoseLib: false,
+    collectionsLabel: "Top PDSes",
+    fields: [
+      {
+        name: "cursor",
+        label: "Cursor",
+        type: "text",
+        placeholder: "Leave empty for live-tail",
+        searchParam: "cursor",
+      },
+      {
+        name: "hideSpam",
+        label: "Hide spam",
+        type: "checkbox",
+        searchParam: "hideSpam",
+        defaultChecked: true,
+      },
+    ],
+    buildUrl: (instance, formData) => {
+      const cursor = formData.get("cursor")?.toString();
+      return cursor?.length ? `${instance}?cursor=${cursor}` : instance;
+    },
+    parseRecord: (rec) => {
+      const op = rec.operation ?? {};
+      // Older operations used "create" and a top-level handle; newer ones are all "plc_operation".
+      const action =
+        op.type === "plc_tombstone" ? "tombstone" : op.prev === null ? "create" : "update";
+      const handle = op.alsoKnownAs?.[0]?.replace("at://", "") ?? op.handle;
+      const time = rec.createdAt ? localDateFromTimestamp(Date.parse(rec.createdAt)) : undefined;
+      return { type: action, did: rec.did, collection: handle, action, time };
+    },
+    topKey: plcPdsHost,
+    filter: (rec, formData) =>
+      formData.get("hideSpam") !== "on" || !SPAM_PDS_HOSTS.includes(plcPdsHost(rec) ?? ""),
   },
 };
 
