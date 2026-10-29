@@ -73,12 +73,26 @@ const authorityResolver = new DohJsonLexiconAuthorityResolver({
   dohUrl: "https://dns.google/resolve?",
 });
 
-const schemaResolver = createMemo(
-  () =>
-    new LexiconSchemaResolver({
-      didDocumentResolver: didDocumentResolver(),
-    }),
-);
+const schemaResolver = createMemo(() => {
+  const documents = didDocumentResolver();
+  // Lexicons mostly share a few owners, e.g. every app.bsky.* one is Bluesky's, and a record's
+  // lexicons load at once. Fetching each owner's document once, rather than per lexicon, lets
+  // them load in parallel: the browser runs identical requests one after another.
+  const cache = new Map<string, ReturnType<typeof documents.resolve>>();
+  return new LexiconSchemaResolver({
+    didDocumentResolver: {
+      resolve: (did, options) => {
+        let pending = cache.get(did);
+        if (!pending) {
+          pending = documents.resolve(did as Parameters<typeof documents.resolve>[0], options);
+          cache.set(did, pending);
+          pending.catch(() => cache.delete(did));
+        }
+        return pending;
+      },
+    },
+  });
+});
 
 const didPDSCache: Record<string, Promise<string>> = {};
 const [labelerCache, setLabelerCache] = createStore<Record<string, string>>({});
