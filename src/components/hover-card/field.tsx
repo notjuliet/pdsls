@@ -1,4 +1,4 @@
-import { Show } from "solid-js";
+import { For, Show } from "solid-js";
 
 import {
   absoluteRef,
@@ -18,12 +18,14 @@ const FieldHoverCard = (props: {
   name: string;
   /** The `$type` of the field's value, which picks its type from a union. */
   valueType?: string;
+  /** For an object value, the fields it has, so the ones it leaves out stand apart. */
+  presentKeys?: string[];
   renderTrigger: HoverTriggerRenderer;
 }) => {
   // Wrapped, so a field the lexicon can't describe still counts as loaded.
   const preview = createHoverResource(
     () => `${props.collection}/${props.steps.map((step) => step.key).join("/")}`,
-    async () => ({ field: await fieldSchemaAt(props.collection, props.steps) }),
+    async () => ({ field: await fieldSchemaAt(props.collection, props.steps, props.valueType) }),
   );
 
   return (
@@ -38,25 +40,43 @@ const FieldHoverCard = (props: {
     >
       <Show when={preview.state().data?.field}>
         {(field) => (
-          <FieldSchemaView name={props.name} field={field()} valueType={props.valueType} />
+          <FieldSchemaView
+            name={props.name}
+            field={field()}
+            valueType={props.valueType}
+            presentKeys={props.presentKeys}
+          />
         )}
       </Show>
     </HoverCard>
   );
 };
 
-const FieldSchemaView = (props: { name: string; field: FieldSchema; valueType?: string }) => {
+const FieldSchemaView = (props: {
+  name: string;
+  field: FieldSchema;
+  valueType?: string;
+  presentKeys?: string[];
+}) => {
   const nsid = () => props.field.definedIn.split("#")[0];
-  // A union's local `#refs` in full, its own or its items', since the card isn't on the
+  // Local `#refs` in full, the field's own and its items', since the card isn't on the
   // lexicon's own page.
+  const fullRef = (ref?: string) => ref && absoluteRef(ref, nsid());
   const fullRefs = (refs?: string[]) => refs?.map((ref) => absoluteRef(ref, nsid()));
   const property = () => {
     const field = props.field.property;
     if (!field) return;
     return {
       ...field,
+      // A ref's own description if it has one, otherwise the one of what it points to.
+      description: field.description ?? props.field.refDescription,
+      ref: fullRef(field.ref),
       refs: fullRefs(field.refs),
-      items: field.items && { ...field.items, refs: fullRefs(field.items.refs) },
+      items: field.items && {
+        ...field.items,
+        ref: fullRef(field.items.ref),
+        refs: fullRefs(field.items.refs),
+      },
     };
   };
   const currentType = () => (props.valueType ? absoluteRef(props.valueType, nsid()) : undefined);
@@ -80,6 +100,32 @@ const FieldSchemaView = (props: { name: string; field: FieldSchema; valueType?: 
             currentType={currentType()}
           />
         )}
+      </Show>
+      {/* What the object can hold, beyond what this record shows: required ones are starred, and
+          ones this record leaves out are dimmed. */}
+      <Show when={props.field.properties?.length}>
+        <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-xs">
+          <span class="text-neutral-500 dark:text-neutral-400">properties:</span>
+          <For each={props.field.properties}>
+            {(property) => (
+              <span
+                class="font-mono"
+                classList={{
+                  "text-neutral-700 dark:text-neutral-300":
+                    props.presentKeys?.includes(property.name) ?? true,
+                  "text-neutral-400 dark:text-neutral-500": !(
+                    props.presentKeys?.includes(property.name) ?? true
+                  ),
+                }}
+              >
+                {property.name}
+                <Show when={property.required}>
+                  <span class="text-red-500 dark:text-red-400">*</span>
+                </Show>
+              </span>
+            )}
+          </For>
+        </div>
       </Show>
       {/* Set apart, so it doesn't read as one more entry of a union's list. */}
       <span class="border-t border-neutral-200 pt-2 font-mono text-xs text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">

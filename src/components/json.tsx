@@ -270,6 +270,11 @@ const CollapsibleItem = (props: {
                   ? (props.value as { $type: string }).$type
                   : undefined
               }
+              presentKeys={
+                isObject() && !Array.isArray(props.value)
+                  ? Object.keys(props.value as object)
+                  : undefined
+              }
               renderTrigger={keyLabel}
             />
           )}

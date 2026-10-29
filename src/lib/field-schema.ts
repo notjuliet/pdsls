@@ -15,6 +15,10 @@ export interface FieldSchema {
   /** Missing when the record has a field its schema doesn't define. */
   property?: LexiconProperty;
   required?: boolean;
+  /** For a ref, the description of what it points to, since a ref rarely has its own. */
+  refDescription?: string;
+  /** For an object, the fields it can have, in the lexicon's order. */
+  properties?: { name: string; required: boolean }[];
 }
 
 type SchemaNode = LexiconDef | LexiconProperty;
@@ -25,8 +29,24 @@ interface Located {
   defName: string;
 }
 
-const loadSchema = async (nsid: string) =>
-  (await resolveLexicon(nsid as Nsid)).schema.rawSchema as LexiconSchema;
+/** How long a lexicon that couldn't be found is left alone, before hovering tries it again. */
+const RETRY_AFTER_MS = 5 * 60 * 1000;
+const failedAt = new Map<string, number>();
+
+// Lexicons are cached once found, but a failure isn't, so without this a record whose lexicon
+// isn't published would look it up again on every key hovered.
+const loadSchema = async (nsid: string) => {
+  const failed = failedAt.get(nsid);
+  if (failed !== undefined && Date.now() - failed < RETRY_AFTER_MS) {
+    throw new Error(`No lexicon found for ${nsid}`);
+  }
+  try {
+    return (await resolveLexicon(nsid as Nsid)).schema.rawSchema as LexiconSchema;
+  } catch (err) {
+    failedAt.set(nsid, Date.now());
+    throw err;
+  }
+};
 
 /** A ref like `#image` or `app.bsky.embed.images#main`, in full and without `#main`. */
 export const absoluteRef = (ref: string, nsid: string) => {
@@ -63,10 +83,14 @@ const resolveNode = async (at: Located, objectType?: string): Promise<Located | 
   }
 };
 
-/** The schema of the field at a path in a record of `collection`, if its lexicon has one. */
+/**
+ * The schema of the field at a path in a record of `collection`, if its lexicon has one.
+ * `valueType` is the `$type` of the field's value, which picks its definition from a union.
+ */
 export const fieldSchemaAt = async (
   collection: string,
   steps: FieldStep[],
+  valueType?: string,
 ): Promise<FieldSchema | undefined> => {
   const record = (await loadSchema(collection)).defs.main?.record;
   if (!record) return;
@@ -98,6 +122,19 @@ export const fieldSchemaAt = async (
       required: (container.node as LexiconDef).required?.includes(step.key),
     };
     current = { ...container, node: property };
+  }
+
+  if (!field?.property) return field;
+
+  // What the value itself is: where a ref points, or the union's member it has.
+  const value = await resolveNode(current, valueType).catch(() => undefined);
+  if (field.property.type === "ref") field.refDescription = value?.node.description;
+  if (value?.node.type === "object") {
+    const def = value.node as LexiconDef;
+    field.properties = Object.keys(def.properties ?? {}).map((name) => ({
+      name,
+      required: !!def.required?.includes(name),
+    }));
   }
   return field;
 };
