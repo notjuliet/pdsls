@@ -173,6 +173,8 @@ export const StreamView = () => {
   let totalEventsCount = 0;
   let collectionsMap: Record<string, number> = {};
 
+  const shownParameters = () => parameters().filter((param) => param.value);
+
   const filteredCollections = () =>
     searchParams.collections
       ?.toString()
@@ -558,14 +560,16 @@ export const StreamView = () => {
             <div class="flex w-full flex-col gap-4 px-2">
               {/* The instance heads the settings it was connected with. */}
               <div class="flex flex-col gap-0.5">
-                {/* A label column wide enough for "Connected to", so the instance lines up with the values below. */}
+                {/* With settings below, a label column wide enough for "Connected to" lines the instance up with their values. */}
                 <p class={`mb-0.5 flex items-baseline gap-1 ${HEADING_TEXT_CLASS}`}>
-                  <span class={`${CONNECTED_LABEL_CLASS} font-normal ${MUTED_CLASS}`}>
+                  <span
+                    class={`${shownParameters().length > 0 ? CONNECTED_LABEL_CLASS : "shrink-0"} font-normal ${MUTED_CLASS}`}
+                  >
                     Connected to
                   </span>
                   <span class="min-w-0 truncate">{connectedInstance()}</span>
                 </p>
-                <For each={parameters().filter((param) => param.value)}>
+                <For each={shownParameters()}>
                   {(param) => (
                     <InfoRow label={param.name} labelClass={CONNECTED_LABEL_CLASS}>
                       {param.value}
