@@ -7,6 +7,7 @@ import { createWindowVirtualizer } from "@tanstack/solid-virtual";
 import { createEffect, createResource, createSignal, For, on, onCleanup, Show } from "solid-js";
 
 import { setPDS } from "../components/repo/navbar";
+import { timestampFromRkey } from "../components/repo/record-row.jsx";
 import { Button } from "../components/ui/button";
 import { ExternalLink } from "../components/ui/external-link.jsx";
 import { CopyValue, InfoRow, InfoSection } from "../components/ui/info.jsx";
@@ -16,7 +17,7 @@ import { Tabs } from "../components/ui/tabs.jsx";
 import { canHover } from "../layout";
 import { didDocCache, resolveDidDoc } from "../lib/api";
 import { createLatch } from "../lib/create-latch.js";
-import { localDateFromTimestamp, formatFileSize } from "../lib/format";
+import { localDateFromTimestamp, formatFileSize, relativeTimeFromTimestamp } from "../lib/format";
 import { LoadMoreSentinel } from "../lib/infinite-scroll";
 
 const LIMIT = 1000;
@@ -38,6 +39,8 @@ const RepoCard = (props: {
 }) => {
   const [hovered, setHovered] = createSignal(false);
   const expanded = () => props.expanded || hovered();
+  // The repo's revision is a TID, so it says when it last changed.
+  const lastChange = () => timestampFromRkey(props.repo.rev);
   const [collapsing, setCollapsing] = createSignal(false);
   let hoverTimeout: number | null = null;
 
@@ -91,7 +94,7 @@ const RepoCard = (props: {
   return (
     <div
       classList={{
-        "group relative rounded-md border-[0.5px]": true,
+        "relative rounded-md border-[0.5px]": true,
         "z-20": expanded(),
         "z-10": collapsing(),
         "transition-[background-color,border-color,box-shadow] duration-250":
@@ -113,7 +116,7 @@ const RepoCard = (props: {
           }}
           class="flex min-w-0 flex-1 items-center px-2 py-1.5"
         >
-          <div class="flex min-h-5 min-w-0 flex-1 items-center gap-x-2 text-xs sm:text-sm">
+          <div class="flex min-h-5 min-w-0 flex-1 items-baseline gap-x-2 text-xs sm:text-sm">
             <span class="min-w-0 truncate font-mono" onclick={(e) => e.stopPropagation()}>
               <A
                 href={`/at://${props.repo.did}`}
@@ -123,9 +126,16 @@ const RepoCard = (props: {
               </A>
             </span>
             <Show when={!props.repo.active}>
-              <span class="flex shrink-0 items-center gap-1 text-red-500 dark:text-red-400">
+              {/* Amber for deactivated, which the owner can undo, and red for the rest. */}
+              <span
+                class="flex shrink-0 items-baseline gap-1"
+                classList={{
+                  "text-amber-600 dark:text-amber-500": props.repo.status === "deactivated",
+                  "text-red-500 dark:text-red-400": props.repo.status !== "deactivated",
+                }}
+              >
                 <span
-                  class={`iconify ${
+                  class={`iconify self-center ${
                     props.repo.status === "deactivated"
                       ? "lucide--user-round-x"
                       : props.repo.status === "takendown"
@@ -136,20 +146,15 @@ const RepoCard = (props: {
                 {props.repo.status ?? "inactive"}
               </span>
             </Show>
+            <Show when={lastChange()}>
+              {(timestamp) => (
+                <span class="ml-auto shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
+                  {relativeTimeFromTimestamp(timestamp())}
+                </span>
+              )}
+            </Show>
           </div>
         </button>
-        <Show when={expanded() || canHover}>
-          <A
-            href={`/at://${props.repo.did}`}
-            classList={{
-              "flex shrink-0 items-center p-2 transition-colors duration-250": true,
-              "invisible group-hover:visible not-hover:text-neutral-500 not-hover:dark:text-neutral-400":
-                !expanded(),
-            }}
-          >
-            <span class="iconify lucide--arrow-right"></span>
-          </A>
-        </Show>
       </div>
       <div
         classList={{
