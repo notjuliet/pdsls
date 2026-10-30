@@ -16,9 +16,6 @@ import { createHoverResource } from "./hover-card/resource";
 const CONTAINER_CLASS =
   "divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/30";
 
-const CARD_CLASS =
-  "flex flex-col gap-2 rounded-lg border border-neutral-200 bg-neutral-50/50 p-3 dark:border-neutral-700 dark:bg-neutral-800/30";
-
 const SECTION_HEADING_CLASS = "text-sm font-medium text-neutral-800 dark:text-neutral-200";
 
 /** A muted label line under a heading, like "Record key:" or "Encoding:". */
@@ -30,20 +27,20 @@ const VALUE_CLASS = "text-neutral-700 dark:text-neutral-300";
 const DESCRIPTION_CLASS = "text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300";
 
 const RESOURCE_COLORS = {
-  repo: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  rpc: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  default: "bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300",
+  repo: "bg-green-500/10 text-green-700 dark:bg-green-400/10 dark:text-green-400",
+  rpc: "bg-purple-500/10 text-purple-700 dark:bg-purple-400/10 dark:text-purple-400",
+  default: "bg-neutral-500/10 text-neutral-700 dark:bg-neutral-400/10 dark:text-neutral-300",
 } as const;
 
 const DEF_TYPE_COLORS = {
-  record: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  query: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  procedure: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  subscription: "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
-  object: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  token: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  "permission-set": "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-  default: "bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300",
+  record: "bg-green-500/10 text-green-700 dark:bg-green-400/10 dark:text-green-400",
+  query: "bg-purple-500/10 text-purple-700 dark:bg-purple-400/10 dark:text-purple-400",
+  procedure: "bg-orange-500/10 text-orange-700 dark:bg-orange-400/10 dark:text-orange-400",
+  subscription: "bg-pink-500/10 text-pink-700 dark:bg-pink-400/10 dark:text-pink-400",
+  object: "bg-blue-500/10 text-blue-700 dark:bg-blue-400/10 dark:text-blue-400",
+  token: "bg-yellow-500/10 text-yellow-700 dark:bg-yellow-400/10 dark:text-yellow-400",
+  "permission-set": "bg-cyan-500/10 text-cyan-700 dark:bg-cyan-400/10 dark:text-cyan-400",
+  default: "bg-neutral-500/10 text-neutral-700 dark:bg-neutral-400/10 dark:text-neutral-300",
 } as const;
 
 // Utility functions
@@ -511,7 +508,7 @@ const PermissionRow = (props: { permission: LexiconPermission; index: number }) 
       <div class="flex flex-wrap items-center gap-2">
         <span class="font-semibold">#{props.index + 1}</span>
         <span
-          class={`rounded px-1.5 py-0.5 font-mono text-xs font-semibold ${resourceColor(props.permission.resource)}`}
+          class={`rounded px-1.5 py-0.5 font-mono text-xs font-medium ${resourceColor(props.permission.resource)}`}
         >
           {props.permission.resource}
         </span>
@@ -587,6 +584,15 @@ const describeRecordKey = (key: string) => {
   return undefined;
 };
 
+/** A permission set's title or detail, then each translation of it labelled with its language. */
+const localizedLines = (label: string, text?: string, translations?: Record<string, string>) => [
+  ...(text ? [{ label, text }] : []),
+  ...Object.entries(translations ?? {}).map(([lang, text]) => ({
+    label: `${label} (${lang})`,
+    text,
+  })),
+];
+
 const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean }) => {
   const defTypeColor = () =>
     DEF_TYPE_COLORS[props.def.type as keyof typeof DEF_TYPE_COLORS] || DEF_TYPE_COLORS.default;
@@ -604,8 +610,8 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
           <span class="iconify lucide--link absolute top-1/2 -left-6 -translate-y-1/2 text-base opacity-0 transition-opacity group-hover:opacity-100" />
           {props.name === "main" ? "Main Definition" : props.name}
         </LocalSchemaLink>
-        <span class={`rounded px-1.5 py-0.5 text-xs font-semibold ${defTypeColor()}`}>
-          <span class="uppercase">{props.def.type.replace("-", " ")}</span>
+        <span class={`rounded px-1.5 py-0.5 font-mono text-xs font-medium ${defTypeColor()}`}>
+          {props.def.type}
         </span>
       </div>
 
@@ -621,68 +627,22 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
         <p class={DESCRIPTION_CLASS}>{props.def.description}</p>
       </Show>
 
-      {/* Permission-set: Title and Detail */}
-      <Show when={props.def.type === "permission-set" && (props.def.title || props.def.detail)}>
-        <div class={CARD_CLASS}>
-          <Show when={props.def.title}>
-            <div class="flex flex-col gap-1">
-              <span class="text-xs font-semibold text-neutral-500 uppercase dark:text-neutral-400">
-                Title
-              </span>
-              <span class="text-sm font-medium">{props.def.title}</span>
-            </div>
-          </Show>
-          <Show when={props.def["title:lang"]}>
-            <div class="flex flex-col gap-1">
-              <span class="text-xs font-semibold text-neutral-500 uppercase dark:text-neutral-400">
-                Localized Titles
-              </span>
-              <div class="flex flex-col gap-1">
-                <For each={Object.entries(props.def["title:lang"]!)}>
-                  {([lang, text]) => (
-                    <div class="flex items-center gap-2 text-sm">
-                      <span class="dark:bg-dark-200 rounded bg-neutral-200/50 px-1.5 py-0.5 font-mono text-xs">
-                        {lang}
-                      </span>
-                      <span>{text}</span>
-                    </div>
-                  )}
-                </For>
-              </div>
-            </div>
-          </Show>
-          <Show when={props.def.detail}>
-            <div class="flex flex-col gap-1">
-              <span class="text-xs font-semibold text-neutral-500 uppercase dark:text-neutral-400">
-                Detail
-              </span>
-              <p class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
-                {props.def.detail}
-              </p>
-            </div>
-          </Show>
-          <Show when={props.def["detail:lang"]}>
-            <div class="flex flex-col gap-1">
-              <span class="text-xs font-semibold text-neutral-500 uppercase dark:text-neutral-400">
-                Localized Details
-              </span>
-              <div class="flex flex-col gap-1">
-                <For each={Object.entries(props.def["detail:lang"]!)}>
-                  {([lang, text]) => (
-                    <div class="flex flex-col gap-1 text-sm">
-                      <span class="dark:bg-dark-200 w-fit rounded bg-neutral-200/50 px-1.5 py-0.5 font-mono text-xs">
-                        {lang}
-                      </span>
-                      <p class="whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
-                        {text}
-                      </p>
-                    </div>
-                  )}
-                </For>
-              </div>
-            </div>
-          </Show>
-        </div>
+      {/* Permission-set: the title and detail an app shows when asking for it, with translations */}
+      <Show when={props.def.type === "permission-set"}>
+        <For each={localizedLines("Title", props.def.title, props.def["title:lang"])}>
+          {(line) => (
+            <span class={INFO_LINE_CLASS}>
+              {line.label}: <span class={VALUE_CLASS}>{line.text}</span>
+            </span>
+          )}
+        </For>
+        <For each={localizedLines("Detail", props.def.detail, props.def["detail:lang"])}>
+          {(line) => (
+            <span class={INFO_LINE_CLASS}>
+              {line.label}: <span class={VALUE_CLASS}>{line.text}</span>
+            </span>
+          )}
+        </For>
       </Show>
 
       {/* Permission-set: Permissions list */}
