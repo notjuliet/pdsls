@@ -9,6 +9,7 @@ import RecordHoverCard from "../components/hover-card/record.jsx";
 import { FilterInput } from "../components/ui/filter-input.jsx";
 import { Spinner } from "../components/ui/states.jsx";
 import { TagInput } from "../components/ui/tag-input.jsx";
+import Tooltip from "../components/ui/tooltip.jsx";
 import { localDateFromTimestamp, relativeTimeFromTimestamp } from "../lib/format.js";
 import { LoadMoreSentinel } from "../lib/infinite-scroll.jsx";
 import { useFilterShortcut } from "../lib/keyboard.js";
@@ -52,16 +53,17 @@ const LabelRow = (props: { label: ComAtprotoLabelDefs.Label }) => {
           {label.uri}
         </span>
         <span class="ml-auto flex shrink-0 items-baseline gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
-          <span title={localDateFromTimestamp(created)}>{relativeTimeFromTimestamp(created)}</span>
+          <Tooltip text={localDateFromTimestamp(created)}>
+            <span>{relativeTimeFromTimestamp(created)}</span>
+          </Tooltip>
           <Show when={expires}>
             {(expiry) => (
-              <span
-                class="flex items-baseline gap-1"
-                title={`Expires ${localDateFromTimestamp(expiry())}`}
-              >
-                <span class="iconify lucide--clock-fading shrink-0 self-center" />
-                {relativeTimeFromTimestamp(expiry())}
-              </span>
+              <Tooltip text={`Expires ${localDateFromTimestamp(expiry())}`}>
+                <span class="flex items-baseline gap-1">
+                  <span class="iconify lucide--clock-fading shrink-0 self-center" />
+                  {relativeTimeFromTimestamp(expiry())}
+                </span>
+              </Tooltip>
             )}
           </Show>
         </span>
@@ -215,10 +217,13 @@ export const LabelFeed = (props: { labelerDid: string; labelerEndpoint: string }
             onChange={applyUriPatterns}
           />
         </label>
-        <div class="flex min-h-7.5 items-center gap-2">
+        {/* Lined up with the lookup field above: the count takes the Add button's width, and the
+            box reaches 1px past each side like the lookup's outline. */}
+        <div class="flex min-h-7.5 items-center gap-1.5">
           <Show when={labels().length > 1}>
             <FilterInput
-              class="min-w-0 flex-1"
+              class="-mx-px min-w-0 flex-1"
+              inputClass="min-w-0 grow py-1 select-none placeholder:text-sm focus:outline-none"
               inputRef={(input) => (filterInputRef = input)}
               placeholder="Filter label values… (* partial, -exclude)"
               value={filter()}
@@ -226,7 +231,7 @@ export const LabelFeed = (props: { labelerDid: string; labelerEndpoint: string }
             />
           </Show>
           <Show when={labels().length > 0}>
-            <span class="ml-auto flex shrink-0 items-center gap-1 text-sm">
+            <span class="ml-auto flex min-w-15 shrink-0 items-center justify-end gap-1 text-sm">
               <Show when={filter()}>
                 <span>{filteredLabels().length}/</span>
               </Show>
