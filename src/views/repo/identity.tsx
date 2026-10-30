@@ -13,6 +13,7 @@ import {
 import { Spinner } from "../../components/ui/states.jsx";
 import { type HandleResolveResult, resolveHandleDetailed, validateHandle } from "../../lib/api.js";
 import { detectDidKeyType, detectKeyType } from "../../lib/key.js";
+import { hasStandardServiceId, serviceLabel } from "../../lib/services.js";
 import { plcDirectory } from "../settings.jsx";
 
 const HandleResult = (props: {
@@ -123,20 +124,9 @@ const AliasEntry = (props: { alias: string; did: string; valid: boolean | undefi
   );
 };
 
-/** Known service types: a short name, and the id they're normally listed under. */
-const KNOWN_SERVICES: Record<string, { label: string; id: string }> = {
-  AtprotoPersonalDataServer: { label: "PDS", id: "atproto_pds" },
-  AtprotoLabeler: { label: "Labeler", id: "atproto_labeler" },
-  BskyFeedGenerator: { label: "Feed generator", id: "bsky_fg" },
-  TangledKnot: { label: "Knot", id: "tangled_knot" },
-};
-
-/** A short name for a service type, or the type itself if it isn't a known one. */
-const serviceLabel = (type: string) => KNOWN_SERVICES[type]?.label ?? type;
-
 /** Whether a service is under the usual id for its type, so the type alone says what it is. */
 const hasStandardId = (service: { id: string; type: unknown }) =>
-  KNOWN_SERVICES[String(service.type)]?.id === fragment(service.id);
+  hasStandardServiceId(String(service.type), fragment(service.id));
 
 /** The part of a DID document id after `#`. */
 const fragment = (id: string) => id.split("#")[1];

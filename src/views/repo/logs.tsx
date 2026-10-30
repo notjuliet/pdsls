@@ -8,8 +8,11 @@ import { useLocation } from "@solidjs/router";
 import { createEffect, createResource, createSignal, For, onCleanup, Show } from "solid-js";
 import * as v from "valibot";
 
+import { LABEL_COLUMN_CLASS, MUTED_CLASS } from "../../components/ui/info.jsx";
 import { localDateFromTimestamp } from "../../lib/format.js";
+import { detectDidKeyType } from "../../lib/key.js";
 import { createOperationHistory, DiffEntry, groupBy } from "../../lib/plc-logs.js";
+import { hasStandardServiceId, serviceLabel } from "../../lib/services.js";
 import PlcValidateWorker from "../../workers/plc-validate.ts?worker";
 import { plcDirectory } from "../settings.jsx";
 
@@ -137,13 +140,19 @@ export const PlcLogView = (props: { did: string }) => {
     );
   };
 
+  /** A service's short name, like "PDS", or its `#id` when it isn't under the usual one. */
+  const serviceTitle = (type: string, id: string) => ({
+    title: "Service",
+    badge: hasStandardServiceId(type, id) ? serviceLabel(type) : `#${id}`,
+  });
+
   const DiffItem = (props: { diff: DiffEntry }) => {
     const diff = props.diff;
 
     const getDiffConfig = () => {
       switch (diff.type) {
         case "identity_created":
-          return { icon: "lucide--bell", title: "Identity created" };
+          return { icon: "lucide--user-round-plus", title: "Identity created" };
         case "identity_tombstoned":
           return { icon: "lucide--skull", title: "Identity tombstoned" };
         case "handle_added":
@@ -171,54 +180,55 @@ export const PlcLogView = (props: { did: string }) => {
           return {
             icon: "lucide--key-round",
             title: "Rotation keys",
+            keys: true,
             addedValues: diff.added_rotation_keys,
             removedValues: diff.removed_rotation_keys,
           };
         case "service_added":
           return {
             icon: "lucide--hard-drive",
-            title: "Service",
-            badge: diff.service_id,
+            ...serviceTitle(diff.service_type, diff.service_id),
             value: diff.service_endpoint,
             isAddition: true,
           };
         case "service_removed":
           return {
             icon: "lucide--hard-drive",
-            title: "Service",
-            badge: diff.service_id,
+            ...serviceTitle(diff.service_type, diff.service_id),
             value: diff.service_endpoint,
             isRemoval: true,
           };
         case "service_changed":
           return {
             icon: "lucide--hard-drive",
-            title: "Service",
-            badge: diff.service_id,
+            ...serviceTitle(diff.next_service_type, diff.service_id),
             oldValue: diff.prev_service_endpoint,
             newValue: diff.next_service_endpoint,
           };
         case "verification_method_added":
           return {
             icon: "lucide--shield-check",
-            title: "Verification key",
-            badge: diff.method_id,
+            title: "Verification method",
+            badge: `#${diff.method_id}`,
+            keys: true,
             value: diff.method_key,
             isAddition: true,
           };
         case "verification_method_removed":
           return {
             icon: "lucide--shield-check",
-            title: "Verification key",
-            badge: diff.method_id,
+            title: "Verification method",
+            badge: `#${diff.method_id}`,
+            keys: true,
             value: diff.method_key,
             isRemoval: true,
           };
         case "verification_method_changed":
           return {
             icon: "lucide--shield-check",
-            title: "Verification key",
-            badge: diff.method_id,
+            title: "Verification method",
+            badge: `#${diff.method_id}`,
+            keys: true,
             oldValue: diff.prev_method_key,
             newValue: diff.next_method_key,
           };
@@ -237,6 +247,7 @@ export const PlcLogView = (props: { did: string }) => {
       addedValues = [],
       removedValues = [],
       badge = "",
+      keys = false,
       isAddition = false,
       isRemoval = false,
     } = config;
@@ -267,7 +278,13 @@ export const PlcLogView = (props: { did: string }) => {
             "text-neutral-700 dark:text-neutral-300": !props.muted,
           }}
         >
-          {props.value}
+          {/* Keys read like the Identity tab's: their type, then the key without `did:key:`. */}
+          <Show when={keys} fallback={props.value}>
+            <span class={`${LABEL_COLUMN_CLASS} inline-block ${MUTED_CLASS}`}>
+              {detectDidKeyType(props.value)}
+            </span>
+            <span class="font-mono">{props.value.replace("did:key:", "")}</span>
+          </Show>
         </span>
       </>
     );
@@ -291,7 +308,7 @@ export const PlcLogView = (props: { did: string }) => {
           </p>
           <Show when={badge}>
             <span class="shrink-0 text-xs font-medium text-neutral-500 dark:text-neutral-400">
-              #{badge}
+              {badge}
             </span>
           </Show>
           <Show when={diff.orig.nullified}>
