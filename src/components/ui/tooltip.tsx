@@ -7,14 +7,16 @@ const Tooltip = (props: {
   shortcut?: string;
   /** An iconify class shown before the text, e.g. `lucide--copy`. */
   icon?: string;
+  /** Lines the tooltip up with the end of its text, for text at the right edge of the page. */
+  alignEnd?: boolean;
   children: JSX.Element;
 }) => (
   <span class="group/tooltip relative inline-flex items-center">
     {props.children}
     <Show when={canHover}>
       <span
-        style={`transform: translate(-50%, 28px)`}
-        class={`dark:shadow-dark-700 dark:bg-dark-300 pointer-events-none absolute left-[50%] z-20 hidden min-w-fit rounded border-[0.5px] border-neutral-300 bg-white p-1 text-center font-sans text-xs font-normal whitespace-nowrap text-neutral-900 shadow-md select-none group-hover/tooltip:inline first-letter:capitalize dark:border-neutral-600 dark:text-neutral-200`}
+        style={props.alignEnd ? "transform: translateY(28px)" : "transform: translate(-50%, 28px)"}
+        class={`dark:shadow-dark-700 dark:bg-dark-300 pointer-events-none absolute ${props.alignEnd ? "right-0" : "left-[50%]"} z-20 hidden min-w-fit rounded border-[0.5px] border-neutral-300 bg-white p-1 text-center font-sans text-xs font-normal whitespace-nowrap text-neutral-900 shadow-md select-none group-hover/tooltip:inline first-letter:capitalize dark:border-neutral-600 dark:text-neutral-200`}
       >
         <Show when={props.icon}>
           <span

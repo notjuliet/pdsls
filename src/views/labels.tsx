@@ -53,12 +53,12 @@ const LabelRow = (props: { label: ComAtprotoLabelDefs.Label }) => {
           {label.uri}
         </span>
         <span class="ml-auto flex shrink-0 items-baseline gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
-          <Tooltip text={localDateFromTimestamp(created)}>
+          <Tooltip alignEnd text={localDateFromTimestamp(created)}>
             <span>{relativeTimeFromTimestamp(created)}</span>
           </Tooltip>
           <Show when={expires}>
             {(expiry) => (
-              <Tooltip text={`Expires ${localDateFromTimestamp(expiry())}`}>
+              <Tooltip alignEnd text={`Expires ${localDateFromTimestamp(expiry())}`}>
                 <span class="flex items-baseline gap-1">
                   <span class="iconify lucide--clock-fading shrink-0 self-center" />
                   {relativeTimeFromTimestamp(expiry())}

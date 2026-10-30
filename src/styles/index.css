@@ -27,6 +27,17 @@
   --color-dark-800: oklch(20.9% 0 0);
   --color-dark-900: oklch(16.84% 0 0);
   --color-dark-950: oklch(13.44% 0 0);
+
+  /* Content that arrives after a fetch fades in rather than popping in. */
+  --animate-fade-in: fade-in 150ms ease-out;
+  /* A loading message waits a moment, so a fast response never flashes it. */
+  --animate-fade-in-late: fade-in 150ms ease-out 300ms both;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
 }
 
 html {
