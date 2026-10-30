@@ -128,6 +128,7 @@ const KNOWN_SERVICES: Record<string, { label: string; id: string }> = {
   AtprotoPersonalDataServer: { label: "PDS", id: "atproto_pds" },
   AtprotoLabeler: { label: "Labeler", id: "atproto_labeler" },
   BskyFeedGenerator: { label: "Feed generator", id: "bsky_fg" },
+  TangledKnot: { label: "Knot", id: "tangled_knot" },
 };
 
 /** A short name for a service type, or the type itself if it isn't a known one. */
@@ -176,7 +177,7 @@ export const IdentityView = (props: { didDoc: DidDocument; rotationKeys: string[
         <CopyValue value={did} />
       </section>
 
-      <Show when={props.didDoc.alsoKnownAs}>
+      <Show when={props.didDoc.alsoKnownAs?.length}>
         <section>
           <h3 class={HEADING_CLASS}>Aliases</h3>
           <For each={props.didDoc.alsoKnownAs}>
@@ -185,7 +186,7 @@ export const IdentityView = (props: { didDoc: DidDocument; rotationKeys: string[
         </section>
       </Show>
 
-      <Show when={props.didDoc.service}>
+      <Show when={props.didDoc.service?.length}>
         <section>
           <h3 class={HEADING_CLASS}>Services</h3>
           <div class="flex flex-col gap-1">
@@ -216,7 +217,7 @@ export const IdentityView = (props: { didDoc: DidDocument; rotationKeys: string[
         </section>
       </Show>
 
-      <Show when={props.didDoc.verificationMethod}>
+      <Show when={props.didDoc.verificationMethod?.length}>
         <section>
           <h3 class={HEADING_CLASS}>Verification methods</h3>
           <div class="flex flex-col gap-2">
