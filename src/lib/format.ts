@@ -23,11 +23,18 @@ const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
 
 const relativeTimeFormat = new Intl.RelativeTimeFormat("en", { numeric: "always" });
 
-/** How long ago a time was, in its largest whole unit, e.g. "3 days ago" or "1 week ago". */
+/**
+ * How far a time is from now, in its largest whole unit: "3 days ago" for the past, or
+ * "in 3 days" for the future.
+ */
 export const relativeTimeFromTimestamp = (timestamp: number) => {
   const elapsed = Date.now() - timestamp;
+  const distance = Math.abs(elapsed);
   for (const [unit, ms] of RELATIVE_UNITS) {
-    if (elapsed >= ms) return relativeTimeFormat.format(-Math.floor(elapsed / ms), unit);
+    if (distance >= ms) {
+      const count = Math.floor(distance / ms);
+      return relativeTimeFormat.format(elapsed >= 0 ? -count : count, unit);
+    }
   }
   return "just now";
 };
