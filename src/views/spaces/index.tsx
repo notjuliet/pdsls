@@ -25,18 +25,15 @@ const SignInPrompt = () => {
   const navigate = useNavigate();
 
   return (
-    <div class="flex flex-col items-start gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800">
-      <div>
-        <h2 class="font-medium">Sign in to use Spaces</h2>
-        <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-          Spaces require OAuth permissions.
-        </p>
-      </div>
+    <EmptyState
+      icon="lucide--log-in"
+      title="Sign in to use Spaces"
+      message="Spaces require OAuth permissions."
+    >
       <Button onClick={() => navigate("/account/add")} variant="primary">
-        <span class="iconify lucide--log-in" />
         Sign in
       </Button>
-    </div>
+    </EmptyState>
   );
 };
 
@@ -49,18 +46,15 @@ const PermissionPrompt = () => {
   };
 
   return (
-    <div class="flex flex-col items-start gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800">
-      <div>
-        <h2 class="font-medium">Space permission required</h2>
-        <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-          Re-authorize this account and enable “View non-public records”.
-        </p>
-      </div>
+    <EmptyState
+      icon="lucide--key-round"
+      title="Space permission required"
+      message="Re-authorize this account and enable “View non-public records”."
+    >
       <Button onClick={editPermissions} variant="primary">
-        <span class="iconify lucide--key-round" />
         Edit permissions
       </Button>
-    </div>
+    </EmptyState>
   );
 };
 

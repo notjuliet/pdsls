@@ -1,3 +1,5 @@
+import { type JSX, Show } from "solid-js";
+
 /** The loading indicator. Size and color come from `class`, e.g. `text-xl`. */
 export const Spinner = (props: { class?: string; centered?: boolean }) => {
   const icon = (
@@ -23,9 +25,24 @@ export const LoadingState = (props: { label: string }) => (
   </div>
 );
 
-export const EmptyState = (props: { icon: string; message: string }) => (
+export const EmptyState = (props: {
+  icon: string;
+  message: string;
+  /** A heading above the message, for a state that asks the user to do something. */
+  title?: string;
+  /** What to do about it, such as a button, shown under the message. */
+  children?: JSX.Element;
+}) => (
   <div class="flex flex-col items-center gap-2 py-10 text-center font-sans text-neutral-500 dark:text-neutral-400">
     <span class={`iconify ${props.icon} text-3xl`} />
-    <p class="text-sm">{props.message}</p>
+    <div>
+      <Show when={props.title}>
+        <h2 class="font-medium text-neutral-800 dark:text-neutral-200">{props.title}</h2>
+      </Show>
+      <p class="text-sm">{props.message}</p>
+    </div>
+    <Show when={props.children}>
+      <div class="mt-2">{props.children}</div>
+    </Show>
   </div>
 );
