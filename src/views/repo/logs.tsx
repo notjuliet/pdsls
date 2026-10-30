@@ -79,8 +79,15 @@ export const PlcLogView = (props: { did: string }) => {
     }
   });
 
+  // A small control like the "Valid log" link opposite it, so it reads as a filter for the page
+  // rather than another row of tabs; its label is darker than the dates below, its icons muted. The native select sits on top, invisible, so
+  // phones still get their own picker.
   const EventFilter = () => (
-    <div class="dark:hover:bg-dark-300 relative flex h-7 items-center gap-1.5 rounded-md border border-neutral-300 bg-neutral-50 px-2 text-xs font-medium text-neutral-900 transition-colors hover:bg-neutral-100 has-[:focus-visible]:outline has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-neutral-400 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200 dark:has-[:focus-visible]:outline-neutral-500">
+    <div class="relative -ml-2 flex h-7 items-center gap-1 rounded-md px-2 text-xs text-neutral-700 transition-colors hover:bg-neutral-200/80 hover:text-neutral-900 has-[:focus-visible]:outline has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-neutral-400 dark:text-neutral-300 dark:hover:bg-neutral-700/50 dark:hover:text-neutral-100 dark:has-[:focus-visible]:outline-neutral-500">
+      <span
+        aria-hidden="true"
+        class="iconify lucide--list-filter shrink-0 text-neutral-500 dark:text-neutral-400"
+      />
       <span aria-hidden="true">
         {plcEventFilters.find((filter) => filter.event === activePlcEvent())?.label}
       </span>
@@ -92,9 +99,12 @@ export const PlcLogView = (props: { did: string }) => {
         aria-label="Filter logs by event type"
         class="absolute inset-0 h-full w-full opacity-0"
         value={activePlcEvent() ?? ""}
-        onChange={(event) =>
-          setActivePlcEvent((event.currentTarget.value || undefined) as PlcEvent | undefined)
-        }
+        onChange={(event) => {
+          setActivePlcEvent((event.currentTarget.value || undefined) as PlcEvent | undefined);
+          // A click focuses a select like a keyboard would, leaving its focus ring around the
+          // filter after picking; let go once the choice is made.
+          event.currentTarget.blur();
+        }}
       >
         <For each={plcEventFilters}>
           {(filter) => <option value={filter.event ?? ""}>{filter.label}</option>}
@@ -348,8 +358,10 @@ export const PlcLogView = (props: { did: string }) => {
   };
 
   return (
-    <div class="flex w-full flex-col gap-3 wrap-anywhere">
-      <div class="flex flex-wrap items-center justify-between gap-2">
+    <div class="flex w-full flex-col gap-1 wrap-anywhere">
+      {/* Pulled up past the controls' own padding, so content starts the usual distance below the
+          tabs; and close to the timeline, since that's what the filter acts on. */}
+      <div class="-mt-1.5 flex flex-wrap items-center justify-between gap-2">
         <EventFilter />
         <ValidationStatus />
       </div>
