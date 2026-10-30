@@ -8,7 +8,7 @@ import { useLocation } from "@solidjs/router";
 import { createEffect, createResource, createSignal, For, onCleanup, Show } from "solid-js";
 import * as v from "valibot";
 
-import { LABEL_COLUMN_CLASS, MUTED_CLASS } from "../../components/ui/info.jsx";
+import { HEADING_TEXT_CLASS, LABEL_COLUMN_CLASS, MUTED_CLASS } from "../../components/ui/info.jsx";
 import { localDateFromTimestamp } from "../../lib/format.js";
 import { detectDidKeyType } from "../../lib/key.js";
 import { createOperationHistory, DiffEntry, groupBy } from "../../lib/plc-logs.js";
@@ -302,12 +302,8 @@ export const PlcLogView = (props: { did: string }) => {
             aria-hidden="true"
             class={`${icon} iconify shrink-0 self-center text-neutral-500 dark:text-neutral-400`}
           />
-          <p
-            classList={{
-              "font-semibold text-sm": true,
-              "line-through": diff.orig.nullified,
-            }}
-          >
+          {/* Styled like the Identity tab's section headings, which name the same things. */}
+          <p class={HEADING_TEXT_CLASS} classList={{ "line-through": diff.orig.nullified }}>
             {title}
           </p>
           <Show when={badge}>
