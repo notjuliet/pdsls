@@ -17,7 +17,6 @@ import { Button } from "../ui/button.jsx";
 import { IconButton } from "../ui/icon-button.jsx";
 import { Modal } from "../ui/modal.jsx";
 import { Spinner } from "../ui/states.jsx";
-import { TextInput } from "../ui/text-input.jsx";
 import { ConfirmSubmit } from "./confirm-submit";
 import { InsertMenu } from "./insert-menu.jsx";
 
@@ -34,8 +33,20 @@ export interface RecordWrite {
 const COLLECTION_ERROR = "Invalid collection: use reverse domain format (e.g. app.bsky.feed.post)";
 const RKEY_ERROR = "Invalid record key: 1-512 chars, use a-z A-Z 0-9 . _ ~ : -";
 
-const invalidInputClass =
-  "border-red-500 focus:outline-red-500 dark:border-red-400 dark:focus:outline-red-400";
+// The parts of the record's address, which sit inside one field like a URI.
+const segmentClass =
+  "min-w-0 bg-transparent px-1 py-1.5 outline-none placeholder:text-neutral-400 disabled:text-neutral-500 dark:placeholder:text-neutral-500 dark:disabled:text-neutral-400";
+const invalidSegmentClass = "text-red-500 dark:text-red-400";
+export const slashClass = "shrink-0 text-neutral-400 select-none dark:text-neutral-500";
+
+const typeOf = (content: string) => {
+  try {
+    const type = JSON.parse(content)?.$type;
+    return typeof type === "string" && type ? type : undefined;
+  } catch {
+    return undefined;
+  }
+};
 
 export const RecordEditorDialog = (props: {
   mode: "create" | "edit";
@@ -64,6 +75,8 @@ export const RecordEditorDialog = (props: {
   const [notice, setNotice] = createSignal("");
   const [collection, setCollection] = createSignal("");
   const [rkey, setRkey] = createSignal("");
+  // Shown as the collection's placeholder, since that is where the record goes by default.
+  const [docType, setDocType] = createSignal(typeOf(props.content));
   let editorView: EditorView | undefined;
   const editing = () => props.mode === "edit";
 
@@ -83,6 +96,7 @@ export const RecordEditorDialog = (props: {
         if (!open) return;
         setCollection(props.collection ?? "");
         setRkey(props.rkey ?? "");
+        setDocType(typeOf(props.content));
         setNotice("");
         setIsMinimized(false);
         setOpenAdvanced(false);
@@ -228,22 +242,30 @@ export const RecordEditorDialog = (props: {
           }}
         >
           <Show when={!editing()}>
-            <div class="flex flex-wrap items-center gap-1 text-sm">
+            <div
+              class={`dark:bg-dark-500 flex min-w-0 items-center rounded-md border-[0.5px] bg-white px-1 text-sm transition-colors ${collectionError() || rkeyError() ? "border-red-500 dark:border-red-400" : "border-neutral-300 focus-within:border-neutral-400 dark:border-neutral-700 dark:focus-within:border-neutral-500"}`}
+            >
               {props.targetPrefix}
-              <TextInput
+              <input
                 name="collection"
+                aria-label="Collection"
+                title="Collection, defaults to the record's $type"
+                spellcheck={false}
                 disabled={props.lockCollection}
                 value={collection()}
-                placeholder="Collection (default: $type)"
-                class={`w-40 placeholder:text-xs lg:w-52 ${collectionError() ? invalidInputClass : ""}`}
+                placeholder={docType() ?? "collection"}
+                class={`${segmentClass} [field-sizing:content] ${collectionError() ? invalidSegmentClass : ""}`}
                 onInput={(event) => setCollection(event.currentTarget.value)}
               />
-              <span>/</span>
-              <TextInput
+              <span class={slashClass}>/</span>
+              <input
                 name="rkey"
+                aria-label="Record key"
+                title="Record key, defaults to a new TID"
+                spellcheck={false}
                 value={rkey()}
-                placeholder="Record key (default: TID)"
-                class={`w-40 placeholder:text-xs lg:w-52 ${rkeyError() ? invalidInputClass : ""}`}
+                placeholder="TID"
+                class={`${segmentClass} min-w-16 flex-1 ${rkeyError() ? invalidSegmentClass : ""}`}
                 onInput={(event) => setRkey(event.currentTarget.value)}
               />
             </div>
@@ -263,7 +285,11 @@ export const RecordEditorDialog = (props: {
                 </div>
               }
             >
-              <Editor content={props.content} onReady={(view) => (editorView = view)} />
+              <Editor
+                content={props.content}
+                onReady={(view) => (editorView = view)}
+                onChange={(doc) => setDocType(typeOf(doc))}
+              />
             </Suspense>
           </div>
 

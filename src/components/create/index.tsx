@@ -10,7 +10,7 @@ import { addNotification } from "../ui/notification.jsx";
 import { iconButtonClass } from "../ui/permission-button.jsx";
 import { showPermissionPrompt } from "../ui/permission-prompt";
 import Tooltip from "../ui/tooltip.jsx";
-import { RecordEditorDialog, type RecordWrite } from "./editor-dialog.jsx";
+import { RecordEditorDialog, type RecordWrite, slashClass } from "./editor-dialog.jsx";
 
 const [placeholder, setPlaceholder] = createSignal<any>();
 export { setPlaceholder };
@@ -171,10 +171,13 @@ export const RecordEditor = (props: {
         rkey={props.create ? undefined : params.rkey}
         targetPrefix={
           <>
-            <span>at://</span>
+            <span class="shrink-0 pl-1 text-neutral-400 select-none max-sm:hidden dark:text-neutral-500">
+              at://
+            </span>
             <select
-              class="dark:bg-dark-100 max-w-40 truncate rounded-md border border-neutral-200 bg-white px-1 py-1 select-none focus:outline-1 focus:outline-neutral-400 dark:border-neutral-600 dark:focus:outline-neutral-400"
+              class="dark:bg-dark-500 max-w-[35%] min-w-0 shrink truncate bg-white py-1.5 pl-1 outline-none"
               name="repo"
+              aria-label="Account"
               value={selectedRepo()}
               onChange={(e) => setSelectedRepo(e.currentTarget.value as Did)}
             >
@@ -184,7 +187,7 @@ export const RecordEditor = (props: {
                 )}
               </For>
             </select>
-            <span>/</span>
+            <span class={slashClass}>/</span>
           </>
         }
         uploadRepo={uploadRepo()}

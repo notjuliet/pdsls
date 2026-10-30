@@ -126,7 +126,11 @@ const highlighting = HighlightStyle.define([
   { tag: tags.invalid, color: "var(--cm-invalid)" },
 ]);
 
-const Editor = (props: { content: string; onReady?: (view: EditorView | undefined) => void }) => {
+const Editor = (props: {
+  content: string;
+  onReady?: (view: EditorView | undefined) => void;
+  onChange?: (doc: string) => void;
+}) => {
   let editorDiv!: HTMLDivElement;
   let view: EditorView;
 
@@ -142,6 +146,9 @@ const Editor = (props: { content: string; onReady?: (view: EditorView | undefine
         keymap.of([tabIndentKey]),
         linter(jsonLinter),
         EditorView.lineWrapping,
+        EditorView.updateListener.of((update) => {
+          if (update.docChanged) props.onChange?.(update.state.doc.toString());
+        }),
       ],
     });
     props.onReady?.(view);
@@ -156,7 +163,7 @@ const Editor = (props: { content: string; onReady?: (view: EditorView | undefine
     <div
       ref={editorDiv}
       id="editor"
-      class="h-full cursor-auto border-[0.5px] border-neutral-300 dark:border-neutral-700"
+      class="h-full cursor-auto overflow-hidden rounded-md border-[0.5px] border-neutral-300 dark:border-neutral-700"
     ></div>
   );
 };
