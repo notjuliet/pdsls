@@ -632,14 +632,14 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
         <For each={localizedLines("Title", props.def.title, props.def["title:lang"])}>
           {(line) => (
             <span class={INFO_LINE_CLASS}>
-              {line.label}: <span class={VALUE_CLASS}>{line.text}</span>
+              {line.label}: <span class={`whitespace-pre-wrap ${VALUE_CLASS}`}>{line.text}</span>
             </span>
           )}
         </For>
         <For each={localizedLines("Detail", props.def.detail, props.def["detail:lang"])}>
           {(line) => (
             <span class={INFO_LINE_CLASS}>
-              {line.label}: <span class={VALUE_CLASS}>{line.text}</span>
+              {line.label}: <span class={`whitespace-pre-wrap ${VALUE_CLASS}`}>{line.text}</span>
             </span>
           )}
         </For>
