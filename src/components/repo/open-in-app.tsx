@@ -1,4 +1,4 @@
-import { createSignal, For, type JSX, onCleanup, onMount, Show } from "solid-js";
+import { createEffect, createSignal, For, type JSX, onCleanup, onMount, Show } from "solid-js";
 
 import { Favicon } from "../ui/favicon.jsx";
 
@@ -54,6 +54,9 @@ const CLOSE_DELAY = 150;
  */
 export const OpenInApp = (props: AppLink) => {
   const [open, setOpen] = createSignal(false);
+  // Built on first open and then only hidden, so its favicons don't reload every time.
+  const [built, setBuilt] = createSignal(false);
+  createEffect(() => open() && setBuilt(true));
   let container!: HTMLDivElement;
   let closeTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -131,9 +134,9 @@ export const OpenInApp = (props: AppLink) => {
         >
           <span class="iconify lucide--chevron-down" />
         </button>
-        <Show when={open()}>
+        <Show when={built()}>
           {/* The top padding bridges the gap, so the mouse doesn't leave on its way down. */}
-          <div class="absolute top-full right-0 z-50 pt-1">
+          <div class="absolute top-full right-0 z-50 pt-1" classList={{ hidden: !open() }}>
             <div
               role="menu"
               class="dark:bg-dark-300 dark:shadow-dark-700 flex min-w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-sm shadow-md dark:border-neutral-700"
