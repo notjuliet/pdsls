@@ -42,7 +42,7 @@ const pickClient = (label: string) => {
 const hostOf = (app: AppLink) => app.hostname ?? new URL(app.link).hostname;
 
 const iconBox = (children: JSX.Element) => (
-  <span class="flex size-[1em] shrink-0 items-center justify-center">{children}</span>
+  <span class="flex size-[1em] shrink-0 items-center justify-center *:size-full!">{children}</span>
 );
 
 /** How long the menu stays open after the mouse leaves, so it can cross to the menu. */
