@@ -3,12 +3,13 @@ import { ActorIdentifier, Nsid } from "@atcute/lexicons";
 import { AtprotoDid, Did } from "@atcute/lexicons/syntax";
 import { verifyRecord } from "@atcute/repo";
 import { useLocation, useNavigate, useParams } from "@solidjs/router";
-import { createResource, createSignal, ErrorBoundary, For, Show, Suspense } from "solid-js";
+import { createResource, createSignal, ErrorBoundary, Show, Suspense } from "solid-js";
 
 import { agent } from "../auth/state";
 import { RecordEditor, setPlaceholder } from "../components/create";
 import { JSONValue } from "../components/json.jsx";
 import { Backlinks } from "../components/repo/backlinks.jsx";
+import { OpenInApp } from "../components/repo/open-in-app.jsx";
 import {
   RecordInfo,
   RecordPage,
@@ -16,7 +17,6 @@ import {
   useRecordSchemaValidation,
 } from "../components/repo/record-page.jsx";
 import { ConfirmDialog } from "../components/ui/confirm-dialog.jsx";
-import { Favicon } from "../components/ui/favicon.jsx";
 import { IconButton } from "../components/ui/icon-button.jsx";
 import { addNotification } from "../components/ui/notification.jsx";
 import { Spinner } from "../components/ui/states.jsx";
@@ -25,38 +25,15 @@ import { useRepo } from "../lib/repo-context.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
 import { AtUri, uriTemplates } from "../lib/templates.js";
 
-const faviconWrapper = (children: any) => (
-  <div class="flex size-4 items-center justify-center">{children}</div>
-);
-
-const bskyAltClients = [
-  {
-    label: "Blacksky",
-    hostname: "blacksky.app",
-    transform: (url: string) => url.replace("https://bsky.app", "https://blacksky.community"),
-  },
-  {
-    label: "Witchsky",
-    hostname: "witchsky.app",
-    transform: (url: string) => url.replace("https://bsky.app", "https://witchsky.app"),
-  },
-  {
-    label: "Red Dwarf",
-    hostname: "reddwarf.app",
-    transform: (url: string) => url.replace("https://bsky.app", "https://reddwarf.app"),
-  },
-];
-
 export const RecordView = () => {
   const repo = useRepo();
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams();
   const [openDelete, setOpenDelete] = createSignal(false);
-  const [showAlternates, setShowAlternates] = createSignal(false);
   const [verifyError, setVerifyError] = createSignal("");
   const [externalLink, setExternalLink] = createSignal<
-    { label: string; link: string; icon?: string } | undefined
+    { label: string; link: string } | undefined
   >();
   const [validRecord, setValidRecord] = createSignal<boolean | undefined>(undefined);
   const schemaValidation = useRecordSchemaValidation(
@@ -206,61 +183,7 @@ export const RecordView = () => {
                     confirmLabel="Delete"
                   />
                 </Show>
-                <Show when={externalLink()}>
-                  {(link) => {
-                    const bskyAlts = () =>
-                      link().link.startsWith("https://bsky.app")
-                        ? bskyAltClients.map((alt) => ({
-                            ...alt,
-                            link: alt.transform(link().link),
-                          }))
-                        : [];
-                    return (
-                      <div
-                        class="relative"
-                        onMouseEnter={() => setShowAlternates(true)}
-                        onMouseLeave={() => setShowAlternates(false)}
-                      >
-                        <a
-                          href={link().link}
-                          target="_blank"
-                          title={`Open on ${link().label}`}
-                          class="flex p-1.5"
-                          classList={{
-                            "rounded-sm hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700 dark:active:bg-neutral-600":
-                              !bskyAlts().length,
-                            "bg-neutral-50 rounded-t dark:bg-dark-200 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600":
-                              showAlternates() && bskyAlts().length > 0,
-                          }}
-                        >
-                          <Favicon
-                            domain={new URL(link().link).hostname}
-                            wrapper={faviconWrapper}
-                          />
-                        </a>
-                        <Show when={bskyAlts().length > 0}>
-                          <div
-                            class="dark:bg-dark-200 absolute top-full left-0 z-10 flex flex-col overflow-hidden rounded-b bg-neutral-50 shadow-xs"
-                            classList={{ invisible: !showAlternates() }}
-                          >
-                            <For each={bskyAlts()}>
-                              {(alt) => (
-                                <a
-                                  href={alt.link}
-                                  target="_blank"
-                                  title={`Open on ${alt.label}`}
-                                  class="flex p-1.5 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-                                >
-                                  <Favicon domain={alt.hostname} wrapper={faviconWrapper} />
-                                </a>
-                              )}
-                            </For>
-                          </div>
-                        </Show>
-                      </div>
-                    );
-                  }}
-                </Show>
+                <Show when={externalLink()}>{(link) => <OpenInApp {...link()} />}</Show>
                 <IconButton
                   icon="lucide--copy"
                   label="Copy record"
