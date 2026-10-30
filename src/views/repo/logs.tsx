@@ -292,12 +292,16 @@ export const PlcLogView = (props: { did: string }) => {
     return (
       <div
         classList={{
-          "grid grid-cols-[auto_1fr] gap-y-0.5 gap-x-2": true,
+          "flex flex-col gap-y-0.5": true,
           "opacity-70": diff.orig.nullified,
         }}
       >
-        <div class={`${icon} iconify shrink-0 self-center`} />
+        {/* The icon hangs before the title, and the values below line up with the title text. */}
         <div class="flex min-w-0 items-baseline gap-1.5">
+          <span
+            aria-hidden="true"
+            class={`${icon} iconify shrink-0 self-center text-neutral-500 dark:text-neutral-400`}
+          />
           <p
             classList={{
               "font-semibold text-sm": true,
@@ -307,9 +311,7 @@ export const PlcLogView = (props: { did: string }) => {
             {title}
           </p>
           <Show when={badge}>
-            <span class="shrink-0 text-xs font-medium text-neutral-500 dark:text-neutral-400">
-              {badge}
-            </span>
+            <span class="shrink-0 text-sm text-neutral-500 dark:text-neutral-400">{badge}</span>
           </Show>
           <Show when={diff.orig.nullified}>
             <span class="ml-auto rounded bg-neutral-200 px-2 py-0.5 text-xs font-medium dark:bg-neutral-700">
@@ -318,8 +320,7 @@ export const PlcLogView = (props: { did: string }) => {
           </Show>
         </div>
         <Show when={value}>
-          <div></div>
-          <div class="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-1.5 text-sm">
+          <div class="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-1.5 pl-5 text-sm">
             <Show
               when={isAddition || isRemoval}
               fallback={<span class="col-span-2 truncate">{value}</span>}
@@ -329,15 +330,13 @@ export const PlcLogView = (props: { did: string }) => {
           </div>
         </Show>
         <Show when={oldValue && newValue}>
-          <div></div>
-          <div class="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-1.5 text-sm">
+          <div class="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-1.5 pl-5 text-sm">
             <ValueRow label="After" value={newValue} />
             <ValueRow label="Before" value={oldValue} muted />
           </div>
         </Show>
         <Show when={addedValues.length > 0 || removedValues.length > 0}>
-          <div></div>
-          <div class="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-1.5 text-sm">
+          <div class="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-x-1.5 pl-5 text-sm">
             <For each={addedValues}>
               {(addedValue) => <ValueRow label="Added" value={addedValue} />}
             </For>
@@ -358,41 +357,51 @@ export const PlcLogView = (props: { did: string }) => {
         <EventFilter />
         <ValidationStatus />
       </div>
-      <div class="flex flex-col gap-3">
+      {/* A timeline: one dot per operation on a line, newest first. */}
+      <ol class="flex flex-col">
         <For each={plcOps()}>
           {([entry, diffs]) => {
             const isHighlighted = () => location.hash === `#logs:${entry.createdAt}`;
             return (
               <Show when={shouldShowEntry(diffs)}>
-                <div
+                <li
                   id={`log-${entry.createdAt}`}
-                  class="group flex scroll-mt-3 flex-col gap-1 rounded-lg transition-colors"
+                  class="group/entry relative scroll-mt-3 pb-5 pl-5 last:pb-0"
                 >
-                  <span class="relative text-sm font-semibold text-neutral-700 dark:text-neutral-300">
-                    <a href={`#logs:${entry.createdAt}`} class="relative hover:underline">
-                      <span class="absolute top-1/2 -left-4.5 flex -translate-y-1/2 items-center text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100 dark:text-neutral-400">
-                        <span class="iconify lucide--link text-xs"></span>
-                      </span>
-                      {localDateFromTimestamp(new Date(entry.createdAt).getTime())}
-                    </a>
-                  </span>
-                  <div
-                    class="flex flex-col gap-2 rounded-md border bg-neutral-50 p-3 text-sm dark:bg-neutral-800"
+                  {/* The line runs from the first dot to the last, behind the dots. */}
+                  <span
+                    aria-hidden="true"
+                    class="absolute top-0 bottom-0 left-[4.5px] w-px bg-neutral-300 group-first/entry:top-2 group-last/entry:bottom-auto group-last/entry:h-2 dark:bg-neutral-700"
+                  />
+                  <span
+                    aria-hidden="true"
+                    class="dark:ring-dark-500 absolute top-2 left-0 size-2.5 rounded-full ring-4 ring-neutral-100"
                     classList={{
-                      "border-neutral-200 dark:border-neutral-700": !isHighlighted(),
-                      "border-blue-500 dark:border-blue-400": isHighlighted(),
+                      "bg-neutral-400 dark:bg-neutral-500": !isHighlighted(),
+                      "bg-blue-500 dark:bg-blue-400": isHighlighted(),
+                    }}
+                  />
+                  <a
+                    href={`#logs:${entry.createdAt}`}
+                    class="text-xs font-medium tabular-nums hover:underline"
+                    classList={{
+                      "text-neutral-500 dark:text-neutral-400": !isHighlighted(),
+                      "text-blue-500 dark:text-blue-400": isHighlighted(),
                     }}
                   >
+                    {localDateFromTimestamp(new Date(entry.createdAt).getTime())}
+                  </a>
+                  <div class="mt-1.5 flex flex-col gap-2 text-sm">
                     <For each={diffs.filter(shouldShowDiff)}>
                       {(diff) => <DiffItem diff={diff} />}
                     </For>
                   </div>
-                </div>
+                </li>
               </Show>
             );
           }}
         </For>
-      </div>
+      </ol>
     </div>
   );
 };
