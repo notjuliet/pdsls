@@ -370,11 +370,12 @@ const BacklinkCollectionDetail = (props: {
           </p>
         }
       >
-        <div class="flex flex-col gap-5">
+        <div class="flex flex-col gap-3">
           <For each={props.entries}>
             {(entry, index) => (
-              <section class="motion-safe:animate-fade-in flex flex-col gap-1">
-                {/* The count sits by the path, not over the right-hand column the rows' times use. */}
+              <section class="motion-safe:animate-fade-in flex flex-col gap-1 border-t border-neutral-200 pt-2 first:border-t-0 first:pt-0 dark:border-neutral-700/60">
+                {/* Groups are divided like the backlinks index's domains. The count sits by the path,
+                  not over the right-hand column the rows' times use. */}
                 <div
                   ref={(el) => (headings[index()] = el)}
                   class="dark:bg-dark-500 sticky z-9 flex min-w-0 items-baseline gap-2 bg-neutral-100 py-1 text-sm"
