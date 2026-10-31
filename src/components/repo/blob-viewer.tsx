@@ -15,8 +15,14 @@ import { formatFileSize } from "../../lib/format.js";
 import { BackLink } from "../ui/back-link.jsx";
 import { Button } from "../ui/button.jsx";
 import { ExternalLink } from "../ui/external-link.jsx";
+import { CopyValue, InfoRow, MUTED_CLASS } from "../ui/info.jsx";
 import { Spinner } from "../ui/states.jsx";
 import { ZoomableImage } from "../ui/zoomable-image.jsx";
+
+/** The info rows' labels are four letters at most, so their column is narrower than usual. */
+const LABEL_CLASS = "min-w-10 shrink-0 font-sans";
+/** Lines a note up with the values, past that column and the row's gap. */
+const UNDER_LABEL_CLASS = "pl-11";
 
 const SIZE_CAP = 50 * 1024 * 1024; // 50 MiB
 
@@ -222,60 +228,61 @@ export const BlobViewer = (props: {
               const unsupported = unsupportedHash();
               return (
                 <>
-                  <div class="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 rounded border border-neutral-200 px-3 py-2 text-sm dark:border-neutral-700">
-                    <span class="text-neutral-500 dark:text-neutral-400">CID</span>
-                    <span dir="rtl" class="truncate text-left">
-                      {props.cid}
-                    </span>
-                    <span class="text-neutral-500 dark:text-neutral-400">Hash</span>
-                    <span class="flex flex-col gap-1">
+                  {/* A few plain rows, with a label column only as wide as these short labels. */}
+                  <div class="flex flex-col gap-1 wrap-anywhere">
+                    <InfoRow label="CID" labelClass={LABEL_CLASS}>
+                      <CopyValue value={props.cid} />
+                    </InfoRow>
+                    <InfoRow label="Hash" labelClass={LABEL_CLASS}>
                       <span
                         class="flex items-center gap-1.5"
                         classList={{
                           "text-green-600 dark:text-green-400":
                             unsupported === undefined && value().matches,
-                          "text-red-600 dark:text-red-400":
+                          "text-red-500 dark:text-red-400":
                             unsupported === undefined && !value().matches,
                           "text-amber-600 dark:text-amber-400": unsupported !== undefined,
                         }}
                       >
                         <span
-                          class="shrink-0"
+                          class="iconify shrink-0"
                           classList={{
-                            "iconify lucide--check": unsupported === undefined && value().matches,
-                            "iconify lucide--x": unsupported === undefined && !value().matches,
-                            "iconify lucide--triangle-alert": unsupported !== undefined,
+                            "lucide--check": unsupported === undefined && value().matches,
+                            "lucide--x": unsupported === undefined && !value().matches,
+                            "lucide--triangle-alert": unsupported !== undefined,
                           }}
                         />
-                        <span>
-                          {unsupported !== undefined
-                            ? "Unsupported"
-                            : value().matches
-                              ? "Valid"
-                              : "Mismatch"}
-                        </span>
+                        {unsupported !== undefined
+                          ? "Not checked"
+                          : value().matches
+                            ? "Valid"
+                            : "Mismatch"}
                       </span>
-                      <Show when={unsupported === undefined && !value().matches}>
-                        <div class="text-xs wrap-break-word text-neutral-600 dark:text-neutral-300">
-                          Fetched bytes do not match the requested CID.
-                          <div class="mt-1 grid grid-cols-[max-content_1fr] gap-x-3 font-mono">
-                            <span class="text-neutral-500 dark:text-neutral-400">expected</span>
-                            <span class="wrap-anywhere">{toHex(value().expected)}</span>
-                            <span class="text-neutral-500 dark:text-neutral-400">actual</span>
-                            <span class="wrap-anywhere">{toHex(value().digest)}</span>
-                          </div>
+                    </InfoRow>
+                    <Show when={unsupported === undefined && !value().matches}>
+                      <div class={`${UNDER_LABEL_CLASS} text-xs text-red-500 dark:text-red-400`}>
+                        The fetched bytes don't match the CID.
+                        <div class="mt-1 grid grid-cols-[max-content_1fr] gap-x-3 font-mono text-neutral-600 dark:text-neutral-300">
+                          <span class={MUTED_CLASS}>expected</span>
+                          <span class="wrap-anywhere">{toHex(value().expected)}</span>
+                          <span class={MUTED_CLASS}>actual</span>
+                          <span class="wrap-anywhere">{toHex(value().digest)}</span>
                         </div>
-                      </Show>
-                      <Show when={unsupported !== undefined}>
-                        <div class="text-xs wrap-break-word text-neutral-600 dark:text-neutral-300">
-                          Hash multicodec 0x{unsupported!.toString(16)} not recognized.
-                        </div>
-                      </Show>
-                    </span>
-                    <span class="text-neutral-500 dark:text-neutral-400">Size</span>
-                    <span>{formatFileSize(value().size)}</span>
-                    <span class="text-neutral-500 dark:text-neutral-400">MIME</span>
-                    <span>{value().mimeType}</span>
+                      </div>
+                    </Show>
+                    <Show when={unsupported !== undefined}>
+                      <div
+                        class={`${UNDER_LABEL_CLASS} text-xs text-amber-600 dark:text-amber-400`}
+                      >
+                        Hash multicodec 0x{unsupported!.toString(16)} isn't recognised.
+                      </div>
+                    </Show>
+                    <InfoRow label="Size" labelClass={LABEL_CLASS}>
+                      {formatFileSize(value().size)}
+                    </InfoRow>
+                    <InfoRow label="Type" labelClass={LABEL_CLASS}>
+                      {value().mimeType}
+                    </InfoRow>
                   </div>
 
                   <Show when={previewKind(value().mimeType) !== "none" && objectUrl()}>
