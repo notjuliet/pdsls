@@ -8,19 +8,23 @@ import { Modal } from "../../components/ui/modal.jsx";
 import { addNotification } from "../../components/ui/notification.jsx";
 import { PermissionButton } from "../../components/ui/permission-button.jsx";
 import { Spinner } from "../../components/ui/states.jsx";
-import { deleteSimpleSpace, type SimpleSpaceInfo, updateSimpleSpace } from "../../lib/spaces.js";
+import {
+  deleteSpace as deleteSpaceRequest,
+  type SpaceInfo,
+  updateSpace,
+} from "../../lib/spaces.js";
 import { useSpacesAuth } from "./context.jsx";
 import {
-  defaultSimpleSpaceSettings,
-  parseSimpleSpaceSettings,
-  SimpleSpaceSettingsFields,
-  simpleSpaceSettingsFromInfo,
-} from "./simple-space-settings.jsx";
+  defaultSpaceSettings,
+  parseSpaceSettings,
+  SpaceSettingsFields,
+  spaceSettingsFromInfo,
+} from "./space-settings.jsx";
 
 export const ManageSpaceDialog = (props: {
-  info: SimpleSpaceInfo;
+  info: SpaceInfo;
   space: string;
-  onUpdated: (info: SimpleSpaceInfo) => void;
+  onUpdated: (info: SpaceInfo) => void;
   onDeleted: () => void;
 }) => {
   const auth = useSpacesAuth();
@@ -29,8 +33,10 @@ export const ManageSpaceDialog = (props: {
   const [submitting, setSubmitting] = createSignal(false);
   const [deleting, setDeleting] = createSignal(false);
   const [notice, setNotice] = createSignal("");
-  const [settings, setSettings] = createStore(defaultSimpleSpaceSettings());
-  const editableSettings = createMemo(() => simpleSpaceSettingsFromInfo(props.info));
+  const [settings, setSettings] = createStore(defaultSpaceSettings());
+  const editableSettings = createMemo(() => spaceSettingsFromInfo(props.info));
+  // A new kind of policy replaces the old one wholesale, member list included.
+  const losesMembers = () => props.info.policy.kind === "member" && settings.kind !== "member";
 
   const openDialog = () => {
     const current = editableSettings();
@@ -52,9 +58,9 @@ export const ManageSpaceDialog = (props: {
   const save = async () => {
     if (submitting()) return;
 
-    let config;
+    let policy;
     try {
-      config = parseSimpleSpaceSettings(settings);
+      policy = parseSpaceSettings(settings);
     } catch (err) {
       setNotice(err instanceof Error ? err.message : "Invalid Space configuration");
       return;
@@ -63,8 +69,8 @@ export const ManageSpaceDialog = (props: {
     setSubmitting(true);
     setNotice("");
     try {
-      await updateSimpleSpace(auth(), props.space, config);
-      props.onUpdated({ uri: props.info.uri, ...config });
+      await updateSpace(auth(), props.space, policy);
+      props.onUpdated({ uri: props.info.uri, policy });
       setOpen(false);
 
       addNotification({ message: "Space updated", type: "success", duration: 3000 });
@@ -80,7 +86,7 @@ export const ManageSpaceDialog = (props: {
 
     setDeleting(true);
     try {
-      await deleteSimpleSpace(auth(), props.space);
+      await deleteSpaceRequest(auth(), props.space);
       // Stays on the delete step while the dialog fades out; opening it again starts over.
       setOpen(false);
 
@@ -161,7 +167,13 @@ export const ManageSpaceDialog = (props: {
                   </p>
                 }
               >
-                <SimpleSpaceSettingsFields settings={settings} setSettings={setSettings} />
+                <SpaceSettingsFields settings={settings} setSettings={setSettings} />
+                <Show when={losesMembers()}>
+                  <p class="text-sm text-amber-600 dark:text-amber-500">
+                    Switching away from Members deletes this Space's member list, and switching back
+                    won't restore it.
+                  </p>
+                </Show>
               </Show>
 
               <Show when={notice()}>

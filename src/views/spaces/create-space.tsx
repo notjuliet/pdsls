@@ -10,20 +10,16 @@ import { addNotification } from "../../components/ui/notification.jsx";
 import { PermissionButton } from "../../components/ui/permission-button.jsx";
 import { Spinner } from "../../components/ui/states.jsx";
 import { TextInput } from "../../components/ui/text-input.jsx";
-import {
-  createSimpleSpace,
-  parseSpaceUri,
-  type CreateSimpleSpaceResult,
-} from "../../lib/spaces.js";
+import { createSpace, parseSpaceUri, type CreateSpaceResult } from "../../lib/spaces.js";
 import { useSpacesAuth } from "./context.jsx";
 import {
-  defaultSimpleSpaceSettings,
-  parseSimpleSpaceSettings,
-  SimpleSpaceSettingsFields,
-} from "./simple-space-settings.jsx";
+  defaultSpaceSettings,
+  parseSpaceSettings,
+  SpaceSettingsFields,
+} from "./space-settings.jsx";
 
 interface CreateSpaceDialogProps {
-  onCreated: (result: CreateSimpleSpaceResult) => void;
+  onCreated: (result: CreateSpaceResult) => void;
 }
 
 export const CreateSpaceDialog = (props: CreateSpaceDialogProps) => {
@@ -32,13 +28,13 @@ export const CreateSpaceDialog = (props: CreateSpaceDialogProps) => {
   const [submitting, setSubmitting] = createSignal(false);
   const [type, setType] = createSignal("");
   const [skey, setSkey] = createSignal("");
-  const [settings, setSettings] = createStore(defaultSimpleSpaceSettings());
+  const [settings, setSettings] = createStore(defaultSpaceSettings());
   const [notice, setNotice] = createSignal("");
 
   const reset = () => {
     setType("");
     setSkey("");
-    setSettings(defaultSimpleSpaceSettings());
+    setSettings(defaultSpaceSettings());
     setNotice("");
   };
 
@@ -66,9 +62,9 @@ export const CreateSpaceDialog = (props: CreateSpaceDialogProps) => {
       return;
     }
 
-    let config;
+    let policy;
     try {
-      config = parseSimpleSpaceSettings(settings);
+      policy = parseSpaceSettings(settings);
     } catch (err) {
       setNotice(err instanceof Error ? err.message : "Invalid Space configuration");
       return;
@@ -77,10 +73,10 @@ export const CreateSpaceDialog = (props: CreateSpaceDialogProps) => {
     setSubmitting(true);
     setNotice("");
     try {
-      const result = await createSimpleSpace(auth(), {
+      const result = await createSpace(auth(), {
         type: targetType,
         skey: targetSkey || undefined,
-        ...config,
+        policy,
       });
       const parsed = parseSpaceUri(result.uri);
       if (!parsed || parsed.authority !== auth().sub || parsed.type !== targetType) {
@@ -161,7 +157,7 @@ export const CreateSpaceDialog = (props: CreateSpaceDialogProps) => {
             </span>
           </label>
 
-          <SimpleSpaceSettingsFields settings={settings} setSettings={setSettings} />
+          <SpaceSettingsFields settings={settings} setSettings={setSettings} />
 
           <Show when={notice()}>
             <div class="text-sm text-red-500 dark:text-red-400">{notice()}</div>

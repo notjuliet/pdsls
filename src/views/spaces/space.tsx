@@ -11,12 +11,7 @@ import { Tabs } from "../../components/ui/tabs.jsx";
 import { localDateFromTimestamp, relativeTimeFromTimestamp } from "../../lib/format.js";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { resolveRawLexicon } from "../../lib/lexicon.js";
-import {
-  getSimpleSpace,
-  listSpaceRepos,
-  type SimpleSpaceInfo,
-  type SpaceRepo,
-} from "../../lib/spaces.js";
+import { getSpaceInfo, listSpaceRepos, type SpaceInfo, type SpaceRepo } from "../../lib/spaces.js";
 import {
   makeSpacePath,
   makeSpaceRef,
@@ -26,7 +21,7 @@ import {
 } from "./context.jsx";
 import { SpaceRecordEditor } from "./create-record.jsx";
 import { ManageSpaceDialog } from "./manage-space.jsx";
-import { SimpleSpaceDetails } from "./simple-space.jsx";
+import { SpaceAccessDetails } from "./space-access.jsx";
 import { parseSpaceTypeInfo, SpaceTypeDetails, type SpaceTypeInfo } from "./space-type-details.jsx";
 
 const SpaceView = () => {
@@ -41,15 +36,15 @@ const SpaceView = () => {
   const [loaded, setLoaded] = createSignal(false);
   const [loading, setLoading] = createSignal(false);
   const [error, setError] = createSignal<string>();
-  const [simpleSpaceInfo, setSimpleSpaceInfo] = createSignal<SimpleSpaceInfo>();
-  const [simpleSpaceResolved, setSimpleSpaceResolved] = createSignal(false);
+  const [spaceInfo, setSpaceInfo] = createSignal<SpaceInfo>();
+  const [spaceInfoResolved, setSpaceInfoResolved] = createSignal(false);
   const [spaceTypeInfo, setSpaceTypeInfo] = createSignal<SpaceTypeInfo>();
   const [spaceTypeLoading, setSpaceTypeLoading] = createSignal(false);
   const [spaceTypeError, setSpaceTypeError] = createSignal<string>();
   let activeKey = "";
   let requestVersion = 0;
-  let simpleSpaceKey = "";
-  let simpleSpaceVersion = 0;
+  let spaceInfoKey = "";
+  let spaceInfoVersion = 0;
   let spaceTypeKey = "";
   let spaceTypeVersion = 0;
 
@@ -116,25 +111,25 @@ const SpaceView = () => {
     const agent = auth();
     const spaceRef = space();
     const key = `${agent.sub}\n${spaceRef}`;
-    if (key === simpleSpaceKey) return;
+    if (key === spaceInfoKey) return;
 
-    simpleSpaceKey = key;
-    simpleSpaceVersion += 1;
-    setSimpleSpaceInfo(undefined);
-    setSimpleSpaceResolved(false);
+    spaceInfoKey = key;
+    spaceInfoVersion += 1;
+    setSpaceInfo(undefined);
+    setSpaceInfoResolved(false);
 
-    const version = simpleSpaceVersion;
-    void getSimpleSpace(agent, spaceRef)
+    const version = spaceInfoVersion;
+    void getSpaceInfo(agent, spaceRef)
       .then((info) => {
-        if (version === simpleSpaceVersion) {
-          setSimpleSpaceInfo(info);
-          setSimpleSpaceResolved(true);
+        if (version === spaceInfoVersion) {
+          setSpaceInfo(info);
+          setSpaceInfoResolved(true);
         }
       })
       .catch(() => {
-        if (version === simpleSpaceVersion) {
-          setSimpleSpaceInfo(undefined);
-          setSimpleSpaceResolved(true);
+        if (version === spaceInfoVersion) {
+          setSpaceInfo(undefined);
+          setSpaceInfoResolved(true);
         }
       });
   });
@@ -199,13 +194,13 @@ const SpaceView = () => {
                 onSaved={() => void loadRepos(true)}
               />
             </Show>
-            <Show when={params.spaceAuthority === auth().sub && simpleSpaceInfo()}>
+            <Show when={params.spaceAuthority === auth().sub && spaceInfo()}>
               {(info) => (
                 <ManageSpaceDialog
                   info={info()}
                   space={space()}
                   onUpdated={(updated) => {
-                    setSimpleSpaceInfo(updated);
+                    setSpaceInfo(updated);
                     void loadRepos(true);
                   }}
                   onDeleted={() => {
@@ -329,12 +324,12 @@ const SpaceView = () => {
               error={spaceTypeError()}
             />
 
-            <Show when={!simpleSpaceResolved()}>
+            <Show when={!spaceInfoResolved()}>
               <LoadingState label="Loading access details…" />
             </Show>
-            <Show when={simpleSpaceInfo()}>
+            <Show when={spaceInfo()}>
               {(info) => (
-                <SimpleSpaceDetails
+                <SpaceAccessDetails
                   info={info()}
                   space={space()}
                   authority={params.spaceAuthority!}

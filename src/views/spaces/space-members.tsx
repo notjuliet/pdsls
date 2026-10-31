@@ -17,10 +17,10 @@ import { TextInput } from "../../components/ui/text-input.jsx";
 import { resolveHandle } from "../../lib/api.js";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import {
-  putSimpleSpaceMember,
-  listSimpleSpaceMembers,
-  removeSimpleSpaceMember,
-  type SimpleSpaceMember,
+  putSpaceMember,
+  listSpaceMembers,
+  removeSpaceMember,
+  type SpaceMember,
 } from "../../lib/spaces.js";
 import { useSpacesAuth } from "./context.jsx";
 
@@ -39,15 +39,15 @@ const accessValue = (member: { read: boolean; write: boolean }) =>
 const actionButtonClass =
   "flex items-center gap-1 rounded-md border border-neutral-300 px-1.5 text-xs leading-5 transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700";
 
-export const SimpleSpaceMembers = (props: {
+export const SpaceMembers = (props: {
   space: string;
   authority: string;
-  /** Whether the read and write policies go by the member list, so each kind of access applies. */
+  /** Whether reading and writing go by the member list rather than being open to anyone. */
   readUsesMembers: boolean;
   writeUsesMembers: boolean;
 }) => {
   const auth = useSpacesAuth();
-  const [members, setMembers] = createSignal<SimpleSpaceMember[]>([]);
+  const [members, setMembers] = createSignal<SpaceMember[]>([]);
   const [cursor, setCursor] = createSignal<string>();
   const [loaded, setLoaded] = createSignal(false);
   const [loading, setLoading] = createSignal(false);
@@ -74,7 +74,7 @@ export const SimpleSpaceMembers = (props: {
     setLoading(true);
     setError(undefined);
     try {
-      const result = await listSimpleSpaceMembers(auth(), props.space, {
+      const result = await listSpaceMembers(auth(), props.space, {
         cursor: reset ? undefined : cursor(),
       });
       if (version !== requestVersion) return;
@@ -86,7 +86,7 @@ export const SimpleSpaceMembers = (props: {
       setLoaded(true);
     } catch (err) {
       if (version !== requestVersion) return;
-      setError(err instanceof Error ? err.message : "Could not load SimpleSpace members");
+      setError(err instanceof Error ? err.message : "Could not load the member list");
       setLoaded(true);
     } finally {
       if (version === requestVersion) setLoading(false);
@@ -123,7 +123,7 @@ export const SimpleSpaceMembers = (props: {
   };
 
   /** Saves a member's access as soon as it's picked on their row. */
-  const changeAccess = async (member: SimpleSpaceMember, value: string) => {
+  const changeAccess = async (member: SpaceMember, value: string) => {
     const option = ACCESS_OPTIONS.find((option) => option.value === value);
     if (!option || savingDid()) return;
     // Picked from the keyboard, which the label's pointer check doesn't catch.
@@ -134,7 +134,7 @@ export const SimpleSpaceMembers = (props: {
 
     setSavingDid(member.did);
     try {
-      await putSimpleSpaceMember(auth(), props.space, {
+      await putSpaceMember(auth(), props.space, {
         did: member.did,
         read: option.read,
         write: option.write,
@@ -159,7 +159,7 @@ export const SimpleSpaceMembers = (props: {
     if (removing()) return;
     setRemoving(true);
     try {
-      await removeSimpleSpaceMember(auth(), props.space, did);
+      await removeSpaceMember(auth(), props.space, did);
       setMembers((current) => current.filter((member) => member.did !== did));
       setConfirmingDid(undefined);
       addNotification({ message: "Member removed", type: "success", duration: 3000 });
@@ -197,7 +197,7 @@ export const SimpleSpaceMembers = (props: {
     setDialogError("");
     try {
       const did = await resolveMemberDid();
-      await putSimpleSpaceMember(auth(), props.space, {
+      await putSpaceMember(auth(), props.space, {
         did,
         read: readAccess(),
         write: writeAccess(),
@@ -410,11 +410,11 @@ export const SimpleSpaceMembers = (props: {
           }}
         >
           <div class="flex flex-col gap-1">
-            <label for="simple-space-member" class="text-sm font-medium">
+            <label for="space-member" class="text-sm font-medium">
               Handle or DID
             </label>
             <TextInput
-              id="simple-space-member"
+              id="space-member"
               class="w-full"
               placeholder="alice.example.com"
               value={memberIdentifier()}
@@ -444,8 +444,8 @@ export const SimpleSpaceMembers = (props: {
             {/* Only when one kind of access does nothing in this space. */}
             <Show when={!props.readUsesMembers || !props.writeUsesMembers}>
               <p class="text-xs text-neutral-500 dark:text-neutral-400">
-                {props.readUsesMembers ? "Write" : "Read"} access does nothing here: this space's{" "}
-                {props.readUsesMembers ? "write" : "read"} policy doesn't use the member list.
+                {props.readUsesMembers ? "Write" : "Read"} access does nothing here: anyone can{" "}
+                {props.readUsesMembers ? "write" : "read"} in this space.
               </p>
             </Show>
           </fieldset>

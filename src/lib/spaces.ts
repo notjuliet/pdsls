@@ -28,43 +28,43 @@ export interface SpaceRepo {
   rev: string;
 }
 
-export type SimpleSpacePolicy =
-  | { kind: "public" }
-  | { kind: "member-list" }
-  | { kind: "managing-app"; managingApp: string }
+/**
+ * A space's policy, which decides who may read and write in it. The PDS supports three:
+ * personal (only the owner), member (a member list, optionally public), and managed (an app
+ * decides). Any other `$type` is shown but can't be edited.
+ */
+export type SpacePolicy =
+  | { kind: "personal" }
+  | {
+      kind: "member";
+      publicRead: boolean;
+      publicWrite: boolean;
+      /** OAuth client IDs that may read; any app may when unset. */
+      allowedApps?: string[];
+      publishPolicy: boolean;
+      publishMembers: boolean;
+    }
+  | { kind: "managed"; managingApp: string; publishPolicy: boolean }
   | { kind: "unknown"; type: string };
 
-type SimpleSpaceAppAccess =
-  | { kind: "open" }
-  | { kind: "allow-list"; allowed: string[] }
-  | { kind: "unknown"; type: string };
+export type NewSpacePolicy = Exclude<SpacePolicy, { kind: "unknown" }>;
 
-export interface SimpleSpaceInfo {
+export interface SpaceInfo {
   uri: string;
-  readPolicy: SimpleSpacePolicy;
-  writePolicy: SimpleSpacePolicy;
-  appAccess: SimpleSpaceAppAccess;
+  policy: SpacePolicy;
 }
 
-export type NewSimpleSpacePolicy = Exclude<SimpleSpacePolicy, { kind: "unknown" }>;
-export type NewSimpleSpaceAppAccess = Exclude<SimpleSpaceAppAccess, { kind: "unknown" }>;
-
-export interface SimpleSpaceConfiguration {
-  readPolicy: NewSimpleSpacePolicy;
-  writePolicy: NewSimpleSpacePolicy;
-  appAccess: NewSimpleSpaceAppAccess;
-}
-
-interface CreateSimpleSpaceOptions extends SimpleSpaceConfiguration {
+interface CreateSpaceOptions {
   type: string;
   skey?: string;
+  policy: NewSpacePolicy;
 }
 
-export interface CreateSimpleSpaceResult {
+export interface CreateSpaceResult {
   uri: string;
 }
 
-export interface SimpleSpaceMember {
+export interface SpaceMember {
   did: string;
   read: boolean;
   write: boolean;
@@ -90,9 +90,9 @@ interface ListSpaceReposResult {
   repos: SpaceRepo[];
 }
 
-interface ListSimpleSpaceMembersResult {
+interface ListSpaceMembersResult {
   cursor?: string;
-  members: SimpleSpaceMember[];
+  members: SpaceMember[];
 }
 
 export interface GetSpaceRecordResult {
@@ -327,6 +327,11 @@ const acquireSpaceCredential = async (
     if (isObject(data) && data.error === "AppNotAuthorized") {
       throw new Error(`${message}. This Space requires an approved application.`);
     }
+    // Authorities answer SpaceNotFound for users they don't authorize, so as not to reveal the
+    // space; older ones may still say UserNotAuthorized.
+    if (isObject(data) && (data.error === "SpaceNotFound" || data.error === "UserNotAuthorized")) {
+      throw new Error("This Space doesn't exist, or you don't have access to it");
+    }
     throw new Error(message);
   }
   if (!isObject(data) || typeof data.credential !== "string") {
@@ -417,69 +422,75 @@ const credentialRequest = async (
 const credentialQuery = async (...args: Parameters<typeof credentialRequest>): Promise<unknown> =>
   (await credentialRequest(...args)).data;
 
-const parseSimpleSpacePolicy = (value: unknown): SimpleSpacePolicy => {
+const POLICY_TYPES = {
+  personal: "com.atproto.personalspace.policy",
+  member: "com.atproto.memberspace.policy",
+  managed: "com.atproto.managedspace.policy",
+} as const;
+
+const parseSpacePolicy = (value: unknown): SpacePolicy => {
   if (!isObject(value) || typeof value.$type !== "string") {
-    throw new Error("The Space authority returned an invalid SimpleSpace policy");
+    throw new Error("The Space authority returned an invalid policy");
   }
 
   switch (value.$type) {
-    case "com.atproto.simplespace.defs#publicPolicy":
-      return { kind: "public" };
-    case "com.atproto.simplespace.defs#memberListPolicy":
-      return { kind: "member-list" };
-    case "com.atproto.simplespace.defs#managingAppPolicy":
-      if (typeof value.managingApp !== "string") {
-        throw new Error("The Space authority returned an invalid managing app policy");
-      }
-      return { kind: "managing-app", managingApp: value.managingApp };
-    default:
-      return { kind: "unknown", type: value.$type };
-  }
-};
-
-const parseSimpleSpaceAppAccess = (value: unknown): SimpleSpaceAppAccess => {
-  if (!isObject(value) || typeof value.$type !== "string") {
-    throw new Error("The Space authority returned an invalid SimpleSpace app policy");
-  }
-
-  switch (value.$type) {
-    case "com.atproto.simplespace.defs#open":
-      return { kind: "open" };
-    case "com.atproto.simplespace.defs#allowList":
+    case POLICY_TYPES.personal:
+      return { kind: "personal" };
+    case POLICY_TYPES.member: {
+      const allowedApps = value.allowedApps;
       if (
-        !Array.isArray(value.allowed) ||
-        !value.allowed.every((item) => typeof item === "string")
+        allowedApps !== undefined &&
+        (!Array.isArray(allowedApps) || !allowedApps.every((app) => typeof app === "string"))
       ) {
-        throw new Error("The Space authority returned an invalid application allow list");
+        throw new Error("The Space authority returned an invalid app allow list");
       }
-      return { kind: "allow-list", allowed: value.allowed };
+      return {
+        kind: "member",
+        publicRead: value.publicRead === true,
+        publicWrite: value.publicWrite === true,
+        allowedApps,
+        publishPolicy: value.publishPolicy === true,
+        publishMembers: value.publishMembers === true,
+      };
+    }
+    case POLICY_TYPES.managed:
+      if (typeof value.managingApp !== "string") {
+        throw new Error("The Space authority returned an invalid managing app");
+      }
+      return {
+        kind: "managed",
+        managingApp: value.managingApp,
+        publishPolicy: value.publishPolicy === true,
+      };
     default:
       return { kind: "unknown", type: value.$type };
   }
 };
 
-const encodeSimpleSpacePolicy = (policy: NewSimpleSpacePolicy) =>
-  policy.kind === "managing-app"
-    ? {
-        $type: "com.atproto.simplespace.defs#managingAppPolicy",
-        managingApp: policy.managingApp,
-      }
-    : {
-        $type:
-          policy.kind === "public"
-            ? "com.atproto.simplespace.defs#publicPolicy"
-            : "com.atproto.simplespace.defs#memberListPolicy",
+const encodeSpacePolicy = (policy: NewSpacePolicy) => {
+  switch (policy.kind) {
+    case "personal":
+      return { $type: POLICY_TYPES.personal };
+    case "member":
+      return {
+        $type: POLICY_TYPES.member,
+        publicRead: policy.publicRead,
+        publicWrite: policy.publicWrite,
+        // Omitted rather than empty: an unset list lets any app read.
+        ...(policy.allowedApps ? { allowedApps: policy.allowedApps } : {}),
+        publishPolicy: policy.publishPolicy,
+        publishMembers: policy.publishMembers,
       };
+    case "managed":
+      return {
+        $type: POLICY_TYPES.managed,
+        managingApp: policy.managingApp,
+        publishPolicy: policy.publishPolicy,
+      };
+  }
+};
 
-const encodeSimpleSpaceAppAccess = (appAccess: NewSimpleSpaceAppAccess) =>
-  appAccess.kind === "allow-list"
-    ? {
-        $type: "com.atproto.simplespace.defs#allowList",
-        allowed: appAccess.allowed,
-      }
-    : { $type: "com.atproto.simplespace.defs#open" };
-
-const assertSimpleSpaceAuthority = (auth: OAuthUserAgent, space: string, action: string) => {
+const assertSpaceAuthority = (auth: OAuthUserAgent, space: string, action: string) => {
   const parsed = parseSpaceUri(space);
   if (!parsed) throw new Error("Invalid Space reference");
   if (parsed.authority !== auth.sub) {
@@ -487,96 +498,101 @@ const assertSimpleSpaceAuthority = (auth: OAuthUserAgent, space: string, action:
   }
 };
 
-export const createSimpleSpace = async (
+export const createSpace = async (
   auth: OAuthUserAgent,
-  options: CreateSimpleSpaceOptions,
-): Promise<CreateSimpleSpaceResult> => {
-  const data = await oauthProcedure(auth, "com.atproto.simplespace.createSpace", {
-    type: options.type,
+  options: CreateSpaceOptions,
+): Promise<CreateSpaceResult> => {
+  const data = await oauthProcedure(auth, "com.atproto.space.createSpace", {
+    spaceType: options.type,
     skey: options.skey,
-    readPolicy: encodeSimpleSpacePolicy(options.readPolicy),
-    writePolicy: encodeSimpleSpacePolicy(options.writePolicy),
-    appAccess: encodeSimpleSpaceAppAccess(options.appAccess),
+    policy: encodeSpacePolicy(options.policy),
   });
 
   if (!isObject(data) || typeof data.uri !== "string" || !parseSpaceUri(data.uri)) {
-    throw new Error("The PDS returned an invalid SimpleSpace creation response");
+    throw new Error("The PDS returned an invalid Space creation response");
   }
 
   clearCredentialsForSpace(data.uri);
   return { uri: data.uri };
 };
 
-export const updateSimpleSpace = async (
+/** Replaces the space's policy as a whole; a different kind discards the old one's member list. */
+export const updateSpace = async (
   auth: OAuthUserAgent,
   space: string,
-  config: SimpleSpaceConfiguration,
+  policy: NewSpacePolicy,
 ): Promise<void> => {
-  assertSimpleSpaceAuthority(auth, space, "configure");
+  assertSpaceAuthority(auth, space, "configure");
 
-  await oauthProcedure(auth, "com.atproto.simplespace.updateSpace", {
+  await oauthProcedure(auth, "com.atproto.space.updateSpace", {
     space,
-    readPolicy: encodeSimpleSpacePolicy(config.readPolicy),
-    writePolicy: encodeSimpleSpacePolicy(config.writePolicy),
-    appAccess: encodeSimpleSpaceAppAccess(config.appAccess),
+    policy: encodeSpacePolicy(policy),
   });
   clearCredentialsForSpace(space);
 };
 
-export const deleteSimpleSpace = async (auth: OAuthUserAgent, space: string): Promise<void> => {
-  assertSimpleSpaceAuthority(auth, space, "delete");
+export const deleteSpace = async (auth: OAuthUserAgent, space: string): Promise<void> => {
+  assertSpaceAuthority(auth, space, "delete");
 
-  await oauthProcedure(auth, "com.atproto.simplespace.deleteSpace", { space });
+  await oauthProcedure(auth, "com.atproto.space.deleteSpace", { space });
   clearCredentialsForSpace(space);
 };
 
-export const putSimpleSpaceMember = async (
+export const putSpaceMember = async (
   auth: OAuthUserAgent,
   space: string,
-  member: SimpleSpaceMember,
+  member: SpaceMember,
 ): Promise<void> => {
-  assertSimpleSpaceAuthority(auth, space, "manage members of");
-  await oauthProcedure(auth, "com.atproto.simplespace.putMember", { space, ...member });
+  assertSpaceAuthority(auth, space, "manage members of");
+  await oauthProcedure(auth, "com.atproto.memberspace.putMember", { space, ...member });
   clearCredentialsForSpace(space);
 };
 
-export const removeSimpleSpaceMember = async (
+export const removeSpaceMember = async (
   auth: OAuthUserAgent,
   space: string,
   did: string,
 ): Promise<void> => {
-  assertSimpleSpaceAuthority(auth, space, "remove members from");
-  await oauthProcedure(auth, "com.atproto.simplespace.removeMember", { space, did });
+  assertSpaceAuthority(auth, space, "remove members from");
+  await oauthProcedure(auth, "com.atproto.memberspace.removeMember", { space, did });
   clearCredentialsForSpace(space);
 };
 
-export const getSimpleSpace = async (
+/**
+ * A space's policy. Only its owner can ask for it directly; anyone else sees it only if the owner
+ * publishes it, as a `com.atproto.space.policy` record in their own repo in the space.
+ */
+export const getSpaceInfo = async (
   auth: OAuthUserAgent,
   space: string,
-): Promise<SimpleSpaceInfo | undefined> => {
+): Promise<SpaceInfo | undefined> => {
   const parsed = parseSpaceUri(space);
   if (!parsed) throw new Error("Invalid Space reference");
 
-  let data: unknown;
+  let policy: unknown;
   try {
     if (parsed.authority === auth.sub) {
-      data = await oauthQuery(auth, "com.atproto.simplespace.getSpace", { space });
+      const data = await oauthQuery(auth, "com.atproto.space.getSpace", { space });
+      if (!isObject(data) || data.uri !== space) {
+        throw new Error("The Space authority returned an invalid Space response");
+      }
+      policy = data.policy;
     } else {
-      const host = await resolveSpaceHost(space);
-      data = await credentialQuery(
+      const record = await getSpaceRecord(
         auth,
         space,
         parsed.authority,
-        host,
-        "com.atproto.simplespace.getSpace",
-        { space },
+        "com.atproto.space.policy",
+        "self",
       );
+      policy = isObject(record.value) ? record.value.policy : undefined;
     }
   } catch (err) {
     if (
       err instanceof SpaceRequestError &&
       (err.status === 404 ||
         err.code === "SpaceNotFound" ||
+        err.code === "RecordNotFound" ||
         err.code === "XRPCNotSupported" ||
         err.code === "MethodNotImplemented")
     ) {
@@ -585,32 +601,23 @@ export const getSimpleSpace = async (
     throw err;
   }
 
-  if (!isObject(data) || data.uri !== space) {
-    throw new Error("The Space authority returned an invalid SimpleSpace response");
-  }
-
-  return {
-    uri: data.uri,
-    readPolicy: parseSimpleSpacePolicy(data.readPolicy),
-    writePolicy: parseSimpleSpacePolicy(data.writePolicy),
-    appAccess: parseSimpleSpaceAppAccess(data.appAccess),
-  };
+  return { uri: space, policy: parseSpacePolicy(policy) };
 };
 
-export const listSimpleSpaceMembers = async (
+export const listSpaceMembers = async (
   auth: OAuthUserAgent,
   space: string,
   options: { cursor?: string; limit?: number } = {},
-): Promise<ListSimpleSpaceMembersResult> => {
+): Promise<ListSpaceMembersResult> => {
   const limit = options.limit ?? 100;
-  const data = await oauthQuery(auth, "com.atproto.simplespace.listMembers", {
+  const data = await oauthQuery(auth, "com.atproto.memberspace.listMembers", {
     space,
     cursor: options.cursor,
     limit,
   });
 
   if (!isObject(data) || !Array.isArray(data.members)) {
-    throw new Error("The PDS returned an invalid SimpleSpace member list");
+    throw new Error("The PDS returned an invalid member list");
   }
 
   return {
@@ -618,14 +625,14 @@ export const listSimpleSpaceMembers = async (
     // page is already exhausted.
     cursor:
       data.members.length >= limit && typeof data.cursor === "string" ? data.cursor : undefined,
-    members: data.members.flatMap((member): SimpleSpaceMember[] => {
+    members: data.members.flatMap((member): SpaceMember[] => {
       if (
         !isObject(member) ||
         typeof member.did !== "string" ||
         typeof member.read !== "boolean" ||
         typeof member.write !== "boolean"
       ) {
-        throw new Error("The PDS returned invalid SimpleSpace member access");
+        throw new Error("The PDS returned invalid member access");
       }
       return [{ did: member.did, read: member.read, write: member.write }];
     }),
