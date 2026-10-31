@@ -14,6 +14,29 @@ function h(type, props, ...children) {
   };
 }
 
+/**
+ * Serves `key` from Cloudflare's edge cache, or makes it with `produce` and caches it for
+ * `ttl(response)` seconds when that's above zero, so every visitor shares one fetch.
+ */
+async function edgeCached(key, ctx, produce, ttl) {
+  const cache = caches.default;
+  const hit = await cache.match(key);
+  if (hit) return hit;
+
+  const res = await produce();
+  const seconds = ttl(res);
+  if (seconds <= 0) return res;
+
+  const headers = new Headers(res.headers);
+  headers.set("Cache-Control", `public, max-age=${seconds}`);
+  const cacheable = new Response(res.body, { status: res.status, headers });
+  ctx.waitUntil(cache.put(key, cacheable.clone()));
+  return cacheable;
+}
+
+/** Fetch options that let Cloudflare keep an upstream response for `seconds`. */
+const upstreamCache = (seconds) => ({ cf: { cacheTtl: seconds, cacheEverything: true } });
+
 let fontData = null;
 async function getFonts() {
   if (!fontData) {
@@ -37,7 +60,7 @@ async function getFonts() {
     ];
     const results = await Promise.all(
       urls.map(([name, url]) =>
-        fetch(url)
+        fetch(url, upstreamCache(7 * 86400))
           .then((r) => (r.ok ? r.arrayBuffer() : null))
           .then((data) => (data ? { data, name, weight: 400, style: "normal" } : null))
           .catch(() => null),
@@ -50,7 +73,7 @@ async function getFonts() {
 
 async function fetchRecord(pdsUrl, repo, collection, rkey) {
   const url = `${pdsUrl}/xrpc/com.atproto.repo.getRecord?repo=${encodeURIComponent(repo)}&collection=${encodeURIComponent(collection)}&rkey=${encodeURIComponent(rkey)}`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
+  const res = await fetch(url, { signal: AbortSignal.timeout(3000), ...upstreamCache(300) });
   if (!res.ok) return null;
   return res.json();
 }
@@ -336,7 +359,7 @@ async function resolveDidDoc(did) {
     return null;
   }
 
-  const res = await fetch(docUrl, { signal: AbortSignal.timeout(3000) });
+  const res = await fetch(docUrl, { signal: AbortSignal.timeout(3000), ...upstreamCache(300) });
   if (!res.ok) return null;
   return res.json();
 }
@@ -483,9 +506,13 @@ class HeadEndRewriter {
 
 const MAX_FAVICON_SIZE = 100 * 1024; // 100KB
 
+/** How long identity lookups are reused: short, so a changed handle or DID shows up soon. */
+const IDENTITY_TTL = 60;
+
 async function corsProxy(url, fetchOpts = {}) {
   const res = await fetch(url, {
     signal: AbortSignal.timeout(5000),
+    ...upstreamCache(IDENTITY_TTL),
     ...fetchOpts,
   });
 
@@ -494,6 +521,7 @@ async function corsProxy(url, fetchOpts = {}) {
     headers: {
       "Content-Type": res.headers.get("content-type") ?? "application/json",
       "Access-Control-Allow-Origin": "*",
+      "Cache-Control": `public, max-age=${IDENTITY_TTL}`,
     },
   });
 }
@@ -609,7 +637,6 @@ async function handleFavicon(searchParams) {
       return new Response(body, {
         headers: {
           "Content-Type": contentType || "image/x-icon",
-          "Cache-Control": "public, max-age=86400",
           "Access-Control-Allow-Origin": "*",
         },
       });
@@ -618,21 +645,42 @@ async function handleFavicon(searchParams) {
     }
   }
 
-  return new Response("Favicon not found", { status: 404 });
+  return new Response("Favicon not found", {
+    status: 404,
+    headers: { "Access-Control-Allow-Origin": "*" },
+  });
 }
 
+const FAVICON_TTL = 86400;
+/** A site without an icon is asked again sooner, in case it adds one. */
+const FAVICON_MISS_TTL = 6 * 3600;
+
+const faviconTtl = (res) =>
+  res.ok ? FAVICON_TTL : res.status === 404 || res.status === 413 ? FAVICON_MISS_TTL : 0;
+
+/** Preview images follow the record, so they're kept for an hour; misses for five minutes. */
+const ogImageTtl = (res) => (res.ok ? 3600 : res.status === 404 ? 300 : 0);
+
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     if (url.pathname === "/og-image") {
-      return handleOgImage(url.searchParams).catch(
+      return edgeCached(
+        new Request(url.toString()),
+        ctx,
+        () => handleOgImage(url.searchParams),
+        ogImageTtl,
+      ).catch(
         (err) => new Response(`Failed to generate image: ${err?.message ?? err}`, { status: 500 }),
       );
     }
 
     if (url.pathname === "/favicon") {
-      return handleFavicon(url.searchParams).catch(
+      // One entry per domain, however it was typed.
+      const domain = (url.searchParams.get("domain") ?? "").toLowerCase();
+      const key = new Request(`${url.origin}/favicon?domain=${encodeURIComponent(domain)}`);
+      return edgeCached(key, ctx, () => handleFavicon(url.searchParams), faviconTtl).catch(
         (err) => new Response(`Failed to fetch favicon: ${err?.message ?? err}`, { status: 500 }),
       );
     }

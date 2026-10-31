@@ -1,19 +1,18 @@
 {
   "version": 1,
-  "include": ["/*"],
-  "exclude": [
-    "/",
-    "/assets/*",
-    "/fonts/*",
-    "/88x31.webp",
-    "/cursor.cur",
-    "/favicon.ico",
-    "/manifest.json",
-    "/oauth-client-metadata.json",
-    "/opensearch.xml",
-    "/pdsls-logo.svg",
-    "/pwa-maskable.png",
-    "/ribbon.webp",
-    "/takumi_wasm_bg.wasm"
-  ]
+  "include": [
+    "/at*",
+    "/streams",
+    "/jetstream",
+    "/firehose",
+    "/spacedust",
+    "/car",
+    "/settings",
+    "/og-image",
+    "/favicon",
+    "/resolve-did-web",
+    "/resolve-handle-dns",
+    "/resolve-handle-http"
+  ],
+  "exclude": []
 }
