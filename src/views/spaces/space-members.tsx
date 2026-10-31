@@ -274,7 +274,7 @@ export const SpaceMembers = (props: {
                     when={confirmingDid() === member.did}
                     fallback={
                       <>
-                        {/* A label over a native select, like the Logs tab's event filter: the access
+                        {/* A label over a native select, like the Log tab's event filter: the access
                       saves as soon as it's picked, without a dialog. */}
                         <label
                           class="relative flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-xs text-neutral-500 transition-colors hover:text-neutral-800 has-[:focus-visible]:outline has-[:focus-visible]:outline-neutral-400 dark:text-neutral-400 dark:hover:text-neutral-200"

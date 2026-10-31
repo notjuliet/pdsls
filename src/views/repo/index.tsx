@@ -263,7 +263,7 @@ const RepoView = () => {
         { tab: "collections", label: "Collections", show: !error() },
         { tab: "labels", label: "Labels", show: !!params.repo && params.repo in labelerCache },
         { tab: "identity", label: "Identity", show: true },
-        { tab: "logs", label: "Logs", show: did.startsWith("did:plc") },
+        { tab: "logs", label: "Log", show: did.startsWith("did:plc") },
         { tab: "blobs", label: "Blobs", show: !error() },
         { tab: "backlinks", label: "Backlinks", show: true },
       ] satisfies { tab: RepoTabId; label: string; show: boolean }[]
