@@ -1,5 +1,14 @@
 import { A, useLocation } from "@solidjs/router";
-import { createResource, createSignal, For, onCleanup, onMount, Show } from "solid-js";
+import {
+  createEffect,
+  createResource,
+  createSignal,
+  For,
+  on,
+  onCleanup,
+  onMount,
+  Show,
+} from "solid-js";
 
 import { getAllBacklinks, getRecordBacklinks, LinksWithRecords } from "../../lib/api.js";
 import { localDateFromTimestamp, relativeTimeFromTimestamp } from "../../lib/format.js";
@@ -10,6 +19,7 @@ import RecordHoverCard from "../hover-card/record.jsx";
 import { DomainGroup, DomainGroupRows, domainGroupRowClasses } from "../ui/domain-group.jsx";
 import { Favicon } from "../ui/favicon.jsx";
 import { HEADING_TEXT_CLASS } from "../ui/info.jsx";
+import { ErrorNotice } from "../ui/states.jsx";
 import Tooltip from "../ui/tooltip.jsx";
 import { timestampFromRkey } from "./record-row.jsx";
 
@@ -296,13 +306,27 @@ const BacklinkCollectionDetail = (props: {
 }) => {
   const authority = () => collectionAuthority(props.collection);
   // Every group's first page loads together, so the groups appear at once instead of their
-  // headings showing first and each list pushing the ones below it down as it arrives.
-  const [firstPages] = createResource(
-    () => props.entries,
-    (entries) =>
-      Promise.all(
-        entries.map((entry) => getRecordBacklinks(props.target, entry.collection, entry.path)),
-      ),
+  // headings showing first and each list pushing the ones below it down as it arrives. A plain
+  // signal, not a resource: the router keeps the previous page up until a resource has loaded,
+  // which made clicking a collection look like it had frozen.
+  const [firstPages, setFirstPages] = createSignal<LinksWithRecords[]>();
+  const [loadError, setLoadError] = createSignal<string>();
+  createEffect(
+    on(
+      () => props.entries,
+      (entries) => {
+        let current = true;
+        onCleanup(() => (current = false));
+        setFirstPages(undefined);
+        setLoadError(undefined);
+        Promise.all(
+          entries.map((entry) => getRecordBacklinks(props.target, entry.collection, entry.path)),
+        ).then(
+          (pages) => current && setFirstPages(pages),
+          (err) => current && setLoadError(err instanceof Error ? err.message : String(err)),
+        );
+      },
+    ),
   );
 
   // The title stays at the top while the lists scroll, like the labels page's controls, and the
@@ -365,9 +389,16 @@ const BacklinkCollectionDetail = (props: {
       <Show
         when={firstPages()}
         fallback={
-          <p class="motion-safe:animate-fade-in-late text-sm text-neutral-500 dark:text-neutral-400">
-            Loading…
-          </p>
+          <Show
+            when={loadError()}
+            fallback={
+              <p class="motion-safe:animate-fade-in-late text-sm text-neutral-500 dark:text-neutral-400">
+                Loading…
+              </p>
+            }
+          >
+            {(message) => <ErrorNotice message={message()} />}
+          </Show>
         }
       >
         <div class="flex flex-col gap-3">
