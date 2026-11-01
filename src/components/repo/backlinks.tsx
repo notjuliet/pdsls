@@ -11,7 +11,6 @@ import {
 } from "solid-js";
 
 import { getAllBacklinks, getRecordBacklinks, LinksWithRecords } from "../../lib/api.js";
-import { localDateFromTimestamp, relativeTimeFromTimestamp } from "../../lib/format.js";
 import { LoadMoreSentinel } from "../../lib/infinite-scroll.jsx";
 import { useRepo } from "../../lib/repo-context.jsx";
 import DidHoverCard from "../hover-card/did.jsx";
@@ -19,8 +18,8 @@ import RecordHoverCard from "../hover-card/record.jsx";
 import { DomainGroup, DomainGroupRows, domainGroupRowClasses } from "../ui/domain-group.jsx";
 import { Favicon } from "../ui/favicon.jsx";
 import { HEADING_TEXT_CLASS } from "../ui/info.jsx";
+import { RelativeTime } from "../ui/relative-time.jsx";
 import { ErrorNotice } from "../ui/states.jsx";
-import Tooltip from "../ui/tooltip.jsx";
 import { timestampFromRkey } from "./record-row.jsx";
 
 type BacklinksProps = {
@@ -170,11 +169,10 @@ const BacklinkRecords = (
                     />
                     <Show when={timestamp}>
                       {(time) => (
-                        <Tooltip alignEnd text={localDateFromTimestamp(time())}>
-                          <span class="shrink-0 font-sans text-neutral-500 dark:text-neutral-400">
-                            {relativeTimeFromTimestamp(time())}
-                          </span>
-                        </Tooltip>
+                        <RelativeTime
+                          timestamp={time()}
+                          class="shrink-0 font-sans text-neutral-500 dark:text-neutral-400"
+                        />
                       )}
                     </Show>
                   </A>

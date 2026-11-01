@@ -20,6 +20,7 @@ import {
   SpaceSettingsFields,
   spaceSettingsFromInfo,
 } from "./space-settings.jsx";
+import { headerButtonClass, headerButtonDisabledClass } from "./styles.js";
 
 export const ManageSpaceDialog = (props: {
   info: SpaceInfo;
@@ -107,8 +108,8 @@ export const ManageSpaceDialog = (props: {
     <>
       <PermissionButton
         scope={SPACE_MANAGE_SPACES_SCOPE_ID}
-        class="flex items-center gap-1 rounded-md border border-neutral-300 px-1.5 py-0.5 text-xs transition-colors hover:bg-neutral-200/50 active:bg-neutral-200 sm:px-2 sm:py-0.75 sm:text-sm dark:border-neutral-700 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-        disabledClass="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs opacity-40 sm:px-2 sm:py-1 sm:text-sm"
+        class={headerButtonClass}
+        disabledClass={headerButtonDisabledClass}
         onClick={openDialog}
       >
         Manage

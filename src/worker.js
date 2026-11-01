@@ -374,7 +374,6 @@ function handleFromDoc(doc) {
 }
 
 const STATIC_ROUTES = {
-  "/": { title: "PDSls", description: "Browse and manage data across the AT Protocol" },
   "/streams": {
     title: "Live streams",
     description: "Inspect events from the AT Protocol network.",
@@ -398,6 +397,7 @@ const STATIC_ROUTES = {
   },
 };
 
+/** Link-preview text for a page. Only the paths in public/_routes.json reach the worker. */
 async function resolveOgData(pathname) {
   if (pathname in STATIC_ROUTES) return STATIC_ROUTES[pathname];
 
@@ -432,13 +432,6 @@ async function resolveOgData(pathname) {
       description = "";
       title = `at://${handle ?? did}/${collection}/${rkey}`;
       return { title, description, generateImage: true, did, collection, rkey };
-    }
-  } else {
-    // /pds
-    const [pds] = segments;
-    if (pds) {
-      title = pds;
-      description = `Browse the repositories at ${pds}`;
     }
   }
 

@@ -7,10 +7,9 @@ import type { HoverTriggerRenderer } from "../components/hover-card/base.jsx";
 import DidHoverCard from "../components/hover-card/did.jsx";
 import RecordHoverCard from "../components/hover-card/record.jsx";
 import { FilterInput } from "../components/ui/filter-input.jsx";
+import { RelativeTime } from "../components/ui/relative-time.jsx";
 import { Spinner } from "../components/ui/states.jsx";
 import { TagInput } from "../components/ui/tag-input.jsx";
-import Tooltip from "../components/ui/tooltip.jsx";
-import { localDateFromTimestamp, relativeTimeFromTimestamp } from "../lib/format.js";
 import { LoadMoreSentinel } from "../lib/infinite-scroll.jsx";
 import { useFilterShortcut } from "../lib/keyboard.js";
 
@@ -53,17 +52,14 @@ const LabelRow = (props: { label: ComAtprotoLabelDefs.Label }) => {
           {label.uri}
         </span>
         <span class="ml-auto flex shrink-0 items-baseline gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
-          <Tooltip alignEnd text={localDateFromTimestamp(created)}>
-            <span>{relativeTimeFromTimestamp(created)}</span>
-          </Tooltip>
+          <RelativeTime timestamp={created} />
           <Show when={expires}>
             {(expiry) => (
-              <Tooltip alignEnd text={`Expires ${localDateFromTimestamp(expiry())}`}>
-                <span class="flex items-baseline gap-1">
-                  <span class="iconify lucide--clock-fading shrink-0 self-center" />
-                  {relativeTimeFromTimestamp(expiry())}
-                </span>
-              </Tooltip>
+              <RelativeTime
+                timestamp={expiry()}
+                label="Expires"
+                icon={<span class="iconify lucide--clock-fading shrink-0 self-center" />}
+              />
             )}
           </Show>
         </span>

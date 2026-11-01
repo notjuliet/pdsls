@@ -12,8 +12,6 @@ import {
 } from "solid-js";
 import { Portal } from "solid-js/web";
 
-import { addToClipboard } from "../../lib/copy";
-
 const MenuContext = createContext<{
   showMenu: Accessor<boolean>;
   setShowMenu: Setter<boolean>;
@@ -24,28 +22,6 @@ export const MenuProvider = (props: { children?: JSX.Element }) => {
   const value = { showMenu, setShowMenu };
 
   return <MenuContext.Provider value={value}>{props.children}</MenuContext.Provider>;
-};
-
-export const CopyMenu = (props: { content: string; label: string; icon?: string }) => {
-  const ctx = useContext(MenuContext);
-
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        addToClipboard(props.content);
-        ctx?.setShowMenu(false);
-      }}
-      class="flex w-full items-center gap-2 rounded-md p-1.5 whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
-    >
-      <Show when={props.icon}>
-        <span
-          class={"iconify shrink-0 text-neutral-500 dark:text-neutral-400 " + props.icon}
-        ></span>
-      </Show>
-      <span class="whitespace-nowrap">{props.label}</span>
-    </button>
-  );
 };
 
 export const NavMenu = (props: {
