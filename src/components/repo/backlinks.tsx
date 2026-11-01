@@ -19,7 +19,7 @@ import { DomainGroup, DomainGroupRows, domainGroupRowClasses } from "../ui/domai
 import { Favicon } from "../ui/favicon.jsx";
 import { HEADING_TEXT_CLASS } from "../ui/info.jsx";
 import { RelativeTime } from "../ui/relative-time.jsx";
-import { ErrorNotice } from "../ui/states.jsx";
+import { ErrorNotice, LoadingState } from "../ui/states.jsx";
 import { timestampFromRkey } from "./record-row.jsx";
 
 type BacklinksProps = {
@@ -390,9 +390,10 @@ const BacklinkCollectionDetail = (props: {
           <Show
             when={loadError()}
             fallback={
-              <p class="motion-safe:animate-fade-in-late text-sm text-neutral-500 dark:text-neutral-400">
-                Loading…
-              </p>
+              // Delayed, so a fast load never flashes it.
+              <div class="motion-safe:animate-fade-in-late">
+                <LoadingState label="Loading backlinks…" />
+              </div>
             }
           >
             {(message) => <ErrorNotice message={message()} />}
@@ -465,7 +466,7 @@ const Backlinks = (props: { target: string }) => {
   return (
     <div class="flex w-full flex-col gap-4 text-sm">
       <Show when={!response.error} fallback={<p class="text-red-500">Failed to load backlinks.</p>}>
-        <Show when={response()} fallback={<p class="text-neutral-500">Loading…</p>}>
+        <Show when={response()} fallback={<LoadingState label="Loading backlinks…" />}>
           <Show
             when={selectedCollection()}
             fallback={<BacklinkDirectory groups={groups()} pathname={location.pathname} />}
