@@ -166,16 +166,21 @@ const RepoCard = (props: {
         <div class="overflow-hidden">
           <div class="ml-2 flex flex-col gap-1.5 pb-1.5 font-mono text-xs text-neutral-500 dark:text-neutral-400">
             <Show when={handle.loading}>
-              <span class="animate-pulse">resolving...</span>
+              <span class="animate-pulse font-sans">Resolving…</span>
             </Show>
             <Show when={!handle.loading && handle()}>
-              <span class="font-medium text-neutral-900 dark:text-neutral-200">@{handle()}</span>
+              <span class="font-sans text-sm font-medium text-neutral-900 dark:text-neutral-200">
+                @{handle()}
+              </span>
             </Show>
             <Show when={TID.validate(props.repo.rev)}>
-              <div class="flex gap-1 text-neutral-700 dark:text-neutral-300">
+              {/* The rev is an identifier, so mono; its date is just a date. */}
+              <div class="flex items-baseline gap-1 text-neutral-700 dark:text-neutral-300">
                 <span>{props.repo.rev}</span>
                 <span>·</span>
-                <span>{localDateFromTimestamp(TID.parse(props.repo.rev).timestamp / 1000)}</span>
+                <span class="font-sans">
+                  {localDateFromTimestamp(TID.parse(props.repo.rev).timestamp / 1000)}
+                </span>
               </div>
             </Show>
             <Show when={props.repo.head}>
