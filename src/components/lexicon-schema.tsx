@@ -162,7 +162,9 @@ const fetchLexiconPreview = async (nsid: string): Promise<LexiconSchema> => {
  * have nothing to click, so they let the mouse through to the next refs in a list they cover.
  */
 const hoverCardClass = (size: string) => `inline ${size} ${size === TYPE_SIZE ? "leading-4" : ""}`;
-const HOVER_PREVIEW_CLASS = "max-h-[32rem] w-[min(36rem,calc(100vw-2rem))] font-sans text-sm";
+/** As wide as its longest line, up to 36rem, so a small definition gets a small card. */
+const HOVER_PREVIEW_CLASS =
+  "max-h-[32rem] w-max min-w-64 max-w-[min(36rem,calc(100vw-2rem))] font-sans text-sm";
 
 /**
  * A reference to a definition in the lexicon shown, previewed on hover like one to another
@@ -1024,7 +1026,12 @@ export const LexiconSchemaView = (props: {
         },
       }}
     >
-      <div class="w-full" classList={{ "px-2": !props.preview }}>
+      {/* A preview sizes to its content, which container queries would hide from it, so its
+          property lists stay stacked rather than measuring their width for two columns. */}
+      <div
+        class="w-full"
+        classList={{ "px-2": !props.preview, "[&_*]:[container-type:normal]": props.preview }}
+      >
         {/* Header. On the page, the name is already above the tabs, so it goes small on the right
             of the tab's first line: beside the lexicon's description, which it ties to the
             lexicon, or else beside the first definition's heading. */}
