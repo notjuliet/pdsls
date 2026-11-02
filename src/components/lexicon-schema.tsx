@@ -1,4 +1,5 @@
 import type { Nsid } from "@atcute/lexicons";
+import { isNsid } from "@atcute/lexicons/syntax";
 import { A, useLocation } from "@solidjs/router";
 import { createContext, createEffect, For, type JSX, Show, useContext } from "solid-js";
 
@@ -69,7 +70,11 @@ const hasConstraints = (property: LexiconProperty | LexiconDef) =>
 /** A union's type as shown: "closed union" when only its listed types are allowed. */
 const unionType = (union: { closed?: boolean }) => (union.closed ? "closed union" : "union");
 
-const LexiconSchemaContext = createContext<{ inertRefs?: boolean }>();
+const LexiconSchemaContext = createContext<{
+  inertRefs?: boolean;
+  /** The lexicon shown, so a reference into it can stay on the page and preview from it. */
+  schema?: LexiconSchema;
+}>();
 const useLexiconSchemaContext = () => useContext(LexiconSchemaContext) ?? {};
 
 const schemaDefId = (defName: string) => `schema:${defName}`;
@@ -109,10 +114,19 @@ const SchemaRefLink = (props: {
   }
 
   if (props.refType.startsWith("#")) {
-    return (
+    const link = (
       <LocalSchemaLink defName={props.refType.slice(1)} class={`${SCHEMA_LINK_CLASS} ${size}`}>
         {props.children}
       </LocalSchemaLink>
+    );
+    return (
+      <Show when={context.schema} fallback={link}>
+        {(schema) => (
+          <LocalRefHoverCard defName={props.refType.slice(1)} schema={schema()} size={size}>
+            {link}
+          </LocalRefHoverCard>
+        )}
+      </Show>
     );
   }
 
@@ -137,6 +151,35 @@ const fetchLexiconPreview = async (nsid: string): Promise<LexiconSchema> => {
   return schema.rawSchema as LexiconSchema;
 };
 
+/**
+ * The hover card classes, shared by references within the lexicon and to others. Their previews
+ * have nothing to click, so they let the mouse through to the next refs in a list they cover.
+ */
+const hoverCardClass = (size: string) => `inline ${size} ${size === TYPE_SIZE ? "leading-4" : ""}`;
+const HOVER_PREVIEW_CLASS = "max-h-[32rem] w-[min(36rem,calc(100vw-2rem))] font-sans text-sm";
+
+/**
+ * A reference to a definition in the lexicon shown, previewed on hover like one to another
+ * lexicon. It needs nothing fetched, and a click still scrolls to it on the page.
+ */
+const LocalRefHoverCard = (props: {
+  defName: string;
+  schema: LexiconSchema;
+  size: string;
+  children: JSX.Element;
+}) => (
+  <HoverCard
+    hoverDelay={300}
+    trigger={props.children}
+    class={hoverCardClass(props.size)}
+    previewClass={HOVER_PREVIEW_CLASS}
+    passThroughWhenCovering
+    showPreview={Boolean(props.schema.defs[props.defName])}
+  >
+    <LexiconSchemaView schema={props.schema} preview inertRefs focusDef={props.defName} />
+  </HoverCard>
+);
+
 function SchemaRefHoverCard(props: { refType: string; size: string; children: JSX.Element }) {
   const parsed = () => parseLexiconRef(props.refType);
   const preview = createHoverResource(() => parsed().nsid, fetchLexiconPreview, {
@@ -159,8 +202,9 @@ function SchemaRefHoverCard(props: { refType: string; size: string; children: JS
       onHover={preview.load}
       hoverDelay={300}
       trigger={trigger()}
-      class={`inline ${props.size} ${props.size === TYPE_SIZE ? "leading-4" : ""}`}
-      previewClass="max-h-[32rem] w-[min(36rem,calc(100vw-2rem))] font-sans text-sm"
+      class={hoverCardClass(props.size)}
+      previewClass={HOVER_PREVIEW_CLASS}
+      passThroughWhenCovering
       showPreview={hasPreview()}
     >
       <Show when={preview.state().error}>
@@ -332,46 +376,93 @@ const Constraint = (props: { label: string; title?: string; children: JSX.Elemen
 /** A count or bound with thousands separators, e.g. 3,000 rather than 3000. */
 const formatCount = (value: number) => value.toLocaleString("en");
 
-const ConstraintsList = (props: { property: LexiconProperty }) => {
+/** Whether a known value names a token, like app.bsky.feed.defs#requestLess, so it can link to it. */
+const isTokenRef = (value: string) => {
+  const [nsid, name] = value.split("#");
+  return Boolean(name) && isNsid(nsid);
+};
+
+/**
+ * Known values one per line under their label, like a union's refs: they're often long token
+ * NSIDs, which run together joined on one line. Tokens link to their definition.
+ */
+const KnownValues = (props: { values: string[] }) => {
+  const context = useLexiconSchemaContext();
+  // A token in the lexicon shown links within the page, like a "#" ref, rather than reloading it.
+  const refType = (value: string) =>
+    context.schema && value.startsWith(`${context.schema.id}#`)
+      ? value.slice(context.schema.id.length)
+      : value;
   return (
-    <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-500 dark:text-neutral-400">
-      <Show when={props.property.minLength !== undefined}>
-        <Constraint label="minLength">{formatCount(props.property.minLength!)}</Constraint>
-      </Show>
-      <Show when={props.property.maxLength !== undefined}>
-        <Constraint label="maxLength">{formatCount(props.property.maxLength!)}</Constraint>
-      </Show>
-      <Show when={props.property.maxGraphemes !== undefined}>
-        <Constraint label="maxGraphemes">{formatCount(props.property.maxGraphemes!)}</Constraint>
-      </Show>
-      <Show when={props.property.minGraphemes !== undefined}>
-        <Constraint label="minGraphemes">{formatCount(props.property.minGraphemes!)}</Constraint>
-      </Show>
-      <Show when={props.property.minimum !== undefined}>
-        <Constraint label="min">{formatCount(props.property.minimum!)}</Constraint>
-      </Show>
-      <Show when={props.property.maximum !== undefined}>
-        <Constraint label="max">{formatCount(props.property.maximum!)}</Constraint>
-      </Show>
-      <Show when={props.property.maxSize !== undefined}>
-        <Constraint label="maxSize" title={`${formatCount(props.property.maxSize!)} bytes`}>
-          {formatSizeLimit(props.property.maxSize!)}
-        </Constraint>
-      </Show>
-      <Show when={props.property.accept}>
-        <Constraint label="accept">{props.property.accept!.join(", ")}</Constraint>
-      </Show>
-      <Show when={props.property.enum}>
-        <Constraint label="enum">{props.property.enum!.join(", ")}</Constraint>
-      </Show>
-      <Show when={props.property.const}>
-        <Constraint label="const">{props.property.const?.toString()}</Constraint>
-      </Show>
-      <Show when={props.property.default !== undefined}>
-        <Constraint label="default">{JSON.stringify(props.property.default)}</Constraint>
+    <div class="flex flex-col gap-2">
+      <span class="text-xs text-neutral-500 dark:text-neutral-400">knownValues:</span>
+      <div class="ml-1 flex flex-col items-start gap-1 border-l border-neutral-300 pl-3 dark:border-neutral-600">
+        <For each={props.values}>
+          {(value) => (
+            <Show
+              when={isTokenRef(value)}
+              fallback={
+                <span class={`font-mono wrap-break-word ${TYPE_SIZE} ${VALUE_CLASS}`}>{value}</span>
+              }
+            >
+              <SchemaRefLink refType={refType(value)}>{breakable(value)}</SchemaRefLink>
+            </Show>
+          )}
+        </For>
+      </div>
+    </div>
+  );
+};
+
+const ConstraintsList = (props: { property: LexiconProperty }) => {
+  const hasInline = () => hasConstraints({ ...props.property, knownValues: undefined });
+  return (
+    <div class="flex flex-col gap-2">
+      <Show when={hasInline()}>
+        <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-500 dark:text-neutral-400">
+          <Show when={props.property.minLength !== undefined}>
+            <Constraint label="minLength">{formatCount(props.property.minLength!)}</Constraint>
+          </Show>
+          <Show when={props.property.maxLength !== undefined}>
+            <Constraint label="maxLength">{formatCount(props.property.maxLength!)}</Constraint>
+          </Show>
+          <Show when={props.property.maxGraphemes !== undefined}>
+            <Constraint label="maxGraphemes">
+              {formatCount(props.property.maxGraphemes!)}
+            </Constraint>
+          </Show>
+          <Show when={props.property.minGraphemes !== undefined}>
+            <Constraint label="minGraphemes">
+              {formatCount(props.property.minGraphemes!)}
+            </Constraint>
+          </Show>
+          <Show when={props.property.minimum !== undefined}>
+            <Constraint label="min">{formatCount(props.property.minimum!)}</Constraint>
+          </Show>
+          <Show when={props.property.maximum !== undefined}>
+            <Constraint label="max">{formatCount(props.property.maximum!)}</Constraint>
+          </Show>
+          <Show when={props.property.maxSize !== undefined}>
+            <Constraint label="maxSize" title={`${formatCount(props.property.maxSize!)} bytes`}>
+              {formatSizeLimit(props.property.maxSize!)}
+            </Constraint>
+          </Show>
+          <Show when={props.property.accept}>
+            <Constraint label="accept">{props.property.accept!.join(", ")}</Constraint>
+          </Show>
+          <Show when={props.property.enum}>
+            <Constraint label="enum">{props.property.enum!.join(", ")}</Constraint>
+          </Show>
+          <Show when={props.property.const}>
+            <Constraint label="const">{props.property.const?.toString()}</Constraint>
+          </Show>
+          <Show when={props.property.default !== undefined}>
+            <Constraint label="default">{JSON.stringify(props.property.default)}</Constraint>
+          </Show>
+        </div>
       </Show>
       <Show when={props.property.knownValues}>
-        <Constraint label="knownValues">{props.property.knownValues!.join(", ")}</Constraint>
+        <KnownValues values={props.property.knownValues!} />
       </Show>
     </div>
   );
@@ -395,7 +486,7 @@ const PropertyRow = (props: {
     // when the list is too narrow for both, with the description straight under the name.
     <div
       class={`grid gap-x-6 gap-y-1.5 ${props.class ?? "py-2"}`}
-      classList={{ "@md:grid-cols-[11rem_minmax(0,1fr)]": !props.hideNameType }}
+      classList={{ "@md:grid-cols-[13rem_minmax(0,1fr)]": !props.hideNameType }}
     >
       <Show when={!props.hideNameType}>
         <div class="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5 @md:flex-col">
@@ -771,7 +862,7 @@ const DefSection = (props: {
           <div class={CONTAINER_CLASS}>
             <For each={props.def.errors}>
               {(error) => (
-                <div class="grid gap-x-6 gap-y-1 py-2 @md:grid-cols-[11rem_minmax(0,1fr)]">
+                <div class="grid gap-x-6 gap-y-1 py-2 @md:grid-cols-[13rem_minmax(0,1fr)]">
                   <div class="font-mono text-sm font-semibold wrap-break-word">{error.name}</div>
                   <Show when={error.description}>
                     <p class={DESCRIPTION_CLASS}>{error.description}</p>
@@ -832,12 +923,15 @@ export const LexiconSchemaView = (props: {
   const location = useLocation();
 
   const allDefinitionEntries = () => Object.entries(props.schema.defs);
+  /** Whether the preview shows only the one definition it was opened for, e.g. a ref's. */
+  const focused = () => Boolean(props.focusDef && props.schema.defs[props.focusDef]);
+
   const visibleDefinitionEntries = () => {
     const entries = allDefinitionEntries();
     if (!props.preview) return entries;
 
-    if (props.focusDef && props.schema.defs[props.focusDef]) {
-      return [[props.focusDef, props.schema.defs[props.focusDef]]] as Array<[string, LexiconDef]>;
+    if (focused()) {
+      return [[props.focusDef!, props.schema.defs[props.focusDef!]]] as Array<[string, LexiconDef]>;
     }
 
     const visible = new Map<string, LexiconDef>();
@@ -881,7 +975,14 @@ export const LexiconSchemaView = (props: {
   });
 
   return (
-    <LexiconSchemaContext.Provider value={{ inertRefs: props.inertRefs }}>
+    <LexiconSchemaContext.Provider
+      value={{
+        inertRefs: props.inertRefs,
+        get schema() {
+          return props.schema;
+        },
+      }}
+    >
       <div class="w-full" classList={{ "px-2": !props.preview }}>
         {/* Header. On the page, the name is already above the tabs, so it moves to the right of
             the first definition's heading, small, and only the description stays here. */}
@@ -924,7 +1025,8 @@ export const LexiconSchemaView = (props: {
               />
             )}
           </For>
-          <Show when={props.preview && hiddenDefinitionCount() > 0}>
+          {/* Only when it's cut short: a ref's preview shows all of what was asked for. */}
+          <Show when={props.preview && !focused() && hiddenDefinitionCount() > 0}>
             <div class="text-xs text-neutral-500 dark:text-neutral-400">
               +{hiddenDefinitionCount()} more definitions
             </div>
