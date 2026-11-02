@@ -775,7 +775,7 @@ const DefSection = (props: {
               defName={props.name}
               class={`relative font-semibold hover:underline ${props.preview ? "" : "text-lg"}`}
             >
-              <span class="iconify lucide--link absolute top-1/2 -left-6 -translate-y-1/2 text-base opacity-0 transition-opacity group-hover:opacity-100" />
+              <span class="iconify lucide--link absolute top-1/2 -left-5 -translate-y-1/2 text-sm text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100 dark:text-neutral-400" />
               {props.name === "main" ? "Main Definition" : props.name}
             </LocalSchemaLink>
             <span class={`rounded px-1.5 py-0.5 font-mono text-xs font-medium ${defTypeColor()}`}>
