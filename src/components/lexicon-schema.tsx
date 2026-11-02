@@ -261,6 +261,13 @@ export interface LexiconProperty {
   maxSize?: number;
 }
 
+/**
+ * A type or NSID that may wrap after each dot and before a "#", e.g. a ref longer than the narrow
+ * column, rather than running on under the description beside it.
+ */
+const breakable = (text: string) =>
+  text.split(/(?<=\.)|(?=#)/).flatMap((part, index) => (index ? [<wbr />, part] : [part]));
+
 const TypeBadge = (props: {
   type: string;
   format?: string;
@@ -283,12 +290,12 @@ const TypeBadge = (props: {
         <span
           class={`font-mono ${props.size ?? TYPE_SIZE} ${props.color ?? "text-neutral-600 dark:text-neutral-300"}`}
         >
-          {displayType}
+          {breakable(displayType)}
         </span>
       }
     >
       <SchemaRefLink refType={props.refType!} size={props.size} color={props.color}>
-        {displayType}
+        {breakable(displayType)}
       </SchemaRefLink>
     </Show>
   );
