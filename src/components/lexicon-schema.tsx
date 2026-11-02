@@ -612,7 +612,13 @@ const localizedLines = (label: string, text?: string, translations?: Record<stri
   })),
 ];
 
-const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean }) => {
+const DefSection = (props: {
+  name: string;
+  def: LexiconDef;
+  preview?: boolean;
+  /** Shown small on the right of the heading, e.g. the lexicon's name on the first definition. */
+  aside?: JSX.Element;
+}) => {
   const defTypeColor = () =>
     DEF_TYPE_COLORS[props.def.type as keyof typeof DEF_TYPE_COLORS] || DEF_TYPE_COLORS.default;
 
@@ -629,14 +635,20 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
       id={schemaDefId(props.name)}
     >
       <div class="flex flex-col gap-2">
-        <div class="group flex items-center gap-2">
-          <LocalSchemaLink defName={props.name} class="relative font-semibold hover:underline">
-            <span class="iconify lucide--link absolute top-1/2 -left-6 -translate-y-1/2 text-base opacity-0 transition-opacity group-hover:opacity-100" />
-            {props.name === "main" ? "Main Definition" : props.name}
-          </LocalSchemaLink>
-          <span class={`rounded px-1.5 py-0.5 font-mono text-xs font-medium ${defTypeColor()}`}>
-            {props.def.type}
-          </span>
+        <div class="flex items-center gap-4">
+          <div class="group flex shrink-0 items-center gap-2">
+            <LocalSchemaLink defName={props.name} class="relative font-semibold hover:underline">
+              <span class="iconify lucide--link absolute top-1/2 -left-6 -translate-y-1/2 text-base opacity-0 transition-opacity group-hover:opacity-100" />
+              {props.name === "main" ? "Main Definition" : props.name}
+            </LocalSchemaLink>
+            <span class={`rounded px-1.5 py-0.5 font-mono text-xs font-medium ${defTypeColor()}`}>
+              {props.def.type}
+            </span>
+          </div>
+          <Show when={props.aside}>
+            {/* Cut short before it can push the heading onto a second line. */}
+            <div class="ml-auto min-w-0 truncate">{props.aside}</div>
+          </Show>
         </div>
 
         <Show when={props.def.key}>
@@ -831,6 +843,20 @@ export const LexiconSchemaView = (props: {
     return Array.from(visible.entries());
   };
 
+  // The lexicon language's version, not the schema's, so it's left out while it's the only one, 1:
+  // next to the name it reads as a revision of the schema, which lexicons don't have.
+  const version = () => (props.schema.lexicon !== 1 ? `v${props.schema.lexicon}` : undefined);
+
+  const lexiconLink = () => (
+    <A
+      href={lexiconRecordHref(props.schema.id)}
+      class="font-mono text-xs text-neutral-500 hover:underline focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 dark:text-neutral-400"
+    >
+      {props.schema.id}
+      {version() && ` ${version()}`}
+    </A>
+  );
+
   const hiddenDefinitionCount = () =>
     allDefinitionEntries().length - visibleDefinitionEntries().length;
 
@@ -850,46 +876,46 @@ export const LexiconSchemaView = (props: {
   return (
     <LexiconSchemaContext.Provider value={{ inertRefs: props.inertRefs }}>
       <div class="w-full" classList={{ "px-2": !props.preview }}>
-        {/* Header */}
-        <div class="flex flex-col gap-2">
+        {/* Header. On the page, the name is already above the tabs, so it moves to the right of
+            the first definition's heading, small, and only the description stays here. */}
+        <Show when={props.preview}>
           <div class="flex min-w-0 items-baseline gap-1.5">
-            <h2
-              class="min-w-0 truncate font-semibold"
-              classList={{ "text-lg": !props.preview, "text-base": props.preview }}
-            >
-              {props.preview ? (
-                props.schema.id
-              ) : (
-                <A
-                  href={lexiconRecordHref(props.schema.id)}
-                  class="hover:underline focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
-                >
-                  {props.schema.id}
-                </A>
-              )}
-            </h2>
-            <span class="shrink-0 text-sm text-neutral-600 dark:text-neutral-400">
-              v{props.schema.lexicon}
-            </span>
+            <h2 class="min-w-0 truncate text-base font-semibold">{props.schema.id}</h2>
+            <Show when={version()}>
+              <span class="shrink-0 text-sm text-neutral-600 dark:text-neutral-400">
+                {version()}
+              </span>
+            </Show>
           </div>
-          <Show when={props.schema.description}>
-            <p class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
-              {props.schema.description}
-            </p>
-          </Show>
-        </div>
+        </Show>
+        <Show when={props.schema.description}>
+          <p
+            class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300"
+            classList={{ "pt-2": props.preview }}
+          >
+            {props.schema.description}
+          </p>
+        </Show>
 
         {/* Definitions, with a rule between them stronger than the lines between rows */}
         <div
           class="flex flex-col"
           classList={{
-            "pt-4 gap-6 [&>*+*]:border-t [&>*+*]:border-neutral-300 [&>*+*]:pt-6 dark:[&>*+*]:border-neutral-700":
+            "gap-6 [&>*+*]:border-t [&>*+*]:border-neutral-300 [&>*+*]:pt-6 dark:[&>*+*]:border-neutral-700":
               !props.preview,
+            "pt-4": !props.preview && !!props.schema.description,
             "pt-3 gap-4": props.preview,
           }}
         >
           <For each={visibleDefinitionEntries()}>
-            {([name, def]) => <DefSection name={name} def={def} preview={props.preview} />}
+            {([name, def], index) => (
+              <DefSection
+                name={name}
+                def={def}
+                preview={props.preview}
+                aside={!props.preview && index() === 0 ? lexiconLink() : undefined}
+              />
+            )}
           </For>
           <Show when={props.preview && hiddenDefinitionCount() > 0}>
             <div class="text-xs text-neutral-500 dark:text-neutral-400">
