@@ -351,6 +351,29 @@ const TypeBadge = (props: {
  * A union's types. With `current`, the one a record's value has, that one comes first in bold,
  * ahead of the others it could have been.
  */
+/**
+ * A muted label with a list of values, e.g. a union's refs. One value goes after the label, like
+ * an array's `items:`; several are nested under it, one per line.
+ */
+const LabelledList = (props: { label: string; count: number; children: JSX.Element }) => (
+  <Show
+    when={props.count > 1}
+    fallback={
+      <div class="flex min-w-0 items-baseline gap-2 text-xs">
+        <span class="shrink-0 text-neutral-500 dark:text-neutral-400">{props.label}:</span>
+        {props.children}
+      </div>
+    }
+  >
+    <div class="flex flex-col gap-2">
+      <span class="text-xs text-neutral-500 dark:text-neutral-400">{props.label}:</span>
+      <div class="ml-1 border-l border-neutral-300 pl-3 dark:border-neutral-600">
+        {props.children}
+      </div>
+    </div>
+  </Show>
+);
+
 const UnionBadges = (props: { refs: string[]; current?: string }) => (
   <div class="flex flex-col items-start gap-1">
     <Show when={props.current && props.refs.includes(props.current) && props.current}>
@@ -396,9 +419,8 @@ const KnownValues = (props: { values: string[] }) => {
       ? value.slice(context.schema.id.length)
       : value;
   return (
-    <div class="flex flex-col gap-2">
-      <span class="text-xs text-neutral-500 dark:text-neutral-400">knownValues:</span>
-      <div class="ml-1 flex flex-col items-start gap-1 border-l border-neutral-300 pl-3 dark:border-neutral-600">
+    <LabelledList label="knownValues" count={props.values.length}>
+      <div class="flex min-w-0 flex-col items-start gap-1">
         <For each={props.values}>
           {(value) => (
             <Show
@@ -412,7 +434,7 @@ const KnownValues = (props: { values: string[] }) => {
           )}
         </For>
       </div>
-    </div>
+    </LabelledList>
   );
 };
 
@@ -522,14 +544,11 @@ const PropertyRow = (props: {
             {props.property.description}
           </p>
         </Show>
-        {/* Labelled and nested like an array's items, so the types don't read as more prose. */}
+        {/* Labelled like an array's items, so the types don't read as more prose. */}
         <Show when={props.property.refs}>
-          <div class="flex flex-col gap-2">
-            <span class="text-xs text-neutral-500 dark:text-neutral-400">refs:</span>
-            <div class="ml-1 border-l border-neutral-300 pl-3 dark:border-neutral-600">
-              <UnionBadges refs={props.property.refs!} current={props.currentType} />
-            </div>
-          </div>
+          <LabelledList label="refs" count={props.property.refs!.length}>
+            <UnionBadges refs={props.property.refs!} current={props.currentType} />
+          </LabelledList>
         </Show>
         <Show when={hasConstraints(props.property)}>
           <ConstraintsList property={props.property} />
