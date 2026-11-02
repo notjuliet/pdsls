@@ -14,10 +14,14 @@ import HoverCard, { HoverCardError } from "./hover-card/base";
 import { createHoverResource } from "./hover-card/resource";
 
 // Style constants
-const CONTAINER_CLASS =
-  "divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-neutral-50/50 px-3 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-800/30";
+/**
+ * A list of properties, errors or permissions: rows between faint hairlines, lighter than the
+ * rules between definitions, with none above the first. It's a container, so its rows split into
+ * two columns when it has the room, in a hover card as on the page.
+ */
+const CONTAINER_CLASS = "@container divide-y divide-neutral-200/80 dark:divide-neutral-700/50";
 
-const SECTION_HEADING_CLASS = "text-sm font-medium text-neutral-800 dark:text-neutral-200";
+const SECTION_HEADING_CLASS = "text-sm font-medium text-neutral-500 dark:text-neutral-400";
 
 /** A muted label line under a heading, like "Record key:" or "Encoding:". */
 const INFO_LINE_CLASS = "w-fit text-sm text-neutral-500 dark:text-neutral-400";
@@ -33,12 +37,15 @@ const RESOURCE_COLORS = {
   default: "bg-neutral-500/10 text-neutral-700 dark:bg-neutral-400/10 dark:text-neutral-300",
 } as const;
 
+/**
+ * A definition's type badge colour. Objects are left out, so they take the neutral default: most
+ * definitions in a big lexicon are objects, and colour is kept for the kinds worth spotting.
+ */
 const DEF_TYPE_COLORS = {
   record: "bg-green-500/10 text-green-700 dark:bg-green-400/10 dark:text-green-400",
   query: "bg-purple-500/10 text-purple-700 dark:bg-purple-400/10 dark:text-purple-400",
   procedure: "bg-orange-500/10 text-orange-700 dark:bg-orange-400/10 dark:text-orange-400",
   subscription: "bg-pink-500/10 text-pink-700 dark:bg-pink-400/10 dark:text-pink-400",
-  object: "bg-blue-500/10 text-blue-700 dark:bg-blue-400/10 dark:text-blue-400",
   token: "bg-yellow-500/10 text-yellow-700 dark:bg-yellow-400/10 dark:text-yellow-400",
   "permission-set": "bg-cyan-500/10 text-cyan-700 dark:bg-cyan-400/10 dark:text-cyan-400",
   default: "bg-neutral-500/10 text-neutral-700 dark:bg-neutral-400/10 dark:text-neutral-300",
@@ -260,7 +267,7 @@ const TypeBadge = (props: {
   refType?: string;
   /** The text color, muted unless the type is a value, e.g. after `items:`. */
   color?: string;
-  /** Larger next to a property's name. */
+  /** Larger on a line of its own, e.g. an input's "Schema:". */
   size?: string;
 }) => {
   const displayType = props.refType
@@ -363,6 +370,9 @@ const ConstraintsList = (props: { property: LexiconProperty }) => {
   );
 };
 
+/** Amber-700 in light mode, since 600 is too faint to read at this size on the grey background. */
+const REQUIRED_CLASS = "text-xs text-amber-700 dark:text-amber-500";
+
 const PropertyRow = (props: {
   name: string;
   property: LexiconProperty;
@@ -374,66 +384,86 @@ const PropertyRow = (props: {
   currentType?: string;
 }) => {
   return (
-    <div class={`flex flex-col gap-2 ${props.class ?? "py-3"}`}>
+    // The name, type and "required" in a narrow column, and what the value is beside it. Stacked
+    // when the list is too narrow for both, with the description straight under the name.
+    <div
+      class={`grid gap-x-6 gap-y-1.5 ${props.class ?? "py-2"}`}
+      classList={{ "@md:grid-cols-[11rem_minmax(0,1fr)]": !props.hideNameType }}
+    >
       <Show when={!props.hideNameType}>
-        <div class="flex flex-wrap items-baseline gap-2">
-          <span class="font-semibold">{props.name}</span>
+        <div class="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5 @md:flex-col">
+          {/* In the narrow column, "required" goes with the name, which is short, rather than the
+              type, which can be long enough to push it onto a third line. Stacked, it reads
+              after the type instead, as "text string required". */}
+          <span class="flex flex-wrap items-baseline gap-x-2">
+            <span class="font-mono text-sm font-semibold wrap-break-word">{props.name}</span>
+            <Show when={props.required}>
+              <span class={`hidden @md:inline ${REQUIRED_CLASS}`}>required</span>
+            </Show>
+          </span>
           <Show when={!props.property.refs}>
             <TypeBadge
               type={props.property.type}
               format={props.property.format}
               refType={props.property.ref}
-              size="text-sm"
             />
           </Show>
           <Show when={props.property.refs}>
-            <TypeBadge type={unionType(props.property)} size="text-sm" />
+            <TypeBadge type={unionType(props.property)} />
           </Show>
           <Show when={props.required}>
-            <span class="text-sm text-amber-600 dark:text-amber-500">required</span>
+            <span class={`@md:hidden ${REQUIRED_CLASS}`}>required</span>
           </Show>
         </div>
       </Show>
-      <Show when={props.property.refs}>
-        <UnionBadges refs={props.property.refs!} current={props.currentType} />
-      </Show>
-      <Show when={hasConstraints(props.property)}>
-        <ConstraintsList property={props.property} />
-      </Show>
-      <Show when={props.property.items}>
-        <div class="flex flex-col gap-2">
-          <div class="flex items-baseline gap-2 text-xs">
-            <span class="text-neutral-500 dark:text-neutral-400">items:</span>
-            <Show when={!props.property.items!.refs}>
-              <TypeBadge
-                type={props.property.items!.type}
-                format={props.property.items!.format}
-                refType={props.property.items!.ref}
-                color={VALUE_CLASS}
-              />
-            </Show>
-            <Show when={props.property.items!.refs}>
-              <TypeBadge type={unionType(props.property.items!)} color={VALUE_CLASS} />
-            </Show>
+      <div class="flex min-w-0 flex-col gap-2">
+        <Show when={props.property.description && !props.hideNameType}>
+          <p class="text-sm wrap-break-word whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
+            {props.property.description}
+          </p>
+        </Show>
+        {/* Labelled and nested like an array's items, so the types don't read as more prose. */}
+        <Show when={props.property.refs}>
+          <div class="flex flex-col gap-2">
+            <span class="text-xs text-neutral-500 dark:text-neutral-400">refs:</span>
+            <div class="ml-1 border-l border-neutral-300 pl-3 dark:border-neutral-600">
+              <UnionBadges refs={props.property.refs!} current={props.currentType} />
+            </div>
           </div>
-          {/* Nested under the items line, so they don't read as the array's own. */}
-          <Show when={props.property.items!.refs || hasConstraints(props.property.items!)}>
-            <div class="ml-1 flex flex-col gap-2 border-l border-neutral-300 pl-3 dark:border-neutral-600">
-              <Show when={props.property.items!.refs}>
-                <UnionBadges refs={props.property.items!.refs!} />
+        </Show>
+        <Show when={hasConstraints(props.property)}>
+          <ConstraintsList property={props.property} />
+        </Show>
+        <Show when={props.property.items}>
+          <div class="flex flex-col gap-2">
+            <div class="flex items-baseline gap-2 text-xs">
+              <span class="text-neutral-500 dark:text-neutral-400">items:</span>
+              <Show when={!props.property.items!.refs}>
+                <TypeBadge
+                  type={props.property.items!.type}
+                  format={props.property.items!.format}
+                  refType={props.property.items!.ref}
+                  color={VALUE_CLASS}
+                />
               </Show>
-              <Show when={hasConstraints(props.property.items!)}>
-                <ConstraintsList property={props.property.items!} />
+              <Show when={props.property.items!.refs}>
+                <TypeBadge type={unionType(props.property.items!)} color={VALUE_CLASS} />
               </Show>
             </div>
-          </Show>
-        </div>
-      </Show>
-      <Show when={props.property.description && !props.hideNameType}>
-        <p class="text-sm wrap-break-word whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
-          {props.property.description}
-        </p>
-      </Show>
+            {/* Nested under the items line, so they don't read as the array's own. */}
+            <Show when={props.property.items!.refs || hasConstraints(props.property.items!)}>
+              <div class="ml-1 flex flex-col gap-2 border-l border-neutral-300 pl-3 dark:border-neutral-600">
+                <Show when={props.property.items!.refs}>
+                  <UnionBadges refs={props.property.items!.refs!} />
+                </Show>
+                <Show when={hasConstraints(props.property.items!)}>
+                  <ConstraintsList property={props.property.items!} />
+                </Show>
+              </div>
+            </Show>
+          </div>
+        </Show>
+      </div>
     </div>
   );
 };
@@ -493,7 +523,7 @@ const SchemaSection = (props: { title: string; body: LexiconBody }) => {
 
 const PermissionRow = (props: { permission: LexiconPermission; index: number }) => {
   return (
-    <div class="flex flex-col gap-2 py-3">
+    <div class="flex flex-col gap-2 py-2">
       <div class="flex flex-wrap items-center gap-2">
         <span class="font-semibold">#{props.index + 1}</span>
         <span
@@ -589,50 +619,56 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
   const hasDefContent = () => props.def.refs || props.def.items || hasConstraints(props.def);
 
   return (
+    // Its sections further apart than the rows in them, so each list reads as one group.
     <div
       class="flex scroll-mt-4 flex-col"
-      classList={{ "gap-3": !props.preview, "gap-2": props.preview }}
+      classList={{
+        "gap-4": !props.preview,
+        "gap-3": props.preview,
+      }}
       id={schemaDefId(props.name)}
     >
-      <div class="group flex items-center gap-2">
-        <LocalSchemaLink defName={props.name} class="relative font-semibold hover:underline">
-          <span class="iconify lucide--link absolute top-1/2 -left-6 -translate-y-1/2 text-base opacity-0 transition-opacity group-hover:opacity-100" />
-          {props.name === "main" ? "Main Definition" : props.name}
-        </LocalSchemaLink>
-        <span class={`rounded px-1.5 py-0.5 font-mono text-xs font-medium ${defTypeColor()}`}>
-          {props.def.type}
-        </span>
-      </div>
-
-      <Show when={props.def.key}>
-        {(key) => (
-          <span class={INFO_LINE_CLASS} title={describeRecordKey(key())}>
-            Record key: <span class={VALUE_CLASS}>{key()}</span>
+      <div class="flex flex-col gap-2">
+        <div class="group flex items-center gap-2">
+          <LocalSchemaLink defName={props.name} class="relative font-semibold hover:underline">
+            <span class="iconify lucide--link absolute top-1/2 -left-6 -translate-y-1/2 text-base opacity-0 transition-opacity group-hover:opacity-100" />
+            {props.name === "main" ? "Main Definition" : props.name}
+          </LocalSchemaLink>
+          <span class={`rounded px-1.5 py-0.5 font-mono text-xs font-medium ${defTypeColor()}`}>
+            {props.def.type}
           </span>
-        )}
-      </Show>
+        </div>
 
-      <Show when={props.def.description}>
-        <p class={DESCRIPTION_CLASS}>{props.def.description}</p>
-      </Show>
-
-      {/* Permission-set: the title and detail an app shows when asking for it, with translations */}
-      <Show when={props.def.type === "permission-set"}>
-        <For each={localizedLines("Title", props.def.title, props.def["title:lang"])}>
-          {(line) => (
-            <span class={INFO_LINE_CLASS}>
-              {line.label}: <span class={`whitespace-pre-wrap ${VALUE_CLASS}`}>{line.text}</span>
+        <Show when={props.def.key}>
+          {(key) => (
+            <span class={INFO_LINE_CLASS} title={describeRecordKey(key())}>
+              Record key: <span class={`font-mono ${VALUE_CLASS}`}>{key()}</span>
             </span>
           )}
-        </For>
-        <For each={localizedLines("Detail", props.def.detail, props.def["detail:lang"])}>
-          {(line) => (
-            <span class={INFO_LINE_CLASS}>
-              {line.label}: <span class={`whitespace-pre-wrap ${VALUE_CLASS}`}>{line.text}</span>
-            </span>
-          )}
-        </For>
-      </Show>
+        </Show>
+
+        <Show when={props.def.description}>
+          <p class={DESCRIPTION_CLASS}>{props.def.description}</p>
+        </Show>
+
+        {/* Permission-set: the title and detail an app shows when asking for it, with translations */}
+        <Show when={props.def.type === "permission-set"}>
+          <For each={localizedLines("Title", props.def.title, props.def["title:lang"])}>
+            {(line) => (
+              <span class={INFO_LINE_CLASS}>
+                {line.label}: <span class={`whitespace-pre-wrap ${VALUE_CLASS}`}>{line.text}</span>
+              </span>
+            )}
+          </For>
+          <For each={localizedLines("Detail", props.def.detail, props.def["detail:lang"])}>
+            {(line) => (
+              <span class={INFO_LINE_CLASS}>
+                {line.label}: <span class={`whitespace-pre-wrap ${VALUE_CLASS}`}>{line.text}</span>
+              </span>
+            )}
+          </For>
+        </Show>
+      </div>
 
       {/* Permission-set: Permissions list */}
       <Show
@@ -716,8 +752,8 @@ const DefSection = (props: { name: string; def: LexiconDef; preview?: boolean })
           <div class={CONTAINER_CLASS}>
             <For each={props.def.errors}>
               {(error) => (
-                <div class="flex flex-col gap-1 py-2">
-                  <div class="font-semibold">{error.name}</div>
+                <div class="grid gap-x-6 gap-y-1 py-2 @md:grid-cols-[11rem_minmax(0,1fr)]">
+                  <div class="font-mono text-sm font-semibold wrap-break-word">{error.name}</div>
                   <Show when={error.description}>
                     <p class={DESCRIPTION_CLASS}>{error.description}</p>
                   </Show>
@@ -843,10 +879,14 @@ export const LexiconSchemaView = (props: {
           </Show>
         </div>
 
-        {/* Definitions */}
+        {/* Definitions, with a rule between them stronger than the lines between rows */}
         <div
-          class="flex flex-col pt-3"
-          classList={{ "gap-6": !props.preview, "gap-4": props.preview }}
+          class="flex flex-col"
+          classList={{
+            "pt-4 gap-6 [&>*+*]:border-t [&>*+*]:border-neutral-300 [&>*+*]:pt-6 dark:[&>*+*]:border-neutral-700":
+              !props.preview,
+            "pt-3 gap-4": props.preview,
+          }}
         >
           <For each={visibleDefinitionEntries()}>
             {([name, def]) => <DefSection name={name} def={def} preview={props.preview} />}
