@@ -482,7 +482,7 @@ const SchemaSection = (props: { title: string; body: LexiconBody }) => {
     <div class="flex flex-col gap-2">
       <h4 class={SECTION_HEADING_CLASS}>{props.title}</h4>
       <span class={INFO_LINE_CLASS}>
-        Encoding: <span class={VALUE_CLASS}>{props.body.encoding}</span>
+        Encoding: <span class={`font-mono ${VALUE_CLASS}`}>{props.body.encoding}</span>
       </span>
       <Show when={props.body.description}>
         <p class={DESCRIPTION_CLASS}>{props.body.description}</p>
