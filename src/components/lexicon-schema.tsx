@@ -486,7 +486,7 @@ const PropertyRow = (props: {
     // when the list is too narrow for both, with the description straight under the name.
     <div
       class={`grid gap-x-6 gap-y-1.5 ${props.class ?? "py-2"}`}
-      classList={{ "@md:grid-cols-[13rem_minmax(0,1fr)]": !props.hideNameType }}
+      classList={{ "@md:grid-cols-[12rem_minmax(0,1fr)]": !props.hideNameType }}
     >
       <Show when={!props.hideNameType}>
         <div class="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5 @md:flex-col">
@@ -862,7 +862,7 @@ const DefSection = (props: {
           <div class={CONTAINER_CLASS}>
             <For each={props.def.errors}>
               {(error) => (
-                <div class="grid gap-x-6 gap-y-1 py-2 @md:grid-cols-[13rem_minmax(0,1fr)]">
+                <div class="grid gap-x-6 gap-y-1 py-2 @md:grid-cols-[12rem_minmax(0,1fr)]">
                   <div class="font-mono text-sm font-semibold wrap-break-word">{error.name}</div>
                   <Show when={error.description}>
                     <p class={DESCRIPTION_CLASS}>{error.description}</p>
