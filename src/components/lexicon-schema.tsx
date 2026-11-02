@@ -17,10 +17,12 @@ import { createHoverResource } from "./hover-card/resource";
 // Style constants
 /**
  * A list of properties, errors or permissions: rows between faint hairlines, lighter than the
- * rules between definitions, with none above the first. It's a container, so its rows split into
- * two columns when it has the room, in a hover card as on the page.
+ * rules between definitions, with none above the first. The last row has no padding below, so
+ * the rule after a definition sits evenly between it and the next. It's a container, so its
+ * rows split into two columns when it has the room, in a hover card as on the page.
  */
-const CONTAINER_CLASS = "@container divide-y divide-neutral-200/80 dark:divide-neutral-700/50";
+const CONTAINER_CLASS =
+  "@container divide-y divide-neutral-200/80 dark:divide-neutral-700/50 [&>:last-child]:pb-0";
 
 const SECTION_HEADING_CLASS = "text-sm font-medium text-neutral-500 dark:text-neutral-400";
 
@@ -732,7 +734,8 @@ const DefSection = (props: {
       }}
       id={schemaDefId(props.name)}
     >
-      <div class="flex flex-col gap-2">
+      {/* Closer to the first section than sections are to each other, as it heads them all. */}
+      <div class="flex flex-col gap-2" classList={{ "-mb-1": !props.preview }}>
         <div class="flex items-center gap-4">
           <div class="group flex shrink-0 items-center gap-2">
             <LocalSchemaLink defName={props.name} class="relative font-semibold hover:underline">
