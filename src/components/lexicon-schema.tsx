@@ -984,8 +984,9 @@ export const LexiconSchemaView = (props: {
       }}
     >
       <div class="w-full" classList={{ "px-2": !props.preview }}>
-        {/* Header. On the page, the name is already above the tabs, so it moves to the right of
-            the first definition's heading, small, and only the description stays here. */}
+        {/* Header. On the page, the name is already above the tabs, so it goes small on the right
+            of the tab's first line: beside the lexicon's description, which it ties to the
+            lexicon, or else beside the first definition's heading. */}
         <Show when={props.preview}>
           <div class="flex min-w-0 items-baseline gap-1.5">
             <h2 class="min-w-0 truncate text-base font-semibold">{props.schema.id}</h2>
@@ -997,12 +998,19 @@ export const LexiconSchemaView = (props: {
           </div>
         </Show>
         <Show when={props.schema.description}>
-          <p
-            class="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300"
+          {/* Side by side when the description has room beside the name, as on a desktop; on a
+              phone the name goes under it, on the right, so the description isn't squeezed. */}
+          <div
+            class="flex flex-wrap items-baseline gap-x-4 gap-y-1"
             classList={{ "pt-2": props.preview }}
           >
-            {props.schema.description}
-          </p>
+            <p class="min-w-0 flex-[1_1_20rem] text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
+              {props.schema.description}
+            </p>
+            <Show when={!props.preview}>
+              <div class="ml-auto min-w-0 truncate">{lexiconLink()}</div>
+            </Show>
+          </div>
         </Show>
 
         {/* Definitions, with a rule between them stronger than the lines between rows */}
@@ -1021,7 +1029,11 @@ export const LexiconSchemaView = (props: {
                 name={name}
                 def={def}
                 preview={props.preview}
-                aside={!props.preview && index() === 0 ? lexiconLink() : undefined}
+                aside={
+                  !props.preview && !props.schema.description && index() === 0
+                    ? lexiconLink()
+                    : undefined
+                }
               />
             )}
           </For>
