@@ -770,7 +770,11 @@ const DefSection = (props: {
       <div class="flex flex-col gap-2" classList={{ "-mb-1": !props.preview }}>
         <div class="flex items-center gap-4">
           <div class="group flex shrink-0 items-center gap-2">
-            <LocalSchemaLink defName={props.name} class="relative font-semibold hover:underline">
+            {/* A clear step above the bold field names right under it; hover cards keep 16px. */}
+            <LocalSchemaLink
+              defName={props.name}
+              class={`relative font-semibold hover:underline ${props.preview ? "" : "text-lg"}`}
+            >
               <span class="iconify lucide--link absolute top-1/2 -left-6 -translate-y-1/2 text-base opacity-0 transition-opacity group-hover:opacity-100" />
               {props.name === "main" ? "Main Definition" : props.name}
             </LocalSchemaLink>
