@@ -5,6 +5,7 @@ import { isNsid } from "@atcute/lexicons/syntax";
 import type { Issue } from "@atcute/lexicons/validations";
 import * as v from "valibot";
 
+import { formatSizeLimit } from "./format.js";
 import { resolveLexicon } from "./lexicon.js";
 
 interface RecordSchemaValidation {
@@ -13,9 +14,6 @@ interface RecordSchemaValidation {
   /** Each problem, with the path to the field it's on. */
   issues?: readonly Issue[];
 }
-
-const formatBytes = (bytes: number) =>
-  bytes >= 1_000_000 ? `${+(bytes / 1_000_000).toFixed(1)} MB` : `${+(bytes / 1000).toFixed(1)} kB`;
 
 /** A limit with either end open, e.g. "at most 300", or "between 1 and 300". */
 const range = (min: number, max: number, unit: string) =>
@@ -49,7 +47,7 @@ export const describeIssue = (issue: Issue): string => {
     case "invalid_bytes_size":
       return `Should be ${range(issue.minSize, issue.maxSize, "bytes")}`;
     case "invalid_blob_size":
-      return `Larger than ${formatBytes(issue.maxSize)}`;
+      return `Larger than ${formatSizeLimit(issue.maxSize)}`;
     case "invalid_blob_mime_type":
       return `Should be ${issue.accept.join(" or ")}`;
   }

@@ -6,6 +6,17 @@ export const formatFileSize = (bytes: number): string => {
   return `${(bytes / Math.pow(k, i)).toFixed(i === 0 ? 0 : 1)} ${sizes[i]}`;
 };
 
+/**
+ * A size limit in decimal units, e.g. a lexicon's maxSize of 1000000 as "1 MB": limits are set
+ * in round thousands, which binary units would turn into "976.6 KiB".
+ */
+export const formatSizeLimit = (bytes: number) =>
+  bytes >= 1_000_000
+    ? `${+(bytes / 1_000_000).toFixed(1)} MB`
+    : bytes >= 1000
+      ? `${+(bytes / 1000).toFixed(1)} kB`
+      : `${bytes} B`;
+
 export const localDateFromTimestamp = (timestamp: number) =>
   new Date(timestamp - new Date().getTimezoneOffset() * 60 * 1000)
     .toISOString()

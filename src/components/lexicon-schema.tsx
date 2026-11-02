@@ -2,6 +2,7 @@ import type { Nsid } from "@atcute/lexicons";
 import { A, useLocation } from "@solidjs/router";
 import { createContext, createEffect, For, type JSX, Show, useContext } from "solid-js";
 
+import { formatSizeLimit } from "../lib/format";
 import {
   lexiconRecordHref,
   parseLexiconRef,
@@ -307,68 +308,56 @@ const UnionBadges = (props: { refs: string[]; current?: string }) => (
   </div>
 );
 
+/** A constraint as a muted label and its value, with the exact value on hover when it's rounded. */
+const Constraint = (props: { label: string; title?: string; children: JSX.Element }) => (
+  <span title={props.title}>
+    {props.label}: <span class={VALUE_CLASS}>{props.children}</span>
+  </span>
+);
+
+/** A count or bound with thousands separators, e.g. 3,000 rather than 3000. */
+const formatCount = (value: number) => value.toLocaleString("en");
+
 const ConstraintsList = (props: { property: LexiconProperty }) => {
   return (
     <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-500 dark:text-neutral-400">
       <Show when={props.property.minLength !== undefined}>
-        <span>
-          minLength: <span class={VALUE_CLASS}>{props.property.minLength}</span>
-        </span>
+        <Constraint label="minLength">{formatCount(props.property.minLength!)}</Constraint>
       </Show>
       <Show when={props.property.maxLength !== undefined}>
-        <span>
-          maxLength: <span class={VALUE_CLASS}>{props.property.maxLength}</span>
-        </span>
+        <Constraint label="maxLength">{formatCount(props.property.maxLength!)}</Constraint>
       </Show>
       <Show when={props.property.maxGraphemes !== undefined}>
-        <span>
-          maxGraphemes: <span class={VALUE_CLASS}>{props.property.maxGraphemes}</span>
-        </span>
+        <Constraint label="maxGraphemes">{formatCount(props.property.maxGraphemes!)}</Constraint>
       </Show>
       <Show when={props.property.minGraphemes !== undefined}>
-        <span>
-          minGraphemes: <span class={VALUE_CLASS}>{props.property.minGraphemes}</span>
-        </span>
+        <Constraint label="minGraphemes">{formatCount(props.property.minGraphemes!)}</Constraint>
       </Show>
       <Show when={props.property.minimum !== undefined}>
-        <span>
-          min: <span class={VALUE_CLASS}>{props.property.minimum}</span>
-        </span>
+        <Constraint label="min">{formatCount(props.property.minimum!)}</Constraint>
       </Show>
       <Show when={props.property.maximum !== undefined}>
-        <span>
-          max: <span class={VALUE_CLASS}>{props.property.maximum}</span>
-        </span>
+        <Constraint label="max">{formatCount(props.property.maximum!)}</Constraint>
       </Show>
       <Show when={props.property.maxSize !== undefined}>
-        <span>
-          maxSize: <span class={VALUE_CLASS}>{props.property.maxSize}</span>
-        </span>
+        <Constraint label="maxSize" title={`${formatCount(props.property.maxSize!)} bytes`}>
+          {formatSizeLimit(props.property.maxSize!)}
+        </Constraint>
       </Show>
       <Show when={props.property.accept}>
-        <span>
-          accept: <span class={VALUE_CLASS}>[{props.property.accept!.join(", ")}]</span>
-        </span>
+        <Constraint label="accept">{props.property.accept!.join(", ")}</Constraint>
       </Show>
       <Show when={props.property.enum}>
-        <span>
-          enum: <span class={VALUE_CLASS}>[{props.property.enum!.join(", ")}]</span>
-        </span>
+        <Constraint label="enum">{props.property.enum!.join(", ")}</Constraint>
       </Show>
       <Show when={props.property.const}>
-        <span>
-          const: <span class={VALUE_CLASS}>{props.property.const?.toString()}</span>
-        </span>
+        <Constraint label="const">{props.property.const?.toString()}</Constraint>
       </Show>
       <Show when={props.property.default !== undefined}>
-        <span>
-          default: <span class={VALUE_CLASS}>{JSON.stringify(props.property.default)}</span>
-        </span>
+        <Constraint label="default">{JSON.stringify(props.property.default)}</Constraint>
       </Show>
       <Show when={props.property.knownValues}>
-        <span>
-          knownValues: <span class={VALUE_CLASS}>[{props.property.knownValues!.join(", ")}]</span>
-        </span>
+        <Constraint label="knownValues">{props.property.knownValues!.join(", ")}</Constraint>
       </Show>
     </div>
   );
