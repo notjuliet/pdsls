@@ -24,7 +24,11 @@ import { createHoverResource } from "./hover-card/resource";
 const CONTAINER_CLASS =
   "@container divide-y divide-neutral-200/80 dark:divide-neutral-700/50 [&>:last-child]:pb-0";
 
-const SECTION_HEADING_CLASS = "text-sm font-medium text-neutral-500 dark:text-neutral-400";
+/**
+ * A section's label, like "Parameters" or "Output". It only shows where a definition has several
+ * sections, so it's a step darker than the small muted labels, but lighter than the rows it heads.
+ */
+const SECTION_HEADING_CLASS = "text-sm font-medium text-neutral-600 dark:text-neutral-300/80";
 
 /** A muted label line under a heading, like "Record key:" or "Encoding:". */
 const INFO_LINE_CLASS = "w-fit text-sm text-neutral-500 dark:text-neutral-400";
@@ -743,6 +747,15 @@ const DefSection = (props: {
 
   const hasDefContent = () => props.def.refs || props.def.items || hasConstraints(props.def);
 
+  // An object's or record's properties are all it lists, so they need no label to tell them
+  // apart, the way a query's Parameters and Output do.
+  const propertiesOnly = () =>
+    !props.def.parameters &&
+    !props.def.input &&
+    !props.def.output &&
+    !props.def.errors?.length &&
+    !props.def.permissions?.length;
+
   return (
     // Its sections further apart than the rows in them, so each list reads as one group.
     <div
@@ -829,7 +842,9 @@ const DefSection = (props: {
         when={Object.keys(props.def.properties || props.def.record?.properties || {}).length > 0}
       >
         <div class="flex flex-col gap-2">
-          <h4 class={SECTION_HEADING_CLASS}>Properties</h4>
+          <Show when={!propertiesOnly()}>
+            <h4 class={SECTION_HEADING_CLASS}>Properties</h4>
+          </Show>
           <div class={CONTAINER_CLASS}>
             <For each={Object.entries(props.def.properties || props.def.record?.properties || {})}>
               {([name, property]) => (
