@@ -544,7 +544,8 @@ const PropertyRow = (props: {
           </Show>
         </div>
       </Show>
-      <div class="flex min-w-0 flex-col gap-2">
+      {/* Hidden when there's nothing to say, so a stacked row doesn't keep the row gap for it. */}
+      <div class="flex min-w-0 flex-col gap-2 empty:hidden">
         <Show when={props.property.description && !props.hideNameType}>
           <p class="text-sm wrap-break-word whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
             {props.property.description}
@@ -1027,10 +1028,15 @@ export const LexiconSchemaView = (props: {
       }}
     >
       {/* A preview sizes to its content, which container queries would hide from it, so its
-          property lists stay stacked rather than measuring their width for two columns. */}
+          property lists stay stacked rather than measuring their width for two columns. Its padding
+          adds to the hover card's own, which is sized for small JSON previews; not at the top,
+          where the title's line height already leaves room above it. */}
       <div
         class="w-full"
-        classList={{ "px-2": !props.preview, "[&_*]:[container-type:normal]": props.preview }}
+        classList={{
+          "px-2": !props.preview,
+          "px-1 pb-1 [&_*]:[container-type:normal]": props.preview,
+        }}
       >
         {/* Header. On the page, the name is already above the tabs, so it goes small on the right
             of the tab's first line: beside the lexicon's description, which it ties to the
