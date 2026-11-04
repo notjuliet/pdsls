@@ -29,7 +29,8 @@ export const Favicon = (props: {
           classList={{ hidden: !loaded() }}
           onLoad={() => setLoaded(true)}
           onError={() => {
-            if (!src()) {
+            // Loading a .local host directly makes Chrome ask for local network access.
+            if (!src() && !domain().toLowerCase().endsWith(".local")) {
               setSrc(directUrl());
             } else {
               setLoaded(false);
