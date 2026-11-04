@@ -1,7 +1,8 @@
+import { Client, simpleFetchHandler } from "@atcute/client";
 import { useParams } from "@solidjs/router";
-import { createEffect, createSignal, onCleanup } from "solid-js";
+import { createEffect, createSignal, onCleanup, Show } from "solid-js";
 
-import { didDocCache } from "../../lib/api";
+import { didDocCache, getPDS } from "../../lib/api";
 import { localDateFromTimestamp } from "../../lib/format";
 import { setPageStreams } from "../../lib/page-streams";
 import { timestampFromRkey } from "./record-row";
@@ -10,9 +11,20 @@ import { nsidDomain, type Stage, StageNav } from "./stage-nav";
 const [pds, setPDS] = createSignal<string>();
 export { setPDS };
 
+/** The pronouns on a repo's Bluesky profile record, if it has any. */
+const fetchPronouns = async (did: `did:${string}:${string}`) => {
+  const rpc = new Client({ handler: simpleFetchHandler({ service: await getPDS(did) }) });
+  const res = await rpc.get("com.atproto.repo.getRecord", {
+    params: { repo: did, collection: "app.bsky.actor.profile", rkey: "self" },
+  });
+  const pronouns = res.ok ? (res.data.value as { pronouns?: unknown }).pronouns : undefined;
+  return typeof pronouns === "string" ? pronouns.trim() || undefined : undefined;
+};
+
 export const NavBar = () => {
   const params = useParams();
   const [handle, setHandle] = createSignal(params.repo);
+  const [pronouns, setPronouns] = createSignal<string>();
   const missingPds = () => pds() === "Missing PDS";
 
   createEffect(() => {
@@ -23,6 +35,17 @@ export const NavBar = () => {
         ?.filter((alias) => alias.startsWith("at://"))[0]
         ?.split("at://")[1] ?? params.repo;
     setHandle(hdl);
+  });
+
+  createEffect(() => {
+    const repo = params.repo;
+    setPronouns(undefined);
+    if (!repo?.startsWith("did:")) return;
+    let stale = false;
+    onCleanup(() => (stale = true));
+    fetchPronouns(repo as `did:${string}:${string}`)
+      .then((value) => !stale && setPronouns(value))
+      .catch(() => {});
   });
 
   // Offer this page's streams in the search dropdown, the deepest level first.
@@ -84,7 +107,17 @@ export const NavBar = () => {
       result.push({
         kind: "Repo",
         label: hasHandle ? handle() : params.repo,
-        detail: hasHandle ? params.repo : undefined,
+        detail:
+          pronouns() || hasHandle ? (
+            <span class="flex gap-x-2">
+              <Show when={pronouns()}>
+                <span class="shrink-0">{pronouns()}</span>
+              </Show>
+              <Show when={hasHandle}>
+                <span class="truncate">{params.repo}</span>
+              </Show>
+            </span>
+          ) : undefined,
         href: params.collection ? `/at://${params.repo}` : undefined,
         copy: { label: "DID", value: params.repo },
       });
