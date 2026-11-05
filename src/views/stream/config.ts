@@ -248,7 +248,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
 
   plc: {
     label: "PLC",
-    summary: "Operations",
+    summary: "Identity updates",
     description: "The stream of did:plc operations from the PLC directory.",
     defaultInstance: "wss://plc.directory/export/stream",
     cborFrames: false,
