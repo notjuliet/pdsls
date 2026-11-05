@@ -543,7 +543,7 @@ export const StreamView = () => {
                                     (searchParams[field.searchParam] as string) ??
                                       (Date.now() * 1000).toString(),
                                   )}
-                                  class="dark:bg-dark-100 min-w-0 grow basis-44 rounded-md bg-white px-2 py-1 text-sm outline-1 outline-neutral-200 select-none focus:outline-neutral-400 dark:scheme-dark dark:outline-neutral-600 dark:focus:outline-neutral-400"
+                                  class="dark:bg-dark-100 min-w-0 grow basis-44 rounded-md bg-white px-2 py-1 text-sm outline-1 -outline-offset-1 outline-neutral-200 select-none focus:outline-neutral-400 dark:scheme-dark dark:outline-neutral-600 dark:focus:outline-neutral-400"
                                   onInput={(e) => {
                                     const micros = datetimeLocalToMicros(e.currentTarget.value);
                                     inputRef.value = micros;

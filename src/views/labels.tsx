@@ -219,7 +219,7 @@ export const LabelFeed = (props: { labelerDid: string; labelerEndpoint: string }
           <Show when={labels().length > 1}>
             <FilterInput
               class="-mx-px min-w-0 flex-1"
-              inputClass="min-w-0 grow py-1 select-none placeholder:text-sm focus:outline-none"
+              inputClass="min-w-0 grow py-[3px] select-none placeholder:text-sm focus:outline-none"
               inputRef={(input) => (filterInputRef = input)}
               placeholder="Filter label values… (* partial, -exclude)"
               value={filter()}
