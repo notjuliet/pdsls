@@ -156,7 +156,7 @@ export const Home = () => {
     <div class="flex min-h-[calc(100dvh-6rem)] w-full flex-col px-2 wrap-break-word">
       <section class="flex flex-1 flex-col items-center justify-center py-10 text-center sm:pb-16">
         <div class="relative isolate flex w-full flex-col items-center pt-14 pb-6 sm:pt-16">
-          <AtmosphereGlobe class="pointer-events-none absolute inset-x-0 -top-8 bottom-0 -z-10 h-[calc(100%+2rem)] w-full mask-x-from-88% mask-b-from-45%" />
+          <AtmosphereGlobe class="atmosphere-fade pointer-events-none absolute inset-x-0 -top-8 bottom-0 -z-10 h-[calc(100%+2rem)] w-full" />
           <For each={atmosphereApps}>
             {(app) => (
               <a

@@ -4,6 +4,9 @@ import { CLOUD_HEIGHT, CLOUD_SCALE, CLOUD_WIDTH } from "../lib/cloud-shape";
 import CloudShapeWorker from "../workers/cloud-shape.ts?worker";
 
 const SECONDS_PER_TURN = 150;
+/** How far below the horizon the planet's color deepens. */
+const PLANET_SHADING = 85;
+const SHADING_STEPS = 8;
 /** How far the top of the horizon sits below the canvas's top edge, leaving room for the glow. */
 const HORIZON_TOP = 72;
 /** Allows for screens that refresh slightly under 60Hz, which would otherwise drop to 20fps. */
@@ -19,7 +22,8 @@ const COLORS = {
       [1, "16, 34, 80", 0],
     ],
     glowWidth: 42,
-    planet: "rgba(24, 58, 104, 0.42)",
+    planet: [103, 144, 186, 0.91],
+    planetEdge: [103, 144, 186, 0.91],
     cloud: "232, 241, 250",
     cloudAlpha: 0.85,
     // Dims the clouds behind the title, to keep it readable.
@@ -29,14 +33,16 @@ const COLORS = {
   light: {
     // A daytime sky: a saturated blue edge, since there's no dark sky for it to glow against.
     atmosphere: [
-      [0, "58, 140, 225", 0.65],
-      [0.18, "96, 170, 238", 0.58],
-      [0.55, "130, 195, 245", 0.34],
+      [0, "50, 125, 220", 0.76],
+      [0.08, "84, 158, 232", 0.6],
+      [0.35, "125, 188, 240", 0.32],
       [1, "170, 215, 248", 0],
     ],
     // Wider than on dark, since a pale haze needs more room to show against a light page.
-    glowWidth: 60,
-    planet: "rgba(80, 160, 232, 0.55)",
+    glowWidth: 62,
+    // Deeper toward the horizon, like a real sphere, so the shape shows without flooding the page.
+    planet: [100, 172, 236, 0.35],
+    planetEdge: [62, 142, 228, 0.7],
     cloud: "255, 255, 255",
     cloudAlpha: 1,
     behindTitle: "255, 255, 255",
@@ -101,7 +107,11 @@ export const AtmosphereGlobe = (props: { class?: string }) => {
         glow.addColorStop(stop, `rgba(${color}, ${alpha})`);
       }
       context.fillStyle = glow;
-      context.fillRect(0, 0, width, height);
+      // Only outside the planet: a gradient keeps its first color all the way inside its inner circle.
+      context.beginPath();
+      context.rect(0, 0, width, height);
+      context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      context.fill("evenodd");
 
       const spin = (time / 1000 / SECONDS_PER_TURN) * Math.PI * 2;
 
@@ -109,7 +119,24 @@ export const AtmosphereGlobe = (props: { class?: string }) => {
       context.beginPath();
       context.arc(centerX, centerY, radius, 0, Math.PI * 2);
       context.clip();
-      context.fillStyle = colors.planet;
+      const shading = context.createRadialGradient(
+        centerX,
+        centerY,
+        radius - PLANET_SHADING,
+        centerX,
+        centerY,
+        radius,
+      );
+      // Eased, since a straight blend shows a visible line where it starts.
+      for (let step = 0; step <= SHADING_STEPS; step++) {
+        const t = step / SHADING_STEPS;
+        const eased = t * t * (3 - 2 * t);
+        const [red, green, blue, alpha] = colors.planet.map(
+          (from, i) => from + (colors.planetEdge[i] - from) * eased,
+        );
+        shading.addColorStop(t, `rgba(${red}, ${green}, ${blue}, ${alpha})`);
+      }
+      context.fillStyle = shading;
       context.fillRect(0, 0, width, height);
       const cloudLayer =
         cloudShape && (clouds[theme] ??= paintClouds(cloudShape, colors.cloud, colors.cloudAlpha));
