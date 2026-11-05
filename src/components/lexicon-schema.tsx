@@ -26,9 +26,9 @@ const CONTAINER_CLASS =
 
 /**
  * A section's label, like "Parameters" or "Output". It only shows where a definition has several
- * sections, so it's a step darker than the small muted labels, but lighter than the rows it heads.
+ * sections, so it stands out from the rows it heads, in the app's font rather than their monospace.
  */
-const SECTION_HEADING_CLASS = "text-sm font-medium text-neutral-600 dark:text-neutral-300/80";
+const SECTION_HEADING_CLASS = "text-base font-semibold";
 
 /** A muted label line under a heading, like "Record key:" or "Encoding:". */
 const INFO_LINE_CLASS = "w-fit text-sm text-neutral-500 dark:text-neutral-400";
@@ -764,13 +764,13 @@ const DefSection = (props: {
     <div
       class="flex scroll-mt-4 flex-col"
       classList={{
-        "gap-4": !props.preview,
-        "gap-3": props.preview,
+        "gap-8": !props.preview,
+        "gap-5": props.preview,
       }}
       id={schemaDefId(props.name)}
     >
       {/* Closer to the first section than sections are to each other, as it heads them all. */}
-      <div class="flex flex-col gap-2" classList={{ "-mb-1": !props.preview }}>
+      <div class={`flex flex-col gap-2 ${props.preview ? "-mb-2" : "-mb-4"}`}>
         <div class="flex items-center gap-4">
           <div class="group flex shrink-0 items-center gap-2">
             {/* A clear step above the bold field names right under it; hover cards keep 16px. */}
