@@ -1,67 +1,40 @@
 import { A } from "@solidjs/router";
 import {
-  Accessor,
   createContext,
+  createEffect,
   createSignal,
+  createUniqueId,
   JSX,
   onCleanup,
-  onMount,
-  Setter,
   Show,
   useContext,
 } from "solid-js";
-import { Portal } from "solid-js/web";
 
-const MenuContext = createContext<{
-  showMenu: Accessor<boolean>;
-  setShowMenu: Setter<boolean>;
-}>();
-
-export const MenuProvider = (props: { children?: JSX.Element }) => {
-  const [showMenu, setShowMenu] = createSignal(false);
-  const value = { showMenu, setShowMenu };
-
-  return <MenuContext.Provider value={value}>{props.children}</MenuContext.Provider>;
-};
+/** Closes the menu an item is in. */
+const MenuContext = createContext<() => void>();
 
 export const NavMenu = (props: {
   href: string;
   label: string;
   icon?: string;
   children?: JSX.Element;
-  class?: string;
-  newTab?: boolean;
-  external?: boolean;
-  shortcut?: string;
 }) => {
-  const ctx = useContext(MenuContext);
+  const closeMenu = useContext(MenuContext);
 
   return (
     <A
       href={props.href}
-      onClick={() => ctx?.setShowMenu(false)}
-      class={`flex w-full items-center gap-2 rounded-md p-1.5 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 ${props.class ?? ""}`}
-      classList={{ "justify-between": props.external || !!props.shortcut }}
-      target={props.newTab ? "_blank" : undefined}
+      onClick={() => closeMenu?.()}
+      class="flex w-full items-center gap-2 rounded-md p-1.5 hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
     >
       {props.children ?? (
         <>
-          <div class="flex items-center gap-2">
-            <Show when={props.icon}>
-              <span
-                class={"iconify shrink-0 text-neutral-500 dark:text-neutral-400 " + props.icon}
-              ></span>
-            </Show>
-            <span class="whitespace-nowrap">{props.label}</span>
-          </div>
-          <Show when={props.shortcut}>
-            <kbd class="rounded border border-neutral-300 bg-neutral-100 px-1.5 py-0.5 font-mono text-[10px] text-neutral-500 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-400">
-              {props.shortcut}
-            </kbd>
+          <Show when={props.icon}>
+            <span
+              class={"iconify shrink-0 text-neutral-500 dark:text-neutral-400 " + props.icon}
+            ></span>
           </Show>
-          <Show when={props.external}>
-            <span class="iconify lucide--external-link"></span>
-          </Show>
+          <span class="whitespace-nowrap">{props.label}</span>
         </>
       )}
     </A>
@@ -72,10 +45,9 @@ export const ActionMenu = (props: {
   label: string;
   icon?: string | JSX.Element;
   onClick: () => unknown;
-  keepOpen?: boolean;
   trailing?: JSX.Element;
 }) => {
-  const ctx = useContext(MenuContext);
+  const closeMenu = useContext(MenuContext);
 
   return (
     <button
@@ -84,7 +56,7 @@ export const ActionMenu = (props: {
         try {
           await props.onClick();
         } finally {
-          if (!props.keepOpen) ctx?.setShowMenu(false);
+          closeMenu?.();
         }
       }}
       class="flex w-full items-center justify-between gap-3 rounded-md p-1.5 text-left whitespace-nowrap hover:bg-neutral-200/50 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600"
@@ -111,23 +83,20 @@ export const MenuSeparator = () => {
 };
 
 export const DropdownMenu = (props: {
-  icon?: string;
-  buttonContent?: JSX.Element;
+  buttonContent: JSX.Element;
   buttonLabel?: string;
   buttonClass?: string;
   menuClass?: string;
   menuWidth?: number;
   children?: JSX.Element;
 }) => {
-  const ctx = useContext(MenuContext);
+  const id = createUniqueId();
   const [menu, setMenu] = createSignal<HTMLDivElement>();
   const [menuButton, setMenuButton] = createSignal<HTMLButtonElement>();
+  const [open, setOpen] = createSignal(false);
   const [buttonRect, setButtonRect] = createSignal<{ bottom: number; right: number }>();
 
-  const clickEvent = (event: MouseEvent) => {
-    const target = event.target as Node;
-    if (!menuButton()?.contains(target) && !menu()?.contains(target)) ctx?.setShowMenu(false);
-  };
+  const top = () => (buttonRect()?.bottom ?? 0) + 4;
 
   const updatePosition = () => {
     const rect = menuButton()?.getBoundingClientRect();
@@ -141,61 +110,67 @@ export const DropdownMenu = (props: {
     }
   };
 
-  onMount(() => {
-    window.addEventListener("click", clickEvent);
+  // An item can finish after the menu was dismissed, e.g. when switching accounts.
+  const close = () => {
+    if (menu()?.matches(":popover-open")) menu()?.hidePopover();
+  };
+
+  createEffect(() => {
+    if (!open()) return;
     window.addEventListener("scroll", updatePosition, true);
     window.addEventListener("resize", updatePosition);
     window.visualViewport?.addEventListener("resize", updatePosition);
     window.visualViewport?.addEventListener("scroll", updatePosition);
-  });
 
-  onCleanup(() => {
-    window.removeEventListener("click", clickEvent);
-    window.removeEventListener("scroll", updatePosition, true);
-    window.removeEventListener("resize", updatePosition);
-    window.visualViewport?.removeEventListener("resize", updatePosition);
-    window.visualViewport?.removeEventListener("scroll", updatePosition);
+    onCleanup(() => {
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+      window.visualViewport?.removeEventListener("resize", updatePosition);
+      window.visualViewport?.removeEventListener("scroll", updatePosition);
+    });
   });
 
   return (
-    <div class="relative">
+    <>
       <button
         type="button"
         aria-label={props.buttonLabel}
-        aria-haspopup="menu"
-        aria-expanded={ctx?.showMenu()}
+        aria-expanded={open()}
+        popovertarget={id}
         class={
           "flex items-center hover:bg-neutral-200 active:bg-neutral-300 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700 " +
           props.buttonClass
         }
         ref={setMenuButton}
-        onClick={() => {
-          updatePosition();
-          ctx?.setShowMenu(!ctx?.showMenu());
-        }}
       >
-        {props.buttonContent ?? <span class={"iconify " + props.icon}></span>}
+        {props.buttonContent}
       </button>
-      <Show when={ctx?.showMenu()}>
-        <Portal>
-          <div
-            ref={setMenu}
-            style={{
-              position: "fixed",
-              top: `${(buttonRect()?.bottom ?? 0) + 4}px`,
-              left: `${Math.max(8, (buttonRect()?.right ?? 0) - (props.menuWidth ?? 160))}px`,
-              width: props.menuWidth ? `${props.menuWidth}px` : undefined,
-            }}
-            role="menu"
-            class={
-              "dark:bg-dark-300 dark:shadow-dark-700 z-50 flex min-w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-sm shadow-md dark:border-neutral-700 " +
-              props.menuClass
-            }
-          >
-            {props.children}
-          </div>
-        </Portal>
-      </Show>
-    </div>
+      <div
+        ref={setMenu}
+        id={id}
+        popover="auto"
+        onBeforeToggle={(event) => {
+          if (event.newState !== "open") return;
+          updatePosition();
+          setOpen(true);
+        }}
+        // The items stay until the menu has closed, so the browser can restore focus from them.
+        onToggle={(event) => setOpen(event.newState === "open")}
+        style={{
+          top: `${top()}px`,
+          left: `${Math.max(8, (buttonRect()?.right ?? 0) - (props.menuWidth ?? 160))}px`,
+          width: props.menuWidth ? `${props.menuWidth}px` : undefined,
+          "max-height": `calc(100dvh - ${top()}px - 8px)`,
+        }}
+        class={
+          "dark:bg-dark-300 dark:shadow-dark-700 inset-auto min-w-40 flex-col rounded-lg border-[0.5px] border-neutral-300 bg-neutral-50 p-2 text-sm text-inherit shadow-md open:flex dark:border-neutral-700 " +
+          props.menuClass
+        }
+      >
+        <Show when={open()}>
+          <MenuContext.Provider value={close}>{props.children}</MenuContext.Provider>
+        </Show>
+      </div>
+    </>
   );
 };
