@@ -22,6 +22,7 @@
         "@atcute/oauth-browser-client": "^5.1.0",
         "@atcute/repo": "^1.1.1",
         "@atcute/tid": "^1.1.4",
+        "@codemirror/autocomplete": "^6.20.3",
         "@codemirror/commands": "^6.11.1",
         "@codemirror/lang-json": "^6.0.2",
         "@codemirror/language": "^6.13.1",

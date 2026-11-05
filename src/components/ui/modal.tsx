@@ -47,6 +47,8 @@ export const Modal = (props: ModalProps) => {
         }}
         ref={(node) => {
           const handleEscape = (e: KeyboardEvent) => {
+            // Something inside already used it, e.g. to close the editor's search panel.
+            if (e.defaultPrevented) return;
             if (e.key === "Escape") {
               const modals = document.querySelectorAll("[data-modal]");
               const lastModal = modals[modals.length - 1];

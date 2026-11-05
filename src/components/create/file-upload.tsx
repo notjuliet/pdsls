@@ -13,7 +13,7 @@ export const FileUpload = (props: {
   file: File;
   repo: Did;
   blobInput: HTMLInputElement;
-  onInsert: (text: string) => void;
+  onInsert: (value: unknown) => void;
   onClose: () => void;
 }) => {
   const [uploading, setUploading] = createSignal(false);
@@ -44,7 +44,7 @@ export const FileUpload = (props: {
       setError(res.data.error);
       return;
     }
-    props.onInsert(JSON.stringify(res.data.blob, null, 2));
+    props.onInsert(res.data.blob);
     props.onClose();
   };
 
@@ -73,7 +73,7 @@ export const FileUpload = (props: {
           </label>
         </div>
         <p class="text-xs text-neutral-600 dark:text-neutral-400">
-          Metadata will be pasted after the cursor
+          Metadata will be inserted at the cursor
         </p>
         <Show when={error()}>
           <span class="text-red-500 dark:text-red-400">Error: {error()}</span>

@@ -18,7 +18,7 @@ import { IconButton } from "../ui/icon-button.jsx";
 import { Modal } from "../ui/modal.jsx";
 import { Spinner } from "../ui/states.jsx";
 import { ConfirmSubmit } from "./confirm-submit";
-import { InsertMenu } from "./insert-menu.jsx";
+import { UploadBlobButton } from "./upload-blob-button.jsx";
 
 const Editor = lazy(() => import("../ui/editor.jsx").then((m) => ({ default: m.Editor })));
 
@@ -39,12 +39,13 @@ const segmentClass =
 const invalidSegmentClass = "text-red-500 dark:text-red-400";
 export const slashClass = "shrink-0 text-neutral-400 select-none dark:text-neutral-500";
 
-const typeOf = (content: string) => {
+/** The record's $type, or `lastKnown` while the JSON is mid-edit and won't parse. */
+const typeOf = (content: string, lastKnown?: string) => {
   try {
     const type = JSON.parse(content)?.$type;
     return typeof type === "string" && type ? type : undefined;
   } catch {
-    return undefined;
+    return lastKnown;
   }
 };
 
@@ -288,7 +289,7 @@ export const RecordEditorDialog = (props: {
               <Editor
                 content={props.content}
                 onReady={(view) => (editorView = view)}
-                onChange={(doc) => setDocType(typeOf(doc))}
+                onChange={(doc) => setDocType((lastKnown) => typeOf(doc, lastKnown))}
               />
             </Suspense>
           </div>
@@ -298,12 +299,16 @@ export const RecordEditorDialog = (props: {
           </Show>
 
           <div class="flex justify-between gap-2">
-            <InsertMenu
-              editor={() => editorView}
-              repo={props.uploadRepo}
-              canUpload={props.canUpload}
-              dialogClass="w-[calc(100%-2rem)] max-w-xs"
-            />
+            <div class="flex min-w-0 items-center gap-2">
+              <UploadBlobButton
+                editor={() => editorView}
+                repo={props.uploadRepo}
+                canUpload={props.canUpload}
+              />
+              <span class="min-w-0 truncate text-xs text-neutral-500 select-none dark:text-neutral-400">
+                Type @ to insert
+              </span>
+            </div>
             <Modal
               open={openAdvanced()}
               onClose={() => setOpenAdvanced(false)}
