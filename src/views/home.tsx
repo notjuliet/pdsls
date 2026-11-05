@@ -165,7 +165,7 @@ export const Home = () => {
                 rel="noopener"
                 aria-label={app.name}
                 title={app.name}
-                class="absolute top-(--compact-y) left-(--compact-x) text-[calc(var(--size)*0.75px)] opacity-70 transition duration-200 hover:scale-110 hover:opacity-100 sm:top-(--y) sm:left-(--x) sm:text-[calc(var(--size)*1px)]"
+                class="absolute top-(--compact-y) left-(--compact-x) text-[calc(var(--size)*0.75px)] opacity-70 transition duration-200 before:absolute before:-inset-2 before:content-[''] hover:scale-110 hover:opacity-100 sm:top-(--y) sm:left-(--x) sm:text-[calc(var(--size)*1px)]"
                 style={{
                   "--x": app.position.x,
                   "--y": app.position.y,
