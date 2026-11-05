@@ -28,6 +28,16 @@ import {
 } from "./views/spaces/index.tsx";
 import { LegacyStreamRedirect, StreamView } from "./views/stream";
 
+// iOS Safari zooms into fields under 16px when they're focused. There, maximum-scale only stops
+// that and pinch zoom still works, but other browsers would lose pinch zoom, so it's iOS only.
+const isIOS =
+  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.userAgent.includes("Macintosh") && navigator.maxTouchPoints > 1);
+if (isIOS) {
+  const viewport = document.querySelector('meta[name="viewport"]');
+  viewport?.setAttribute("content", `${viewport.getAttribute("content")}, maximum-scale=1`);
+}
+
 restoreAfterSignIn();
 
 render(
