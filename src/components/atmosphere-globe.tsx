@@ -31,18 +31,17 @@ const COLORS = {
     behindTitleAlpha: 0.62,
   },
   light: {
-    // A daytime sky: a saturated blue edge, since there's no dark sky for it to glow against.
+    // A daytime sky: a pale edge that fades outward into the page, brightest against the planet.
     atmosphere: [
-      [0, "50, 125, 220", 0.76],
-      [0.08, "84, 158, 232", 0.6],
-      [0.35, "125, 188, 240", 0.32],
+      [0, "225, 240, 255", 0.9],
+      [0.16, "160, 205, 245", 0.74],
+      [0.5, "155, 200, 240", 0.36],
       [1, "170, 215, 248", 0],
     ],
-    // Wider than on dark, since a pale haze needs more room to show against a light page.
-    glowWidth: 62,
+    glowWidth: 46,
     // Deeper toward the horizon, like a real sphere, so the shape shows without flooding the page.
     planet: [100, 172, 236, 0.35],
-    planetEdge: [62, 142, 228, 0.7],
+    planetEdge: [77, 153, 231, 0.57],
     cloud: "255, 255, 255",
     cloudAlpha: 1,
     behindTitle: "255, 255, 255",
