@@ -58,6 +58,8 @@ const atmosphereApps: {
   /** A logo in `public/logos`, for those that have to keep their own colors. */
   image?: string;
   size: number;
+  /** Fades less on the light theme, for a logo too pale to take the usual amount. */
+  pale?: boolean;
   rotate: number;
   position: { x: string; y: string };
   /** Where it goes on small screens, following the tighter curve of the horizon. */
@@ -113,6 +115,7 @@ const atmosphereApps: {
     domain: "wisp.place",
     image: "/logos/wisp.svg",
     size: 38,
+    pale: true,
     rotate: 5,
     position: { x: "89%", y: "16.5%" },
     compact: { x: "87%", y: "13.5%" },
@@ -162,7 +165,11 @@ export const Home = () => {
                 rel="noopener"
                 aria-label={app.name}
                 title={app.name}
-                class="absolute top-(--compact-y) left-(--compact-x) text-[calc(var(--size)*0.75px)] opacity-70 transition duration-200 before:absolute before:-inset-2 before:content-[''] hover:scale-110 hover:opacity-100 sm:top-(--y) sm:left-(--x) sm:text-[calc(var(--size)*1px)]"
+                class="absolute top-(--compact-y) left-(--compact-x) text-[calc(var(--size)*0.75px)] transition duration-200 before:absolute before:-inset-2 before:content-[''] hover:scale-110 hover:opacity-100 sm:top-(--y) sm:left-(--x) sm:text-[calc(var(--size)*1px)]"
+                classList={{
+                  "opacity-70": !app.pale,
+                  "opacity-85 dark:opacity-70 dark:hover:opacity-100": app.pale,
+                }}
                 style={{
                   "--x": app.position.x,
                   "--y": app.position.y,
