@@ -57,8 +57,6 @@ const atmosphereApps: {
   icon?: string;
   /** A logo in `public/logos`, for those that have to keep their own colors. */
   image?: string;
-  /** Rounds a logo that fills a square, and softens its dark tile on the light theme. */
-  tile?: boolean;
   size: number;
   rotate: number;
   position: { x: string; y: string };
@@ -113,9 +111,8 @@ const atmosphereApps: {
   {
     name: "wisp.place",
     domain: "wisp.place",
-    image: "/logos/wisp.png",
-    tile: true,
-    size: 26,
+    image: "/logos/wisp.svg",
+    size: 38,
     rotate: 5,
     position: { x: "90%", y: "24%" },
     compact: { x: "88%", y: "16%" },
@@ -178,12 +175,7 @@ export const Home = () => {
                 {app.icon ? (
                   <span class={`iconify block ${app.icon}`} />
                 ) : (
-                  <img
-                    src={app.image}
-                    alt=""
-                    class="size-[1em] object-contain"
-                    classList={{ "rounded-md opacity-85 dark:opacity-100": app.tile }}
-                  />
+                  <img src={app.image} alt="" class="size-[1em] object-contain" />
                 )}
               </a>
             )}
