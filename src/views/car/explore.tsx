@@ -27,7 +27,7 @@ import { IconButton } from "../../components/ui/icon-button.jsx";
 import { Spinner, EmptyState, ErrorNotice } from "../../components/ui/states.jsx";
 import { didDocCache, resolveDidDoc } from "../../lib/api.js";
 import { addToClipboard } from "../../lib/copy";
-import { localDateFromTimestamp } from "../../lib/format.js";
+import { localDateFromTimestamp, sortKeys } from "../../lib/format.js";
 import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import { carFileAccept, createFileChangeHandler, isIOS } from "./file-handlers.js";
 import { clearQueuedCarFile, queuedCarFile } from "./state.js";
@@ -631,7 +631,7 @@ const RecordSubview = (props: {
         <IconButton
           icon="lucide--copy"
           label="Copy record"
-          onClick={() => addToClipboard(JSON.stringify(props.record.record, null, 2))}
+          onClick={() => addToClipboard(JSON.stringify(sortKeys(props.record.record), null, 2))}
         />
       }
       record={

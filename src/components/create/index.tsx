@@ -6,6 +6,7 @@ import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid
 
 import { hasAccountScope, hasUserScope } from "../../auth/scope-utils";
 import { agent, sessions } from "../../auth/state";
+import { sortKeys } from "../../lib/format";
 import { addNotification } from "../ui/notification.jsx";
 import { iconButtonClass } from "../ui/permission-button.jsx";
 import { showPermissionPrompt } from "../ui/permission-prompt";
@@ -163,7 +164,11 @@ export const RecordEditor = (props: {
         onRequestOpen={openEditor}
         shortcut={props.create ? "n" : "e"}
         content={JSON.stringify(
-          !props.create ? props.record : params.rkey ? placeholder() : defaultPlaceholder(),
+          !props.create
+            ? sortKeys(props.record)
+            : params.rkey
+              ? sortKeys(placeholder())
+              : defaultPlaceholder(),
           null,
           2,
         )}

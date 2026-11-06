@@ -49,3 +49,17 @@ export const relativeTimeFromTimestamp = (timestamp: number) => {
   }
   return "just now";
 };
+
+/**
+ * A copy of a JSON value with each object's keys in alphabetical order, as PDS implementations
+ * return them in different orders. `$type` sorts first, since `$` comes before letters and digits.
+ */
+export const sortKeys = <T>(value: T): T => {
+  if (Array.isArray(value)) return value.map(sortKeys) as T;
+  if (value === null || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.keys(value)
+      .sort()
+      .map((key) => [key, sortKeys((value as Record<string, unknown>)[key])]),
+  ) as T;
+};

@@ -7,6 +7,7 @@ import { RecordEditorDialog, type RecordWrite } from "../../components/create/ed
 import type { JSONType } from "../../components/json.jsx";
 import { addNotification } from "../../components/ui/notification.jsx";
 import { PermissionButton } from "../../components/ui/permission-button.jsx";
+import { sortKeys } from "../../lib/format.js";
 import {
   createSpaceRecord,
   putSpaceRecord,
@@ -30,7 +31,7 @@ interface SpaceRecordEditorProps {
 
 const initialRecord = (collection?: string, record?: JSONType) =>
   JSON.stringify(
-    record ?? {
+    sortKeys(record) ?? {
       $type: collection ?? "",
     },
     null,

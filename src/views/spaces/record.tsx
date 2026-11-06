@@ -14,6 +14,7 @@ import { IconButton } from "../../components/ui/icon-button.jsx";
 import { addNotification } from "../../components/ui/notification.jsx";
 import { ErrorNotice, LoadingState } from "../../components/ui/states.jsx";
 import { addToClipboard } from "../../lib/copy.js";
+import { sortKeys } from "../../lib/format.js";
 import { SchemaTabContent, useLexiconSchema } from "../../lib/schema-tab.jsx";
 import {
   deleteSpaceRecord,
@@ -198,7 +199,7 @@ export const SpaceRecordView = () => {
                   <IconButton
                     icon="lucide--copy"
                     label="Copy record"
-                    onClick={() => addToClipboard(JSON.stringify(value.value, null, 2))}
+                    onClick={() => addToClipboard(JSON.stringify(sortKeys(value.value), null, 2))}
                   />
                 </>
               }

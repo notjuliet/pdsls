@@ -21,6 +21,7 @@ import { IconButton } from "../components/ui/icon-button.jsx";
 import { addNotification } from "../components/ui/notification.jsx";
 import { Spinner } from "../components/ui/states.jsx";
 import { addToClipboard } from "../lib/copy.js";
+import { sortKeys } from "../lib/format.js";
 import { useRepo } from "../lib/repo-context.jsx";
 import { SchemaTabContent, useLexiconSchema } from "../lib/schema-tab.jsx";
 import { AtUri, uriTemplates } from "../lib/templates.js";
@@ -187,7 +188,7 @@ export const RecordView = () => {
                 <IconButton
                   icon="lucide--copy"
                   label="Copy record"
-                  onClick={() => addToClipboard(JSON.stringify(record()?.value, null, 2))}
+                  onClick={() => addToClipboard(JSON.stringify(sortKeys(record()?.value), null, 2))}
                 />
               </>
             }

@@ -17,7 +17,7 @@ import { HEADING_TEXT_CLASS, InfoRow, MUTED_CLASS } from "../../components/ui/in
 import { TagInput } from "../../components/ui/tag-input";
 import { TextInput } from "../../components/ui/text-input";
 import { addToClipboard } from "../../lib/copy";
-import { localDateFromTimestamp } from "../../lib/format";
+import { localDateFromTimestamp, sortKeys } from "../../lib/format";
 import { websocketCloseReasons } from "../../lib/websocket";
 import { getStreamType, isChecked, STREAM_CONFIGS, STREAM_TYPES, StreamType } from "./config";
 import { decodeFirehoseFrame } from "./firehose";
@@ -82,7 +82,7 @@ const StreamRecordItem = (props: { record: any; streamType: StreamType }) => {
 
   const copyRecord = (e: MouseEvent) => {
     e.stopPropagation();
-    addToClipboard(JSON.stringify(props.record, null, 2));
+    addToClipboard(JSON.stringify(sortKeys(props.record), null, 2));
   };
 
   return (

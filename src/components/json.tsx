@@ -16,7 +16,7 @@ import {
 } from "solid-js";
 
 import type { FieldStep } from "../lib/field-schema";
-import { formatFileSize } from "../lib/format";
+import { formatFileSize, sortKeys } from "../lib/format";
 import { describeIssue } from "../lib/record-validation";
 import { hideMedia } from "../views/settings";
 import DidHoverCard from "./hover-card/did";
@@ -567,7 +567,7 @@ export const JSONValue = (props: {
         issues,
       }}
     >
-      <JSONValueInner data={props.data} />
+      <JSONValueInner data={sortKeys(props.data)} />
     </JSONCtx.Provider>
   );
 };
