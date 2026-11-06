@@ -114,8 +114,8 @@ const atmosphereApps: {
     image: "/logos/wisp.svg",
     size: 38,
     rotate: 5,
-    position: { x: "90%", y: "24%" },
-    compact: { x: "88%", y: "16%" },
+    position: { x: "89%", y: "21%" },
+    compact: { x: "87%", y: "13.5%" },
   },
 ];
 
