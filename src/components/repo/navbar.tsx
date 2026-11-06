@@ -11,6 +11,10 @@ import { nsidDomain, type Stage, StageNav } from "./stage-nav";
 const [pds, setPDS] = createSignal<string>();
 export { setPDS };
 
+/** Why the open repo can't be read, e.g. "Taken down". */
+const [repoStatus, setRepoStatus] = createSignal<string>();
+export { setRepoStatus };
+
 /** The pronouns on a repo's Bluesky profile record, if it has any. */
 const fetchPronouns = async (did: `did:${string}:${string}`) => {
   const rpc = new Client({ handler: simpleFetchHandler({ service: await getPDS(did) }) });
@@ -121,6 +125,32 @@ export const NavBar = () => {
         href: params.collection ? `/at://${params.repo}` : undefined,
         copy: { label: "DID", value: params.repo },
       });
+
+      const status = repoStatus();
+      if (status) {
+        result.push({
+          kind: "Status",
+          label: (
+            <span class="flex items-center gap-1">
+              <span
+                class={`iconify shrink-0 ${
+                  status === "Deactivated"
+                    ? "lucide--user-round-x"
+                    : status === "Taken down"
+                      ? "lucide--shield-ban"
+                      : "lucide--unplug"
+                }`}
+              />
+              {status}
+            </span>
+          ),
+          // Amber for deactivated, which the owner can undo, and red for the rest.
+          labelClass:
+            status === "Deactivated"
+              ? "text-amber-600 dark:text-amber-500"
+              : "text-red-500 dark:text-red-400",
+        });
+      }
     }
 
     if (params.collection) {

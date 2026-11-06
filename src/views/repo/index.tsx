@@ -14,6 +14,7 @@ import {
   createSignal,
   ErrorBoundary,
   type JSX,
+  onCleanup,
   Show,
   Suspense,
 } from "solid-js";
@@ -24,7 +25,7 @@ import {
   CollectionListControls,
   createCollapseState,
 } from "../../components/repo/collection-list.jsx";
-import { setPDS } from "../../components/repo/navbar.jsx";
+import { setPDS, setRepoStatus } from "../../components/repo/navbar.jsx";
 import { IconButton } from "../../components/ui/icon-button.jsx";
 import { NestedLayout } from "../../components/ui/nested-layout.jsx";
 import {
@@ -323,6 +324,10 @@ const RepoView = () => {
     setDownloading(false);
   };
 
+  // Shown with the PDS and repo above the page. A missing PDS already says so in its own row.
+  createEffect(() => setRepoStatus(error() === "Missing PDS" ? undefined : error()));
+  onCleanup(() => setRepoStatus(undefined));
+
   createEffect(() => {
     if (hidden()) return;
     const handle = repo
@@ -349,20 +354,6 @@ const RepoView = () => {
               active={activeTab()}
             />
             <div class="flex shrink-0 gap-1">
-              <Show when={error() && error() !== "Missing PDS"}>
-                <div class="flex items-center gap-1 rounded-md border border-red-500 px-1.5 py-0.5 text-xs font-medium text-red-500 sm:text-sm dark:border-red-400 dark:text-red-400">
-                  <span
-                    class={`iconify ${
-                      error() === "Deactivated"
-                        ? "lucide--user-round-x"
-                        : error() === "Taken down"
-                          ? "lucide--shield-ban"
-                          : "lucide--unplug"
-                    }`}
-                  ></span>
-                  <span>{error()}</span>
-                </div>
-              </Show>
               <Show when={error()?.length === 0 || error() === undefined}>
                 <IconButton
                   icon={downloading() ? "lucide--loader-circle animate-spin" : "lucide--download"}
