@@ -68,10 +68,11 @@ export const TagInput = (props: {
         <button
           type="button"
           onClick={addTag}
-          class="dark:bg-dark-300 dark:hover:bg-dark-200 dark:active:bg-dark-100 flex shrink-0 items-center gap-1 rounded-md border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-xs text-neutral-700 transition-colors select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:text-neutral-300"
+          aria-label="Add"
+          title="Add"
+          class="dark:bg-dark-300 dark:hover:bg-dark-200 dark:active:bg-dark-100 flex shrink-0 items-center justify-center rounded-md border border-neutral-200 bg-neutral-50 px-2 py-1 text-xs text-neutral-700 transition-colors select-none hover:bg-neutral-100 active:bg-neutral-200 dark:border-neutral-700 dark:text-neutral-300 pointer-coarse:w-10"
         >
-          <span class="iconify lucide--plus text-xs"></span>
-          Add
+          <span class="iconify lucide--plus text-sm"></span>
         </button>
       </div>
       <Show when={tags().length > 0}>

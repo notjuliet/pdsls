@@ -66,7 +66,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
   jetstream: {
     label: "Jetstream",
     summary: "Simplified events",
-    description: "A simplified event stream with support for collection and DID filtering.",
+    description: "A simplified event stream with filters.",
     defaultInstance: "wss://jetstream1.us-east.bsky.network/subscribe",
     cborFrames: false,
     collectionsLabel: "Top collections",
@@ -170,7 +170,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
   spacedust: {
     label: "Spacedust",
     summary: "Backlinks",
-    description: "A stream of links showing interactions across the network.",
+    description: "A stream of links between records.",
     defaultInstance: "wss://spacedust.microcosm.blue/subscribe",
     cborFrames: false,
     collectionsLabel: "Top sources",
@@ -249,7 +249,7 @@ export const STREAM_CONFIGS: Record<StreamType, StreamConfig> = {
   plc: {
     label: "PLC",
     summary: "Identity updates",
-    description: "The stream of did:plc operations from the PLC directory.",
+    description: "The stream of did:plc operations.",
     defaultInstance: "wss://plc.directory/export/stream",
     cborFrames: false,
     collectionsLabel: "Top PDSes",

@@ -48,6 +48,9 @@ const typeRank = (type: string) => {
 };
 
 const CONNECTED_LABEL_CLASS = "min-w-24 shrink-0 font-sans";
+/** The form's labels sit in the same column as the settings shown once connected. */
+const FORM_ROW_CLASS = "flex flex-col gap-1 sm:flex-row sm:items-start";
+const FORM_LABEL_CLASS = `${CONNECTED_LABEL_CLASS} text-neutral-700 sm:pt-1.5 dark:text-neutral-300`;
 
 const TYPE_COLORS: Record<string, string> = {
   create: "text-green-600 dark:text-green-400",
@@ -474,95 +477,98 @@ export const StreamView = () => {
         </For>
       </nav>
 
-      <div class="flex w-full flex-col gap-4">
+      <div class="flex w-full flex-col gap-3">
         {/* Explains the stream while choosing its settings; once connected, the settings say enough. */}
         <Show when={!connected()}>
-          <p class="px-2 text-xs text-neutral-500 dark:text-neutral-400">{config().description}</p>
+          <p class="px-2 text-sm text-neutral-500 dark:text-neutral-400">{config().description}</p>
         </Show>
 
         <section class="w-full">
           <Show when={!connected()}>
             <form
               ref={formRef}
-              class="flex w-full flex-col gap-4 px-2 text-sm"
+              class="flex w-full flex-col gap-2.5 px-2 text-sm [&_input[type=text]]:py-1.5"
               onSubmit={(event) => {
                 event.preventDefault();
                 void connectStream(new FormData(formRef));
               }}
             >
-              <label class="flex flex-col gap-1">
-                <span class="font-medium">Instance</span>
+              <label class={FORM_ROW_CLASS}>
+                <span class={FORM_LABEL_CLASS}>Instance</span>
                 <TextInput
                   name="instance"
                   value={searchParams.instance ?? config().defaultInstance}
-                  class="w-full"
+                  class="min-w-0 grow"
                 />
               </label>
 
-              <Show when={config().fields.some((field) => field.type !== "checkbox")}>
-                <div class="flex flex-col gap-3">
-                  <For each={config().fields.filter((field) => field.type !== "checkbox")}>
-                    {(field) => {
-                      let inputRef!: HTMLInputElement;
-                      let pickerRef!: HTMLInputElement;
-                      return (
-                        <label class="flex flex-col gap-1">
-                          <span class="font-medium">{field.label}</span>
-                          <Show when={field.type === "tags"}>
-                            <TagInput
-                              name={field.name}
-                              placeholder={field.placeholder}
-                              initialValues={
-                                (searchParams[field.searchParam] as string)
-                                  ?.split(",")
-                                  .filter((v) => v.trim().length > 0) ?? []
-                              }
-                            />
-                          </Show>
+              <For each={config().fields.filter((field) => field.type !== "checkbox")}>
+                {(field) => {
+                  let inputRef!: HTMLInputElement;
+                  let pickerRef!: HTMLInputElement;
+                  return (
+                    <label class={FORM_ROW_CLASS}>
+                      <span class={FORM_LABEL_CLASS}>{field.label}</span>
+                      <Show when={field.type === "tags"}>
+                        <TagInput
+                          name={field.name}
+                          placeholder={field.placeholder}
+                          initialValues={
+                            (searchParams[field.searchParam] as string)
+                              ?.split(",")
+                              .filter((v) => v.trim().length > 0) ?? []
+                          }
+                        />
+                      </Show>
 
-                          <Show when={field.type === "text"}>
-                            <div class="flex flex-wrap items-center gap-1.5">
-                              <TextInput
-                                ref={inputRef}
-                                name={field.name}
-                                placeholder={field.placeholder}
-                                value={(searchParams[field.searchParam] as string) ?? ""}
-                                class="min-w-0 grow basis-44"
-                                onInput={() => {
-                                  if (field.datetimePicker && pickerRef) {
-                                    pickerRef.value = microsToDatetimeLocal(inputRef.value);
-                                  }
+                      <Show when={field.type === "text"}>
+                        <div class="relative flex min-w-0 grow">
+                          <TextInput
+                            ref={inputRef}
+                            name={field.name}
+                            placeholder={field.placeholder}
+                            value={(searchParams[field.searchParam] as string) ?? ""}
+                            class={`min-w-0 grow ${field.datetimePicker ? "pr-8 pointer-coarse:pr-10" : ""}`}
+                            onInput={() => {
+                              if (field.datetimePicker && pickerRef) {
+                                pickerRef.value = microsToDatetimeLocal(inputRef.value);
+                              }
+                            }}
+                          />
+                          <Show when={field.datetimePicker}>
+                            {/* The browser's own picker, invisible over the icon, so it still opens
+                                from the keyboard and on phones. */}
+                            <span class="absolute inset-y-0 right-0 flex w-8 items-center justify-center text-base text-neutral-700 focus-within:text-neutral-950 hover:text-neutral-950 dark:text-neutral-300 dark:focus-within:text-white dark:hover:text-white pointer-coarse:w-10">
+                              <span class="iconify lucide--calendar" />
+                              <input
+                                ref={pickerRef}
+                                type="datetime-local"
+                                step="1"
+                                aria-label="Pick a time"
+                                title="Pick a time"
+                                value={microsToDatetimeLocal(
+                                  (searchParams[field.searchParam] as string) ??
+                                    (Date.now() * 1000).toString(),
+                                )}
+                                class="absolute inset-0 cursor-pointer opacity-0 dark:scheme-dark pointer-coarse:text-base"
+                                onClick={(e) => e.currentTarget.showPicker?.()}
+                                onInput={(e) => {
+                                  inputRef.value = datetimeLocalToMicros(e.currentTarget.value);
                                 }}
                               />
-                              <Show when={field.datetimePicker}>
-                                <input
-                                  ref={pickerRef}
-                                  type="datetime-local"
-                                  step="1"
-                                  value={microsToDatetimeLocal(
-                                    (searchParams[field.searchParam] as string) ??
-                                      (Date.now() * 1000).toString(),
-                                  )}
-                                  class="dark:bg-dark-100 min-w-0 grow basis-44 rounded-md bg-white px-2 py-1 text-sm outline-1 -outline-offset-1 outline-neutral-200 select-none focus:outline-neutral-400 dark:scheme-dark dark:outline-neutral-600 dark:focus:outline-neutral-400"
-                                  onInput={(e) => {
-                                    const micros = datetimeLocalToMicros(e.currentTarget.value);
-                                    inputRef.value = micros;
-                                  }}
-                                />
-                              </Show>
-                            </div>
+                            </span>
                           </Show>
-                        </label>
-                      );
-                    }}
-                  </For>
-                </div>
-              </Show>
+                        </div>
+                      </Show>
+                    </label>
+                  );
+                }}
+              </For>
 
-              <div class="flex flex-wrap items-center gap-2 pt-1">
+              <div class="flex flex-wrap items-center gap-2 pt-1 sm:pl-25">
                 <For each={config().fields.filter((field) => field.type === "checkbox")}>
                   {(field) => (
-                    <label class="flex items-center gap-2">
+                    <label class="flex items-center gap-2 pointer-coarse:py-2">
                       <input
                         type="checkbox"
                         name={field.name}
@@ -574,7 +580,11 @@ export const StreamView = () => {
                   )}
                 </For>
                 <div class="ml-auto">
-                  <Button type="submit">
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    classList={{ "min-h-8 pointer-coarse:min-h-9 pointer-coarse:px-3": true }}
+                  >
                     <span class="iconify lucide--play" />
                     Start
                   </Button>
