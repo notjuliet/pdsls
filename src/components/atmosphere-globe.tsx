@@ -51,11 +51,13 @@ const COLORS = {
 
 /** Strips this wide follow the horizon's curve closely enough that no steps show. */
 const STRIP_WIDTH = 2;
+/** Enough of the clouds' start repeated past their end for a strip to always be drawn in one piece. */
+const WRAP_OVERLAP = Math.ceil(STRIP_WIDTH * CLOUD_SCALE) + 1;
 
 /** The cloud shape in one color, on a canvas of its own so it only has to be painted once. */
 const paintClouds = (shape: Uint8ClampedArray, color: string, alpha: number) => {
   const canvas = document.createElement("canvas");
-  canvas.width = CLOUD_WIDTH;
+  canvas.width = CLOUD_WIDTH + WRAP_OVERLAP;
   canvas.height = CLOUD_HEIGHT;
   const context = canvas.getContext("2d")!;
   const image = context.createImageData(CLOUD_WIDTH, CLOUD_HEIGHT);
@@ -67,6 +69,7 @@ const paintClouds = (shape: Uint8ClampedArray, color: string, alpha: number) => 
     image.data[i * 4 + 3] = shape[i] * alpha;
   }
   context.putImageData(image, 0, 0);
+  context.putImageData(image, CLOUD_WIDTH, 0);
   return canvas;
 };
 
@@ -147,33 +150,17 @@ export const AtmosphereGlobe = (props: { class?: string }) => {
         const offset = x + STRIP_WIDTH / 2 - centerX;
         const top = centerY - Math.sqrt(radius * radius - offset * offset);
         const source = (x * CLOUD_SCALE + scroll) % CLOUD_WIDTH;
-        const first = Math.min(sourceWidth, CLOUD_WIDTH - source);
-        const firstWidth = first / CLOUD_SCALE;
-        const stripHeight = CLOUD_HEIGHT / CLOUD_SCALE;
         context.drawImage(
           cloudLayer,
           source,
           0,
-          first,
+          sourceWidth,
           CLOUD_HEIGHT,
           x,
           top,
-          firstWidth,
-          stripHeight,
+          STRIP_WIDTH,
+          CLOUD_HEIGHT / CLOUD_SCALE,
         );
-        if (first < sourceWidth) {
-          context.drawImage(
-            cloudLayer,
-            0,
-            0,
-            sourceWidth - first,
-            CLOUD_HEIGHT,
-            x + firstWidth,
-            top,
-            STRIP_WIDTH - firstWidth,
-            stripHeight,
-          );
-        }
       }
       if (colors.behindTitleAlpha) {
         const behindTitle = context.createLinearGradient(0, 0, width, 0);
