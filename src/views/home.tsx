@@ -96,7 +96,7 @@ const atmosphereApps: {
     icon: "i-tangled text-neutral-700 dark:text-white",
     size: 28,
     rotate: 8,
-    position: { x: "58%", y: "2%" },
+    position: { x: "58%", y: "0%" },
     compact: { x: "56%", y: "0%" },
   },
   {
@@ -105,7 +105,7 @@ const atmosphereApps: {
     icon: "i-streamplace text-neutral-700 dark:text-white",
     size: 26,
     rotate: -6,
-    position: { x: "74%", y: "10%" },
+    position: { x: "74%", y: "8%" },
     compact: { x: "72%", y: "6%" },
   },
   {
@@ -114,7 +114,7 @@ const atmosphereApps: {
     image: "/logos/wisp.svg",
     size: 38,
     rotate: 5,
-    position: { x: "89%", y: "21%" },
+    position: { x: "89%", y: "16.5%" },
     compact: { x: "87%", y: "13.5%" },
   },
 ];
