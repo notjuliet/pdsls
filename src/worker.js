@@ -476,13 +476,7 @@ class HeadEndRewriter {
   element(element) {
     const t = esc(this.ogData.title);
     const d = esc(this.ogData.description);
-    const i = this.imageUrl ? esc(this.imageUrl) : null;
-
-    const imageTags = i
-      ? `\n  <meta property="og:image" content="${i}" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:image" content="${i}" />`
-      : `\n  <meta name="twitter:card" content="summary" />`;
+    const i = esc(this.imageUrl);
 
     element.append(
       `<meta property="og:title" content="${t}" />
@@ -491,7 +485,10 @@ class HeadEndRewriter {
   <meta property="og:site_name" content="PDSls" />
   <meta name="description" content="${d}" />
   <meta name="twitter:title" content="${t}" />
-  <meta name="twitter:description" content="${d}" />${imageTags}`,
+  <meta name="twitter:description" content="${d}" />
+  <meta property="og:image" content="${i}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="${i}" />`,
       { html: true },
     );
   }
@@ -706,7 +703,7 @@ export default {
     const imageUrl = ogData.generateImage
       ? `${url.origin}/og-image?` +
         new URLSearchParams({ did: ogData.did, collection: ogData.collection, rkey: ogData.rkey })
-      : null;
+      : `${url.origin}/og-card.png`;
 
     const response = await env.ASSETS.fetch(request);
     const contentType = response.headers.get("content-type") ?? "";
