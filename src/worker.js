@@ -703,7 +703,7 @@ export default {
     const imageUrl = ogData.generateImage
       ? `${url.origin}/og-image?` +
         new URLSearchParams({ did: ogData.did, collection: ogData.collection, rkey: ogData.rkey })
-      : `${url.origin}/og-card.png`;
+      : `${url.origin}/atmosphere-card.png`;
 
     const response = await env.ASSETS.fetch(request);
     const contentType = response.headers.get("content-type") ?? "";
