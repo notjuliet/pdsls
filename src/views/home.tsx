@@ -135,6 +135,28 @@ const getAtProtocolUrl = () => {
   }
 };
 
+const LinkSection = (props: {
+  title: string;
+  links: { label: string; detail: string; href: string }[];
+}) => (
+  <section>
+    <h2 class="px-2 pb-1.5 text-base font-semibold tracking-tight">{props.title}</h2>
+    <div class="grid grid-cols-1 gap-x-3 sm:grid-cols-2">
+      <For each={props.links}>
+        {(link) => (
+          <A
+            href={link.href}
+            class="flex min-w-0 items-baseline gap-2 rounded-md px-2 py-1 text-xs hover:bg-neutral-200/80 active:bg-neutral-200 sm:py-1.5 dark:hover:bg-neutral-700/50 dark:active:bg-neutral-700"
+          >
+            <span class="w-20 shrink-0 text-neutral-800 dark:text-neutral-200">{link.label}</span>
+            <span class="truncate text-neutral-500 dark:text-neutral-400">{link.detail}</span>
+          </A>
+        )}
+      </For>
+    </div>
+  </section>
+);
+
 export const Home = () => {
   const FooterLink = (props: {
     href: string;
@@ -154,7 +176,7 @@ export const Home = () => {
   document.title = "PDSls";
   return (
     <div class="flex min-h-[calc(100dvh-6rem)] w-full flex-col px-2 wrap-break-word">
-      <section class="flex flex-1 flex-col items-center justify-center py-10 text-center sm:pb-16">
+      <section class="flex flex-1 flex-col items-center py-10 text-center sm:pt-20 sm:pb-16">
         <div class="relative isolate flex w-full flex-col items-center pt-14 pb-6 sm:pt-16">
           <AtmosphereGlobe class="atmosphere-fade pointer-events-none absolute inset-x-0 -top-8 bottom-0 -z-10 h-[calc(100%+2rem)] w-full" />
           <For each={atmosphereApps}>
@@ -199,65 +221,31 @@ export const Home = () => {
           </a>
         </div>
 
-        <div class="mt-6 w-full text-left">
-          <div class="rounded-lg border border-neutral-200 p-2 sm:p-3 dark:border-neutral-700">
-            <h2 class="px-2 py-1 text-sm font-medium sm:text-base">Browse</h2>
-            <div class="mt-1 grid grid-cols-1 gap-x-3 sm:grid-cols-2">
-              <For each={repositoryExamples}>
-                {(example) => (
-                  <A
-                    href={example.href}
-                    class="flex min-w-0 items-baseline gap-2 rounded-md px-2 py-1 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-1.5 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-                  >
-                    <span class="w-16 shrink-0 text-xs text-neutral-500 dark:text-neutral-400">
-                      {example.type}
-                    </span>
-                    <span class="truncate text-xs text-neutral-800 dark:text-neutral-200">
-                      {example.value}
-                    </span>
-                  </A>
-                )}
-              </For>
-            </div>
-          </div>
-
-          <div class="mt-3 rounded-lg border border-neutral-200 p-2 sm:p-3 dark:border-neutral-700">
-            <h2 class="px-2 py-1 text-sm font-medium sm:text-base">Stream</h2>
-            <div class="grid grid-cols-2 gap-1 sm:grid-cols-4">
-              <For each={STREAM_TYPES}>
-                {(type) => (
-                  <A
-                    href={`/streams?type=${type}`}
-                    class="flex min-w-0 flex-col items-center justify-center rounded-md px-1.5 py-1.5 text-xs text-neutral-800 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-200 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-                  >
-                    <span class="max-w-full truncate">{STREAM_CONFIGS[type].label}</span>
-                    <span class="max-w-full truncate text-xs text-neutral-500 dark:text-neutral-400">
-                      {STREAM_CONFIGS[type].summary}
-                    </span>
-                  </A>
-                )}
-              </For>
-            </div>
-          </div>
-
-          <div class="mt-3 rounded-lg border border-neutral-200 p-2 sm:p-3 dark:border-neutral-700">
-            <h2 class="px-2 py-1 text-sm font-medium sm:text-base">Manage</h2>
-            <div class="grid grid-cols-2 gap-1">
-              <For each={manageLinks()}>
-                {(link) => (
-                  <A
-                    href={link.href}
-                    class="flex min-w-0 flex-col items-center justify-center rounded-md px-1.5 py-1.5 text-xs text-neutral-800 hover:bg-neutral-200/60 active:bg-neutral-200 sm:py-2 sm:text-sm dark:text-neutral-200 dark:hover:bg-neutral-800 dark:active:bg-neutral-700"
-                  >
-                    <span class="max-w-full truncate">{link.label}</span>
-                    <span class="max-w-full truncate text-xs text-neutral-500 dark:text-neutral-400">
-                      {link.summary}
-                    </span>
-                  </A>
-                )}
-              </For>
-            </div>
-          </div>
+        <div class="mt-6 flex w-full flex-col gap-5 text-left sm:gap-6">
+          <LinkSection
+            title="Browse"
+            links={repositoryExamples.map((example) => ({
+              label: example.type,
+              detail: example.value,
+              href: example.href,
+            }))}
+          />
+          <LinkSection
+            title="Stream"
+            links={STREAM_TYPES.map((type) => ({
+              label: STREAM_CONFIGS[type].label,
+              detail: STREAM_CONFIGS[type].summary,
+              href: `/streams?type=${type}`,
+            }))}
+          />
+          <LinkSection
+            title="Manage"
+            links={manageLinks().map((link) => ({
+              label: link.label,
+              detail: link.summary,
+              href: link.href,
+            }))}
+          />
         </div>
       </section>
 
