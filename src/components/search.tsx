@@ -12,7 +12,7 @@ import {
 } from "solid-js";
 import { Portal } from "solid-js/web";
 
-import { agent, avatars, sessions } from "../auth/state.js";
+import { agent, avatars } from "../auth/state.js";
 import { resolveLexiconAuthority, resolveLexiconAuthorityDirect } from "../lib/api";
 import { appHandleLink, appList, AppUrl } from "../lib/app-urls";
 import { createDebouncedValue } from "../lib/debounced";
@@ -32,11 +32,11 @@ type Destination = {
   label: string;
   icon?: string;
   avatar?: string;
-  /** A muted line under the label, e.g. what a stream is filtered to. */
+  /** A muted line under the label, for what a stream is filtered to. */
   target?: string;
 };
 
-/** A shortcut in the search dropdown: an icon and name, with an optional muted line under it. */
+/** A shortcut in the search dropdown: an icon and name, with a muted line under it when filtered. */
 const DestinationCell = (props: {
   destination: Destination;
   class?: string;
@@ -44,7 +44,7 @@ const DestinationCell = (props: {
 }) => (
   <A
     href={props.destination.href}
-    class={`flex min-w-0 flex-col items-center justify-center rounded-lg px-1.5 py-2 hover:bg-neutral-200/60 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 ${props.class ?? ""}`}
+    class={`flex min-w-0 flex-col items-center justify-center rounded-lg px-1.5 py-1.5 hover:bg-neutral-200/60 active:bg-neutral-200 dark:hover:bg-neutral-700 dark:active:bg-neutral-600 ${props.class ?? ""}`}
     onClick={() => props.onClick()}
   >
     <span class="flex min-w-0 items-center gap-1.5">
@@ -178,13 +178,11 @@ export const Search = () => {
             label: "Your repo",
             icon: "lucide--circle-user-round",
             avatar: avatars[currentAgent.sub]?.replace("img/avatar/", "img/avatar_thumbnail/"),
-            target: sessions[currentAgent.sub]?.handle ?? currentAgent.sub,
           },
           {
             href: "/spaces",
             label: "Spaces",
             icon: "lucide--lock-keyhole",
-            target: "Non-public data",
           },
         ]
       : [
@@ -192,7 +190,6 @@ export const Search = () => {
             href: "/account/add",
             label: "Sign in",
             icon: "lucide--log-in",
-            target: "Manage your records",
           },
         ];
   };
@@ -204,7 +201,7 @@ export const Search = () => {
       return {
         href: pageStream?.href ?? `/streams?type=${type}`,
         label: STREAM_CONFIGS[type].label,
-        target: pageStream?.target ?? STREAM_CONFIGS[type].summary,
+        target: pageStream?.target,
       };
     });
 
