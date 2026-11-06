@@ -108,9 +108,10 @@ export const AtmosphereGlobe = (props: { class?: string }) => {
       }
       context.fillStyle = glow;
       // Only outside the planet: a gradient keeps its first color all the way inside its inner circle.
+      // Overlapping it by a pixel, or the background shows through a thin seam along the horizon.
       context.beginPath();
       context.rect(0, 0, width, height);
-      context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      context.arc(centerX, centerY, radius - 1 / (window.devicePixelRatio || 1), 0, Math.PI * 2);
       context.fill("evenodd");
 
       const spin = (time / 1000 / SECONDS_PER_TURN) * Math.PI * 2;
