@@ -34,7 +34,7 @@ export const RecordView = () => {
   const [openDelete, setOpenDelete] = createSignal(false);
   const [verifyError, setVerifyError] = createSignal("");
   const [externalLink, setExternalLink] = createSignal<
-    { label: string; link: string } | undefined
+    { label: string; link: string; hostname?: string } | undefined
   >();
   const [validRecord, setValidRecord] = createSignal<boolean | undefined>(undefined);
   const schemaValidation = useRecordSchemaValidation(

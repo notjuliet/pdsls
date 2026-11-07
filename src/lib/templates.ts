@@ -1,5 +1,5 @@
 export type AtUri = { repo: string; collection: string; rkey: string };
-type TemplateFn = (uri: AtUri, record?: any) => { label: string; link: string };
+type TemplateFn = (uri: AtUri, record?: any) => { label: string; link: string; hostname?: string };
 type TemplateMap = Record<string, TemplateFn>;
 
 export const uriTemplates: TemplateMap = {
@@ -50,6 +50,12 @@ export const uriTemplates: TemplateMap = {
   "social.popfeed.feed.list": (uri) => ({
     label: "Popfeed",
     link: `https://popfeed.social/list/at:/${uri.repo}/${uri.collection}/${uri.rkey}`,
+  }),
+  "place.wisp.fs": (uri) => ({
+    label: "wisp.place",
+    link: `https://sites.wisp.place/${uri.repo}/${uri.rkey}`,
+    // sites.wisp.place has no favicon of its own.
+    hostname: "wisp.place",
   }),
   "app.sonasky.ref": (uri) => ({
     label: "SonaSky REF",
