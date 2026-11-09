@@ -31,7 +31,8 @@ export const Button = (props: ButtonProps) => {
       class={props.class ?? `${baseClass} ${variantClasses[props.variant ?? "default"]}`}
       classList={props.classList}
       onClick={props.onClick}
-      ontouchstart={props.ontouchstart}
+      // Not delegated, so preventDefault() can stop the click that follows.
+      on:touchstart={props.ontouchstart}
     >
       {props.children}
     </button>
