@@ -262,6 +262,30 @@ export const StreamView = () => {
     setRecords(visible.map((entry) => entry.record));
   };
 
+  const showCounts = () =>
+    setStats((prev) => ({
+      ...prev,
+      totalEvents: totalEventsCount,
+      collections: { ...collectionsMap },
+      types: { ...typesMap },
+    }));
+
+  /** Freezes the whole section, or catches it up with what came in meanwhile. */
+  const togglePause = () => {
+    if (paused()) {
+      setPaused(false);
+      showCounts();
+      setCurrentTime(Date.now());
+    } else {
+      setPaused(true);
+      // An update already queued would change the list just after pausing.
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    }
+  };
+
   const toggleType = (type: string) => {
     setHiddenTypes(
       hiddenTypes().includes(type)
@@ -362,19 +386,17 @@ export const StreamView = () => {
       types: { ...typesMap },
     });
 
+    // Paused, the counts and timer hold still with the list, but keep counting underneath.
     statsUpdateIntervalId = window.setInterval(() => {
-      setStats((prev) => ({
-        ...prev,
-        totalEvents: totalEventsCount,
-        collections: { ...collectionsMap },
-        types: { ...typesMap },
-      }));
+      if (!paused()) showCounts();
     }, 50);
 
     statsIntervalId = window.setInterval(() => {
-      setStats((prev) => ({ ...prev, eventsPerSecond: currentSecondEventCount }));
+      if (!paused()) {
+        setStats((prev) => ({ ...prev, eventsPerSecond: currentSecondEventCount }));
+        setCurrentTime(Date.now());
+      }
       currentSecondEventCount = 0;
-      setCurrentTime(Date.now());
     }, 1000);
 
     const onConnectionError = (message: string) => {
@@ -643,9 +665,9 @@ export const StreamView = () => {
                 <Button
                   ontouchstart={(e) => {
                     e.preventDefault();
-                    requestAnimationFrame(() => setPaused(!paused()));
+                    requestAnimationFrame(togglePause);
                   }}
-                  onClick={() => setPaused(!paused())}
+                  onClick={togglePause}
                 >
                   <span class={`iconify ${paused() ? "lucide--play" : "lucide--pause"}`} />
                   {/* Both buttons are only icons on phones, so the event counts fit beside them. */}
