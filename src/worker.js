@@ -651,6 +651,8 @@ const faviconTtl = (res) =>
 /** Preview images follow the record, so they're kept for an hour; misses for five minutes. */
 const ogImageTtl = (res) => (res.ok ? 3600 : res.status === 404 ? 300 : 0);
 
+const OG_PREFIX = "/_og";
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -687,6 +689,14 @@ export default {
       );
     }
 
+    // A zone rewrite rule sends link-preview bots to /_og/<path>, so ordinary page views are
+    // served as static files and never reach the worker.
+    const viaPrefix = url.pathname.startsWith(OG_PREFIX + "/");
+    if (viaPrefix) {
+      url.pathname = url.pathname.slice(OG_PREFIX.length);
+      request = new Request(url.toString(), request);
+    }
+
     const ua = request.headers.get("user-agent") ?? "";
 
     if (!isBot(ua)) {
@@ -711,9 +721,15 @@ export default {
       return response;
     }
 
-    return new HTMLRewriter()
+    const rewritten = new HTMLRewriter()
       .on("meta", new OgTagRewriter(ogData, request.url))
       .on("head", new HeadEndRewriter(ogData, imageUrl))
       .transform(response);
+    if (!viaPrefix) return rewritten;
+
+    // Lets a curl check tell the rewrite rule is the one routing previews.
+    const headers = new Headers(rewritten.headers);
+    headers.set("X-Og-Route", "rewrite");
+    return new Response(rewritten.body, { status: rewritten.status, headers });
   },
 };
