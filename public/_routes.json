@@ -2,7 +2,6 @@
   "version": 1,
   "include": [
     "/_og/*",
-    "/at*",
     "/streams",
     "/jetstream",
     "/firehose",
