@@ -34,6 +34,8 @@ export interface CollectionRecord {
 export interface CollectionSource {
   /** The listing reloads from scratch whenever this changes. */
   key: string;
+  /** Set when the source can't list records in reverse order. */
+  fixedOrder?: boolean;
   repo: string;
   collection: string;
   collectionHref: string;
@@ -86,7 +88,7 @@ export const CollectionPage = (props: {
 
   onMount(() => useFilterShortcut(() => filterInputRef));
 
-  const reverse = () => searchParams.reverse === "true";
+  const reverse = () => !props.source.fixedOrder && searchParams.reverse === "true";
   const previewField = () => getSearchParam(searchParams.preview);
   const limit = () => {
     const value = parseInt(getSearchParam(searchParams.limit));
@@ -387,18 +389,20 @@ export const CollectionPage = (props: {
           </div>
 
           <div class="flex min-h-7.5 w-full max-w-[40.5rem] items-center justify-between gap-2">
-            <Button
-              onClick={() => setSearchParams({ reverse: reverse() ? undefined : "true" })}
-              classList={{
-                "text-blue-500! dark:text-blue-400! border-blue-500! dark:border-blue-400!":
-                  reverse(),
-              }}
-            >
-              <span
-                class={`iconify ${reverse() ? "lucide--arrow-down-wide-narrow" : "lucide--arrow-up-narrow-wide"}`}
-              />
-              Reverse
-            </Button>
+            <Show when={!props.source.fixedOrder} fallback={<span />}>
+              <Button
+                onClick={() => setSearchParams({ reverse: reverse() ? undefined : "true" })}
+                classList={{
+                  "text-blue-500! dark:text-blue-400! border-blue-500! dark:border-blue-400!":
+                    reverse(),
+                }}
+              >
+                <span
+                  class={`iconify ${reverse() ? "lucide--arrow-down-wide-narrow" : "lucide--arrow-up-narrow-wide"}`}
+                />
+                Reverse
+              </Button>
+            </Show>
 
             <div class="shrink-0 text-sm">
               <Show when={managing()}>

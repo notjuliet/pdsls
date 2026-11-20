@@ -104,7 +104,12 @@ export interface GetSpaceRecordResult {
 }
 
 interface SpaceRecordMac {
-  header: string | null;
+  /** The `Atproto-Space-Record` response header, which the MAC covers. */
+  covered: string | null;
+  signatureInput: string | null;
+  signature: string | null;
+  /** The signature parameters the MAC was requested with. */
+  signatureParams: string;
   keyShare: KeyShare;
 }
 
@@ -308,7 +313,7 @@ const acquireSpaceCredential = async (
     throw new Error("The PDS returned an invalid Space delegation token");
   }
 
-  const exchangeUrl = new URL("/xrpc/com.atproto.space.getSpaceCredential", host);
+  const exchangeUrl = new URL("/xrpc/com.atproto.space.authorizeSpaceSync", host);
   const response = await fetch(exchangeUrl, {
     method: "POST",
     headers: {
@@ -317,7 +322,7 @@ const acquireSpaceCredential = async (
     },
     body: JSON.stringify({
       space,
-      credentialKid: await key.exportPublicKey("did"),
+      credentialKey: await key.exportPublicKey("did"),
       delegationToken: delegation.token,
     }),
   });
@@ -327,10 +332,18 @@ const acquireSpaceCredential = async (
     if (isObject(data) && data.error === "AppNotAuthorized") {
       throw new Error(`${message}. This Space requires an approved application.`);
     }
-    // Authorities answer SpaceNotFound for users they don't authorize, so as not to reveal the
-    // space; older ones may still say UserNotAuthorized.
-    if (isObject(data) && (data.error === "SpaceNotFound" || data.error === "UserNotAuthorized")) {
+    // Authorities may answer SpaceNotFound or the generic NotAuthorized for accounts they
+    // don't authorize, so as not to reveal the space.
+    if (
+      isObject(data) &&
+      (data.error === "SpaceNotFound" ||
+        data.error === "AccountNotAuthorized" ||
+        data.error === "NotAuthorized")
+    ) {
       throw new Error("This Space doesn't exist, or you don't have access to it");
+    }
+    if (isObject(data) && data.error === "SpaceDeleted") {
+      throw new Error("This Space has been deleted");
     }
     throw new Error(message);
   }
@@ -508,12 +521,12 @@ export const createSpace = async (
     policy: encodeSpacePolicy(options.policy),
   });
 
-  if (!isObject(data) || typeof data.uri !== "string" || !parseSpaceUri(data.uri)) {
+  if (!isObject(data) || typeof data.space !== "string" || !parseSpaceUri(data.space)) {
     throw new Error("The PDS returned an invalid Space creation response");
   }
 
-  clearCredentialsForSpace(data.uri);
-  return { uri: data.uri };
+  clearCredentialsForSpace(data.space);
+  return { uri: data.space };
 };
 
 /** Replaces the space's policy as a whole; a different kind discards the old one's member list. */
@@ -544,7 +557,10 @@ export const putSpaceMember = async (
   member: SpaceMember,
 ): Promise<void> => {
   assertSpaceAuthority(auth, space, "manage members of");
-  await oauthProcedure(auth, "com.atproto.memberspace.putMember", { space, ...member });
+  await oauthProcedure(auth, "com.atproto.memberspace.putMembers", {
+    space,
+    members: [{ did: member.did, read: member.read, write: member.write }],
+  });
   clearCredentialsForSpace(space);
 };
 
@@ -554,7 +570,7 @@ export const removeSpaceMember = async (
   did: string,
 ): Promise<void> => {
   assertSpaceAuthority(auth, space, "remove members from");
-  await oauthProcedure(auth, "com.atproto.memberspace.removeMember", { space, did });
+  await oauthProcedure(auth, "com.atproto.memberspace.removeMembers", { space, dids: [did] });
   clearCredentialsForSpace(space);
 };
 
@@ -573,7 +589,7 @@ export const getSpaceInfo = async (
   try {
     if (parsed.authority === auth.sub) {
       const data = await oauthQuery(auth, "com.atproto.space.getSpace", { space });
-      if (!isObject(data) || data.uri !== space) {
+      if (!isObject(data) || data.space !== space) {
         throw new Error("The Space authority returned an invalid Space response");
       }
       policy = data.policy;
@@ -660,8 +676,8 @@ export const listSpaces = async (
 
   return {
     cursor: typeof data.cursor === "string" ? data.cursor : undefined,
-    spaces: data.spaces.filter(
-      (space): space is SpaceView => isObject(space) && typeof space.uri === "string",
+    spaces: data.spaces.flatMap((entry): SpaceView[] =>
+      isObject(entry) && typeof entry.space === "string" ? [{ uri: entry.space }] : [],
     ),
   };
 };
@@ -681,7 +697,7 @@ export const listSpaceRepos = async (
     space,
     parsed.authority,
     host,
-    "com.atproto.space.listRepos",
+    "com.atproto.space.listWriters",
     {
       space,
       cursor: options.cursor,
@@ -697,11 +713,12 @@ export const listSpaceRepos = async (
     // Unlike the other list endpoints, the space host always returns the last
     // writer's spaceRev as the cursor, so a short page is what signals the end.
     cursor: data.repos.length >= limit && typeof data.cursor === "string" ? data.cursor : undefined,
-    repos: data.repos.flatMap((repo): SpaceRepo[] => {
-      if (!isObject(repo) || typeof repo.did !== "string" || typeof repo.repoRev !== "string") {
+    // Entries without a repoRev are repos removed from the writer set, which are left out.
+    repos: data.repos.flatMap((entry): SpaceRepo[] => {
+      if (!isObject(entry) || typeof entry.repo !== "string" || typeof entry.repoRev !== "string") {
         return [];
       }
-      return [{ did: repo.did, rev: repo.repoRev }];
+      return [{ did: entry.repo, rev: entry.repoRev }];
     }),
   };
 };
@@ -715,7 +732,6 @@ export const listSpaceRecords = async (
     cursor?: string;
     excludeValues?: boolean;
     limit?: number;
-    reverse?: boolean;
   } = {},
 ): Promise<ListSpaceRecordsResult> => {
   const pds = await resolveRepoHost(repo);
@@ -726,7 +742,6 @@ export const listSpaceRecords = async (
     cursor: options.cursor,
     excludeValues: options.excludeValues,
     limit: options.limit ?? 1000,
-    reverse: options.reverse,
   });
 
   if (!isObject(data) || !Array.isArray(data.records)) {
@@ -749,13 +764,12 @@ export const listSpaceBlobs = async (
   auth: OAuthUserAgent,
   space: string,
   repo: string,
-  options: { cursor?: string; limit?: number; since?: string } = {},
+  options: { cursor?: string; limit?: number } = {},
 ): Promise<ListSpaceBlobsResult> => {
   const pds = await resolveRepoHost(repo);
   const data = await credentialQuery(auth, space, repo, pds, "com.atproto.space.listBlobs", {
     space,
     repo,
-    since: options.since,
     cursor: options.cursor,
     limit: options.limit ?? 1000,
   });
@@ -778,6 +792,7 @@ export const getSpaceRecord = async (
   rkey: string,
 ): Promise<GetSpaceRecordResult> => {
   const [pds, keyShare] = await Promise.all([resolveRepoHost(repo), createKeyShare()]);
+  const signatureParams = recordMacParams(keyShare.did);
   const { data, headers } = await credentialRequest(
     auth,
     space,
@@ -785,9 +800,7 @@ export const getSpaceRecord = async (
     pds,
     "com.atproto.space.getRecord",
     { space, repo, collection, rkey },
-    {
-      "atproto-space-want-mac": `type="${RECORD_MAC_TYPE}", ver=${RECORD_MAC_VERSION}, key_share="${keyShare.did}"`,
-    },
+    { "accept-signature": `mac=${signatureParams}` },
   );
 
   if (
@@ -803,16 +816,26 @@ export const getSpaceRecord = async (
     uri: data.uri,
     cid: data.cid,
     value: data.value as JSONType,
-    mac: { header: headers.get("atproto-space-mac"), keyShare },
+    mac: {
+      covered: headers.get(RECORD_MAC_PROFILE),
+      signatureInput: headers.get("signature-input"),
+      signature: headers.get("signature"),
+      signatureParams,
+      keyShare,
+    },
   };
 };
 
-// Space records read with a credential are authenticated by a MAC keyed with a secret
-// shared between us and the author's repo host: an ephemeral key of ours is combined
-// (ECDH) with the author's #atproto_kem key, as in DHKEM(P-256, HKDF-SHA256).
+// Space records read with a credential are authenticated by a MAC: an HTTP message signature
+// (RFC 9421) using hmac-sha256, requested with Accept-Signature. Its key is a secret shared
+// between us and the author's repo host, exported from HPKE (RFC 9180) in base mode with
+// DHKEM(P-256, HKDF-SHA256): an ephemeral key of ours against the author's #atproto_kem key.
 
-const RECORD_MAC_TYPE = "atproto-space-record";
-const RECORD_MAC_VERSION = 1;
+const RECORD_MAC_PROFILE = "atproto-space-record";
+
+/** The parameters of the MAC we ask for, which the host signs under as given. */
+const recordMacParams = (keyShare: string) =>
+  `("${RECORD_MAC_PROFILE}";sf);keyid="${keyShare}";tag="${RECORD_MAC_PROFILE}"`;
 
 interface KeyShare {
   did: string;
@@ -842,12 +865,36 @@ const concatBytes = (parts: Uint8Array[]): Uint8Array<ArrayBuffer> => {
   return result;
 };
 
-const lengthPrefixed = (value: string) => {
-  const bytes = utf8(value);
-  return concatBytes([uint16be(bytes.length), bytes]);
+// HPKE labels every HKDF input with a version and the IDs of the algorithms in use: 0x0010 is
+// DHKEM(P-256, HKDF-SHA256), 0x0001 is HKDF-SHA256, and 0xffff is the export-only AEAD.
+const HPKE_VERSION = utf8("HPKE-v1");
+const KEM_ID = concatBytes([utf8("KEM"), uint16be(0x0010)]);
+const SUITE_ID = concatBytes([utf8("HPKE"), uint16be(0x0010), uint16be(0x0001), uint16be(0xffff)]);
+const HPKE_INFO = utf8("atproto-mac");
+const EMPTY = new Uint8Array(0);
+const HASH_LENGTH = 32;
+
+const hmacSha256 = async (key: Uint8Array, data: Uint8Array): Promise<Uint8Array<ArrayBuffer>> => {
+  const imported = await crypto.subtle.importKey(
+    "raw",
+    // HMAC pads its key with zeros, so this stands in for an empty one, which can't be imported.
+    key.length ? new Uint8Array(key) : new Uint8Array(HASH_LENGTH),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  return new Uint8Array(await crypto.subtle.sign("HMAC", imported, new Uint8Array(data)));
 };
 
-const KEM_PREFIX = concatBytes([utf8("HPKE-v1"), utf8("KEM"), uint16be(0x0010)]);
+const labeledExtract = (id: Uint8Array, salt: Uint8Array, label: string, ikm: Uint8Array) =>
+  hmacSha256(salt, concatBytes([HPKE_VERSION, id, utf8(label), ikm]));
+
+/** Always expands to one hash's length, which a single HKDF block covers. */
+const labeledExpand = (id: Uint8Array, prk: Uint8Array, label: string, info: Uint8Array) =>
+  hmacSha256(
+    prk,
+    concatBytes([uint16be(HASH_LENGTH), HPKE_VERSION, id, utf8(label), info, new Uint8Array([1])]),
+  );
 
 /** A fresh ephemeral key for each request, never reused. */
 const createKeyShare = async (): Promise<KeyShare> => {
@@ -894,68 +941,94 @@ const resolveKemKey = async (repo: string, refresh: boolean): Promise<KemKey> =>
   return getKemKey(repo, document);
 };
 
+/** HPKE's SetupBaseS followed by an export with an empty exporter context. */
 const deriveSharedSecret = async (keyShare: KeyShare, kemKey: KemKey) => {
   const dh = new Uint8Array(
     await crypto.subtle.deriveBits({ name: "ECDH", public: kemKey.key }, keyShare.privateKey, 256),
   );
-  const input = await crypto.subtle.importKey(
-    "raw",
-    concatBytes([KEM_PREFIX, utf8("eae_prk"), dh]),
-    "HKDF",
-    false,
-    ["deriveBits"],
+
+  // The KEM's secret, from the ECDH result and both public keys.
+  const eaePrk = await labeledExtract(KEM_ID, EMPTY, "eae_prk", dh);
+  const kemSecret = await labeledExpand(
+    KEM_ID,
+    eaePrk,
+    "shared_secret",
+    concatBytes([keyShare.publicKey, kemKey.publicKey]),
   );
-  const info = concatBytes([
-    uint16be(32),
-    KEM_PREFIX,
-    utf8("shared_secret"),
-    keyShare.publicKey,
-    kemKey.publicKey,
-  ]);
-  return crypto.subtle.deriveBits(
-    { name: "HKDF", hash: "SHA-256", salt: new Uint8Array(), info },
-    input,
-    256,
-  );
+
+  // The key schedule, in base mode with no pre-shared key.
+  const pskIdHash = await labeledExtract(SUITE_ID, EMPTY, "psk_id_hash", EMPTY);
+  const infoHash = await labeledExtract(SUITE_ID, EMPTY, "info_hash", HPKE_INFO);
+  const context = concatBytes([new Uint8Array([0]), pskIdHash, infoHash]);
+  const secret = await labeledExtract(SUITE_ID, kemSecret, "secret", EMPTY);
+  const exporterSecret = await labeledExpand(SUITE_ID, secret, "exp", context);
+
+  return labeledExpand(SUITE_ID, exporterSecret, "sec", EMPTY);
 };
 
-/** Parses `type="atproto-space-record", ver=1, mac=:<base64>:` into the raw MAC. */
-const parseRecordMacHeader = (header: string | null): Uint8Array<ArrayBuffer> => {
-  if (!header) throw new Error("The PDS did not return a record MAC");
-
-  const fields = new Map<string, string>();
-  for (const member of header.split(",")) {
-    const separator = member.indexOf("=");
-    if (separator === -1) throw new Error("The PDS returned a malformed MAC header");
-    fields.set(member.slice(0, separator).trim(), member.slice(separator + 1).trim());
+/** Splits a structured field dictionary into its members, keeping each value as written. */
+const parseDictionaryMembers = (field: string): Map<string, string> => {
+  const members = new Map<string, string>();
+  let start = 0;
+  let quoted = false;
+  for (let index = 0; index <= field.length; index++) {
+    const char = field[index];
+    if (quoted && char === "\\") index++;
+    else if (char === '"') quoted = !quoted;
+    else if (index === field.length || (char === "," && !quoted)) {
+      const member = field.slice(start, index).trim();
+      const separator = member.indexOf("=");
+      if (separator <= 0) throw new Error("The PDS returned a malformed MAC");
+      members.set(member.slice(0, separator), member.slice(separator + 1));
+      start = index + 1;
+    }
   }
-  if (fields.get("type") !== `"${RECORD_MAC_TYPE}"`) {
-    throw new Error("The PDS returned a MAC of an unsupported type");
-  }
-  if (fields.get("ver") !== String(RECORD_MAC_VERSION)) {
-    throw new Error("The PDS returned a MAC of an unsupported version");
-  }
-  const mac = /^:([A-Za-z0-9+/]*)=*:$/.exec(fields.get("mac") ?? "");
-  if (!mac) throw new Error("The PDS returned a malformed MAC header");
-  return fromBase64(mac[1]);
+  if (quoted) throw new Error("The PDS returned a malformed MAC");
+  return members;
 };
 
+/**
+ * Checks the MAC on a record: that the `Atproto-Space-Record` header names this record, and
+ * that the signature under the parameters we asked for covers that header.
+ */
 const checkRecordMac = async (record: GetSpaceRecordResult, kemKey: KemKey) => {
   if (!record.mac) throw new Error("The record was not fetched with a MAC");
-  const mac = parseRecordMacHeader(record.mac.header);
+  const { covered, signatureInput, signature, signatureParams, keyShare } = record.mac;
+  if (!covered || !signatureInput || !signature) {
+    throw new Error("The PDS did not return a record MAC");
+  }
+
+  const fields = parseDictionaryMembers(covered);
+  if (
+    fields.get("uri") !== JSON.stringify(record.uri) ||
+    fields.get("cid") !== JSON.stringify(record.cid)
+  ) {
+    throw new Error("The record does not match its MAC");
+  }
+
+  // Labels carry no meaning, so the MAC is the signature made under our parameters.
+  const label = [...parseDictionaryMembers(signatureInput)].find(
+    ([, params]) => params === signatureParams,
+  )?.[0];
+  const mac = /^:([A-Za-z0-9+/]*)=*:$/.exec(
+    (label && parseDictionaryMembers(signature).get(label)) ?? "",
+  );
+  if (!mac) throw new Error("The PDS did not return a record MAC");
+
   const key = await crypto.subtle.importKey(
     "raw",
-    await deriveSharedSecret(record.mac.keyShare, kemKey),
+    await deriveSharedSecret(keyShare, kemKey),
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["verify"],
   );
-  const data = concatBytes([
-    utf8(`${RECORD_MAC_TYPE}-v${RECORD_MAC_VERSION}`),
-    lengthPrefixed(record.uri),
-    CID.fromString(record.cid).bytes,
-  ]);
-  return crypto.subtle.verify("HMAC", key, mac, data);
+  // The `sf` flag covers the header as re-serialized from its parsed form.
+  const serialized = [...fields].map(([name, value]) => `${name}=${value}`).join(", ");
+  const base = [
+    `"${RECORD_MAC_PROFILE}";sf: ${serialized}`,
+    `"@signature-params": ${signatureParams}`,
+  ].join("\n");
+  return crypto.subtle.verify("HMAC", key, fromBase64(mac[1]), utf8(base));
 };
 
 /**

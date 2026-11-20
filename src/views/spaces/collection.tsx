@@ -43,12 +43,13 @@ const SpaceCollectionView = () => {
           collection,
           rkey,
         ),
-      listRecords: async ({ cursor, limit, reverse }) => {
+      // The space API lists records in one order only.
+      fixedOrder: true,
+      listRecords: async ({ cursor, limit }) => {
         const result = await listSpaceRecords(auth(), space(), repo(), {
           collection,
           cursor,
           limit,
-          reverse,
         });
         return {
           records: result.records.map((record) => ({
