@@ -17,6 +17,13 @@ const bskyClients = [
   { label: "Blacksky", hostname: "blacksky.app", origin: "https://blacksky.community" },
   { label: "Witchsky", hostname: "witchsky.app", origin: "https://witchsky.app" },
   { label: "Red Dwarf", hostname: "reddwarf.app", origin: "https://reddwarf.app" },
+  // Parfait has the same pages without the /profile prefix: /juliet.paris/post/3abc.
+  {
+    label: "Parfait",
+    hostname: "parfait.social",
+    origin: "https://parfait.social",
+    path: (path: string) => path.replace(/^\/profile(?=\/)/, ""),
+  },
 ];
 
 const STORAGE_KEY = "bskyClient";
@@ -62,11 +69,14 @@ export const OpenInApp = (props: AppLink) => {
 
   const clients = () =>
     props.link.startsWith(BSKY)
-      ? bskyClients.map((client) => ({
-          label: client.label,
-          hostname: client.hostname,
-          link: client.origin + props.link.slice(BSKY.length),
-        }))
+      ? bskyClients.map((client) => {
+          const path = props.link.slice(BSKY.length);
+          return {
+            label: client.label,
+            hostname: client.hostname,
+            link: client.origin + (client.path?.(path) ?? path),
+          };
+        })
       : [];
   const current = (): AppLink =>
     clients().find((client) => client.label === preferredClient()) ?? props;

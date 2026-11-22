@@ -8,6 +8,7 @@ enum App {
   Popfeed,
   GreenGale,
   SonaskyREF,
+  Parfait,
 }
 
 export const appList: Record<AppUrl, App> = {
@@ -23,6 +24,7 @@ export const appList: Record<AppUrl, App> = {
   "reddwarf.app": App.Bluesky,
   "mu.social": App.Bluesky,
   "cope.works": App.Bluesky,
+  "parfait.social": App.Parfait,
   "tangled.org": App.Tangled,
   "pinksea.art": App.Pinksea,
   "blento.app": App.Blento,
@@ -119,5 +121,21 @@ export const appHandleLink: Record<App, (url: string[]) => string> = {
       return `at://${path[1]}/app.sonasky.ref/${path[2]}`;
     }
     return `at://${path[1]}`;
+  },
+  // Bluesky's pages without the /profile prefix: /juliet.paris/post/3abc.
+  [App.Parfait]: (path) => {
+    const parts = path.filter(Boolean).map((part) => decodeURIComponent(part));
+    if (parts[0] === "starter-pack" || parts[0] === "start") {
+      return parts[2]
+        ? `at://${parts[1]}/app.bsky.graph.starterpack/${parts[2]}`
+        : `at://${parts[1]}`;
+    }
+    const [user, type, rkey] = parts;
+    const collection = {
+      post: "app.bsky.feed.post",
+      lists: "app.bsky.graph.list",
+      feed: "app.bsky.feed.generator",
+    }[type];
+    return collection && rkey ? `at://${user}/${collection}/${rkey}` : `at://${user}`;
   },
 };
