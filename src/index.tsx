@@ -60,8 +60,8 @@ render(
         component={LegacySpaceRedirect}
       />
       <Route
-        path="/:pds/:spaceAuthority/space/:spaceType/:skey"
-        matchFilters={{ pds: ["at:"] }}
+        path="/:spaceScheme/:spaceAuthority/:spaceType/:skey"
+        matchFilters={{ spaceScheme: ["at:space"] }}
         component={SpaceRouteLayout}
       >
         <Route path="/" />
@@ -73,6 +73,18 @@ render(
             <Route path="/:rkey" component={SpaceRecordView} />
           </Route>
         </Route>
+      </Route>
+      {/* Space pages used to sit under the form space URIs had earlier in the alpha. */}
+      <Route
+        path="/:pds/:spaceAuthority/space/:spaceType/:skey"
+        matchFilters={{ pds: ["at:"] }}
+        component={LegacySpaceRedirect}
+      >
+        <Route path="/" />
+        <Route path="/:spaceRepo" />
+        <Route path="/:spaceRepo/blob/:cid" />
+        <Route path="/:spaceRepo/:collection" />
+        <Route path="/:spaceRepo/:collection/:rkey" />
       </Route>
       <Route path="/settings" component={Settings} />
       <Route path="/lexicon/:nsid" component={LexiconRedirect} />

@@ -6,7 +6,12 @@ import { timestampFromRkey } from "../../components/repo/record-row.jsx";
 import { nsidDomain, type Stage, StageNav } from "../../components/repo/stage-nav.jsx";
 import { BackLink } from "../../components/ui/back-link.jsx";
 import { localDateFromTimestamp } from "../../lib/format.js";
-import { makeSpaceCollectionPath, makeSpacePath, makeSpaceRepoPath } from "./context.jsx";
+import {
+  makeSpaceCollectionPath,
+  makeSpacePath,
+  makeSpaceRef,
+  makeSpaceRepoPath,
+} from "./context.jsx";
 
 const resolveDidHandle = async (did: string) => {
   try {
@@ -79,7 +84,7 @@ export const SpacesNav = (props: { action?: JSX.Element }) => {
       detail: timestamp === undefined ? undefined : localDateFromTimestamp(timestamp),
       copy: {
         label: "AT URI",
-        value: `at://${authority}/space/${spaceType}/${skey}/${repo}/${collection}/${params.rkey}`,
+        value: `${makeSpaceRef(authority, spaceType, skey)}/${repo}/${collection}/${params.rkey}`,
       },
     });
     return result;

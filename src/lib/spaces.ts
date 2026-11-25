@@ -655,8 +655,14 @@ export const listSpaceMembers = async (
   };
 };
 
+/**
+ * Parses a space reference, `at:space/{authority}/{type}/{skey}`. The form used earlier in the
+ * alpha, `at://{authority}/space/{type}/{skey}`, is read too, since older hosts still return it.
+ */
 export const parseSpaceUri = (uri: string): ParsedSpaceUri | undefined => {
-  const match = /^at:\/\/([^/]+)\/space\/([^/]+)\/([^/]+)$/.exec(uri);
+  const match =
+    /^at:space\/([^/]+)\/([^/]+)\/([^/]+)$/.exec(uri) ??
+    /^at:\/\/([^/]+)\/space\/([^/]+)\/([^/]+)$/.exec(uri);
   if (!match) return;
   return { authority: match[1], type: match[2], skey: match[3] };
 };

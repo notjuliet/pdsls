@@ -371,6 +371,7 @@ export const SpaceRouteLayout = (props: RouteSectionProps) => (
   </SpacesShell>
 );
 
+/** Sends the paths space pages used to have to where they are now. */
 export const LegacySpaceRedirect = () => {
   const params = useParams();
   const location = useLocation();
@@ -379,9 +380,13 @@ export const LegacySpaceRedirect = () => {
   createEffect(() => {
     if (!params.spaceAuthority || !params.spaceType || !params.skey) return;
 
-    const rest = params.spaceRest ? `/${params.spaceRest}` : "";
+    const rest =
+      params.spaceRest ??
+      [params.spaceRepo, ...(params.cid ? ["blob", params.cid] : [params.collection, params.rkey])]
+        .filter(Boolean)
+        .join("/");
     navigate(
-      `${makeSpacePath(params.spaceAuthority, params.spaceType, params.skey)}${rest}${location.search}${location.hash}`,
+      `${makeSpacePath(params.spaceAuthority, params.spaceType, params.skey)}${rest ? `/${rest}` : ""}${location.search}${location.hash}`,
       { replace: true },
     );
   });

@@ -22,8 +22,9 @@ export const useSpaceRecords = () => {
   return state;
 };
 
+/** The space's reference, as the space API takes it. */
 export const makeSpaceRef = (authority: string, type: string, skey: string) =>
-  `at://${authority}/space/${type}/${skey}`;
+  `at:space/${authority}/${type}/${skey}`;
 
 export const makeSpacePath = (authority: string, type: string, skey: string) =>
   `/${makeSpaceRef(authority, type, skey)}`;
