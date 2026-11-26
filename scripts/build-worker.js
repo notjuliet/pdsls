@@ -10,7 +10,7 @@ const wasmSrc = resolve(__dirname, "../node_modules/@takumi-rs/wasm/pkg/takumi_w
 await build({
   entryPoints: ["src/worker.js"],
   bundle: true,
-  outfile: "dist/_worker.js",
+  outfile: "dist-worker/index.js",
   format: "esm",
   platform: "browser",
   target: "es2022",
@@ -18,6 +18,6 @@ await build({
   minify: true,
 });
 
-copyFileSync(wasmSrc, "dist/takumi_wasm_bg.wasm");
+copyFileSync(wasmSrc, "dist-worker/takumi_wasm_bg.wasm");
 
 console.log("Worker built successfully.");

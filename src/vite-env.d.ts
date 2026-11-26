@@ -7,10 +7,9 @@ import type {} from "@atcute/bluesky";
 declare global {
   interface ImportMetaEnv {
     readonly VITE_DEV_SERVER_PORT?: string;
-    readonly VITE_CLIENT_URI: string;
-    readonly VITE_OAUTH_CLIENT_ID: string;
-    readonly VITE_OAUTH_REDIRECT_URL: string;
-    readonly VITE_OAUTH_SCOPE: string;
+    /** Set by the dev server only. */
+    readonly VITE_OAUTH_CLIENT_ID?: string;
+    readonly VITE_OAUTH_REDIRECT_URL?: string;
   }
 
   interface ImportMeta {

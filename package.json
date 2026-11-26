@@ -4,15 +4,12 @@
   "type": "module",
   "scripts": {
     "start": "bun node_modules/vite/bin/vite.js",
-    "predev": "bun scripts/generate-metadata.js",
     "dev": "bun node_modules/vite/bin/vite.js",
-    "prebuild": "bun scripts/generate-metadata.js",
     "build": "bun node_modules/vite/bin/vite.js build && bun scripts/build-worker.js",
-    "pages:build": "bun install --frozen-lockfile && bun run build",
+    "deploy": "bun run build && wrangler deploy",
     "serve": "bun node_modules/vite/bin/vite.js preview",
     "format": "bun node_modules/oxfmt/bin/oxfmt",
     "format:check": "bun node_modules/oxfmt/bin/oxfmt --check",
-    "pretypecheck": "bun scripts/generate-metadata.js",
     "typecheck": "bun node_modules/typescript/bin/tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
@@ -60,7 +57,8 @@
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vite": "^8.3.4",
-    "vite-plugin-solid": "^2.11.14"
+    "vite-plugin-solid": "^2.11.14",
+    "wrangler": "^4.168.0"
   },
   "overrides": {
     "svgo": "4.0.2"

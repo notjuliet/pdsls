@@ -4,6 +4,7 @@ import { render } from "solid-js/web";
 
 import { restoreAfterSignIn } from "./auth/return-to.ts";
 import { Layout } from "./layout.tsx";
+import { restoreAddress } from "./lib/restore-address.ts";
 
 import "./styles/index.css";
 import { AccountLoginView, AccountPermissionsView } from "./views/account.tsx";
@@ -38,6 +39,7 @@ if (isIOS) {
   viewport?.setAttribute("content", `${viewport.getAttribute("content")}, maximum-scale=1`);
 }
 
+restoreAddress();
 restoreAfterSignIn();
 
 render(

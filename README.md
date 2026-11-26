@@ -10,12 +10,11 @@ You will need `bun` to get started:
 bun install              # install deps
 bun run dev              # runs local dev server
 bun run build            # bundles the production app
-bunx wrangler pages dev  # runs worker locally
+bunx wrangler dev         # runs the built site and worker locally
+bun run deploy           # builds and deploys the worker
 ```
 
-Set `APP_DOMAIN` (default: `pdsls.dev`) and `APP_PROTOCOL` (default: `https`) to configure the base URL used in the generated OAuth and OpenSearch metadata files.
-
-Cloudflare Pages builds should use `bun run pages:build` with `dist` as the build output directory.
+The site is one Cloudflare Worker with static assets (`wrangler.toml`). It can be attached to any number of domains: the OAuth client metadata and OpenSearch file are made per request from the domain the site is opened on.
 
 ## Logo
 

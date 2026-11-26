@@ -1,5 +1,11 @@
 import { ImageResponse } from "@takumi-rs/image-response";
 
+import {
+  OAUTH_METADATA_PATH,
+  OPENSEARCH_PATH,
+  oauthClientMetadata,
+  opensearchXml,
+} from "./lib/site-metadata.ts";
 import wasmModule from "./takumi_wasm_bg.wasm";
 
 // Minimal createElement helper — avoids pulling in React
@@ -397,7 +403,7 @@ const STATIC_ROUTES = {
   },
 };
 
-/** Link-preview text for a page. Only the paths in public/_routes.json reach the worker. */
+/** Link-preview text for a page. Only the paths in wrangler.toml's run_worker_first reach the worker. */
 async function resolveOgData(pathname) {
   if (pathname in STATIC_ROUTES) return STATIC_ROUTES[pathname];
 
@@ -677,6 +683,22 @@ export default {
       );
     }
 
+    // These name the site's own address, so each domain gets its own copy.
+    if (url.pathname === OAUTH_METADATA_PATH) {
+      return Response.json(oauthClientMetadata(url.origin), {
+        headers: { "Cache-Control": "public, max-age=300" },
+      });
+    }
+
+    if (url.pathname === OPENSEARCH_PATH) {
+      return new Response(opensearchXml(url.origin), {
+        headers: {
+          "Content-Type": "application/opensearchdescription+xml",
+          "Cache-Control": "public, max-age=3600",
+        },
+      });
+    }
+
     const proxyRoutes = {
       "/resolve-did-web": handleResolveDidWeb,
       "/resolve-handle-dns": handleResolveHandleDns,
@@ -715,7 +737,9 @@ export default {
         new URLSearchParams({ did: ogData.did, collection: ogData.collection, rkey: ogData.rkey })
       : `${url.origin}/atmosphere-card.png`;
 
-    const response = await env.ASSETS.fetch(request);
+    // Always the app's page itself: asked for an at:// path, the asset layer answers with a
+    // redirect to its own encoding of it.
+    const response = await env.ASSETS.fetch(new Request(new URL("/", url), request));
     const contentType = response.headers.get("content-type") ?? "";
     if (!contentType.includes("text/html")) {
       return response;

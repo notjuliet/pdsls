@@ -1,3 +1,29 @@
 name = "pdsls"
-pages_build_output_dir = "dist"
+main = "dist-worker/index.js"
 compatibility_date = "2025-10-30"
+
+[assets]
+directory = "dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+# Only these reach the worker. Everything else is a static file or the app's index.html, which
+# cost no worker requests. Link-preview bots get to /_og/ through a rewrite rule on each zone.
+run_worker_first = [
+  "/_og/*",
+  "/og-image",
+  "/favicon",
+  "/resolve-did-web",
+  "/resolve-handle-dns",
+  "/resolve-handle-http",
+  "/oauth-client-metadata.json",
+  "/opensearch.xml",
+  "/streams",
+  "/jetstream",
+  "/firehose",
+  "/spacedust",
+  "/car",
+  "/settings",
+]
+
+[observability]
+enabled = true

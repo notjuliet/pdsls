@@ -4,8 +4,6 @@ node_modules
 dist
 .env
 .DS_Store
-public/oauth-client-metadata.json
-public/opensearch.xml
-public/_worker.js
+dist-worker
 .wrangler
 .claude
